@@ -1,4 +1,4 @@
-NAME = ft_ls
+NAME = tester
 
 
 #----COLORS----#
@@ -14,27 +14,16 @@ PINK = \033[1;35m
 CYAN = \033[1;36m
 
 
+#----COMPILER----#
+CC = cc
+CCFLAGS += -Wall -Werror -Wextra
+
+
 #----DIRS----#
 BIN_DIR = bin/
 SRC = src/
 INC = inc/
-TEST_DIR = test/
-
-
-#----COMPILER----#
-CC = cc
-CCFLAGS += -Wall -Werror -Wextra
 INCLUDES = -I$(INC)
-
-
-#----LIBFT----#
-LIBFT_DIR = lib/libft/
-LIBFT_LIB = $(LIBFT_DIR)libft.a
-INCLUDES += -I$(LIBFT_DIR)
-
-
-#----MACROS----#
-export GNL_BUFFER_SIZE := 50000
 
 
 #----VPATH----#
@@ -42,7 +31,7 @@ vpath %.c	$(SRC)
 
 
 #----SHARED----#
-SRCS = ft_ls.c
+SRCS = main.c
 
 OBJS = $(SRCS:%.c=$(BIN_DIR)%.o)
 DEPS = $(OBJS:%.o=%.d)
@@ -52,12 +41,11 @@ DEPS = $(OBJS:%.o=%.d)
 #----- R U L E S -----#
 
 all:
-	@$(MAKE) --no-print-directory make_libft
 	@$(MAKE) --no-print-directory $(NAME)
 
-$(NAME): $(LIBFT_LIB) $(OBJS)
+$(NAME): $(OBJS)
 	@printf "$(BLUE)Linking objects and creating program...$(RESET)\n"
-	$(CC) $(CCFLAGS) $(OBJS) $(LIBFT_LIB) -o $(NAME)
+	$(CC) $(CCFLAGS) $(OBJS) -o $(NAME)
 	@echo "$(GREEN)[✓] $(PINK)$(NAME)$(GREEN) created$(RESET)"
 
 $(BIN_DIR)%.o: %.c Makefile
@@ -65,50 +53,26 @@ $(BIN_DIR)%.o: %.c Makefile
 	@mkdir -p $(BIN_DIR)
 	@$(CC) $(CCFLAGS) $(INCLUDES) -MMD -c $< -o $@
 
-clean: libft_clean
+clean:
 	@rm -rf $(BIN_DIR)
 	@echo "$(RED)Binaries deleted$(RESET)\n"
 
-fclean: clean libft_fclean
+fclean: clean
 	@rm -rf $(NAME)
 	@echo "$(RED)Executable deleted$(RESET)\n"
 
 re: fclean all
 
-bonus:
-	$(MAKE) --no-print-directory all
-
-b: bonus
-
-bonusre: fclean bonus
-
-bre: bonusre
-
-test:
-	@$(MAKE) --no-print-directory -C $(TEST_DIR) run
-
-make_libft:
-	@$(MAKE) --no-print-directory -C $(LIBFT_DIR) bonus
-
-libft_clean:
-	@$(MAKE) --no-print-directory -C $(LIBFT_DIR) clean
-
-libft_fclean:
-	@echo "$(RED)Cleaning $(PINK)Libft$(RED)...$(RESET)"
-	@$(MAKE) --no-print-directory -C $(LIBFT_DIR) fclean
+run: all
+	@echo "$(CYAN)Running $(WHITE_BOLD)tests$(CYAN)...$(RESET)\n"
+	@./tester
 
 .PHONY: all \
 		clean \
 		fclean \
 		re \
-		bonus \
-		b \
-		bonusre \
-		bre \
-		test \
-		make_libft \
-		libft_clean \
-		libft_fclean \
+		run
+
 
 -include $(DEPS)
 -include $(MDEPS)
