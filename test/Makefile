@@ -16,22 +16,45 @@ CYAN = \033[1;36m
 
 #----COMPILER----#
 CC = cc
-CCFLAGS += -Wall -Werror -Wextra
+CCFLAGS += -Wall -Wextra -Werror
 
 
 #----DIRS----#
 BIN_DIR = bin/
 SRC = src/
 INC = inc/
-INCLUDES = -I$(INC)
+SUITES_DIR = $(SRC)/suites
+
+
+#----CUNIT----#
+FRAMEWORKS_DIR = $(CURDIR)/frameworks
+CUNIT_DIR = $(FRAMEWORKS_DIR)/CUnit
+CUNIT_ROOT = $(CUNIT_DIR)/CUnit
+CUNIT_BUILD_DIR = $(CUNIT_DIR)/build
+CUNIT_LIB = $(CUNIT_BUILD_DIR)/libcunit.a
+
+
+#----ROOT PROJ----#
+ROOT_DIR = ..
+ROOT_INC = $(ROOT_DIR)/inc
+LIBFT_DIR = $(ROOT_DIR)/lib/libft
+LIBFT_LIB = $(LIBFT_DIR)/libft.a
+
+
+#----INCLUDES----#
+INCLUDES = -I$(INC) -I$(ROOT_INC) -I$(LIBFT_DIR) -I$(CUNIT_ROOT)
+LDFLAGS = $(LIBFT_LIB)
 
 
 #----VPATH----#
-vpath %.c	$(SRC)
+vpath %.c	$(SRC) \
+			$(SUITES_DIR)
 
 
 #----SHARED----#
-SRCS = main.c
+SRCS = main.c \
+		math_suite.c \
+		string_suite.c
 
 OBJS = $(SRCS:%.c=$(BIN_DIR)%.o)
 DEPS = $(OBJS:%.o=%.d)
@@ -40,26 +63,37 @@ DEPS = $(OBJS:%.o=%.d)
 
 #----- R U L E S -----#
 
-all:
-	@$(MAKE) --no-print-directory $(NAME)
+all: setup-cunit $(CUNIT_LIB) $(NAME)
 
-$(NAME): $(OBJS)
-	@printf "$(BLUE)Linking objects and creating program...$(RESET)\n"
-	$(CC) $(CCFLAGS) $(OBJS) -o $(NAME)
+$(NAME): $(OBJS) $(CUNIT_LIB)
+	@printf "$(BLUE)Linking objects and creating tester...$(RESET)\n"
+	@$(CC) $(CCFLAGS) $(OBJS) $(CUNIT_LIB) $(LDFLAGS) -lm -o $(NAME)
 	@echo "$(GREEN)[✓] $(PINK)$(NAME)$(GREEN) created$(RESET)"
 
 $(BIN_DIR)%.o: %.c Makefile
-	@printf "$(CYAN)Compiling: $(PINK)$(notdir $<)...$(RESET)\n"
+	@printf "$(CYAN)Compiling test: $(PINK)$(notdir $<)...$(RESET)\n"
 	@mkdir -p $(BIN_DIR)
 	@$(CC) $(CCFLAGS) $(INCLUDES) -MMD -c $< -o $@
 
+$(CUNIT_LIB): $(CUNIT_ROOT)/CMakeLists.txt
+	@printf "$(CYAN)Configuring CUnit with CMake...$(RESET)\n"
+	@cmake -S $(CUNIT_ROOT) -Wno-dev -B $(CUNIT_BUILD_DIR) -DCUNIT_DISABLE_TESTS=ON -DCUNIT_DISABLE_EXAMPLES=ON -DCUNIT_CMAKE_INSTALL=no 2>&1 >/dev/null
+	@printf "$(CYAN)Building CUnit library...$(RESET)\n"
+	@cmake --build $(CUNIT_BUILD_DIR) --target cunit --parallel >/dev/null
+
+setup-cunit:
+	@if [ ! -d "$(FRAMEWORKS_DIR)/CUnit" ]; then \
+		git clone --depth 1 https://gitlab.com/cunity/cunit.git $(FRAMEWORKS_DIR)/CUnit >/dev/null || exit 1; \
+	fi
+
 clean:
-	@rm -rf $(BIN_DIR)
-	@echo "$(RED)Binaries deleted$(RESET)\n"
+	@rm -rf $(BIN_DIR) $(CUNIT_BUILD_DIR)
+	@echo "$(RED)Test binaries deleted$(RESET)\n"
 
 fclean: clean
-	@rm -rf $(NAME)
-	@echo "$(RED)Executable deleted$(RESET)\n"
+	@rm -f $(NAME)
+	@rm -rf $(CUNIT_DIR)
+	@echo "$(RED)Tester deleted$(RESET)\n"
 
 re: fclean all
 
@@ -68,13 +102,12 @@ run: all
 	@./tester
 
 .PHONY: all \
-		clean \
-		fclean \
-		re \
-		run
-
+	clean \
+	fclean \
+	re \
+	run \
+	setup-cunit
 
 -include $(DEPS)
--include $(MDEPS)
--include $(BDEPS)
+
 .SILENT:

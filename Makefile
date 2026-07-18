@@ -65,11 +65,11 @@ $(BIN_DIR)%.o: %.c Makefile
 	@mkdir -p $(BIN_DIR)
 	@$(CC) $(CCFLAGS) $(INCLUDES) -MMD -c $< -o $@
 
-clean: libft_clean
+clean: libft_clean test_clean
 	@rm -rf $(BIN_DIR)
 	@echo "$(RED)Binaries deleted$(RESET)\n"
 
-fclean: clean libft_fclean
+fclean: clean libft_fclean test_fclean
 	@rm -rf $(NAME)
 	@echo "$(RED)Executable deleted$(RESET)\n"
 
@@ -84,8 +84,14 @@ bonusre: fclean bonus
 
 bre: bonusre
 
-test:
+test: make_libft
 	@$(MAKE) --no-print-directory -C $(TEST_DIR) run
+
+test_clean:
+	@$(MAKE) --no-print-directory -C $(TEST_DIR) clean
+
+test_fclean:
+	@$(MAKE) --no-print-directory -C $(TEST_DIR) fclean
 
 make_libft:
 	@$(MAKE) --no-print-directory -C $(LIBFT_DIR) bonus
@@ -106,11 +112,12 @@ libft_fclean:
 		bonusre \
 		bre \
 		test \
+		test_clean \
+		test_fclean \
 		make_libft \
 		libft_clean \
 		libft_fclean \
 
 -include $(DEPS)
--include $(MDEPS)
--include $(BDEPS)
+
 .SILENT:
