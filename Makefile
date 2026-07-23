@@ -28,7 +28,7 @@ INCLUDES = -I$(INC)
 
 
 #----LIBFT----#
-LIBFT_DIR = lib/libft/
+LIBFT_DIR = libft/
 LIBFT_LIB = $(LIBFT_DIR)libft.a
 INCLUDES += -I$(LIBFT_DIR)
 

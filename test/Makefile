@@ -37,7 +37,7 @@ CUNIT_LIB = $(CUNIT_BUILD_DIR)/libcunit.a
 #----ROOT PROJ----#
 ROOT_DIR = ..
 ROOT_INC = $(ROOT_DIR)/inc
-LIBFT_DIR = $(ROOT_DIR)/lib/libft
+LIBFT_DIR = $(ROOT_DIR)/libft
 LIBFT_LIB = $(LIBFT_DIR)/libft.a
 
 
