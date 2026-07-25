@@ -1,6 +1,5 @@
 #include "CUnit/CUnit.h"
 #include "CUnit/Basic.h"
-
 #include "scanner.h"
 
 #define SUITE_NAME "scanner"
@@ -42,12 +41,7 @@ static void should_return_one_entry_if_the_current_directory_has_one_file(void)
 {
     scan_directory(".");
 
-    int count = 0;
-    for (t_file_data *ptr = file_data; ptr != NULL; ptr = file_data_get_next(ptr))
-    {
-        count++;
-    }
-    CU_ASSERT_EQUAL(count, 0);
+    CU_ASSERT_EQUAL(file_data_get_length(file_data), 0);
     CU_ASSERT_STRING_EQUAL(file_data_get_name(file_data), "file");
 }
 
