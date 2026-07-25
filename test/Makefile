@@ -16,7 +16,7 @@ CYAN = \033[1;36m
 
 #----COMPILER----#
 CC = cc
-CCFLAGS += -Wall -Wextra -Werror
+CCFLAGS += -Wall -Wextra -Werror -fsanitize=address
 
 
 #----DIRS----#
@@ -36,6 +36,7 @@ CUNIT_LIB = $(CUNIT_BUILD_DIR)/libcunit.a
 
 #----ROOT PROJ----#
 ROOT_DIR = ..
+ROOT_SRC = $(ROOT_DIR)/src
 ROOT_INC = $(ROOT_DIR)/inc
 LIBFT_DIR = $(ROOT_DIR)/libft
 LIBFT_LIB = $(LIBFT_DIR)/libft.a
@@ -47,14 +48,16 @@ LDFLAGS = $(LIBFT_LIB)
 
 
 #----VPATH----#
-vpath %.c	$(SRC) \
-			$(SUITES_DIR)
+vpath %.c	$(SRC):\
+			$(SUITES_DIR):\
+			$(ROOT_SRC)/file_data
+
 
 
 #----SHARED----#
 SRCS = main.c \
-		math_suite.c \
-		string_suite.c
+		file_data.c \
+		file_data_suite.c
 
 OBJS = $(SRCS:%.c=$(BIN_DIR)%.o)
 DEPS = $(OBJS:%.o=%.d)

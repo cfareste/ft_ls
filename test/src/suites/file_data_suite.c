@@ -1,3 +1,5 @@
+#include <stdlib.h>
+
 #include "file_data.h"
 
 #include "CUnit/CUnit.h"
@@ -5,9 +7,13 @@
 
 #define SUITE_NAME "file_data"
 
-static void x(void)
+static void should_be_created_correctly(void)
 {
-    CU_ASSERT_TRUE(1);
+    t_file_data *file_data = file_data_create();
+
+    CU_ASSERT_PTR_NOT_NULL(file_data);
+
+    free(file_data);
 }
 
 void register_file_data_suite(void)
@@ -16,6 +22,6 @@ void register_file_data_suite(void)
 
     if (suite != NULL)
     {
-        CU_add_test(suite, "x", x);
+        CU_add_test(suite, "should_be_created_correctly", should_be_created_correctly);
     }
 }
