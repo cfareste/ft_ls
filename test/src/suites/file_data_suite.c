@@ -1,5 +1,3 @@
-#include <stdlib.h>
-
 #include "file_data.h"
 
 #include "CUnit/CUnit.h"
@@ -13,7 +11,7 @@ static void should_be_created_correctly(void)
 
     CU_ASSERT_PTR_NOT_NULL(file_data);
 
-    free(file_data);
+    file_data_destroy(&file_data);
 }
 
 static void should_be_destroyed_correctly(void)
