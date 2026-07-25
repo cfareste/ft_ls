@@ -12,25 +12,30 @@ static void scan_directory(const char *path)
     file_data = scan(path);
 }
 
+static void assertFileDataIsNull()
+{
+    CU_ASSERT_PTR_NULL(file_data);
+}
+
 static void should_return_NULL_if_a_NULL_path_is_specified(void)
 {
     scan_directory(NULL);
 
-    CU_ASSERT_PTR_NULL(file_data);
+    assertFileDataIsNull();
 }
 
 static void should_return_NULL_if_an_empty_path_is_specified(void)
 {
     scan_directory("");
 
-    CU_ASSERT_PTR_NULL(file_data);
+    assertFileDataIsNull();
 }
 
 static void should_return_NULL_if_the_current_directory_is_empty(void)
 {
     scan_directory(".");
 
-    CU_ASSERT_PTR_NULL(file_data);
+    assertFileDataIsNull();
 }
 
 void register_scanner_suite(void)
