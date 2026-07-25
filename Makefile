@@ -39,11 +39,13 @@ export GNL_BUFFER_SIZE := 50000
 
 #----VPATH----#
 vpath %.c	$(SRC):\
-			$(SRC)/file_data
+			$(SRC)/file_data:\
+			$(SRC)/scanner
 
 #----SHARED----#
 SRCS = ft_ls.c \
-		file_data.c
+		file_data.c \
+		scanner.c
 
 OBJS = $(SRCS:%.c=$(BIN_DIR)%.o)
 DEPS = $(OBJS:%.o=%.d)
