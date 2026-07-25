@@ -16,6 +16,15 @@ static void should_be_created_correctly(void)
     free(file_data);
 }
 
+static void should_be_destroyed_correctly(void)
+{
+    t_file_data *file_data = file_data_create();
+
+    file_data_destroy(&file_data);
+
+    CU_ASSERT_PTR_NULL(file_data);
+}
+
 void register_file_data_suite(void)
 {
     const CU_pSuite suite = CU_add_suite(SUITE_NAME, NULL, NULL);
@@ -23,5 +32,6 @@ void register_file_data_suite(void)
     if (suite != NULL)
     {
         CU_add_test(suite, "should_be_created_correctly", should_be_created_correctly);
+        CU_add_test(suite, "should_be_destroyed_correctly", should_be_destroyed_correctly);
     }
 }
