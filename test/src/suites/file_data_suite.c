@@ -5,9 +5,11 @@
 
 #define SUITE_NAME "file_data"
 
+static t_file_data *file_data;
+
 static void should_be_created_correctly(void)
 {
-    t_file_data *file_data = file_data_create();
+    file_data = file_data_create();
 
     CU_ASSERT_PTR_NOT_NULL(file_data);
 
@@ -16,7 +18,7 @@ static void should_be_created_correctly(void)
 
 static void should_be_destroyed_correctly(void)
 {
-    t_file_data *file_data = file_data_create();
+    file_data = file_data_create();
 
     file_data_destroy(&file_data);
 
@@ -25,7 +27,7 @@ static void should_be_destroyed_correctly(void)
 
 static void should_return_the_correct_length(void)
 {
-    t_file_data *file_data = file_data_create();
+    file_data = file_data_create();
     t_file_data *file_data_second = file_data_create();
     t_file_data *file_data_third = file_data_create();
 
