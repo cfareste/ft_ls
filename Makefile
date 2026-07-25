@@ -45,7 +45,7 @@ vpath %.c	$(SRC):\
 
 #----SHARED----#
 SRCS = ft_ls.c \
-		opendir_adapter.c \
+		dirent_adapter.c \
 		file_data.c \
 		scanner.c
 

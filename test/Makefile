@@ -59,7 +59,7 @@ vpath %.c	$(SRC):\
 
 #----SHARED----#
 SRCS = main.c \
-		opendir_mock.c \
+		dirent_mock.c \
 		file_data.c \
 		file_data_suite.c \
 		scanner.c \

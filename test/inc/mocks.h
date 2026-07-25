@@ -1,6 +1,6 @@
 #pragma once
 
-#include <dirent.h>
+typedef struct DIR DIR;
 
 typedef enum e_failure_type
 {
