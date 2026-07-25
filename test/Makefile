@@ -50,14 +50,17 @@ LDFLAGS = $(LIBFT_LIB)
 #----VPATH----#
 vpath %.c	$(SRC):\
 			$(SUITES_DIR):\
-			$(ROOT_SRC)/file_data
+			$(ROOT_SRC)/file_data:\
+			$(ROOT_SRC)/scanner
 
 
 
 #----SHARED----#
 SRCS = main.c \
 		file_data.c \
-		file_data_suite.c
+		file_data_suite.c \
+		scanner.c \
+		scanner_suite.c
 
 OBJS = $(SRCS:%.c=$(BIN_DIR)%.o)
 DEPS = $(OBJS:%.o=%.d)
