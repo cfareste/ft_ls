@@ -23,7 +23,7 @@ TEST_DIR = test/
 
 #----COMPILER----#
 CC = cc
-CCFLAGS += -Wall -Werror -Wextra
+CCFLAGS += -Wall -Werror -Wextra -fsanitize=address
 INCLUDES = -I$(INC)
 
 
@@ -38,11 +38,12 @@ export GNL_BUFFER_SIZE := 50000
 
 
 #----VPATH----#
-vpath %.c	$(SRC)
-
+vpath %.c	$(SRC):\
+			$(SRC)/file_data
 
 #----SHARED----#
-SRCS = ft_ls.c
+SRCS = ft_ls.c \
+		file_data.c
 
 OBJS = $(SRCS:%.c=$(BIN_DIR)%.o)
 DEPS = $(OBJS:%.o=%.d)
