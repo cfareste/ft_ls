@@ -23,6 +23,22 @@ static void should_be_destroyed_correctly(void)
     CU_ASSERT_PTR_NULL(file_data);
 }
 
+static void should_return_the_correct_length(void)
+{
+    t_file_data *file_data = file_data_create();
+    t_file_data *file_data_second = file_data_create();
+    t_file_data *file_data_third = file_data_create();
+
+    file_data_add_entry(file_data, file_data_second);
+    file_data_add_entry(file_data, file_data_third);
+
+    CU_ASSERT_EQUAL(file_data_get_length(file_data), 3);
+
+    file_data_destroy(&file_data);
+    file_data_destroy(&file_data_second);
+    file_data_destroy(&file_data_third);
+}
+
 void register_file_data_suite(void)
 {
     const CU_pSuite suite = CU_add_suite(SUITE_NAME, NULL, NULL);
@@ -31,5 +47,6 @@ void register_file_data_suite(void)
     {
         CU_add_test(suite, "should_be_created_correctly", should_be_created_correctly);
         CU_add_test(suite, "should_be_destroyed_correctly", should_be_destroyed_correctly);
+        CU_add_test(suite, "should_return_the_correct_length", should_return_the_correct_length);
     }
 }
