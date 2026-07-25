@@ -1,13 +1,11 @@
 #include <stdlib.h>
+#include <string.h>
 
-#include "libft.h"
 #include "mocks.h"
-
-typedef struct DIR {} DIR;
-struct dirent {};
 
 t_failure_type g_opendir_fail = NO_FAILURE;
 t_failure_type g_readdir_fail = NO_FAILURE;
+static char g_dirent_name[256] = "";
 
 DIR *opendir_adapter(const char *path)
 {
@@ -17,7 +15,7 @@ DIR *opendir_adapter(const char *path)
         return NULL;
     }
 
-    DIR *dir = ft_calloc(1, sizeof(DIR));
+    DIR *dir = calloc(1, sizeof(DIR));
     return dir;
 }
 
@@ -29,6 +27,13 @@ struct dirent *readdir_adapter(DIR *dir)
         return NULL;
     }
 
-    struct dirent *dirent = ft_calloc(1, sizeof(struct dirent));
+    struct dirent *dirent = calloc(1, sizeof(struct dirent));
+    strlcpy(dirent->d_name, g_dirent_name, sizeof(dirent->d_name));
+
     return dirent;
+}
+
+void affirm_readdir_will_return_a_file_named(const char *path)
+{
+    strlcpy(g_dirent_name, path, sizeof(g_dirent_name));
 }
