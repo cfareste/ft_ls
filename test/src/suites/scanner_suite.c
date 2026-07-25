@@ -5,23 +5,25 @@
 
 #define SUITE_NAME "scanner"
 
+static t_file_data *file_data;
+
 static void should_return_NULL_if_a_NULL_path_is_specified(void)
 {
-    const t_file_data *file_data = scan(NULL);
+    file_data = scan(NULL);
 
     CU_ASSERT_PTR_NULL(file_data);
 }
 
 static void should_return_NULL_if_an_empty_path_is_specified(void)
 {
-    const t_file_data *file_data = scan("");
+    file_data = scan("");
 
     CU_ASSERT_PTR_NULL(file_data);
 }
 
 static void should_return_NULL_if_the_current_directory_is_empty(void)
 {
-    const t_file_data *file_data = scan(".");
+    file_data = scan(".");
 
     CU_ASSERT_PTR_NULL(file_data);
 }
