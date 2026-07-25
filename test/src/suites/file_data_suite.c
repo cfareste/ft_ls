@@ -7,9 +7,14 @@
 
 static t_file_data *file_data;
 
-static void should_be_created_correctly(void)
+static void initialize_file_data()
 {
     file_data = file_data_create();
+}
+
+static void should_be_created_correctly(void)
+{
+    initialize_file_data();
 
     CU_ASSERT_PTR_NOT_NULL(file_data);
 
@@ -18,7 +23,7 @@ static void should_be_created_correctly(void)
 
 static void should_be_destroyed_correctly(void)
 {
-    file_data = file_data_create();
+    initialize_file_data();
 
     file_data_destroy(&file_data);
 
@@ -27,7 +32,7 @@ static void should_be_destroyed_correctly(void)
 
 static void should_return_the_correct_length(void)
 {
-    file_data = file_data_create();
+    initialize_file_data();
     t_file_data *file_data_second = file_data_create();
     t_file_data *file_data_third = file_data_create();
 
