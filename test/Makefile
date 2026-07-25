@@ -24,6 +24,7 @@ BIN_DIR = bin/
 SRC = src/
 INC = inc/
 SUITES_DIR = $(SRC)/suites
+MOCKS_DIR = $(SRC)/mocks
 
 
 #----CUNIT----#
@@ -50,6 +51,7 @@ LDFLAGS = $(LIBFT_LIB)
 #----VPATH----#
 vpath %.c	$(SRC):\
 			$(SUITES_DIR):\
+			$(MOCKS_DIR):\
 			$(ROOT_SRC)/file_data:\
 			$(ROOT_SRC)/scanner
 
@@ -57,6 +59,7 @@ vpath %.c	$(SRC):\
 
 #----SHARED----#
 SRCS = main.c \
+		opendir_mock.c \
 		file_data.c \
 		file_data_suite.c \
 		scanner.c \
