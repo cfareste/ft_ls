@@ -39,11 +39,13 @@ export GNL_BUFFER_SIZE := 50000
 
 #----VPATH----#
 vpath %.c	$(SRC):\
+			$(SRC)/os_adapter:\
 			$(SRC)/file_data:\
 			$(SRC)/scanner
 
 #----SHARED----#
 SRCS = ft_ls.c \
+		opendir_adapter.c \
 		file_data.c \
 		scanner.c
 
