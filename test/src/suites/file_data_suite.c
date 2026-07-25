@@ -12,20 +12,25 @@ static void initialize_file_data()
     file_data = file_data_create();
 }
 
+static void cleanup_file_data()
+{
+    file_data_destroy(&file_data);
+}
+
 static void should_be_created_correctly(void)
 {
     initialize_file_data();
 
     CU_ASSERT_PTR_NOT_NULL(file_data);
 
-    file_data_destroy(&file_data);
+    cleanup_file_data();
 }
 
 static void should_be_destroyed_correctly(void)
 {
     initialize_file_data();
 
-    file_data_destroy(&file_data);
+    cleanup_file_data();
 
     CU_ASSERT_PTR_NULL(file_data);
 }
@@ -41,7 +46,7 @@ static void should_return_the_correct_length(void)
 
     CU_ASSERT_EQUAL(file_data_get_length(file_data), 3);
 
-    file_data_destroy(&file_data);
+    cleanup_file_data();
     file_data_destroy(&file_data_second);
     file_data_destroy(&file_data_third);
 }
