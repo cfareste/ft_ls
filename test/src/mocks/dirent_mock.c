@@ -15,7 +15,6 @@ struct dir_stream
 
 short g_opendir_fail = 0;
 short g_readdir_fail = 0;
-short g_closedir_fail = 0;
 static char g_dirent_name[256] = "";
 static unsigned int g_dirent_entry_num = 0;
 static unsigned int g_total_dirent_entries = 0;
@@ -65,11 +64,6 @@ t_dir_entry *readdir_adapter(t_dir_stream *dir)
 
 int closedir_adapter(t_dir_stream **dir_stream)
 {
-    if (g_closedir_fail == 1)
-    {
-        return -1;
-    }
-
     free(*dir_stream);
     return 0;
 }
