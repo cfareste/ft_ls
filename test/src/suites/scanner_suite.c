@@ -35,6 +35,7 @@ static void should_return_NULL_if_an_empty_path_is_specified(void)
 static void should_return_NULL_if_the_current_directory_is_empty(void)
 {
     reset_readdir_affirmations();
+
     scan_directory(".");
 
     assertFileDataIsNull();
@@ -44,10 +45,30 @@ static void should_return_one_entry_if_the_current_directory_has_one_file(void)
 {
     reset_readdir_affirmations();
     affirm_readdir_will_return_a_file_named("file");
+
     scan_directory(".");
 
     CU_ASSERT_EQUAL(file_data_get_length(file_data), 1);
     CU_ASSERT_STRING_EQUAL(file_data_get_name(file_data), "file");
+
+    file_data_destroy(&file_data);
+}
+
+static void should_return_multiple_entries_if_the_current_directory_has_more_than_one_file(void)
+{
+    reset_readdir_affirmations();
+    affirm_readdir_will_return_N_files_named("multiple", 3);
+
+    scan_directory(".");
+    const t_file_data *file_data_second = file_data_get_next(file_data);
+    const t_file_data *file_data_third = file_data_get_next(file_data_second);
+
+    CU_ASSERT_EQUAL(file_data_get_length(file_data), 3);
+    CU_ASSERT_STRING_EQUAL(file_data_get_name(file_data), "multiple");
+    CU_ASSERT_STRING_EQUAL(file_data_get_name(file_data_second), "multiple2");
+    CU_ASSERT_STRING_EQUAL(file_data_get_name(file_data_third), "multiple3");
+
+    file_data_destroy(&file_data);
 }
 
 void register_scanner_suite(void)
@@ -60,5 +81,6 @@ void register_scanner_suite(void)
         CU_add_test(suite, "should_return_NULL_if_an_empty_path_is_specified", should_return_NULL_if_an_empty_path_is_specified);
         CU_add_test(suite, "should_return_NULL_if_the_current_directory_is_empty", should_return_NULL_if_the_current_directory_is_empty);
         CU_add_test(suite, "should_return_one_entry_if_the_current_directory_has_one_file", should_return_one_entry_if_the_current_directory_has_one_file);
+        CU_add_test(suite, "should_return_multiple_entries_if_the_current_directory_has_more_than_one_file", should_return_multiple_entries_if_the_current_directory_has_more_than_one_file);
     }
 }
