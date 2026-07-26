@@ -84,6 +84,19 @@ static void should_return_NULL_if_fails_to_open_a_directory(void)
     file_data_destroy(&file_data);
 }
 
+static void should_return_NULL_if_fails_to_read_a_directory(void)
+{
+    reset_readdir_affirmations();
+    g_opendir_fail = 0;
+    g_readdir_fail = 1;
+
+    scan_directory(".");
+
+    assertFileDataIsNull();
+
+    file_data_destroy(&file_data);
+}
+
 void register_scanner_suite(void)
 {
     const CU_pSuite suite = CU_add_suite(SUITE_NAME, NULL, NULL);
@@ -96,5 +109,6 @@ void register_scanner_suite(void)
         CU_add_test(suite, "should_return_one_entry_if_the_current_directory_has_one_file", should_return_one_entry_if_the_current_directory_has_one_file);
         CU_add_test(suite, "should_return_multiple_entries_if_the_current_directory_has_more_than_one_file", should_return_multiple_entries_if_the_current_directory_has_more_than_one_file);
         CU_add_test(suite, "should_return_NULL_if_fails_to_open_a_directory", should_return_NULL_if_fails_to_open_a_directory);
+        CU_add_test(suite, "should_return_NULL_if_fails_to_read_a_directory", should_return_NULL_if_fails_to_read_a_directory);
     }
 }
