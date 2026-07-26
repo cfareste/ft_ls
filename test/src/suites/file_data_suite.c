@@ -38,17 +38,12 @@ static void should_be_destroyed_correctly(void)
 static void should_return_the_correct_length(void)
 {
     initialize_file_data();
-    t_file_data *file_data_second = file_data_create();
-    t_file_data *file_data_third = file_data_create();
-
-    file_data_add_entry(file_data, file_data_second);
-    file_data_add_entry(file_data, file_data_third);
+    file_data_add_entry(&file_data, file_data_create());
+    file_data_add_entry(&file_data, file_data_create());
 
     CU_ASSERT_EQUAL(file_data_get_length(file_data), 3);
 
     cleanup_file_data();
-    file_data_destroy(&file_data_second);
-    file_data_destroy(&file_data_third);
 }
 
 void register_file_data_suite(void)
