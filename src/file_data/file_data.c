@@ -3,6 +3,7 @@
 
 
 struct s_file_data {
+    char *name;
     t_file_data *next;
 };
 
@@ -20,6 +21,7 @@ void file_data_destroy(t_file_data **_file_data)
     t_file_data *temp = to_free->next;
     do
     {
+        free(to_free->name);
         free(to_free);
         to_free = temp;
         if (temp != NULL)
@@ -27,6 +29,23 @@ void file_data_destroy(t_file_data **_file_data)
     } while (to_free != NULL);
 
     *_file_data = NULL;
+}
+
+const char *file_data_get_name(const t_file_data *_file_data)
+{
+    if (_file_data == NULL)
+        return NULL;
+
+    return _file_data->name;
+}
+
+void file_data_set_name(t_file_data *_file_data, const char *_name)
+{
+    if (_file_data == NULL)
+        return;
+
+    free(_file_data->name);
+    _file_data->name = ft_strdup(_name);
 }
 
 void file_data_add_entry(t_file_data **_file_data, t_file_data *_next)
