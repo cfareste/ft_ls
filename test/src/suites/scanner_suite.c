@@ -44,7 +44,7 @@ static void should_return_one_entry_if_the_current_directory_has_one_file(void)
     affirm_readdir_will_return_a_file_named("file");
     scan_directory(".");
 
-    CU_ASSERT_EQUAL(file_data_get_length(file_data), 0);
+    CU_ASSERT_EQUAL(file_data_get_length(file_data), 1);
     CU_ASSERT_STRING_EQUAL(file_data_get_name(file_data), "file");
 }
 
