@@ -48,6 +48,14 @@ void file_data_set_name(t_file_data *_file_data, const char *_name)
     _file_data->name = ft_strdup(_name);
 }
 
+t_file_data *file_data_get_next(const t_file_data *_file_data)
+{
+    if (_file_data == NULL)
+        return NULL;
+
+    return _file_data->next;
+}
+
 void file_data_add_entry(t_file_data **_file_data, t_file_data *_next)
 {
     if (_file_data == NULL)
