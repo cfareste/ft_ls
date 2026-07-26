@@ -4,6 +4,7 @@
 
 t_failure_type g_opendir_fail = NO_FAILURE;
 t_failure_type g_readdir_fail = NO_FAILURE;
+t_failure_type g_closedir_fail = NO_FAILURE;
 static char g_dirent_name[256] = "";
 static unsigned int g_dirent_entry_num = 0;
 static unsigned int g_total_dirent_entries = 0;
@@ -58,6 +59,17 @@ struct dirent *readdir_adapter(DIR *dir)
     free(file_name);
 
     return &dir->entry;
+}
+
+int closedir_adapter(DIR *dir)
+{
+    if (g_closedir_fail != NO_FAILURE)
+    {
+        return -1;
+    }
+
+    free(dir);
+    return 0;
 }
 
 //TODO: Change how the name file name is computed as it makes the tests fragile (we depend on fileX)
