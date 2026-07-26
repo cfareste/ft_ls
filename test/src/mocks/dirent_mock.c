@@ -13,9 +13,9 @@ struct dir_stream
     t_dir_entry entry;
 };
 
-t_failure_type g_opendir_fail = NO_FAILURE;
-t_failure_type g_readdir_fail = NO_FAILURE;
-t_failure_type g_closedir_fail = NO_FAILURE;
+short g_opendir_fail = 0;
+short g_readdir_fail = 0;
+short g_closedir_fail = 0;
 static char g_dirent_name[256] = "";
 static unsigned int g_dirent_entry_num = 0;
 static unsigned int g_total_dirent_entries = 0;
@@ -38,7 +38,7 @@ static char *get_file_name()
 t_dir_stream *opendir_adapter(const char *path)
 {
     (void) path;
-    if (g_opendir_fail != NO_FAILURE)
+    if (g_opendir_fail == 1)
     {
         return NULL;
     }
@@ -50,12 +50,7 @@ t_dir_stream *opendir_adapter(const char *path)
 
 t_dir_entry *readdir_adapter(t_dir_stream *dir)
 {
-    if (g_readdir_fail != NO_FAILURE)
-    {
-        return NULL;
-    }
-
-    if (g_total_dirent_entries == 0 || g_dirent_entry_num > g_total_dirent_entries)
+    if (g_readdir_fail == 1 || g_total_dirent_entries == 0 || g_dirent_entry_num > g_total_dirent_entries)
     {
         return NULL;
     }
@@ -70,7 +65,7 @@ t_dir_entry *readdir_adapter(t_dir_stream *dir)
 
 int closedir_adapter(t_dir_stream **dir_stream)
 {
-    if (g_closedir_fail != NO_FAILURE)
+    if (g_closedir_fail == 1)
     {
         return -1;
     }
