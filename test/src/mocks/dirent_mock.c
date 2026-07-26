@@ -1,6 +1,17 @@
 #include "libft.h"
 #include "ft_printf.h"
 #include "mocks.h"
+#include "os_adapter.h"
+
+struct dir_entry
+{
+    char d_name[256];
+};
+
+struct dir_stream
+{
+    t_dir_entry entry;
+};
 
 t_failure_type g_opendir_fail = NO_FAILURE;
 t_failure_type g_readdir_fail = NO_FAILURE;
@@ -24,7 +35,7 @@ static char *get_file_name()
     return file_name;
 }
 
-DIR *opendir_adapter(const char *path)
+t_dir_stream *opendir_adapter(const char *path)
 {
     (void) path;
     if (g_opendir_fail != NO_FAILURE)
@@ -32,7 +43,7 @@ DIR *opendir_adapter(const char *path)
         return NULL;
     }
 
-    DIR *dir = ft_calloc(1, sizeof(DIR));
+    t_dir_stream *dir = ft_calloc(1, sizeof(t_dir_stream));
     g_dirent_name[0] = '\0';
     g_dirent_entry_num = 0;
     g_total_dirent_entries = 0;
@@ -40,7 +51,7 @@ DIR *opendir_adapter(const char *path)
     return dir;
 }
 
-struct dirent *readdir_adapter(DIR *dir)
+const t_dir_entry *readdir_adapter(t_dir_stream *dir)
 {
     if (g_readdir_fail != NO_FAILURE)
     {
@@ -52,7 +63,6 @@ struct dirent *readdir_adapter(DIR *dir)
         return NULL;
     }
 
-
     char *file_name = get_file_name();
     ft_strlcpy(dir->entry.d_name, file_name, sizeof(dir->entry.d_name));
     g_dirent_entry_num++;
@@ -61,15 +71,20 @@ struct dirent *readdir_adapter(DIR *dir)
     return &dir->entry;
 }
 
-int closedir_adapter(DIR *dir)
+int closedir_adapter(t_dir_stream **dir_stream)
 {
     if (g_closedir_fail != NO_FAILURE)
     {
         return -1;
     }
 
-    free(dir);
+    free(*dir_stream);
     return 0;
+}
+
+const char *dir_entry_get_name(const t_dir_entry *dir_entry)
+{
+    return dir_entry->d_name;
 }
 
 //TODO: Change how the name file name is computed as it makes the tests fragile (we depend on fileX)

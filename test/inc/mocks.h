@@ -1,15 +1,5 @@
 #pragma once
 
-struct dirent
-{
-    char d_name[256];
-};
-
-typedef struct DIR
-{
-    struct dirent entry;
-} DIR;
-
 typedef enum e_failure_type
 {
     NO_FAILURE = 0

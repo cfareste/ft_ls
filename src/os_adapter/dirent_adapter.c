@@ -1,6 +1,49 @@
+#include <dirent.h>
+
+#include "libft.h"
 #include "os_adapter.h"
 
-DIR *opendir_adapter(const char *path)
+struct dir_stream
 {
-    return opendir(path);
+    DIR *dir;
+};
+
+struct dir_entry
+{
+    struct dirent *entry;
+};
+
+t_dir_stream *opendir_adapter(const char *path)
+{
+    t_dir_stream *dir_stream = ft_calloc(1, sizeof(t_dir_stream));
+
+    dir_stream->dir = opendir(path);
+
+    return dir_stream;
+}
+
+const t_dir_entry *readdir_adapter(t_dir_stream *dir)
+{
+    t_dir_entry *dir_entry = ft_calloc(1, sizeof(t_dir_entry));
+
+    dir_entry->entry = readdir(dir->dir);
+
+    return dir_entry;
+}
+
+int closedir_adapter(t_dir_stream **dir_stream)
+{
+    if (dir_stream == NULL || *dir_stream == NULL)
+        return 0;
+
+    const int result = closedir((*dir_stream)->dir);
+    free(*dir_stream);
+    *dir_stream = NULL;
+
+    return result;
+}
+
+const char *dir_entry_get_name(const t_dir_entry *dir_entry)
+{
+    return dir_entry->entry->d_name;
 }

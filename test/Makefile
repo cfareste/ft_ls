@@ -16,7 +16,7 @@ CYAN = \033[1;36m
 
 #----COMPILER----#
 CC = cc
-CCFLAGS += -Wall -Wextra -Werror -fsanitize=address
+CCFLAGS += -g -Wall -Wextra -Werror -fsanitize=address
 
 
 #----DIRS----#
