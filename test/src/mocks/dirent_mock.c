@@ -48,7 +48,7 @@ t_dir_stream *opendir_adapter(const char *path)
     return dir;
 }
 
-const t_dir_entry *readdir_adapter(t_dir_stream *dir)
+t_dir_entry *readdir_adapter(t_dir_stream *dir)
 {
     if (g_readdir_fail != NO_FAILURE)
     {
@@ -79,10 +79,22 @@ int closedir_adapter(t_dir_stream **dir_stream)
     return 0;
 }
 
+
+void dir_entry_destroy(t_dir_entry **dir_entry)
+{
+    (void) dir_entry;
+}
+
 const char *dir_entry_get_name(const t_dir_entry *dir_entry)
 {
     return dir_entry->d_name;
 }
+
+short dir_entry_is_null(const t_dir_entry *dir_entry)
+{
+    return (short) (dir_entry == NULL);
+}
+
 
 //TODO: Change how the name file name is computed as it makes the tests fragile (we depend on fileX)
 void affirm_readdir_will_return_N_files_named(const char *file_name, const unsigned int num)
