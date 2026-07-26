@@ -15,7 +15,7 @@ struct dir_entry
 
 t_dir_stream *opendir_adapter(const char *path)
 {
-    t_dir_stream *dir_stream = ft_calloc(1, sizeof(t_dir_stream));
+    t_dir_stream *dir_stream = ft_safe_calloc(1, sizeof(t_dir_stream));
 
     dir_stream->dir = opendir(path);
     if (dir_stream->dir == NULL)
@@ -29,7 +29,7 @@ t_dir_stream *opendir_adapter(const char *path)
 
 t_dir_entry *readdir_adapter(t_dir_stream *dir)
 {
-    t_dir_entry *dir_entry = ft_calloc(1, sizeof(t_dir_entry));
+    t_dir_entry *dir_entry = ft_safe_calloc(1, sizeof(t_dir_entry));
 
     dir_entry->entry = readdir(dir->dir);
 

@@ -4,7 +4,6 @@ typedef struct dir_stream t_dir_stream;
 typedef struct dir_entry t_dir_entry;
 
 t_dir_stream *opendir_adapter(const char *path);
-
 t_dir_entry *readdir_adapter(t_dir_stream *dir);
 int closedir_adapter(t_dir_stream **dir_stream);
 

@@ -42,7 +42,7 @@ t_dir_stream *opendir_adapter(const char *path)
         return NULL;
     }
 
-    t_dir_stream *dir = ft_calloc(1, sizeof(t_dir_stream));
+    t_dir_stream *dir = ft_safe_calloc(1, sizeof(t_dir_stream));
 
     return dir;
 }

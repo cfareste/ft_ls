@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "ft_printf.h"
+#include "libft.h"
 
 static int	calculate_num_of_digits(unsigned int num)
 {
@@ -42,7 +43,7 @@ char	*ft_uitoa(unsigned int n)
 	int		num_of_digits;
 
 	num_of_digits = calculate_num_of_digits(n);
-	num = malloc(num_of_digits + 1 * sizeof(char));
+	num = ft_safe_calloc(num_of_digits + 1, sizeof(char));
 	if (!num)
 		return (0);
 	num[num_of_digits] = '\0';
