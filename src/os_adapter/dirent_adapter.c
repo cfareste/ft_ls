@@ -18,6 +18,11 @@ t_dir_stream *opendir_adapter(const char *path)
     t_dir_stream *dir_stream = ft_calloc(1, sizeof(t_dir_stream));
 
     dir_stream->dir = opendir(path);
+    if (dir_stream->dir == NULL)
+    {
+        free(dir_stream);
+        return NULL;
+    }
 
     return dir_stream;
 }
