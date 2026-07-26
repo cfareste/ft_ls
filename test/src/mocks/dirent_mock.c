@@ -44,9 +44,6 @@ t_dir_stream *opendir_adapter(const char *path)
     }
 
     t_dir_stream *dir = ft_calloc(1, sizeof(t_dir_stream));
-    g_dirent_name[0] = '\0';
-    g_dirent_entry_num = 0;
-    g_total_dirent_entries = 0;
 
     return dir;
 }
@@ -98,4 +95,12 @@ void affirm_readdir_will_return_N_files_named(const char *file_name, const unsig
 void affirm_readdir_will_return_a_file_named(const char *file_name)
 {
     affirm_readdir_will_return_N_files_named(file_name, 1);
+}
+
+//TODO: Fix mocking coupling to this function; find another solution to not depend on calling this function whenever I need to reset readdir
+void reset_readdir_affirmations()
+{
+    g_dirent_name[0] = '\0';
+    g_dirent_entry_num = 0;
+    g_total_dirent_entries = 0;
 }

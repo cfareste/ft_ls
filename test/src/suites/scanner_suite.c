@@ -34,6 +34,7 @@ static void should_return_NULL_if_an_empty_path_is_specified(void)
 
 static void should_return_NULL_if_the_current_directory_is_empty(void)
 {
+    reset_readdir_affirmations();
     scan_directory(".");
 
     assertFileDataIsNull();
@@ -41,6 +42,7 @@ static void should_return_NULL_if_the_current_directory_is_empty(void)
 
 static void should_return_one_entry_if_the_current_directory_has_one_file(void)
 {
+    reset_readdir_affirmations();
     affirm_readdir_will_return_a_file_named("file");
     scan_directory(".");
 
