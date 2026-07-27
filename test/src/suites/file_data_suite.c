@@ -17,6 +17,14 @@ static void cleanup_file_data()
     file_data_destroy(&file_data);
 }
 
+static t_file_data *create_next_file_data(const char *file_name)
+{
+    t_file_data *next = file_data_create();
+    file_data_set_name(next, file_name);
+
+    return next;
+}
+
 static void should_be_created_correctly(void)
 {
     initialize_file_data();
@@ -38,6 +46,7 @@ static void should_be_destroyed_correctly(void)
 static void should_return_the_correct_length(void)
 {
     initialize_file_data();
+
     file_data_add_entry(&file_data, file_data_create());
     file_data_add_entry(&file_data, file_data_create());
 
@@ -49,13 +58,14 @@ static void should_return_the_correct_length(void)
 static void should_return_the_next_instance_correctly(void)
 {
     initialize_file_data();
-    t_file_data *next = file_data_create();
-    file_data_set_name(next, "next_file");
+
+    const char *next_file_name = "next_file";
+    t_file_data *next = create_next_file_data(next_file_name);
     file_data_add_entry(&file_data, next);
 
     const char *file_name = file_data_get_name(file_data_get_next(file_data));
 
-    CU_ASSERT_STRING_EQUAL(file_name, "next_file");
+    CU_ASSERT_STRING_EQUAL(file_name, next_file_name);
 
     cleanup_file_data();
 }
