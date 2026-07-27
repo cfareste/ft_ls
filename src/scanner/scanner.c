@@ -3,22 +3,9 @@
 #include "file_data.h"
 #include "os_adapter.h"
 
-static int is_invalid_path(const char *path)
-{
-    return path == NULL || path[0] == '\0';
-}
-
-static t_dir_stream *get_dir_stream(const char *path)
-{
-    if (is_invalid_path(path))
-        return NULL;
-
-    return opendir_adapter(path);
-}
-
 t_file_data *scan(const char *path)
 {
-    t_dir_stream *dir_stream = get_dir_stream(path);
+    t_dir_stream *dir_stream = opendir_adapter(path);
     if (dir_stream == NULL)
         return NULL;
 

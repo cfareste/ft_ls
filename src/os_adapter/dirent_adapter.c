@@ -13,10 +13,17 @@ struct dir_entry
     struct dirent *entry;
 };
 
+static int is_invalid_path(const char *path)
+{
+    return path == NULL || path[0] == '\0';
+}
+
 t_dir_stream *opendir_adapter(const char *path)
 {
-    t_dir_stream *dir_stream = ft_safe_calloc(1, sizeof(t_dir_stream));
+    if (is_invalid_path(path))
+        return NULL;
 
+    t_dir_stream *dir_stream = ft_safe_calloc(1, sizeof(t_dir_stream));
     dir_stream->dir = opendir(path);
     if (dir_stream->dir == NULL)
     {

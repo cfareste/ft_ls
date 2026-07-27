@@ -36,13 +36,11 @@ static char *get_file_name()
 
 t_dir_stream *opendir_adapter(const char *path)
 {
-    const char fail_test= path[1];
-    (void) fail_test;
-
-    if (g_opendir_fail == 1)
-    {
+    if (path == NULL || path[0] == '\0' || g_opendir_fail == 1)
         return NULL;
-    }
+
+    const char fail_test = path[1];
+    (void) fail_test;
 
     t_dir_stream *dir = ft_safe_calloc(1, sizeof(t_dir_stream));
 
