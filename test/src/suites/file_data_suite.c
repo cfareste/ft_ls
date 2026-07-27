@@ -5,16 +5,16 @@
 
 #define SUITE_NAME "file_data"
 
-static t_file_data *file_data;
+static t_file_data *sut;
 
 static void initialize_file_data()
 {
-    file_data = file_data_create();
+    sut = file_data_create();
 }
 
 static void cleanup_file_data()
 {
-    file_data_destroy(&file_data);
+    file_data_destroy(&sut);
 }
 
 static t_file_data *create_next_file_data(const char *file_name)
@@ -29,7 +29,7 @@ static void should_be_created_correctly(void)
 {
     initialize_file_data();
 
-    CU_ASSERT_PTR_NOT_NULL(file_data);
+    CU_ASSERT_PTR_NOT_NULL(sut);
 
     cleanup_file_data();
 }
@@ -40,17 +40,17 @@ static void should_be_destroyed_correctly(void)
 
     cleanup_file_data();
 
-    CU_ASSERT_PTR_NULL(file_data);
+    CU_ASSERT_PTR_NULL(sut);
 }
 
 static void should_return_the_correct_length(void)
 {
     initialize_file_data();
 
-    file_data_add_entry(&file_data, file_data_create());
-    file_data_add_entry(&file_data, file_data_create());
+    file_data_add_entry(&sut, file_data_create());
+    file_data_add_entry(&sut, file_data_create());
 
-    CU_ASSERT_EQUAL(file_data_get_length(file_data), 3);
+    CU_ASSERT_EQUAL(file_data_get_length(sut), 3);
 
     cleanup_file_data();
 }
@@ -61,9 +61,9 @@ static void should_return_the_next_instance_correctly(void)
 
     const char *next_file_name = "next_file";
     t_file_data *next = create_next_file_data(next_file_name);
-    file_data_add_entry(&file_data, next);
+    file_data_add_entry(&sut, next);
 
-    const char *file_name = file_data_get_name(file_data_get_next(file_data));
+    const char *file_name = file_data_get_name(file_data_get_next(sut));
 
     CU_ASSERT_STRING_EQUAL(file_name, next_file_name);
 

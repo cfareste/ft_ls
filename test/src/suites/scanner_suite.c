@@ -6,30 +6,40 @@
 
 #define SUITE_NAME "scanner"
 
-static t_file_data *file_data;
+static t_file_data *sut;
 
 static void scan_directory(const char *path)
 {
-    file_data = scan(path);
+    sut = scan(path);
 }
 
-static void assertFileDataIsNull()
+static void assert_file_data_is_null()
 {
-    CU_ASSERT_PTR_NULL(file_data);
+    CU_ASSERT_PTR_NULL(sut);
+}
+
+static void assert_file_data_length_is(const unsigned int length)
+{
+    CU_ASSERT_EQUAL(file_data_get_length(sut), length);
+}
+
+static void assert_file_data_name_is(const t_file_data *_file_data, const char *name)
+{
+    CU_ASSERT_STRING_EQUAL(file_data_get_name(_file_data), name);
 }
 
 static void should_return_NULL_if_a_NULL_path_is_specified(void)
 {
     scan_directory(NULL);
 
-    assertFileDataIsNull();
+    assert_file_data_is_null();
 }
 
 static void should_return_NULL_if_an_empty_path_is_specified(void)
 {
     scan_directory("");
 
-    assertFileDataIsNull();
+    assert_file_data_is_null();
 }
 
 static void should_return_NULL_if_the_current_directory_is_empty(void)
@@ -38,7 +48,7 @@ static void should_return_NULL_if_the_current_directory_is_empty(void)
 
     scan_directory(".");
 
-    assertFileDataIsNull();
+    assert_file_data_is_null();
 }
 
 static void should_return_one_entry_if_the_current_directory_has_one_file(void)
@@ -48,10 +58,10 @@ static void should_return_one_entry_if_the_current_directory_has_one_file(void)
 
     scan_directory(".");
 
-    CU_ASSERT_EQUAL(file_data_get_length(file_data), 1);
-    CU_ASSERT_STRING_EQUAL(file_data_get_name(file_data), "file");
+    assert_file_data_length_is(1);
+    assert_file_data_name_is(sut, "file");
 
-    file_data_destroy(&file_data);
+    file_data_destroy(&sut);
 }
 
 static void should_return_multiple_entries_if_the_current_directory_has_more_than_one_file(void)
@@ -60,15 +70,15 @@ static void should_return_multiple_entries_if_the_current_directory_has_more_tha
     affirm_readdir_will_return_N_files_named("multiple", 3);
 
     scan_directory(".");
-    const t_file_data *file_data_second = file_data_get_next(file_data);
+    const t_file_data *file_data_second = file_data_get_next(sut);
     const t_file_data *file_data_third = file_data_get_next(file_data_second);
 
-    CU_ASSERT_EQUAL(file_data_get_length(file_data), 3);
-    CU_ASSERT_STRING_EQUAL(file_data_get_name(file_data), "multiple");
-    CU_ASSERT_STRING_EQUAL(file_data_get_name(file_data_second), "multiple2");
-    CU_ASSERT_STRING_EQUAL(file_data_get_name(file_data_third), "multiple3");
+    assert_file_data_length_is(3);
+    assert_file_data_name_is(sut, "multiple");
+    assert_file_data_name_is(file_data_second, "multiple2");
+    assert_file_data_name_is(file_data_third, "multiple3");
 
-    file_data_destroy(&file_data);
+    file_data_destroy(&sut);
 }
 
 static void should_return_NULL_if_fails_to_open_a_directory(void)
@@ -79,9 +89,9 @@ static void should_return_NULL_if_fails_to_open_a_directory(void)
 
     scan_directory(".");
 
-    assertFileDataIsNull();
+    assert_file_data_is_null();
 
-    file_data_destroy(&file_data);
+    file_data_destroy(&sut);
 }
 
 static void should_return_NULL_if_fails_to_read_a_directory(void)
@@ -92,9 +102,9 @@ static void should_return_NULL_if_fails_to_read_a_directory(void)
 
     scan_directory(".");
 
-    assertFileDataIsNull();
+    assert_file_data_is_null();
 
-    file_data_destroy(&file_data);
+    file_data_destroy(&sut);
 }
 
 void register_scanner_suite(void)
