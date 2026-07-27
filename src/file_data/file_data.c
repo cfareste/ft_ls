@@ -7,6 +7,7 @@ struct s_file_data {
     t_file_data *next;
 };
 
+
 t_file_data *file_data_create()
 {
     return ft_safe_calloc(1, sizeof(t_file_data));
@@ -18,14 +19,14 @@ void file_data_destroy(t_file_data **_file_data)
         return;
 
     t_file_data *to_free = *_file_data;
-    t_file_data *temp = to_free->next;
+    t_file_data *next = to_free->next;
     do
     {
         free(to_free->name);
         free(to_free);
-        to_free = temp;
-        if (temp != NULL)
-            temp = temp->next;
+        to_free = next;
+        if (next != NULL)
+            next = next->next;
     } while (to_free != NULL);
 
     *_file_data = NULL;

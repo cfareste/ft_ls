@@ -13,6 +13,7 @@ struct dir_entry
     struct dirent *entry;
 };
 
+
 static int is_invalid_path(const char *path)
 {
     return path == NULL || path[0] == '\0';
@@ -69,7 +70,7 @@ const char *dir_entry_get_name(const t_dir_entry *dir_entry)
     return dir_entry->entry->d_name;
 }
 
-short dir_entry_is_null(const t_dir_entry *dir_entry)
+short dir_entry_is_empty(const t_dir_entry *dir_entry)
 {
     return (short) (dir_entry->entry == NULL);
 }

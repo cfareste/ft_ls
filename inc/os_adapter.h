@@ -9,4 +9,4 @@ int closedir_adapter(t_dir_stream **dir_stream);
 
 void dir_entry_destroy(t_dir_entry **dir_entry);
 const char *dir_entry_get_name(const t_dir_entry *dir_entry);
-short dir_entry_is_null(const t_dir_entry *dir_entry);
+short dir_entry_is_empty(const t_dir_entry *dir_entry);

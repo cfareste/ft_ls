@@ -11,7 +11,7 @@ t_file_data *scan(const char *path)
 
     t_file_data *file_data_list = NULL;
     t_dir_entry *dir_entry = readdir_adapter(dir_stream);
-    while (!dir_entry_is_null(dir_entry))
+    while (!dir_entry_is_empty(dir_entry))
     {
         t_file_data *next = file_data_create();
 
