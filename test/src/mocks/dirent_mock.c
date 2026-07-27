@@ -36,7 +36,9 @@ static char *get_file_name()
 
 t_dir_stream *opendir_adapter(const char *path)
 {
-    (void) path;
+    const char fail_test= path[1];
+    (void) fail_test;
+
     if (g_opendir_fail == 1)
     {
         return NULL;
