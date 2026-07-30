@@ -10,7 +10,7 @@ t_file_data *scan(const char *path)
         return NULL;
 
     t_file_data *file_data_list = NULL;
-    t_dir_entry *dir_entry = dir_entry_get_next(dir_stream);
+    t_dir_entry *dir_entry = dir_stream_get_next_entry(dir_stream);
     while (!dir_entry_is_empty(dir_entry))
     {
         const char *file_name = dir_entry_get_name(dir_entry);
@@ -19,7 +19,7 @@ t_file_data *scan(const char *path)
         file_data_add_entry(&file_data_list, next);
 
         dir_entry_destroy(&dir_entry);
-        dir_entry = dir_entry_get_next(dir_stream);
+        dir_entry = dir_stream_get_next_entry(dir_stream);
     }
 
     dir_entry_destroy(&dir_entry);

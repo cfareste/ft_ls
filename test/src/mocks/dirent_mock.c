@@ -53,7 +53,7 @@ int dir_stream_close(t_dir_stream **dir_stream)
     return 0;
 }
 
-t_dir_entry *dir_entry_get_next(t_dir_stream *dir)
+t_dir_entry *dir_stream_get_next_entry(t_dir_stream *dir)
 {
     if (g_readdir_fail == 1 || g_total_dirent_entries == 0 || g_dirent_entry_num > g_total_dirent_entries)
     {

@@ -47,7 +47,7 @@ int dir_stream_close(t_dir_stream **dir_stream)
     return result;
 }
 
-t_dir_entry *dir_entry_get_next(t_dir_stream *dir)
+t_dir_entry *dir_stream_get_next_entry(t_dir_stream *dir)
 {
     t_dir_entry *dir_entry = ft_safe_calloc(1, sizeof(t_dir_entry));
 
