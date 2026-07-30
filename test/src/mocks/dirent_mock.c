@@ -34,7 +34,7 @@ static char *get_file_name()
     return file_name;
 }
 
-t_dir_stream *opendir_adapter(const char *path)
+t_dir_stream *dir_stream_open(const char *path)
 {
     if (path == NULL || path[0] == '\0' || g_opendir_fail == 1)
         return NULL;
@@ -47,7 +47,13 @@ t_dir_stream *opendir_adapter(const char *path)
     return dir;
 }
 
-t_dir_entry *readdir_adapter(t_dir_stream *dir)
+int dir_stream_close(t_dir_stream **dir_stream)
+{
+    free(*dir_stream);
+    return 0;
+}
+
+t_dir_entry *dir_entry_get_next(t_dir_stream *dir)
 {
     if (g_readdir_fail == 1 || g_total_dirent_entries == 0 || g_dirent_entry_num > g_total_dirent_entries)
     {
@@ -61,13 +67,6 @@ t_dir_entry *readdir_adapter(t_dir_stream *dir)
 
     return &dir->entry;
 }
-
-int closedir_adapter(t_dir_stream **dir_stream)
-{
-    free(*dir_stream);
-    return 0;
-}
-
 
 void dir_entry_destroy(t_dir_entry **dir_entry)
 {
