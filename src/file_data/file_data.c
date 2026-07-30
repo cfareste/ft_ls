@@ -8,9 +8,13 @@ struct s_file_data {
 };
 
 
-t_file_data *file_data_create()
+t_file_data *file_data_create(const char *file_name)
 {
-    return ft_safe_calloc(1, sizeof(t_file_data));
+    t_file_data *file_data = ft_safe_calloc(1, sizeof(t_file_data));
+
+    file_data_set_name(file_data, file_name);
+
+    return file_data;
 }
 
 void file_data_destroy(t_file_data **_file_data)

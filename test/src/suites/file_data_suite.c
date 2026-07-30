@@ -4,12 +4,13 @@
 #include "CUnit/Basic.h"
 
 #define SUITE_NAME "file_data"
+#define DEFAULT_NAME "default"
 
 static t_file_data *sut;
 
 static void initialize_file_data()
 {
-    sut = file_data_create();
+    sut = file_data_create(DEFAULT_NAME);
 }
 
 static void cleanup_file_data()
@@ -19,8 +20,7 @@ static void cleanup_file_data()
 
 static t_file_data *create_next_file_data(const char *file_name)
 {
-    t_file_data *next = file_data_create();
-    file_data_set_name(next, file_name);
+    t_file_data *next = file_data_create(file_name);
 
     return next;
 }
@@ -47,8 +47,8 @@ static void should_return_the_correct_length(void)
 {
     initialize_file_data();
 
-    file_data_add_entry(&sut, file_data_create());
-    file_data_add_entry(&sut, file_data_create());
+    file_data_add_entry(&sut, file_data_create(DEFAULT_NAME));
+    file_data_add_entry(&sut, file_data_create(DEFAULT_NAME));
 
     CU_ASSERT_EQUAL(file_data_get_length(sut), 3);
 
