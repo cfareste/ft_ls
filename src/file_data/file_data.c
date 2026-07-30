@@ -10,6 +10,9 @@ struct s_file_data {
 
 t_file_data *file_data_create(const char *file_name)
 {
+    if (file_name == NULL)
+        return NULL;
+
     t_file_data *file_data = ft_safe_calloc(1, sizeof(t_file_data));
 
     file_data_set_name(file_data, file_name);
