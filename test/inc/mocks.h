@@ -1,8 +1,7 @@
 #pragma once
 
-extern short g_opendir_fail;
-extern short g_readdir_fail;
-
-void affirm_readdir_will_return_N_files_named(const char *file_name, unsigned int num);
-void affirm_readdir_will_return_a_file_named(const char *file_name);
-void reset_readdir_affirmations();
+void guarantee_readdir_will_return_N_files_named(const char *file_name, unsigned int num);
+void guarantee_readdir_will_return_a_file_named(const char *file_name);
+void guarantee_opendir_will_fail();
+void guarantee_readdir_will_fail();
+void reset_dirent_guarantees();

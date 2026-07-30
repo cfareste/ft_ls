@@ -13,8 +13,8 @@ struct dir_stream
     t_dir_entry entry;
 };
 
-short g_opendir_fail = 0;
-short g_readdir_fail = 0;
+static short g_opendir_fail = 0;
+static short g_readdir_fail = 0;
 static char g_dirent_name[256] = "";
 static unsigned int g_dirent_entry_num = 0;
 static unsigned int g_total_dirent_entries = 0;
@@ -85,21 +85,33 @@ short dir_entry_is_empty(const t_dir_entry *dir_entry)
 
 
 //TODO: Change how the name file name is computed as it makes the tests fragile (we depend on fileX)
-void affirm_readdir_will_return_N_files_named(const char *file_name, const unsigned int num)
+void guarantee_readdir_will_return_N_files_named(const char *file_name, const unsigned int num)
 {
     g_dirent_entry_num = 1;
     g_total_dirent_entries = num;
     ft_strlcpy(g_dirent_name, file_name, sizeof(g_dirent_name));
 }
 
-void affirm_readdir_will_return_a_file_named(const char *file_name)
+void guarantee_readdir_will_return_a_file_named(const char *file_name)
 {
-    affirm_readdir_will_return_N_files_named(file_name, 1);
+    guarantee_readdir_will_return_N_files_named(file_name, 1);
+}
+
+void guarantee_opendir_will_fail()
+{
+    g_opendir_fail = 1;
+}
+
+void guarantee_readdir_will_fail()
+{
+    g_readdir_fail = 1;
 }
 
 //TODO: Fix mocking coupling to this function; find another solution to not depend on calling this function whenever I need to reset readdir
-void reset_readdir_affirmations()
+void reset_dirent_guarantees()
 {
+    g_opendir_fail = 0;
+    g_readdir_fail = 0;
     g_dirent_name[0] = '\0';
     g_dirent_entry_num = 0;
     g_total_dirent_entries = 0;

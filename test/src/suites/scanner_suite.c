@@ -44,7 +44,7 @@ static void should_return_NULL_if_an_empty_path_is_specified(void)
 
 static void should_return_NULL_if_the_current_directory_is_empty(void)
 {
-    reset_readdir_affirmations();
+    reset_dirent_guarantees();
 
     scan_directory(".");
 
@@ -53,8 +53,8 @@ static void should_return_NULL_if_the_current_directory_is_empty(void)
 
 static void should_return_one_entry_if_the_current_directory_has_one_file(void)
 {
-    reset_readdir_affirmations();
-    affirm_readdir_will_return_a_file_named("file");
+    reset_dirent_guarantees();
+    guarantee_readdir_will_return_a_file_named("file");
 
     scan_directory(".");
 
@@ -66,8 +66,8 @@ static void should_return_one_entry_if_the_current_directory_has_one_file(void)
 
 static void should_return_multiple_entries_if_the_current_directory_has_more_than_one_file(void)
 {
-    reset_readdir_affirmations();
-    affirm_readdir_will_return_N_files_named("multiple", 3);
+    reset_dirent_guarantees();
+    guarantee_readdir_will_return_N_files_named("multiple", 3);
 
     scan_directory(".");
     const t_file_data *file_data_second = file_data_get_next(sut);
@@ -83,9 +83,8 @@ static void should_return_multiple_entries_if_the_current_directory_has_more_tha
 
 static void should_return_NULL_if_fails_to_open_a_directory(void)
 {
-    reset_readdir_affirmations();
-    affirm_readdir_will_return_a_file_named("should_fail");
-    g_opendir_fail = 1;
+    reset_dirent_guarantees();
+    guarantee_opendir_will_fail();
 
     scan_directory(".");
 
@@ -96,9 +95,8 @@ static void should_return_NULL_if_fails_to_open_a_directory(void)
 
 static void should_return_NULL_if_fails_to_read_a_directory(void)
 {
-    reset_readdir_affirmations();
-    g_opendir_fail = 0;
-    g_readdir_fail = 1;
+    reset_dirent_guarantees();
+    guarantee_readdir_will_fail();
 
     scan_directory(".");
 
