@@ -7,10 +7,14 @@ struct s_file_data {
     t_file_data *next;
 };
 
+static int is_valid_file_name(const char *_name)
+{
+    return (_name && _name[0] != '\0');
+}
 
 t_file_data *file_data_create(const char *file_name)
 {
-    if (file_name == NULL || file_name[0] == '\0')
+    if (!is_valid_file_name(file_name))
         return NULL;
 
     t_file_data *file_data = ft_safe_calloc(1, sizeof(t_file_data));
@@ -49,7 +53,7 @@ const char *file_data_get_name(const t_file_data *_file_data)
 
 void file_data_set_name(t_file_data *_file_data, const char *_name)
 {
-    if (_file_data == NULL || _name == NULL || _name[0] == '\0')
+    if (_file_data == NULL || !is_valid_file_name(_name))
         return;
 
     free(_file_data->name);
