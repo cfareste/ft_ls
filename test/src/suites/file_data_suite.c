@@ -34,6 +34,15 @@ static void should_be_created_correctly(void)
     cleanup_file_data();
 }
 
+static void should_be_destroyed_correctly(void)
+{
+    initialize_file_data();
+
+    cleanup_file_data();
+
+    CU_ASSERT_PTR_NULL(sut);
+}
+
 static void should_fail_to_create_if_a_null_file_name_is_passed(void)
 {
     const char *invalid_name = NULL;
@@ -52,13 +61,13 @@ static void should_fail_to_create_if_an_empty_file_name_is_passed(void)
     CU_ASSERT_PTR_NULL(invalid_file_data);
 }
 
-static void should_be_destroyed_correctly(void)
+static void should_return_the_correct_name(void)
 {
     initialize_file_data();
 
-    cleanup_file_data();
+    const char *file_data_name = file_data_get_name(sut);
 
-    CU_ASSERT_PTR_NULL(sut);
+    CU_ASSERT_STRING_EQUAL(file_data_name, DEFAULT_NAME);
 }
 
 static void should_return_the_correct_length(void)
@@ -100,5 +109,6 @@ void register_file_data_suite(void)
         CU_add_test(suite, "should_return_the_next_instance_correctly", should_return_the_next_instance_correctly);
         CU_add_test(suite, "should_fail_to_create_if_a_null_file_name_is_passed", should_fail_to_create_if_a_null_file_name_is_passed);
         CU_add_test(suite, "should_fail_to_create_if_an_empty_file_name_is_passed", should_fail_to_create_if_an_empty_file_name_is_passed);
+        CU_add_test(suite, "should_return_the_correct_name", should_return_the_correct_name);
     }
 }
