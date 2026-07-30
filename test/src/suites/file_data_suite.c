@@ -65,9 +65,12 @@ static void should_return_the_correct_name(void)
 {
     initialize_file_data();
 
+    const char *file_name = "valid_name";
+    file_data_set_name(sut, file_name);
+
     const char *file_data_name = file_data_get_name(sut);
 
-    CU_ASSERT_STRING_EQUAL(file_data_name, DEFAULT_NAME);
+    CU_ASSERT_STRING_EQUAL(file_data_name, file_name);
 }
 
 static void should_return_the_correct_length(void)
