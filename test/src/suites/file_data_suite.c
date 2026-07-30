@@ -34,9 +34,18 @@ static void should_be_created_correctly(void)
     cleanup_file_data();
 }
 
-static void should_fail_to_create_if_an_invalid_file_name_is_passed(void)
+static void should_fail_to_create_if_a_null_file_name_is_passed(void)
 {
     const char *invalid_name = NULL;
+
+    const t_file_data *invalid_file_data = create_next_file_data(invalid_name);
+
+    CU_ASSERT_PTR_NULL(invalid_file_data);
+}
+
+static void should_fail_to_create_if_an_empty_file_name_is_passed(void)
+{
+    const char *invalid_name = "";
 
     const t_file_data *invalid_file_data = create_next_file_data(invalid_name);
 
@@ -89,6 +98,7 @@ void register_file_data_suite(void)
         CU_add_test(suite, "should_be_destroyed_correctly", should_be_destroyed_correctly);
         CU_add_test(suite, "should_return_the_correct_length", should_return_the_correct_length);
         CU_add_test(suite, "should_return_the_next_instance_correctly", should_return_the_next_instance_correctly);
-        CU_add_test(suite, "should_fail_to_create_if_a_null_file_name_is_passed", should_fail_to_create_if_an_invalid_file_name_is_passed);
+        CU_add_test(suite, "should_fail_to_create_if_a_null_file_name_is_passed", should_fail_to_create_if_a_null_file_name_is_passed);
+        CU_add_test(suite, "should_fail_to_create_if_an_empty_file_name_is_passed", should_fail_to_create_if_an_empty_file_name_is_passed);
     }
 }
