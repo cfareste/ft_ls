@@ -25,11 +25,17 @@ static t_file_data *create_next_file_data(const char *file_name)
     return next;
 }
 
+static void assert_file_data_is_null(const t_file_data *file_data)
+{
+    CU_ASSERT_PTR_NULL(file_data);
+}
+
 static void should_be_created_correctly(void)
 {
     initialize_file_data();
 
     CU_ASSERT_PTR_NOT_NULL(sut);
+    CU_ASSERT_STRING_EQUAL(file_data_get_name(sut), DEFAULT_NAME);
 
     cleanup_file_data();
 }
@@ -40,7 +46,7 @@ static void should_be_destroyed_correctly(void)
 
     cleanup_file_data();
 
-    CU_ASSERT_PTR_NULL(sut);
+    assert_file_data_is_null(sut);
 }
 
 static void should_fail_to_create_if_a_null_file_name_is_passed(void)
@@ -49,7 +55,7 @@ static void should_fail_to_create_if_a_null_file_name_is_passed(void)
 
     const t_file_data *invalid_file_data = create_next_file_data(invalid_name);
 
-    CU_ASSERT_PTR_NULL(invalid_file_data);
+    assert_file_data_is_null(invalid_file_data);
 }
 
 static void should_fail_to_create_if_an_empty_file_name_is_passed(void)
@@ -58,7 +64,7 @@ static void should_fail_to_create_if_an_empty_file_name_is_passed(void)
 
     const t_file_data *invalid_file_data = create_next_file_data(invalid_name);
 
-    CU_ASSERT_PTR_NULL(invalid_file_data);
+    assert_file_data_is_null(invalid_file_data);
 }
 
 static void should_return_the_correct_name(void)
