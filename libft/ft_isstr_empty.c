@@ -14,5 +14,5 @@
 
 size_t	ft_isstr_empty(const char *s)
 {
-    return (s[0] == '\0');
+	return (s[0] == '\0');
 }

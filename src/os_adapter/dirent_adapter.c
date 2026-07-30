@@ -1,5 +1,5 @@
 #include <dirent.h>
-
+#include <stdlib.h>
 #include "libft.h"
 #include "os_adapter.h"
 
