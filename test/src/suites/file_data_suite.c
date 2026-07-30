@@ -18,13 +18,6 @@ static void cleanup_file_data()
     file_data_destroy(&sut);
 }
 
-static t_file_data *create_next_file_data(const char *file_name)
-{
-    t_file_data *next = file_data_create(file_name);
-
-    return next;
-}
-
 static void assert_file_data_is_null(const t_file_data *file_data)
 {
     CU_ASSERT_PTR_NULL(file_data);
@@ -53,7 +46,7 @@ static void should_fail_to_create_if_a_null_file_name_is_passed(void)
 {
     const char *invalid_name = NULL;
 
-    const t_file_data *invalid_file_data = create_next_file_data(invalid_name);
+    const t_file_data *invalid_file_data = file_data_create(invalid_name);
 
     assert_file_data_is_null(invalid_file_data);
 }
@@ -62,7 +55,7 @@ static void should_fail_to_create_if_an_empty_file_name_is_passed(void)
 {
     const char *invalid_name = "";
 
-    const t_file_data *invalid_file_data = create_next_file_data(invalid_name);
+    const t_file_data *invalid_file_data = file_data_create(invalid_name);
 
     assert_file_data_is_null(invalid_file_data);
 }
@@ -126,7 +119,7 @@ static void should_return_the_next_instance_correctly(void)
     initialize_file_data();
 
     const char *next_file_name = "next_file";
-    t_file_data *next = create_next_file_data(next_file_name);
+    t_file_data *next = file_data_create(next_file_name);
     file_data_add_entry(&sut, next);
 
     const char *file_name = file_data_get_name(file_data_get_next(sut));
