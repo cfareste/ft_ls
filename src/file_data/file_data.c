@@ -49,7 +49,7 @@ const char *file_data_get_name(const t_file_data *_file_data)
 
 void file_data_set_name(t_file_data *_file_data, const char *_name)
 {
-    if (_file_data == NULL)
+    if (_file_data == NULL || _name == NULL)
         return;
 
     free(_file_data->name);
