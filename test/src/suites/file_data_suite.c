@@ -130,6 +130,18 @@ static void should_not_fail_when_attempting_to_add_a_next_entry_to_a_null_pointe
     file_data_add_entry(NULL, sut);
 }
 
+static void should_add_the_next_instance_as_the_first_element_if_a_null_file_data_is_passed(void)
+{
+    t_file_data *list = NULL;
+    const char *sut_name = "first_element";
+    file_data_set_name(sut, sut_name);
+
+    file_data_add_entry(&list, sut);
+    const char *file_name = file_data_get_name(list);
+
+    CU_ASSERT_STRING_EQUAL(file_name, sut_name);
+}
+
 static void should_return_the_next_instance_correctly(void)
 {
     const char *next_file_name = "next_file";
@@ -162,6 +174,7 @@ void register_file_data_suite(void)
         CU_add_test(suite, "should_return_the_correct_length", should_return_the_correct_length);
         CU_add_test(suite, "should_not_fail_returning_the_next_instance_if_a_null_file_data_is_passed", should_not_fail_returning_the_next_instance_if_a_null_file_data_is_passed);
         CU_add_test(suite, "should_not_fail_when_attempting_to_add_a_next_entry_to_a_null_pointer", should_not_fail_when_attempting_to_add_a_next_entry_to_a_null_pointer);
+        CU_add_test(suite, "should_add_the_next_instance_as_the_first_element_if_a_null_file_data_is_passed", should_add_the_next_instance_as_the_first_element_if_a_null_file_data_is_passed);
         CU_add_test(suite, "should_return_the_next_instance_correctly", should_return_the_next_instance_correctly);
     }
 }
