@@ -112,6 +112,11 @@ static void should_not_fail_setting_the_name_if_an_empty_file_name_is_passed(voi
     CU_ASSERT_STRING_EQUAL(file_data_name, DEFAULT_NAME);
 }
 
+static void should_return_length_of_zero_when_passed_a_null_file_data(void)
+{
+    CU_ASSERT_EQUAL(file_data_get_length(NULL), 0);
+}
+
 static void should_return_the_correct_length(void)
 {
     file_data_add_entry(&sut, file_data_create(DEFAULT_NAME));
@@ -167,6 +172,7 @@ void register_file_data_suite(void)
         CU_add_test(suite, "should_fail_to_create_if_a_null_file_name_is_passed", should_fail_to_create_if_a_null_file_name_is_passed);
         CU_add_test(suite, "should_fail_to_create_if_an_empty_file_name_is_passed", should_fail_to_create_if_an_empty_file_name_is_passed);
         CU_add_test(suite, "should_return_NULL_if_a_null_file_data_is_passed_the_correct_name", should_return_NULL_if_a_null_file_data_is_passed_the_correct_name);
+        CU_add_test(suite, "should_return_length_of_zero_when_passed_a_null_file_data", should_return_length_of_zero_when_passed_a_null_file_data);
         CU_add_test(suite, "should_return_the_correct_name", should_return_the_correct_name);
         CU_add_test(suite, "should_not_fail_setting_the_name_if_a_null_file_data_is_passed", should_not_fail_setting_the_name_if_a_null_file_data_is_passed);
         CU_add_test(suite, "should_not_fail_setting_the_name_if_a_null_file_name_is_passed", should_not_fail_setting_the_name_if_a_null_file_name_is_passed);
