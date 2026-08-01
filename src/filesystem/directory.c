@@ -19,6 +19,9 @@ DIR *directory_open(const char *path)
 
 struct dirent *directory_get_next_entry(DIR *dir)
 {
+    if (dir == NULL)
+        return NULL;
+
     return readdir(dir);
 }
 
@@ -27,7 +30,5 @@ int directory_close(DIR *dir_stream)
     if (dir_stream == NULL)
         return 0;
 
-    const int result = closedir(dir_stream);
-
-    return result;
+    return closedir(dir_stream);
 }
