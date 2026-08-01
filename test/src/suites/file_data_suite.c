@@ -125,6 +125,11 @@ static void should_not_fail_returning_the_next_instance_if_a_null_file_data_is_p
     file_data_get_next(NULL);
 }
 
+static void should_not_fail_when_attempting_to_add_a_next_entry_to_a_null_pointer(void)
+{
+    file_data_add_entry(NULL, sut);
+}
+
 static void should_return_the_next_instance_correctly(void)
 {
     const char *next_file_name = "next_file";
@@ -156,6 +161,7 @@ void register_file_data_suite(void)
         CU_add_test(suite, "should_not_fail_setting_the_name_if_an_empty_file_name_is_passed", should_not_fail_setting_the_name_if_an_empty_file_name_is_passed);
         CU_add_test(suite, "should_return_the_correct_length", should_return_the_correct_length);
         CU_add_test(suite, "should_not_fail_returning_the_next_instance_if_a_null_file_data_is_passed", should_not_fail_returning_the_next_instance_if_a_null_file_data_is_passed);
+        CU_add_test(suite, "should_not_fail_when_attempting_to_add_a_next_entry_to_a_null_pointer", should_not_fail_when_attempting_to_add_a_next_entry_to_a_null_pointer);
         CU_add_test(suite, "should_return_the_next_instance_correctly", should_return_the_next_instance_correctly);
     }
 }
