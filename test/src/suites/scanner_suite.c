@@ -53,32 +53,34 @@ static void should_return_NULL_if_the_current_directory_is_empty(void)
 
 static void should_return_one_entry_if_the_current_directory_has_one_file(void)
 {
+    const char *file_name = "file";
+
     reset_dirent_guarantees();
-    guarantee_readdir_will_return_a_file_named("file");
+    guarantee_readdir_will_return_a_file_named(file_name);
 
     scan_directory(".");
 
     assert_file_data_length_is(1);
-    assert_file_data_name_is(sut, "file");
+    assert_file_data_name_is(sut, file_name);
 
     file_data_destroy(&sut);
 }
 
 static void should_return_multiple_entries_if_the_current_directory_has_more_than_one_file(void)
 {
-    const char *file_names[3] = { "multiple", "multiple2", "multiple3" };
+    const char *files_names[4] = { "multiple", "multiple2", "multiple3", NULL };
 
     reset_dirent_guarantees();
-    guarantee_readdir_will_return_N_files_named(file_names, 3);
+    guarantee_readdir_will_return_N_files_named(files_names);
 
     scan_directory(".");
     const t_file_data *file_data_second = file_data_get_next(sut);
     const t_file_data *file_data_third = file_data_get_next(file_data_second);
 
     assert_file_data_length_is(3);
-    assert_file_data_name_is(sut, "multiple");
-    assert_file_data_name_is(file_data_second, "multiple2");
-    assert_file_data_name_is(file_data_third, "multiple3");
+    assert_file_data_name_is(sut, files_names[0]);
+    assert_file_data_name_is(file_data_second, files_names[1]);
+    assert_file_data_name_is(file_data_third, files_names[2]);
 
     file_data_destroy(&sut);
 }
