@@ -40,7 +40,7 @@ struct dirent *mock_readdir(DIR *dirp)
 {
     t_mock_dir *dir = (t_mock_dir *) dirp;
 
-    if (g_readdir_fail == 1 || dir == NULL || g_dirent_names[dir->next_index] == NULL)
+    if (g_readdir_fail == 1 || g_dirent_names[dir->next_index] == NULL)
         return NULL;
 
     ft_bzero(&dir->entry, sizeof(dir->entry));
