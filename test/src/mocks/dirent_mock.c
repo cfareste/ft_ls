@@ -43,7 +43,7 @@ struct dirent *mock_readdir(DIR *dirp)
     if (g_readdir_fail == 1 || dir == NULL || g_dirent_names[dir->next_index] == NULL)
         return NULL;
 
-    ft_memset(&dir->entry, 0, sizeof(dir->entry));
+    ft_bzero(&dir->entry, sizeof(dir->entry));
     ft_strlcpy(dir->entry.d_name, g_dirent_names[dir->next_index], sizeof(dir->entry.d_name));
     dir->next_index++;
 
@@ -61,6 +61,7 @@ void guarantee_readdir_will_return_N_files_named(const char **files_names)
 {
     g_opendir_fail = 0;
     g_readdir_fail = 0;
+
     free_dirent_names();
 
     unsigned int i = 0;
