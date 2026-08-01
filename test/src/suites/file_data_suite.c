@@ -87,7 +87,12 @@ static void should_return_the_correct_name(void)
     CU_ASSERT_STRING_EQUAL(file_data_name, file_name);
 }
 
-static void should_fail_setting_the_name_if_a_null_file_name_is_passed(void)
+static void should_not_fail_setting_the_name_if_a_null_file_data_is_passed(void)
+{
+    file_data_set_name(NULL, "name");
+}
+
+static void should_not_fail_setting_the_name_if_a_null_file_name_is_passed(void)
 {
     const char *invalid_file_name = NULL;
     file_data_set_name(sut, invalid_file_name);
@@ -97,7 +102,7 @@ static void should_fail_setting_the_name_if_a_null_file_name_is_passed(void)
     CU_ASSERT_STRING_EQUAL(file_data_name, DEFAULT_NAME);
 }
 
-static void should_fail_setting_the_name_if_an_empty_file_name_is_passed(void)
+static void should_not_fail_setting_the_name_if_an_empty_file_name_is_passed(void)
 {
     const char *invalid_file_name = "";
     file_data_set_name(sut, invalid_file_name);
@@ -140,8 +145,9 @@ void register_file_data_suite(void)
         CU_add_test(suite, "should_fail_to_create_if_an_empty_file_name_is_passed", should_fail_to_create_if_an_empty_file_name_is_passed);
         CU_add_test(suite, "should_return_NULL_if_a_null_file_data_is_passed_the_correct_name", should_return_NULL_if_a_null_file_data_is_passed_the_correct_name);
         CU_add_test(suite, "should_return_the_correct_name", should_return_the_correct_name);
-        CU_add_test(suite, "should_fail_setting_the_name_if_a_null_file_name_is_passed", should_fail_setting_the_name_if_a_null_file_name_is_passed);
-        CU_add_test(suite, "should_fail_setting_the_name_if_an_empty_file_name_is_passed", should_fail_setting_the_name_if_an_empty_file_name_is_passed);
+        CU_add_test(suite, "should_not_fail_setting_the_name_if_a_null_file_data_is_passed", should_not_fail_setting_the_name_if_a_null_file_data_is_passed);
+        CU_add_test(suite, "should_not_fail_setting_the_name_if_a_null_file_name_is_passed", should_not_fail_setting_the_name_if_a_null_file_name_is_passed);
+        CU_add_test(suite, "should_not_fail_setting_the_name_if_an_empty_file_name_is_passed", should_not_fail_setting_the_name_if_an_empty_file_name_is_passed);
         CU_add_test(suite, "should_return_the_correct_length", should_return_the_correct_length);
         CU_add_test(suite, "should_return_the_next_instance_correctly", should_return_the_next_instance_correctly);
     }
