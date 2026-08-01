@@ -13,7 +13,12 @@ static void initialize_file_data()
     sut = file_data_create(DEFAULT_NAME);
 }
 
-static void cleanup_file_data()
+static void test_setup(void)
+{
+    initialize_file_data();
+}
+
+static void test_teardown(void)
 {
     file_data_destroy(&sut);
 }
@@ -25,19 +30,13 @@ static void assert_file_data_is_null(const t_file_data *file_data)
 
 static void should_be_created_correctly(void)
 {
-    initialize_file_data();
-
     CU_ASSERT_PTR_NOT_NULL(sut);
     CU_ASSERT_STRING_EQUAL(file_data_get_name(sut), DEFAULT_NAME);
-
-    cleanup_file_data();
 }
 
 static void should_be_destroyed_correctly(void)
 {
-    initialize_file_data();
-
-    cleanup_file_data();
+    file_data_destroy(&sut);
 
     assert_file_data_is_null(sut);
 }
@@ -62,62 +61,44 @@ static void should_fail_to_create_if_an_empty_file_name_is_passed(void)
 
 static void should_return_the_correct_name(void)
 {
-    initialize_file_data();
-
     const char *file_name = "valid_name";
     file_data_set_name(sut, file_name);
 
     const char *file_data_name = file_data_get_name(sut);
 
     CU_ASSERT_STRING_EQUAL(file_data_name, file_name);
-
-    cleanup_file_data();
 }
 
 static void should_fail_setting_the_name_if_a_null_file_name_is_passed(void)
 {
-    initialize_file_data();
-
     const char *invalid_file_name = NULL;
     file_data_set_name(sut, invalid_file_name);
 
     const char *file_data_name = file_data_get_name(sut);
 
     CU_ASSERT_STRING_EQUAL(file_data_name, DEFAULT_NAME);
-
-    cleanup_file_data();
 }
 
 static void should_fail_setting_the_name_if_an_empty_file_name_is_passed(void)
 {
-    initialize_file_data();
-
     const char *invalid_file_name = "";
     file_data_set_name(sut, invalid_file_name);
 
     const char *file_data_name = file_data_get_name(sut);
 
     CU_ASSERT_STRING_EQUAL(file_data_name, DEFAULT_NAME);
-
-    cleanup_file_data();
 }
 
 static void should_return_the_correct_length(void)
 {
-    initialize_file_data();
-
     file_data_add_entry(&sut, file_data_create(DEFAULT_NAME));
     file_data_add_entry(&sut, file_data_create(DEFAULT_NAME));
 
     CU_ASSERT_EQUAL(file_data_get_length(sut), 3);
-
-    cleanup_file_data();
 }
 
 static void should_return_the_next_instance_correctly(void)
 {
-    initialize_file_data();
-
     const char *next_file_name = "next_file";
     t_file_data *next = file_data_create(next_file_name);
     file_data_add_entry(&sut, next);
@@ -125,13 +106,11 @@ static void should_return_the_next_instance_correctly(void)
     const char *file_name = file_data_get_name(file_data_get_next(sut));
 
     CU_ASSERT_STRING_EQUAL(file_name, next_file_name);
-
-    cleanup_file_data();
 }
 
 void register_file_data_suite(void)
 {
-    const CU_pSuite suite = CU_add_suite(SUITE_NAME, NULL, NULL);
+    const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, test_teardown);
 
     if (suite != NULL)
     {
