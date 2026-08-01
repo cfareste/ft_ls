@@ -16,7 +16,7 @@ CYAN = \033[1;36m
 
 #----COMPILER----#
 CC = cc
-CCFLAGS += -g -Wall -Wextra -Werror -fsanitize=address
+CCFLAGS += -g -Wall -Wextra -Werror -fsanitize=address -Dopendir=mock_opendir -Dreaddir=mock_readdir -Dclosedir=mock_closedir
 
 
 #----DIRS----#
@@ -53,6 +53,7 @@ vpath %.c	$(SRC):\
 			$(SUITES_DIR):\
 			$(MOCKS_DIR):\
 			$(ROOT_SRC)/file_data:\
+			$(ROOT_SRC)/os_adapter:\
 			$(ROOT_SRC)/scanner
 
 
@@ -62,6 +63,7 @@ SRCS = main.c \
 		dirent_mock.c \
 		file_data.c \
 		file_data_suite.c \
+		dirent_adapter.c \
 		scanner.c \
 		scanner_suite.c
 

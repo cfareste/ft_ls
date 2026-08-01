@@ -1,118 +1,104 @@
+#include <dirent.h>
 #include <stdlib.h>
+#include <string.h>
 #include "libft.h"
 #include "mocks.h"
-#include "os_adapter.h"
 
-struct dir_entry
+typedef struct s_mock_dir
 {
-    char d_name[256];
-};
-
-struct dir_stream
-{
-    t_dir_entry entry;
-};
+    struct dirent entry;
+    unsigned int next_index;
+    unsigned int total_entries;
+} t_mock_dir;
 
 static short g_opendir_fail = 0;
 static short g_readdir_fail = 0;
-static char g_dirent_name[256] = "";
-static unsigned int g_dirent_entry_num = 0;
+static char *g_dirent_names[256] = {0};
 static unsigned int g_total_dirent_entries = 0;
 
-static char *get_file_name()
+static void free_dirent_names(void)
 {
-    char *file_num = "";
-
-    if (g_dirent_entry_num != 1)
-        file_num = ft_uitoa(g_dirent_entry_num);
-
-    char *file_name = ft_strjoin(g_dirent_name, file_num);
-
-    if (g_dirent_entry_num != 1)
-        free(file_num);
-
-    return file_name;
-}
-
-t_dir_stream *dir_stream_open(const char *path)
-{
-    if (path == NULL || path[0] == '\0' || g_opendir_fail == 1)
-        return NULL;
-
-    const char fail_test = path[1];
-    (void) fail_test;
-
-    t_dir_stream *dir = ft_safe_calloc(1, sizeof(t_dir_stream));
-
-    return dir;
-}
-
-int dir_stream_close(t_dir_stream **dir_stream)
-{
-    free(*dir_stream);
-    return 0;
-}
-
-t_dir_entry *dir_stream_get_next_entry(t_dir_stream *dir)
-{
-    if (g_readdir_fail == 1 || g_total_dirent_entries == 0 || g_dirent_entry_num > g_total_dirent_entries)
+    for (unsigned int i = 0; i < g_total_dirent_entries; i++)
     {
-        return NULL;
+        free(g_dirent_names[i]);
+        g_dirent_names[i] = NULL;
     }
 
-    char *file_name = get_file_name();
-    ft_strlcpy(dir->entry.d_name, file_name, sizeof(dir->entry.d_name));
-    g_dirent_entry_num++;
-    free(file_name);
+    g_total_dirent_entries = 0;
+}
+
+DIR *mock_opendir(const char *path)
+{
+    (void) path;
+
+    if (g_opendir_fail == 1)
+        return NULL;
+
+    t_mock_dir *dir = ft_safe_calloc(1, sizeof(t_mock_dir));
+    dir->next_index = 0;
+    dir->total_entries = g_total_dirent_entries;
+
+    return (DIR *) dir;
+}
+
+struct dirent *mock_readdir(DIR *dirp)
+{
+    t_mock_dir *dir = (t_mock_dir *) dirp;
+
+    if (g_readdir_fail == 1 || dir == NULL || dir->next_index >= dir->total_entries)
+        return NULL;
+
+    memset(&dir->entry, 0, sizeof(dir->entry));
+    ft_strlcpy(dir->entry.d_name, g_dirent_names[dir->next_index], sizeof(dir->entry.d_name));
+    dir->next_index++;
 
     return &dir->entry;
 }
 
-void dir_entry_destroy(t_dir_entry **dir_entry)
+int mock_closedir(DIR *dirp)
 {
-    (void) dir_entry;
-}
-
-const char *dir_entry_get_name(const t_dir_entry *dir_entry)
-{
-    return dir_entry->d_name;
-}
-
-short dir_entry_is_empty(const t_dir_entry *dir_entry)
-{
-    return (short) (dir_entry == NULL);
+    free(dirp);
+    return 0;
 }
 
 
-//TODO: Change how the name file name is computed as it makes the tests fragile (we depend on fileX)
-void guarantee_readdir_will_return_N_files_named(const char *file_name, const unsigned int num)
+void guarantee_readdir_will_return_N_files_named(const char **files_names, const unsigned int num)
 {
-    g_dirent_entry_num = 1;
+    g_opendir_fail = 0;
+    g_readdir_fail = 0;
+    free_dirent_names();
     g_total_dirent_entries = num;
-    ft_strlcpy(g_dirent_name, file_name, sizeof(g_dirent_name));
+
+    for (unsigned int i = 0; i < num; i++)
+        g_dirent_names[i] = ft_strdup(files_names[i]);
 }
 
 void guarantee_readdir_will_return_a_file_named(const char *file_name)
 {
-    guarantee_readdir_will_return_N_files_named(file_name, 1);
+    const char *file_names[1] = {file_name};
+
+    guarantee_readdir_will_return_N_files_named(file_names, 1);
 }
 
 void guarantee_opendir_will_fail()
 {
+    g_readdir_fail = 0;
     g_opendir_fail = 1;
+    free_dirent_names();
+    g_total_dirent_entries = 0;
 }
 
 void guarantee_readdir_will_fail()
 {
+    g_opendir_fail = 0;
     g_readdir_fail = 1;
+    free_dirent_names();
+    g_total_dirent_entries = 0;
 }
 
-//TODO: Fix mocking coupling to this function; find another solution to not depend on calling this function whenever I need to reset readdir
 void reset_dirent_guarantees()
 {
     g_opendir_fail = 0;
     g_readdir_fail = 0;
-    g_dirent_name[0] = '\0';
-    g_dirent_entry_num = 0;
-    g_total_dirent_entries = 0;
+    free_dirent_names();
 }

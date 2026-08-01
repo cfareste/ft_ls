@@ -66,8 +66,10 @@ static void should_return_one_entry_if_the_current_directory_has_one_file(void)
 
 static void should_return_multiple_entries_if_the_current_directory_has_more_than_one_file(void)
 {
+    const char *file_names[3] = { "multiple", "multiple2", "multiple3" };
+
     reset_dirent_guarantees();
-    guarantee_readdir_will_return_N_files_named("multiple", 3);
+    guarantee_readdir_will_return_N_files_named(file_names, 3);
 
     scan_directory(".");
     const t_file_data *file_data_second = file_data_get_next(sut);
