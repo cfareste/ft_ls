@@ -25,25 +25,6 @@ t_file_data *file_data_create(const char *file_name)
     return file_data;
 }
 
-void file_data_destroy(t_file_data **_file_data)
-{
-    if (!_file_data || !*_file_data)
-        return;
-
-    t_file_data *to_free = *_file_data;
-    t_file_data *next = to_free->next;
-    do
-    {
-        free(to_free->name);
-        free(to_free);
-        to_free = next;
-        if (next != NULL)
-            next = next->next;
-    } while (to_free != NULL);
-
-    *_file_data = NULL;
-}
-
 const char *file_data_get_name(const t_file_data *_file_data)
 {
     if (_file_data == NULL)
@@ -100,4 +81,23 @@ unsigned int file_data_get_length(const t_file_data *_file_data)
     }
 
     return count;
+}
+
+void file_data_destroy(t_file_data **_file_data)
+{
+    if (!_file_data || !*_file_data)
+        return;
+
+    t_file_data *to_free = *_file_data;
+    t_file_data *next = to_free->next;
+    do
+    {
+        free(to_free->name);
+        free(to_free);
+        to_free = next;
+        if (next != NULL)
+            next = next->next;
+    } while (to_free != NULL);
+
+    *_file_data = NULL;
 }

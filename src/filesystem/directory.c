@@ -35,6 +35,15 @@ t_dir_stream *dir_stream_open(const char *path)
     return dir_stream;
 }
 
+t_dir_entry *dir_stream_get_next_entry(t_dir_stream *dir)
+{
+    t_dir_entry *dir_entry = ft_safe_calloc(1, sizeof(t_dir_entry));
+
+    dir_entry->entry = readdir(dir->dir);
+
+    return dir_entry;
+}
+
 int dir_stream_close(t_dir_stream **dir_stream)
 {
     if (dir_stream == NULL || *dir_stream == NULL)
@@ -47,14 +56,6 @@ int dir_stream_close(t_dir_stream **dir_stream)
     return result;
 }
 
-t_dir_entry *dir_stream_get_next_entry(t_dir_stream *dir)
-{
-    t_dir_entry *dir_entry = ft_safe_calloc(1, sizeof(t_dir_entry));
-
-    dir_entry->entry = readdir(dir->dir);
-
-    return dir_entry;
-}
 
 void dir_entry_destroy(t_dir_entry **dir_entry)
 {
