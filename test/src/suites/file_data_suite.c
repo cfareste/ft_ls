@@ -41,6 +41,11 @@ static void should_be_destroyed_correctly(void)
     assert_file_data_is_null(sut);
 }
 
+static void should_not_fail_to_destroy_a_file_data_when_a_null_pointer_is_passed(void)
+{
+    file_data_destroy(NULL);
+}
+
 static void should_fail_to_create_if_a_null_file_name_is_passed(void)
 {
     const char *invalid_name = NULL;
@@ -116,12 +121,13 @@ void register_file_data_suite(void)
     {
         CU_add_test(suite, "should_be_created_correctly", should_be_created_correctly);
         CU_add_test(suite, "should_be_destroyed_correctly", should_be_destroyed_correctly);
-        CU_add_test(suite, "should_return_the_correct_length", should_return_the_correct_length);
-        CU_add_test(suite, "should_return_the_next_instance_correctly", should_return_the_next_instance_correctly);
+        CU_add_test(suite, "should_not_fail_to_destroy_a_file_data_when_a_null_pointer_is_passed", should_not_fail_to_destroy_a_file_data_when_a_null_pointer_is_passed);
         CU_add_test(suite, "should_fail_to_create_if_a_null_file_name_is_passed", should_fail_to_create_if_a_null_file_name_is_passed);
         CU_add_test(suite, "should_fail_to_create_if_an_empty_file_name_is_passed", should_fail_to_create_if_an_empty_file_name_is_passed);
         CU_add_test(suite, "should_return_the_correct_name", should_return_the_correct_name);
         CU_add_test(suite, "should_fail_setting_the_name_if_a_null_file_name_is_passed", should_fail_setting_the_name_if_a_null_file_name_is_passed);
         CU_add_test(suite, "should_fail_setting_the_name_if_an_empty_file_name_is_passed", should_fail_setting_the_name_if_an_empty_file_name_is_passed);
+        CU_add_test(suite, "should_return_the_correct_length", should_return_the_correct_length);
+        CU_add_test(suite, "should_return_the_next_instance_correctly", should_return_the_next_instance_correctly);
     }
 }
