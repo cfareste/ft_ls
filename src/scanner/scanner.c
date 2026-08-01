@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include "scanner.h"
 #include "file_data.h"
-#include "os_adapter.h"
+#include "directory.h"
 
 t_file_data *scan(const char *path)
 {

@@ -1,7 +1,7 @@
 #include <dirent.h>
 #include <stdlib.h>
 #include "libft.h"
-#include "os_adapter.h"
+#include "directory.h"
 
 struct dir_stream
 {

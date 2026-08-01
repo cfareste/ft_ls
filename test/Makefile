@@ -52,18 +52,18 @@ LDFLAGS = $(LIBFT_LIB)
 vpath %.c	$(SRC):\
 			$(SUITES_DIR):\
 			$(MOCKS_DIR):\
+			$(ROOT_SRC)/filesystem:\
 			$(ROOT_SRC)/file_data:\
-			$(ROOT_SRC)/os_adapter:\
 			$(ROOT_SRC)/scanner
 
 
 
 #----SHARED----#
 SRCS = main.c \
-		dirent_mock.c \
+		directory_mock.c \
+		directory.c \
 		file_data.c \
 		file_data_suite.c \
-		dirent_adapter.c \
 		scanner.c \
 		scanner_suite.c
 
