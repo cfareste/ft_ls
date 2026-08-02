@@ -7,5 +7,5 @@ void render(const t_file_data *file_list)
     if (file_list == NULL)
         return;
 
-    ft_printf("%s", file_data_get_name(file_list));
+    ft_printf("%s\n", file_data_get_name(file_list));
 }
