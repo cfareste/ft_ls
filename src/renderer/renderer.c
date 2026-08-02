@@ -1,6 +1,11 @@
+#include <stdlib.h>
+#include "libft.h"
 #include "renderer.h"
 
 void render(const t_file_data *file_list)
 {
-    (void) file_list;
+    if (file_list == NULL)
+        return;
+
+    ft_printf("%s", file_data_get_name(file_list));
 }
