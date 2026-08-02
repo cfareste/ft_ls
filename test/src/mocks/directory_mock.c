@@ -1,4 +1,3 @@
-#include <assert.h>
 #include <dirent.h>
 #include <stdlib.h>
 #include <string.h>
@@ -13,7 +12,7 @@ typedef struct s_mock_dir
 
 static short g_opendir_fail = 0;
 static short g_readdir_fail = 0;
-static char *g_dirent_names[256] = {0};
+static char *g_dirent_names[256] = { 0 };
 
 static void free_dirent_names(void)
 {
@@ -55,7 +54,6 @@ int mock_closedir(DIR *dirp)
     return 0;
 }
 
-
 void guarantee_readdir_will_return_N_files_named(const char **files_names)
 {
     g_opendir_fail = 0;
@@ -70,7 +68,7 @@ void guarantee_readdir_will_return_N_files_named(const char **files_names)
 
 void guarantee_readdir_will_return_a_file_named(const char *file_name)
 {
-    const char *file_names[2] = {file_name, NULL};
+    const char *file_names[2] = { file_name, NULL };
 
     guarantee_readdir_will_return_N_files_named(file_names);
 }

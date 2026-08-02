@@ -89,7 +89,7 @@ static void should_return_zero_when_closing_a_valid_directory(void)
 
 void register_directory_suite(void)
 {
-    const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL,  test_setup, test_teardown);
+    const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, test_teardown);
 
     if (suite != NULL)
     {

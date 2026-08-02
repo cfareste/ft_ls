@@ -3,7 +3,6 @@
 #include "libft.h"
 #include "directory.h"
 
-
 static int is_valid_path(const char *path)
 {
     return path != NULL && !ft_isstr_empty(path);

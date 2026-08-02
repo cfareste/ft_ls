@@ -2,8 +2,8 @@
 #include "file_data.h"
 #include "libft.h"
 
-
-struct s_file_data {
+struct s_file_data
+{
     char *name;
     t_file_data *next;
 };
