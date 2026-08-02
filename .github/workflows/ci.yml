@@ -16,13 +16,13 @@ jobs:
       - name: Run make test
         run: make test
 
-  testcover:
-    name: make testcover
+  test_coverage:
+    name: make test_cover
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Run make testcover
-        run: make testcover
+      - name: Run make test_cover
+        run: make test_cover

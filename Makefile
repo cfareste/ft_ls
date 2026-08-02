@@ -92,7 +92,7 @@ bre: bonusre
 test: make_libft
 	@$(MAKE) --no-print-directory -C $(TEST_DIR) run
 
-testcover:
+test_cover: make_libft
 	@$(MAKE) --no-print-directory -C $(TEST_DIR) cover
 
 test_clean:
@@ -120,7 +120,7 @@ libft_fclean:
 		bonusre \
 		bre \
 		test \
-		testcover \
+		test_cover \
 		test_clean \
 		test_fclean \
 		make_libft \
