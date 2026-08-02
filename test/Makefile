@@ -17,6 +17,7 @@ CYAN = \033[1;36m
 #----COMPILER----#
 CC = cc
 CCFLAGS += -g -Wall -Wextra -Werror -fsanitize=address -Dopendir=mock_opendir -Dreaddir=mock_readdir -Dclosedir=mock_closedir
+COVERAGE_FLAGS = -fprofile-arcs -ftest-coverage
 
 
 #----DIRS----#
@@ -25,6 +26,7 @@ SRC = src/
 INC = inc/
 SUITES_DIR = $(SRC)/suites
 MOCKS_DIR = $(SRC)/mocks
+REPORTS_DIR = reports/
 
 
 #----CUNIT----#
@@ -59,14 +61,16 @@ vpath %.c	$(SRC):\
 
 
 #----SHARED----#
+ROOT_SRCS = directory.c \
+			file_data.c \
+			scanner.c
+
 SRCS = main.c \
 		directory_mock.c \
-		directory.c \
 		directory_suite.c \
-		file_data.c \
 		file_data_suite.c \
-		scanner.c \
-		scanner_suite.c
+		scanner_suite.c \
+		$(ROOT_SRCS)
 
 OBJS = $(SRCS:%.c=$(BIN_DIR)%.o)
 DEPS = $(OBJS:%.o=%.d)
@@ -99,7 +103,7 @@ setup-cunit:
 	fi
 
 clean:
-	@rm -rf $(BIN_DIR) $(CUNIT_BUILD_DIR)
+	@rm -rf $(BIN_DIR) $(CUNIT_BUILD_DIR) $(REPORTS_DIR)
 	@echo "$(RED)Test binaries deleted$(RESET)\n"
 
 fclean: clean
@@ -108,6 +112,19 @@ fclean: clean
 	@echo "$(RED)Tester deleted$(RESET)\n"
 
 re: fclean all
+
+cover: clean
+	@mkdir -p $(REPORTS_DIR)
+	@$(MAKE) --no-print-directory CCFLAGS="$(CCFLAGS) $(COVERAGE_FLAGS)" all
+	@echo "$(CYAN)Generating $(WHITE_BOLD)coverage reports$(CYAN)...$(RESET)\n"
+	@./tester
+	@$(MAKE) --no-print-directory gcov_report
+
+gcov_report:
+	@mkdir -p $(REPORTS_DIR)
+	@gcov -b -o $(BIN_DIR) $(ROOT_SRCS) > /dev/null 2>&1
+	@mv -f *.gcov $(REPORTS_DIR) >/dev/null 2>&1 || true
+	@echo "$(GREEN)[✓] $(PINK)Coverage reports generated in $(REPORTS_DIR)$(GREEN)$(RESET)"
 
 run: all
 	@echo "$(CYAN)Running $(WHITE_BOLD)tests$(CYAN)...$(RESET)\n"
@@ -118,6 +135,8 @@ run: all
 	fclean \
 	re \
 	run \
+	cover \
+	gcov_report \
 	setup-cunit
 
 -include $(DEPS)

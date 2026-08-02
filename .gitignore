@@ -45,6 +45,12 @@ tester
 *.idb
 *.pdb
 
+# Coverage reports
+*.gcov
+*.gcda
+*.gcno
+test/reports/
+
 # Kernel Module Compile Results
 *.mod*
 *.cmd
