@@ -28,7 +28,7 @@ struct dirent *directory_get_next_entry(DIR *dir)
 int directory_close(DIR *dir_stream)
 {
     if (dir_stream == NULL)
-        return 0;
+        return -1;
 
     return closedir(dir_stream);
 }
