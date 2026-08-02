@@ -7,6 +7,11 @@
 
 static DIR *dir_stream_sut;
 
+static void test_setup(void)
+{
+    reset_dirent_guarantees();
+}
+
 static void test_teardown(void)
 {
     directory_close(&dir_stream_sut);
@@ -69,7 +74,7 @@ static void should_return_minus_one_when_closing_a_null_directory(void)
 
 void register_directory_suite(void)
 {
-    const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL,  NULL, test_teardown);
+    const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL,  test_setup, test_teardown);
 
     if (suite != NULL)
     {
