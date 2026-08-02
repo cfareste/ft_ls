@@ -4,14 +4,14 @@
 #include "directory.h"
 
 
-static int is_invalid_path(const char *path)
+static int is_valid_path(const char *path)
 {
-    return path == NULL || ft_isstr_empty(path);
+    return path != NULL && !ft_isstr_empty(path);
 }
 
 DIR *directory_open(const char *path)
 {
-    if (is_invalid_path(path))
+    if (!is_valid_path(path))
         return NULL;
 
     return opendir(path);
