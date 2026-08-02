@@ -37,6 +37,15 @@ static void should_return_a_directory_stream_when_opening_a_valid_path(void)
     CU_ASSERT_PTR_NOT_NULL(dir_stream_sut);
 }
 
+static void should_return_NULL_when_reading_an_entry_from_a_null_directory(void)
+{
+    open_directory_stream("valid");
+
+    const struct dirent *entry = directory_get_next_entry(NULL);
+
+    CU_ASSERT_PTR_NULL(entry);
+}
+
 void register_directory_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL,  NULL, test_teardown);
@@ -46,5 +55,6 @@ void register_directory_suite(void)
         CU_add_test(suite, "should_return_NULL_when_opening_a_NULL_path", should_return_NULL_when_opening_a_NULL_path);
         CU_add_test(suite, "should_return_NULL_when_opening_an_empty_path", should_return_NULL_when_opening_an_empty_path);
         CU_add_test(suite, "should_return_a_directory_stream_when_opening_a_valid_path", should_return_a_directory_stream_when_opening_a_valid_path);
+        CU_add_test(suite, "should_return_NULL_when_reading_an_entry_from_a_null_directory", should_return_NULL_when_reading_an_entry_from_a_null_directory);
     }
 }
