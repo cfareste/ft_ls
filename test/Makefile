@@ -103,12 +103,12 @@ setup-cunit:
 	fi
 
 clean:
-	@rm -rf $(BIN_DIR) $(CUNIT_BUILD_DIR) $(REPORTS_DIR)
+	@rm -rf $(BIN_DIR) $(CUNIT_BUILD_DIR)
 	@echo "$(RED)Test binaries deleted$(RESET)\n"
 
 fclean: clean
 	@rm -f $(NAME)
-	@rm -rf $(CUNIT_DIR)
+	@rm -rf $(CUNIT_DIR) $(REPORTS_DIR)
 	@echo "$(RED)Tester deleted$(RESET)\n"
 
 re: fclean all
@@ -124,6 +124,8 @@ gcov_report:
 	@mkdir -p $(REPORTS_DIR)
 	@gcov -b -o $(BIN_DIR) $(ROOT_SRCS) > /dev/null 2>&1
 	@mv -f *.gcov $(REPORTS_DIR) >/dev/null 2>&1 || true
+	@./generate_coverage_reports.sh
+	@$(MAKE) --no-print-directory clean > /dev/null
 	@echo "$(GREEN)[✓] $(PINK)Coverage reports generated in $(REPORTS_DIR)$(GREEN)$(RESET)"
 
 run: all
