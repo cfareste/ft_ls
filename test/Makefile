@@ -62,6 +62,7 @@ vpath %.c	$(SRC):\
 SRCS = main.c \
 		directory_mock.c \
 		directory.c \
+		directory_suite.c \
 		file_data.c \
 		file_data_suite.c \
 		scanner.c \

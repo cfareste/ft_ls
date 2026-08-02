@@ -9,6 +9,7 @@ int	main(void)
 
 	register_file_data_suite();
 	register_scanner_suite();
+	register_directory_suite();
 
 	CU_basic_set_mode(CU_BRM_VERBOSE);
 	CU_basic_run_tests();
