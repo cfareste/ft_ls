@@ -4,42 +4,37 @@
 
 #define SUITE_NAME "directory"
 
-static void test_setup(void)
-{
-
-}
+static DIR *dir;
 
 static void test_teardown(void)
 {
-
+    directory_close(dir);
 }
 
 static void should_return_NULL_when_opening_a_NULL_path(void)
 {
-    const DIR *dir = directory_open(NULL);
+    dir = directory_open(NULL);
 
     CU_ASSERT_PTR_NULL(dir);
 }
 
 static void should_return_NULL_when_opening_an_empty_path(void)
 {
-    const DIR *dir = directory_open("");
+    dir = directory_open("");
 
     CU_ASSERT_PTR_NULL(dir);
 }
 
 static void should_return_a_directory_stream_when_opening_a_valid_path(void)
 {
-    DIR *dir = directory_open("valid");
+    dir = directory_open("valid");
 
     CU_ASSERT_PTR_NOT_NULL(dir);
-
-    directory_close(dir);
 }
 
 void register_directory_suite(void)
 {
-    const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, test_teardown);
+    const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL,  NULL, test_teardown);
 
     if (suite != NULL)
     {
