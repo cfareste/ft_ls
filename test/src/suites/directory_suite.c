@@ -72,6 +72,15 @@ static void should_return_minus_one_when_closing_a_null_directory(void)
     CU_ASSERT_EQUAL(actual, -1);
 }
 
+static void should_return_zero_when_closing_a_valid_directory(void)
+{
+    open_directory_stream("valid");
+
+    const int actual = directory_close(&dir_stream_sut);
+
+    CU_ASSERT_PTR_NULL(dir_stream_sut);
+    CU_ASSERT_EQUAL(actual, 0);
+}
 void register_directory_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL,  test_setup, test_teardown);
@@ -84,5 +93,6 @@ void register_directory_suite(void)
         CU_add_test(suite, "should_return_NULL_when_reading_an_entry_from_a_null_directory", should_return_NULL_when_reading_an_entry_from_a_null_directory);
         CU_add_test(suite, "should_return_an_entry_when_reading_from_a_valid_directory", should_return_an_entry_when_reading_from_a_valid_directory);
         CU_add_test(suite, "should_return_minus_one_when_closing_a_null_directory", should_return_minus_one_when_closing_a_null_directory);
+        CU_add_test(suite, "should_return_zero_when_closing_a_valid_directory", should_return_zero_when_closing_a_valid_directory);
     }
 }
