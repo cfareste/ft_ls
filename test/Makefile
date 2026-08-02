@@ -130,7 +130,7 @@ gcov_report:
 	@mv -f *.gcov $(REPORTS_DIR) >/dev/null 2>&1 || true
 	@./generate_coverage_reports.sh "$(REPORT_OUTPUT_MODE)"
 	@$(MAKE) --no-print-directory clean > /dev/null
-	@echo "$(GREEN)[✓] $(PINK)Coverage reports generated in $(REPORTS_DIR)$(GREEN)$(RESET)"
+	@echo "$(GREEN)[✓] $(PINK)Coverage reports saved in $(REPORTS_DIR)$(GREEN)$(RESET)"
 
 run: all
 	@echo "$(CYAN)Running $(WHITE_BOLD)tests$(CYAN)...$(RESET)\n"
