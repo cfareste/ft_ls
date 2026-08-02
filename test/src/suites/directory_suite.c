@@ -81,6 +81,7 @@ static void should_return_zero_when_closing_a_valid_directory(void)
     CU_ASSERT_PTR_NULL(dir_stream_sut);
     CU_ASSERT_EQUAL(actual, 0);
 }
+
 void register_directory_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL,  test_setup, test_teardown);
