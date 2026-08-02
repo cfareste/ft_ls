@@ -1,6 +1,7 @@
 #include "CUnit/CUnit.h"
 #include "CUnit/Basic.h"
 #include "directory.h"
+#include "mocks.h"
 
 #define SUITE_NAME "directory"
 
@@ -46,6 +47,18 @@ static void should_return_NULL_when_reading_an_entry_from_a_null_directory(void)
     CU_ASSERT_PTR_NULL(entry);
 }
 
+static void should_return_an_entry_when_reading_from_a_valid_directory(void)
+{
+    const char *file_name = "file";
+    guarantee_readdir_will_return_a_file_named(file_name);
+
+    open_directory_stream("valid");
+
+    const struct dirent *entry = directory_get_next_entry(dir_stream_sut);
+
+    CU_ASSERT_PTR_NOT_NULL(entry);
+}
+
 void register_directory_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL,  NULL, test_teardown);
@@ -56,5 +69,6 @@ void register_directory_suite(void)
         CU_add_test(suite, "should_return_NULL_when_opening_an_empty_path", should_return_NULL_when_opening_an_empty_path);
         CU_add_test(suite, "should_return_a_directory_stream_when_opening_a_valid_path", should_return_a_directory_stream_when_opening_a_valid_path);
         CU_add_test(suite, "should_return_NULL_when_reading_an_entry_from_a_null_directory", should_return_NULL_when_reading_an_entry_from_a_null_directory);
+        CU_add_test(suite, "should_return_an_entry_when_reading_from_a_valid_directory", should_return_an_entry_when_reading_from_a_valid_directory);
     }
 }
