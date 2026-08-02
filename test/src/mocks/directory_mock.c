@@ -60,7 +60,6 @@ void guarantee_readdir_will_return_N_files_named(const char **files_names)
 {
     g_opendir_fail = 0;
     g_readdir_fail = 0;
-
     free_dirent_names();
 
     unsigned int i = 0;

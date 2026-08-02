@@ -62,7 +62,6 @@ static void should_return_NULL_if_the_current_directory_is_empty(void)
 static void should_return_one_entry_if_the_current_directory_has_one_file(void)
 {
     const char *file_name = "file";
-
     guarantee_readdir_will_return_a_file_named(file_name);
 
     scan_directory(".");
@@ -74,7 +73,6 @@ static void should_return_one_entry_if_the_current_directory_has_one_file(void)
 static void should_return_multiple_entries_if_the_current_directory_has_more_than_one_file(void)
 {
     const char *files_names[4] = { "multiple", "multiple2", "multiple3", NULL };
-
     guarantee_readdir_will_return_N_files_named(files_names);
 
     scan_directory(".");
