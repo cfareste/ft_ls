@@ -16,7 +16,7 @@ CYAN = \033[1;36m
 
 #----COMPILER----#
 CC = cc
-CCFLAGS += -g -Wall -Wextra -Werror -fsanitize=address -Dopendir=mock_opendir -Dreaddir=mock_readdir -Dclosedir=mock_closedir
+CCFLAGS += -g -Wall -Wextra -Werror -fsanitize=address -Dopendir=mock_opendir -Dreaddir=mock_readdir -Dclosedir=mock_closedir -Dft_printf=printf_mock
 COVERAGE_FLAGS = -fprofile-arcs -ftest-coverage
 
 
@@ -73,6 +73,7 @@ ROOT_SRCS = directory.c \
 
 SRCS = main.c \
 		directory_mock.c \
+		print_mock.c \
 		directory_suite.c \
 		file_data_suite.c \
 		scanner_suite.c \

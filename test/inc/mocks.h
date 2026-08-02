@@ -5,3 +5,5 @@ void guarantee_readdir_will_return_a_file_named(const char *file_name);
 void guarantee_opendir_will_fail();
 void guarantee_readdir_will_fail();
 void reset_dirent_guarantees();
+
+void verify_that_str_has_been_printed(const char *str);
