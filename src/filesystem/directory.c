@@ -25,10 +25,13 @@ struct dirent *directory_get_next_entry(DIR *dir)
     return readdir(dir);
 }
 
-int directory_close(DIR *dir_stream)
+int directory_close(DIR **dir_stream)
 {
-    if (dir_stream == NULL)
+    if (dir_stream == NULL || *dir_stream == NULL)
         return -1;
 
-    return closedir(dir_stream);
+    const int result = closedir(*dir_stream);
+    *dir_stream = NULL;
+
+    return result;
 }

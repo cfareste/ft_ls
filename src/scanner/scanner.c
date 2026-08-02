@@ -18,7 +18,7 @@ t_file_data *scan(const char *path)
         dir_entry = directory_get_next_entry(dir_stream);
     }
 
-    directory_close(dir_stream);
+    directory_close(&dir_stream);
 
     return file_data_list;
 }
