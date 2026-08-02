@@ -57,6 +57,7 @@ static void should_return_an_entry_when_reading_from_a_valid_directory(void)
     const struct dirent *entry = directory_get_next_entry(dir_stream_sut);
 
     CU_ASSERT_PTR_NOT_NULL(entry);
+    CU_ASSERT_STRING_EQUAL(entry->d_name, file_name);
 }
 
 void register_directory_suite(void)
