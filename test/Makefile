@@ -60,20 +60,23 @@ vpath %.c	$(SRC):\
 			$(MOCKS_DIR):\
 			$(ROOT_SRC)/filesystem:\
 			$(ROOT_SRC)/file_data:\
-			$(ROOT_SRC)/scanner
+			$(ROOT_SRC)/scanner:\
+			$(ROOT_SRC)/renderer
 
 
 
 #----SHARED----#
 ROOT_SRCS = directory.c \
 			file_data.c \
-			scanner.c
+			scanner.c \
+			renderer.c
 
 SRCS = main.c \
 		directory_mock.c \
 		directory_suite.c \
 		file_data_suite.c \
 		scanner_suite.c \
+		renderer_suite.c \
 		$(ROOT_SRCS)
 
 OBJS = $(SRCS:%.c=$(BIN_DIR)%.o)
