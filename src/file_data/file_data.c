@@ -10,7 +10,7 @@ struct s_file_data {
 
 static int is_valid_file_name(const char *_name)
 {
-    return (_name && !ft_isstr_empty(_name));
+    return (_name != NULL && !ft_isstr_empty(_name));
 }
 
 t_file_data *file_data_create(const char *file_name)
@@ -19,7 +19,6 @@ t_file_data *file_data_create(const char *file_name)
         return NULL;
 
     t_file_data *file_data = ft_safe_calloc(1, sizeof(t_file_data));
-
     file_data_set_name(file_data, file_name);
 
     return file_data;
@@ -85,7 +84,7 @@ unsigned int file_data_get_length(const t_file_data *_file_data)
 
 void file_data_destroy(t_file_data **_file_data)
 {
-    if (!_file_data || !*_file_data)
+    if (_file_data == NULL || *_file_data == NULL)
         return;
 
     t_file_data *to_free = *_file_data;
