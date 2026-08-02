@@ -83,7 +83,7 @@ main() {
     mean="$(compute_mean_percentage)"
     printf 'Mean %%: %s\n' "$mean" >> "$OUTPUT_FILE"
 
-    if awk -v mean="$mean" 'BEGIN { exit !(mean >= 80) }'; then
+    if awk -v mean="$mean" 'BEGIN { exit !(mean >= 90) }'; then
         exit 0
     fi
 
