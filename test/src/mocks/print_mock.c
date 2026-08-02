@@ -3,27 +3,38 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-static char printing_buffer[1024];
+#define PRINT_BUFFER_SIZE 1024
 
-int printf_mock(const char *format, ...)
-{
-    va_list args;
+static char printing_buffer[PRINT_BUFFER_SIZE] = { '\0' };
 
-    va_start(args, format);
-    const int res = vsnprintf(printing_buffer, 1024, format, args);
-    va_end(args);
-
-    return res;
-}
-
-void verify_that_the_str_that_has_been_printed_is(const char *format, ...)
+int printf_mock(const char *str, ...)
 {
     char temp_buffer[1024];
     va_list args;
 
-    va_start(args, format);
-    vsnprintf(temp_buffer, 1024, format, args);
+    va_start(args, str);
+    const int written_length = vsprintf(temp_buffer, str, args);
     va_end(args);
 
-    assert(ft_are_string_equals(printing_buffer, temp_buffer));
+    const int printing_buffer_length = (int) ft_strlen(printing_buffer);
+    ft_strlcat(printing_buffer, temp_buffer, printing_buffer_length + written_length + 1);
+
+    return printing_buffer_length + written_length;
+}
+
+void verify_that_the_str_that_has_been_printed_is(const char *str, ...)
+{
+    char expected[PRINT_BUFFER_SIZE];
+    va_list args;
+
+    va_start(args, str);
+    vsprintf(expected, str, args);
+    va_end(args);
+
+    assert(ft_are_string_equals(printing_buffer, expected));
+}
+
+void reset_printing_buffer()
+{
+    printing_buffer[0] = '\0';
 }
