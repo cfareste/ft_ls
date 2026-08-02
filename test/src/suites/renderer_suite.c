@@ -19,7 +19,7 @@ static void should_print_the_name_of_the_entry_with_a_file_list_of_one_element(v
 
     render(file_list);
 
-    verify_that_the_str_that_has_been_printed_is(expected_file_name);
+    verify_that_the_str_that_has_been_printed_is("%s", expected_file_name);
 
     file_data_destroy(&file_list);
 }
