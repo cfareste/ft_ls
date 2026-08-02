@@ -5,7 +5,7 @@
 
 static int is_valid_path(const char *path)
 {
-    return path != NULL && !ft_isstr_empty(path);
+    return path != NULL && !ft_is_str_empty(path);
 }
 
 DIR *directory_open(const char *path)

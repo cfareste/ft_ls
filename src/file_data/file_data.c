@@ -10,7 +10,7 @@ struct s_file_data
 
 static int is_valid_file_name(const char *_name)
 {
-    return (_name != NULL && !ft_isstr_empty(_name));
+    return (_name != NULL && !ft_is_str_empty(_name));
 }
 
 t_file_data *file_data_create(const char *file_name)
