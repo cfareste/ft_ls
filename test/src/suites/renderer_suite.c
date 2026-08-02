@@ -5,6 +5,11 @@
 
 #define SUITE_NAME "renderer"
 
+static void test_setup()
+{
+    reset_printing_buffer();
+}
+
 static void should_not_print_anything_if_the_file_list_is_null(void)
 {
     render(NULL);
@@ -26,7 +31,7 @@ static void should_print_the_name_of_the_entry_with_a_file_list_of_one_element(v
 
 void register_renderer_suite(void)
 {
-    const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, NULL, NULL);
+    const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, NULL);
 
     if (suite != NULL)
     {
