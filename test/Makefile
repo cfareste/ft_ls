@@ -29,6 +29,10 @@ MOCKS_DIR = $(SRC)/mocks
 REPORTS_DIR = reports/
 
 
+#----Reports----#
+REPORT_OUTPUT_MODE ?= file
+
+
 #----CUNIT----#
 FRAMEWORKS_DIR = $(CURDIR)/frameworks
 CUNIT_DIR = $(FRAMEWORKS_DIR)/CUnit
@@ -117,14 +121,14 @@ cover: clean
 	@mkdir -p $(REPORTS_DIR)
 	@$(MAKE) --no-print-directory CCFLAGS="$(CCFLAGS) $(COVERAGE_FLAGS)" all
 	@echo "$(CYAN)Generating $(WHITE_BOLD)coverage reports$(CYAN)...$(RESET)\n"
-	@./tester
-	@$(MAKE) --no-print-directory gcov_report
+	@./tester > /dev/null
+	@$(MAKE) --no-print-directory gcov_report REPORT_OUTPUT_MODE="$(REPORT_OUTPUT_MODE)"
 
 gcov_report:
 	@mkdir -p $(REPORTS_DIR)
 	@gcov -b -o $(BIN_DIR) $(ROOT_SRCS) > /dev/null 2>&1
 	@mv -f *.gcov $(REPORTS_DIR) >/dev/null 2>&1 || true
-	@./generate_coverage_reports.sh
+	@./generate_coverage_reports.sh "$(REPORT_OUTPUT_MODE)"
 	@$(MAKE) --no-print-directory clean > /dev/null
 	@echo "$(GREEN)[✓] $(PINK)Coverage reports generated in $(REPORTS_DIR)$(GREEN)$(RESET)"
 

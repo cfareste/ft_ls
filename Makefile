@@ -27,6 +27,10 @@ CCFLAGS += -g -Wall -Werror -Wextra -fsanitize=address
 INCLUDES = -I$(INC)
 
 
+#----TESTING----#
+REPORT_OUTPUT_MODE ?= file
+
+
 #----LIBFT----#
 LIBFT_DIR = libft/
 LIBFT_LIB = $(LIBFT_DIR)libft.a
@@ -93,7 +97,7 @@ test: make_libft
 	@$(MAKE) --no-print-directory -C $(TEST_DIR) run
 
 test_cover: make_libft
-	@$(MAKE) --no-print-directory -C $(TEST_DIR) cover
+	@$(MAKE) --no-print-directory -C $(TEST_DIR) cover REPORT_OUTPUT_MODE="$(REPORT_OUTPUT_MODE)"
 
 test_clean:
 	@$(MAKE) --no-print-directory -C $(TEST_DIR) clean

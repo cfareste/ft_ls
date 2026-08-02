@@ -2,8 +2,19 @@
 set -euo pipefail
 export LC_ALL=C
 
+REPORT_OUTPUT_MODE="${REPORT_OUTPUT_MODE:-${1:-file}}"
 REPORTS_DIR="./reports"
 OUTPUT_FILE="./$REPORTS_DIR/reports.txt"
+
+write_report_line() {
+    local text="$1"
+
+    if [ "$REPORT_OUTPUT_MODE" = "stdout" ]; then
+        printf '%s\n' "$text"
+    else
+        printf '%s\n' "$text" >> "$OUTPUT_FILE"
+    fi
+}
 
 list_gcov_files() {
     find "$REPORTS_DIR" -maxdepth 1 -type f -name '*.gcov' | sort
@@ -24,14 +35,14 @@ write_file_summary() {
     local filename
 
     filename="$(basename "$file")"
-    printf '%s:\n' "$filename" >> "$OUTPUT_FILE"
+    write_report_line "${filename}:"
 
     while IFS= read -r line; do
         [ -n "$line" ] || continue
-        printf ' - %s\n' "$line" >> "$OUTPUT_FILE"
+        write_report_line " - $line"
     done < <(extract_function_lines "$file")
 
-    printf '\n' >> "$OUTPUT_FILE"
+    write_report_line ""
 }
 
 compute_mean_percentage() {
@@ -73,7 +84,9 @@ main() {
         exit 1
     fi
 
-    : > "$OUTPUT_FILE"
+    if [ "$REPORT_OUTPUT_MODE" = "file" ]; then
+        : > "$OUTPUT_FILE"
+    fi
 
     while IFS= read -r file; do
         write_file_summary "$file"
@@ -81,7 +94,7 @@ main() {
 
     local mean
     mean="$(compute_mean_percentage)"
-    printf 'Mean %%: %s\n' "$mean" >> "$OUTPUT_FILE"
+    write_report_line "Mean %: $mean"
 
     if awk -v mean="$mean" 'BEGIN { exit !(mean >= 90) }'; then
         exit 0

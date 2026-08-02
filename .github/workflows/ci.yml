@@ -25,4 +25,4 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run make test_cover
-        run: make test_cover
+        run: make test_cover REPORT_OUTPUT_MODE=stdout
