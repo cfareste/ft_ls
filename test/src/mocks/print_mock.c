@@ -16,7 +16,7 @@ int printf_mock(const char *format, ...)
     return res;
 }
 
-void verify_that_str_has_been_printed(const char *str)
+void verify_that_the_str_that_has_been_printed_is(const char *str)
 {
     assert(ft_are_string_equals(str, printing_buffer));
 }
