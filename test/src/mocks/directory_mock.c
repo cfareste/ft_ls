@@ -62,7 +62,7 @@ void guarantee_readdir_will_return_N_files_named(const char **files_names)
 
     unsigned int i = 0;
     for (; files_names[i] != NULL; i++)
-        g_dirent_names[i] = ft_strdup(files_names[i]);
+        g_dirent_names[i] = ft_safe_strdup(files_names[i]);
     g_dirent_names[i] = NULL;
 }
 

@@ -38,7 +38,7 @@ void file_data_set_name(t_file_data *_file_data, const char *_name)
         return;
 
     free(_file_data->name);
-    _file_data->name = ft_strdup(_name);
+    _file_data->name = ft_safe_strdup(_name);
 }
 
 t_file_data *file_data_get_next(const t_file_data *_file_data)
