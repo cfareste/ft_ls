@@ -1,0 +1,41 @@
+TODO:
+0. Leer POSIX, GNU Core-utils y si hace falta el código fuente de ls
+1. Hacer una lista de lo que hay que hacer en cada tarea realmente. Apuntarlo en el Jira
+2. Implementar quoting :D soy feliz
+
+
+TODO En algún momento:
+- Usar un struct para listas, otro para file data y rename de file data a file entry ******
+- Investigar si los tests están acoplados a la implementacion interna de las cosas
+- Usar un struct propio para los opendirs, readdirs, etc. (como t_dir_stream de antes)
+- Si tengo problemas, tendre que meter un wrapper al ft_printf para poder mockearlo
+- Tests de aceptación (comparando a ls) y e2e, con un script de bash o lo que sea
+  - En los tests, usar valgrind
+
+
+TODO Para mejorar siguientes proyectos:
+- Las historias no pensarlas tan prematuramente (o tener más cosas en cuenta)
+- No ser tan rígido con el número de ellas, ya que algunas son muy grandes porque he tenido que hacer muchas cosas en ella porque no tenía
+el terreno allanado, como con los mocks, github actions, etc. Cada una de ellas podía ser un ticket de Jira (tarea, no historia) diferente.
+- TDD hacerlo bien: escribir código del test del caso más sencillo, código mínimo para que pase, refactor
+- Pensar mejor las historias (una historia que es "manage errors" no es una buena historia)
+- Flujo:
+  - Buscar al principio las fuentes necesarias para saber todos los requerimientos. TODAS, cuanto más oficiales mejor (POSIX, etc.)
+  - Apuntar todos los requerimientos y separarlos por épicas (basic behavior, mandatory options...)
+  - Reordenar los requerimientos de cada épica en historias
+
+
+TODO QA:
+- Investigar de nuevo casos completos (para esa historia, no épica)
+- Probar que este hecho, tanto a mano como con tests
+
+
+QA LS-8 Execution without parameters
+1. Directorio vacío - NO ACCESIBLE (siempre hay '.' y '..')
+2. Un solo fichero - NO ACCESIBLE (siempre hay '.' y '..')
+3. Multiples ficheros
+4. Casos "borde" en el nombre (espacios, símbolos, ASCII++)
+   - Con carácteres especiales hace quoting
+   - Vigilar si hay quotes en el propio nombre
+5. No memory leaks
+

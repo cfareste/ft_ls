@@ -73,5 +73,3 @@ dkms.conf
 # Test frameworks
 CUnit
 
-# Dev
-todo-list.txt
