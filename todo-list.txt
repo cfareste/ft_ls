@@ -1,4 +1,5 @@
 TODO:
+0. Revisar lo hecho en el MAC y volver a testear, lintear
 0. Leer POSIX, GNU Core-utils y si hace falta el código fuente de ls
 1. Hacer una lista de lo que hay que hacer en cada tarea realmente. Apuntarlo en el Jira
 2. Implementar quoting :D soy feliz
