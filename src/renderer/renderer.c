@@ -12,7 +12,7 @@ void render(const t_file_data *file_list)
     {
         ft_printf("%s", file_data_get_name(entry));
         if (file_data_get_next(entry) != NULL)
-            ft_printf("  ");
+            ft_printf("\n");
         entry = file_data_get_next(entry);
     }
     ft_printf("\n");
