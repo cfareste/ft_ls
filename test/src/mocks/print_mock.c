@@ -13,7 +13,7 @@ int printf_mock(const char *str, ...)
     va_list args;
 
     va_start(args, str);
-    const int written_length = vsprintf(temp_buffer, str, args);
+    const int written_length = vsnprintf(temp_buffer, PRINT_BUFFER_SIZE, str, args);
     va_end(args);
 
     const int printing_buffer_length = (int) ft_strlen(printing_buffer);
@@ -28,7 +28,7 @@ void verify_that_the_str_that_has_been_printed_is(const char *str, ...)
     va_list args;
 
     va_start(args, str);
-    vsprintf(expected, str, args);
+    vsnprintf(expected, PRINT_BUFFER_SIZE, str, args);
     va_end(args);
 
     assert(ft_are_string_equals(printing_buffer, expected));
