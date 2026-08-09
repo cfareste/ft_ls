@@ -1,5 +1,6 @@
 TODO:
-
+1. Investigar en POSIX y GNU Coreutils lo necesario para llevar a cabo LS-9
+2. Implementar execution with 1 parameter
 
 
 TODO En algún momento:

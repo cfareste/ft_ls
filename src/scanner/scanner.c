@@ -1,10 +1,20 @@
 #include <stdlib.h>
+#include <sys/stat.h>
 #include "scanner.h"
 #include "file_data.h"
 #include "directory.h"
 
 t_file_data *scan(const char *path)
 {
+    struct stat st;
+
+    stat(path, &st);
+
+    if (!S_ISDIR(st.st_mode))
+    {
+        return file_data_create(path);
+    }
+
     DIR *dir_stream = directory_open(path);
 
     t_file_data *file_data_list = NULL;

@@ -85,6 +85,14 @@ static void should_return_multiple_entries_if_the_current_directory_has_more_tha
     assert_file_data_name_is(file_data_third, files_names[2]);
 }
 
+static void should_return_one_entry_if_one_regular_file_path_is_specified(void)
+{
+    scan_directory("file");
+
+    assert_file_data_length_is(1);
+    assert_file_data_name_is(sut, "file");
+}
+
 static void should_return_NULL_if_fails_to_open_a_directory(void)
 {
     guarantee_opendir_will_fail();
@@ -114,6 +122,7 @@ void register_scanner_suite(void)
         CU_add_test(suite, "should_return_NULL_if_the_current_directory_is_empty", should_return_NULL_if_the_current_directory_is_empty);
         CU_add_test(suite, "should_return_one_entry_if_the_current_directory_has_one_file", should_return_one_entry_if_the_current_directory_has_one_file);
         CU_add_test(suite, "should_return_multiple_entries_if_the_current_directory_has_more_than_one_file", should_return_multiple_entries_if_the_current_directory_has_more_than_one_file);
+        CU_add_test(suite, "should_return_one_entry_if_one_regular_file_path_is_specified", should_return_one_entry_if_one_regular_file_path_is_specified);
         CU_add_test(suite, "should_return_NULL_if_fails_to_open_a_directory", should_return_NULL_if_fails_to_open_a_directory);
         CU_add_test(suite, "should_return_NULL_if_fails_to_read_a_directory", should_return_NULL_if_fails_to_read_a_directory);
     }

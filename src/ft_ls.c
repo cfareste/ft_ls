@@ -10,5 +10,6 @@ int	main(int argc, char **argv)
 	render(file_list);
 
 	file_data_destroy(&file_list);
+
 	return 0;
 }
