@@ -1,6 +1,9 @@
 TODO:
-1. Investigar en POSIX y GNU Coreutils lo necesario para llevar a cabo LS-9
-2. Implementar execution with 1 parameter
+0. Mock stat
+1. Refactor test pasar array en vez de ir uno por uno
+2. Refactor reset_dirent_guarantees
+3. Refactor file_data -> file_entry
+4. Tests integración / e2e en el ls real
 
 
 TODO En algún momento:

@@ -40,6 +40,8 @@ static void assert_file_data_name_is(const t_file_data *_file_data, const char *
 
 static void should_return_NULL_if_a_NULL_path_is_specified(void)
 {
+    guarantee_stat_will_populate_data_of_a_directory_type_file();
+
     scan_directory(NULL);
 
     assert_file_data_is_null();
@@ -47,6 +49,8 @@ static void should_return_NULL_if_a_NULL_path_is_specified(void)
 
 static void should_return_NULL_if_an_empty_path_is_specified(void)
 {
+    guarantee_stat_will_populate_data_of_a_directory_type_file();
+
     scan_directory("");
 
     assert_file_data_is_null();
@@ -54,6 +58,8 @@ static void should_return_NULL_if_an_empty_path_is_specified(void)
 
 static void should_return_NULL_if_the_current_directory_is_empty(void)
 {
+    guarantee_stat_will_populate_data_of_a_directory_type_file();
+
     scan_directory(".");
 
     assert_file_data_is_null();
@@ -62,6 +68,7 @@ static void should_return_NULL_if_the_current_directory_is_empty(void)
 static void should_return_one_entry_if_the_current_directory_has_one_file(void)
 {
     const char *file_name = "file";
+    guarantee_stat_will_populate_data_of_a_directory_type_file();
     guarantee_readdir_will_return_a_file_named(file_name);
 
     scan_directory(".");
@@ -73,6 +80,7 @@ static void should_return_one_entry_if_the_current_directory_has_one_file(void)
 static void should_return_multiple_entries_if_the_current_directory_has_more_than_one_file(void)
 {
     const char *files_names[4] = { "multiple", "multiple2", "multiple3", NULL };
+    guarantee_stat_will_populate_data_of_a_directory_type_file();
     guarantee_readdir_will_return_N_files_named(files_names);
 
     scan_directory(".");
@@ -87,6 +95,8 @@ static void should_return_multiple_entries_if_the_current_directory_has_more_tha
 
 static void should_return_one_entry_if_one_regular_file_path_is_specified(void)
 {
+    guarantee_stat_will_populate_data_of_a_regular_type_file();
+
     scan_directory("file");
 
     assert_file_data_length_is(1);
@@ -95,6 +105,7 @@ static void should_return_one_entry_if_one_regular_file_path_is_specified(void)
 
 static void should_return_NULL_if_fails_to_open_a_directory(void)
 {
+    guarantee_stat_will_populate_data_of_a_directory_type_file();
     guarantee_opendir_will_fail();
 
     scan_directory(".");
@@ -104,6 +115,7 @@ static void should_return_NULL_if_fails_to_open_a_directory(void)
 
 static void should_return_NULL_if_fails_to_read_a_directory(void)
 {
+    guarantee_stat_will_populate_data_of_a_directory_type_file();
     guarantee_readdir_will_fail();
 
     scan_directory(".");

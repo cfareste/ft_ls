@@ -6,6 +6,9 @@
 
 t_file_data *scan(const char *path)
 {
+    if (path == NULL || *path == '\0')
+        return NULL;
+
     struct stat st;
 
     stat(path, &st);

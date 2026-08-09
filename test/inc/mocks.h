@@ -8,3 +8,6 @@ void reset_dirent_guarantees();
 
 void verify_that_the_str_that_has_been_printed_is(const char *str, ...);
 void reset_printing_buffer();
+
+void guarantee_stat_will_populate_data_of_a_regular_type_file();
+void guarantee_stat_will_populate_data_of_a_directory_type_file();
