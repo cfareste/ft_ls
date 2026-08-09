@@ -1,8 +1,5 @@
 TODO:
-0. Revisar lo hecho en el MAC y volver a testear, lintear
-0. Leer POSIX, GNU Core-utils y si hace falta el código fuente de ls
-1. Hacer una lista de lo que hay que hacer en cada tarea realmente. Apuntarlo en el Jira
-2. Implementar quoting :D soy feliz
+
 
 
 TODO En algún momento:
@@ -31,12 +28,10 @@ TODO QA:
 - Probar que este hecho, tanto a mano como con tests
 
 
-QA LS-8 Execution without parameters
+QA LS-8 Execution without parameters (`ls | cat`)
 1. Directorio vacío - NO ACCESIBLE (siempre hay '.' y '..')
 2. Un solo fichero - NO ACCESIBLE (siempre hay '.' y '..')
 3. Multiples ficheros
-4. Casos "borde" en el nombre (espacios, símbolos, ASCII++)
-   - Con carácteres especiales hace quoting
-   - Vigilar si hay quotes en el propio nombre
+4. Ficheros con nombres raros se ven bien
 5. No memory leaks
 
