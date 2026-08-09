@@ -38,6 +38,18 @@ static void assert_file_data_name_is(const t_file_data *_file_data, const char *
     CU_ASSERT_STRING_EQUAL(file_data_get_name(_file_data), name);
 }
 
+static void assert_file_list_names_are(const char **files_names)
+{
+    unsigned int i = 0;
+    const t_file_data *current = sut;
+    while (current != NULL)
+    {
+        assert_file_data_name_is(current, files_names[i]);
+        current = file_data_get_next(current);
+        i++;
+    }
+}
+
 static void should_return_NULL_if_a_NULL_path_is_specified(void)
 {
     guarantee_stat_will_populate_data_of_a_directory_type_file();
@@ -84,13 +96,9 @@ static void should_return_multiple_entries_if_the_current_directory_has_more_tha
     guarantee_readdir_will_return_N_files_named(files_names);
 
     scan_directory(".");
-    const t_file_data *file_data_second = file_data_get_next(sut);
-    const t_file_data *file_data_third = file_data_get_next(file_data_second);
 
     assert_file_data_length_is(3);
-    assert_file_data_name_is(sut, files_names[0]);
-    assert_file_data_name_is(file_data_second, files_names[1]);
-    assert_file_data_name_is(file_data_third, files_names[2]);
+    assert_file_list_names_are(files_names);
 }
 
 static void should_return_one_entry_if_one_regular_file_path_is_specified(void)
@@ -110,15 +118,9 @@ static void should_return_a_list_of_entries_if_one_non_empty_directory_path_is_s
     guarantee_readdir_will_return_N_files_named(files_names);
 
     scan_directory("dir");
-    const t_file_data *file_data_second = file_data_get_next(sut);
-    const t_file_data *file_data_third = file_data_get_next(file_data_second);
-    const t_file_data *file_data_fourth = file_data_get_next(file_data_third);
 
     assert_file_data_length_is(4);
-    assert_file_data_name_is(sut, files_names[0]);
-    assert_file_data_name_is(file_data_second, files_names[1]);
-    assert_file_data_name_is(file_data_third, files_names[2]);
-    assert_file_data_name_is(file_data_fourth, files_names[3]);
+    assert_file_list_names_are(files_names);
 }
 
 static void should_return_NULL_if_fails_to_open_a_directory(void)
