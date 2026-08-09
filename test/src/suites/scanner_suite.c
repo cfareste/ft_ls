@@ -103,6 +103,24 @@ static void should_return_one_entry_if_one_regular_file_path_is_specified(void)
     assert_file_data_name_is(sut, "file");
 }
 
+static void should_return_a_list_of_entries_if_one_non_empty_directory_path_is_specified(void)
+{
+    const char *files_names[5] = { "file", "subdir", "file2", "subdir2", NULL };
+    guarantee_stat_will_populate_data_of_a_directory_type_file();
+    guarantee_readdir_will_return_N_files_named(files_names);
+
+    scan_directory("dir");
+    const t_file_data *file_data_second = file_data_get_next(sut);
+    const t_file_data *file_data_third = file_data_get_next(file_data_second);
+    const t_file_data *file_data_fourth = file_data_get_next(file_data_third);
+
+    assert_file_data_length_is(4);
+    assert_file_data_name_is(sut, files_names[0]);
+    assert_file_data_name_is(file_data_second, files_names[1]);
+    assert_file_data_name_is(file_data_third, files_names[2]);
+    assert_file_data_name_is(file_data_fourth, files_names[3]);
+}
+
 static void should_return_NULL_if_fails_to_open_a_directory(void)
 {
     guarantee_stat_will_populate_data_of_a_directory_type_file();
@@ -135,6 +153,7 @@ void register_scanner_suite(void)
         CU_add_test(suite, "should_return_one_entry_if_the_current_directory_has_one_file", should_return_one_entry_if_the_current_directory_has_one_file);
         CU_add_test(suite, "should_return_multiple_entries_if_the_current_directory_has_more_than_one_file", should_return_multiple_entries_if_the_current_directory_has_more_than_one_file);
         CU_add_test(suite, "should_return_one_entry_if_one_regular_file_path_is_specified", should_return_one_entry_if_one_regular_file_path_is_specified);
+        CU_add_test(suite, "should_return_a_list_of_entries_if_one_non_empty_directory_path_is_specified", should_return_a_list_of_entries_if_one_non_empty_directory_path_is_specified);
         CU_add_test(suite, "should_return_NULL_if_fails_to_open_a_directory", should_return_NULL_if_fails_to_open_a_directory);
         CU_add_test(suite, "should_return_NULL_if_fails_to_read_a_directory", should_return_NULL_if_fails_to_read_a_directory);
     }
