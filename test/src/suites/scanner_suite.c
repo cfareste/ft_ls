@@ -11,6 +11,7 @@ static t_file_data *sut;
 static void test_setup(void)
 {
     reset_dirent_guarantees();
+    reset_stat_guarantees();
 }
 
 static void test_teardown(void)

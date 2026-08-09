@@ -1,5 +1,4 @@
 TODO:
-1. Refactor test pasar array en vez de ir uno por uno
 2. Refactor reset_dirent_guarantees
 3. Refactor file_data -> file_entry
 4. Refactor add stat wrapper and add null / empty path protection there

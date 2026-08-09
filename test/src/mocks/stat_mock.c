@@ -22,3 +22,8 @@ void guarantee_stat_will_populate_data_of_a_directory_type_file()
 {
     mode = S_IFDIR;
 }
+
+void reset_stat_guarantees()
+{
+    mode = 0;
+}
