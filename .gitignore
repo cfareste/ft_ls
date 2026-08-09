@@ -27,6 +27,7 @@
 *.so
 *.so.*
 *.dylib
+bin/
 
 # Executables
 *.exe
@@ -43,6 +44,12 @@ tester
 *.su
 *.idb
 *.pdb
+
+# Coverage reports
+*.gcov
+*.gcda
+*.gcno
+test/reports/
 
 # Kernel Module Compile Results
 *.mod*
@@ -65,3 +72,4 @@ dkms.conf
 
 # Test frameworks
 CUnit
+

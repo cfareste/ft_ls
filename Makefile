@@ -23,8 +23,12 @@ TEST_DIR = test/
 
 #----COMPILER----#
 CC = cc
-CCFLAGS += -Wall -Werror -Wextra
+CCFLAGS += -g -Wall -Werror -Wextra
 INCLUDES = -I$(INC)
+
+
+#----TESTING----#
+REPORT_OUTPUT_MODE ?= file
 
 
 #----LIBFT----#
@@ -38,11 +42,18 @@ export GNL_BUFFER_SIZE := 50000
 
 
 #----VPATH----#
-vpath %.c	$(SRC)
-
+vpath %.c	$(SRC):\
+			$(SRC)/filesystem:\
+			$(SRC)/file_data:\
+			$(SRC)/scanner:\
+			$(SRC)/renderer
 
 #----SHARED----#
-SRCS = ft_ls.c
+SRCS = ft_ls.c \
+		directory.c \
+		file_data.c \
+		scanner.c \
+		renderer.c
 
 OBJS = $(SRCS:%.c=$(BIN_DIR)%.o)
 DEPS = $(OBJS:%.o=%.d)
@@ -87,6 +98,9 @@ bre: bonusre
 test: make_libft
 	@$(MAKE) --no-print-directory -C $(TEST_DIR) run
 
+test_cover: make_libft
+	@$(MAKE) --no-print-directory -C $(TEST_DIR) cover REPORT_OUTPUT_MODE="$(REPORT_OUTPUT_MODE)"
+
 test_clean:
 	@$(MAKE) --no-print-directory -C $(TEST_DIR) clean
 
@@ -112,6 +126,7 @@ libft_fclean:
 		bonusre \
 		bre \
 		test \
+		test_cover \
 		test_clean \
 		test_fclean \
 		make_libft \

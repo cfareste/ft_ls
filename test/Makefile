@@ -16,7 +16,8 @@ CYAN = \033[1;36m
 
 #----COMPILER----#
 CC = cc
-CCFLAGS += -Wall -Wextra -Werror
+CCFLAGS += -g -Wall -Wextra -Werror -fsanitize=address -Dopendir=mock_opendir -Dreaddir=mock_readdir -Dclosedir=mock_closedir -Dft_printf=printf_mock
+COVERAGE_FLAGS = -fprofile-arcs -ftest-coverage
 
 
 #----DIRS----#
@@ -24,6 +25,12 @@ BIN_DIR = bin/
 SRC = src/
 INC = inc/
 SUITES_DIR = $(SRC)/suites
+MOCKS_DIR = $(SRC)/mocks
+REPORTS_DIR = reports/
+
+
+#----Reports----#
+REPORT_OUTPUT_MODE ?= file
 
 
 #----CUNIT----#
@@ -36,6 +43,7 @@ CUNIT_LIB = $(CUNIT_BUILD_DIR)/libcunit.a
 
 #----ROOT PROJ----#
 ROOT_DIR = ..
+ROOT_SRC = $(ROOT_DIR)/src
 ROOT_INC = $(ROOT_DIR)/inc
 LIBFT_DIR = $(ROOT_DIR)/libft
 LIBFT_LIB = $(LIBFT_DIR)/libft.a
@@ -47,14 +55,30 @@ LDFLAGS = $(LIBFT_LIB)
 
 
 #----VPATH----#
-vpath %.c	$(SRC) \
-			$(SUITES_DIR)
+vpath %.c	$(SRC):\
+			$(SUITES_DIR):\
+			$(MOCKS_DIR):\
+			$(ROOT_SRC)/filesystem:\
+			$(ROOT_SRC)/file_data:\
+			$(ROOT_SRC)/scanner:\
+			$(ROOT_SRC)/renderer
+
 
 
 #----SHARED----#
+ROOT_SRCS = directory.c \
+			file_data.c \
+			scanner.c \
+			renderer.c
+
 SRCS = main.c \
-		math_suite.c \
-		string_suite.c
+		directory_mock.c \
+		print_mock.c \
+		directory_suite.c \
+		file_data_suite.c \
+		scanner_suite.c \
+		renderer_suite.c \
+		$(ROOT_SRCS)
 
 OBJS = $(SRCS:%.c=$(BIN_DIR)%.o)
 DEPS = $(OBJS:%.o=%.d)
@@ -92,10 +116,25 @@ clean:
 
 fclean: clean
 	@rm -f $(NAME)
-	@rm -rf $(CUNIT_DIR)
+	@rm -rf $(CUNIT_DIR) $(REPORTS_DIR)
 	@echo "$(RED)Tester deleted$(RESET)\n"
 
 re: fclean all
+
+cover: clean
+	@mkdir -p $(REPORTS_DIR)
+	@$(MAKE) --no-print-directory CCFLAGS="$(CCFLAGS) $(COVERAGE_FLAGS)" all
+	@echo "$(CYAN)Generating $(WHITE_BOLD)coverage reports$(CYAN)...$(RESET)\n"
+	@./tester > /dev/null
+	@$(MAKE) --no-print-directory gcov_report REPORT_OUTPUT_MODE="$(REPORT_OUTPUT_MODE)"
+
+gcov_report:
+	@mkdir -p $(REPORTS_DIR)
+	@gcov -b -o $(BIN_DIR) $(ROOT_SRCS) > /dev/null 2>&1
+	@mv -f *.gcov $(REPORTS_DIR) >/dev/null 2>&1 || true
+	@./generate_coverage_reports.sh "$(REPORT_OUTPUT_MODE)"
+	@$(MAKE) --no-print-directory clean > /dev/null
+	@echo "$(GREEN)[✓] $(PINK)Coverage reports saved in $(REPORTS_DIR)$(GREEN)$(RESET)"
 
 run: all
 	@echo "$(CYAN)Running $(WHITE_BOLD)tests$(CYAN)...$(RESET)\n"
@@ -106,6 +145,8 @@ run: all
 	fclean \
 	re \
 	run \
+	cover \
+	gcov_report \
 	setup-cunit
 
 -include $(DEPS)
