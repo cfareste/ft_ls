@@ -1,9 +1,7 @@
 TODO:
-2. Refactor reset_dirent_guarantees
-3. Refactor file_data -> file_entry
-4. Refactor add stat wrapper and add null / empty path protection there
-5. Other possible refactors
-6. Tests integración / e2e en el ls real
+1. Refactor file_data -> file_entry
+2. Refactor add stat wrapper and add null / empty path protection there
+3. Tests integración / e2e en el ls real
 
 
 TODO En algún momento:

@@ -4,20 +4,8 @@
 #include "file_data.h"
 #include "directory.h"
 
-t_file_data *scan(const char *path)
+static t_file_data *scan_directory(const char *path)
 {
-    if (path == NULL || *path == '\0')
-        return NULL;
-
-    struct stat st;
-
-    stat(path, &st);
-
-    if (!S_ISDIR(st.st_mode))
-    {
-        return file_data_create(path);
-    }
-
     DIR *dir_stream = directory_open(path);
 
     t_file_data *file_data_list = NULL;
@@ -32,6 +20,22 @@ t_file_data *scan(const char *path)
     }
 
     directory_close(&dir_stream);
-
     return file_data_list;
+}
+
+t_file_data *scan(const char *path)
+{
+    if (path == NULL || *path == '\0')
+        return NULL;
+
+    struct stat st;
+
+    stat(path, &st);
+
+    if (!S_ISDIR(st.st_mode))
+    {
+        return file_data_create(path);
+    }
+
+    return scan_directory(path);
 }
