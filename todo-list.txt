@@ -1,7 +1,6 @@
 TODO:
-1. Refactor file_data -> file_entry
-2. Refactor add stat wrapper and add null / empty path protection there
-3. Tests integración / e2e en el ls real
+1. Refactor add stat wrapper and add null / empty path protection there
+2. Tests integración / e2e en el ls real. Extraer el main a una función externa y testearla
 
 
 TODO En algún momento:

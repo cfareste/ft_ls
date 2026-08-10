@@ -59,7 +59,7 @@ vpath %.c	$(SRC):\
 			$(SUITES_DIR):\
 			$(MOCKS_DIR):\
 			$(ROOT_SRC)/filesystem:\
-			$(ROOT_SRC)/file_data:\
+			$(ROOT_SRC)/file_entry_list:\
 			$(ROOT_SRC)/scanner:\
 			$(ROOT_SRC)/renderer
 
@@ -67,7 +67,7 @@ vpath %.c	$(SRC):\
 
 #----SHARED----#
 ROOT_SRCS = directory.c \
-			file_data.c \
+			file_entry_list.c \
 			scanner.c \
 			renderer.c
 
@@ -76,7 +76,7 @@ SRCS = main.c \
 		print_mock.c \
 		stat_mock.c \
 		directory_suite.c \
-		file_data_suite.c \
+		file_entry_list_suite.c \
 		scanner_suite.c \
 		renderer_suite.c \
 		$(ROOT_SRCS)

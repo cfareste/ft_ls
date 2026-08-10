@@ -1,6 +1,6 @@
 #include "CUnit/CUnit.h"
 #include "CUnit/Basic.h"
-#include "file_data.h"
+#include "file_entry_list.h"
 
 #define SUITE_NAME "file_entry_list"
 #define DEFAULT_NAME "default"

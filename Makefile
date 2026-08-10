@@ -44,14 +44,14 @@ export GNL_BUFFER_SIZE := 50000
 #----VPATH----#
 vpath %.c	$(SRC):\
 			$(SRC)/filesystem:\
-			$(SRC)/file_data:\
+			$(SRC)/file_entry_list:\
 			$(SRC)/scanner:\
 			$(SRC)/renderer
 
 #----SHARED----#
 SRCS = ft_ls.c \
 		directory.c \
-		file_data.c \
+		file_entry_list.c \
 		scanner.c \
 		renderer.c
 

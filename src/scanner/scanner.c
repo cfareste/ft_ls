@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 #include "scanner.h"
-#include "file_data.h"
+#include "file_entry_list.h"
 #include "directory.h"
 
 static t_file_entry_list *scan_directory(const char *path)
