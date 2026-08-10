@@ -1,11 +1,11 @@
 #pragma once
 
-typedef struct s_file_data t_file_data;
+typedef struct s_file_entry_list t_file_entry_list;
 
-t_file_data *file_data_create(const char *file_name);
-const char *file_data_get_name(const t_file_data *_file_data);
-void file_data_set_name(t_file_data *_file_data, const char *_name);
-t_file_data *file_data_get_next(const t_file_data *_file_data);
-void file_data_add_entry(t_file_data **_file_data, t_file_data *_next);
-unsigned int file_data_get_length(const t_file_data *_file_data);
-void file_data_destroy(t_file_data **_file_data);
+t_file_entry_list *file_entry_list_create(const char *file_name);
+const char *file_entry_list_get_name(const t_file_entry_list *file_entry_list);
+void file_entry_list_set_name(t_file_entry_list *file_entry_list, const char *name);
+t_file_entry_list *file_entry_list_get_next(const t_file_entry_list *file_entry_list);
+void file_entry_list_add_entry(t_file_entry_list **file_entry_list, t_file_entry_list *next);
+unsigned int file_entry_list_get_length(const t_file_entry_list *file_entry_list);
+void file_entry_list_destroy(t_file_entry_list **file_entry_list);

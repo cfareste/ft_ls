@@ -2,4 +2,4 @@
 
 #include "file_data.h"
 
-void render(const t_file_data *file_list);
+void render(const t_file_entry_list *file_entry_list);

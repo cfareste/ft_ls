@@ -7,7 +7,7 @@ int	main(void)
 	if (CU_initialize_registry() != CUE_SUCCESS)
 		return 1;
 
-	register_file_data_suite();
+	register_file_entry_list_suite();
 	register_scanner_suite();
 	register_directory_suite();
 	register_renderer_suite();

@@ -5,11 +5,11 @@ int	main(int argc, char **argv)
 {
 	(void) argc;
 	(void) argv;
-	t_file_data *file_list = scan(".");
+	t_file_entry_list *file_entry_list = scan(".");
 
-	render(file_list);
+	render(file_entry_list);
 
-	file_data_destroy(&file_list);
+	file_entry_list_destroy(&file_entry_list);
 
 	return 0;
 }
