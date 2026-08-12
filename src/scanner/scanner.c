@@ -3,6 +3,7 @@
 #include "scanner.h"
 #include "file_entry_list.h"
 #include "directory.h"
+#include "file_data.h"
 
 static t_file_entry_list *scan_directory(const char *path)
 {
@@ -25,14 +26,12 @@ static t_file_entry_list *scan_directory(const char *path)
 
 t_file_entry_list *scan(const char *path)
 {
-    if (path == NULL || *path == '\0')
+    struct stat file_data;
+
+    if (get_file_data(path, &file_data) == FILE_DATA_COULD_NOT_RETRIEVE_DATA)
         return NULL;
 
-    struct stat st;
-
-    stat(path, &st);
-
-    if (!S_ISDIR(st.st_mode))
+    if (!S_ISDIR(file_data.st_mode))
     {
         return file_entry_list_create(path);
     }

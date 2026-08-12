@@ -67,6 +67,7 @@ vpath %.c	$(SRC):\
 
 #----SHARED----#
 ROOT_SRCS = directory.c \
+			file_data.c \
 			file_entry_list.c \
 			scanner.c \
 			renderer.c

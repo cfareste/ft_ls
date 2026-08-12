@@ -51,6 +51,7 @@ vpath %.c	$(SRC):\
 #----SHARED----#
 SRCS = ft_ls.c \
 		directory.c \
+		file_data.c \
 		file_entry_list.c \
 		scanner.c \
 		renderer.c
