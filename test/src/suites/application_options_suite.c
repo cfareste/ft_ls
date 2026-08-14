@@ -4,22 +4,25 @@
 
 #define SUITE_NAME "application_options"
 
+static t_ft_ls_options *sut;
+
+static void test_setup()
+{
+    sut = ft_ls_options_get(0);
+}
+
 static void should_be_created_correctly(void)
 {
-    t_ft_ls_options *options = ft_ls_options_get(0);
+    CU_ASSERT_PTR_NOT_NULL(sut);
 
-    CU_ASSERT_PTR_NOT_NULL(options);
-
-    ft_ls_options_destroy(&options);
+    ft_ls_options_destroy(&sut);
 }
 
 static void should_be_destroyed_correctly(void)
 {
-    t_ft_ls_options *options = ft_ls_options_get(0);
+    ft_ls_options_destroy(&sut);
 
-    ft_ls_options_destroy(&options);
-
-    CU_ASSERT_PTR_NULL(options);
+    CU_ASSERT_PTR_NULL(sut);
 }
 
 static void should_return_NULL_if_the_number_of_arguments_is_negative(void)
@@ -33,7 +36,7 @@ static void should_return_NULL_if_the_number_of_arguments_is_negative(void)
 
 void register_application_options_suite(void)
 {
-    const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, NULL, NULL);
+    const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, NULL);
 
     if (suite != NULL)
     {
