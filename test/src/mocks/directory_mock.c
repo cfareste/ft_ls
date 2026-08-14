@@ -10,32 +10,32 @@ typedef struct s_mock_dir
     unsigned int next_index;
 } t_mock_dir;
 
-static short g_opendir_fail = 0;
-static short g_readdir_fail = 0;
-static char *g_dirent_names[256] = { 0 };
-static char *g_expected_opendir_path = NULL;
+static short will_opendir_fail = 0;
+static short will_readdir_fail = 0;
+static char *next_dir_names[256] = { 0 };
+static char *expected_opendir_path = NULL;
 
 static void free_dirent_names(void)
 {
-    for (unsigned int i = 0; g_dirent_names[i] != NULL; i++)
+    for (unsigned int i = 0; next_dir_names[i] != NULL; i++)
     {
-        free(g_dirent_names[i]);
-        g_dirent_names[i] = NULL;
+        free(next_dir_names[i]);
+        next_dir_names[i] = NULL;
     }
 }
 
 static void free_expected_opendir_path(void)
 {
-    if (g_expected_opendir_path == NULL)
+    if (expected_opendir_path == NULL)
         return ;
 
-    free(g_expected_opendir_path);
-    g_expected_opendir_path = NULL;
+    free(expected_opendir_path);
+    expected_opendir_path = NULL;
 }
 
 DIR *mock_opendir(const char *path)
 {
-    if (g_opendir_fail == 1 || g_expected_opendir_path == NULL || ft_strcmp(path, g_expected_opendir_path) != EQUAL_STRINGS)
+    if (will_opendir_fail == 1 || expected_opendir_path == NULL || ft_strcmp(path, expected_opendir_path) != EQUAL_STRINGS)
         return NULL;
 
     (void) path;
@@ -49,11 +49,11 @@ struct dirent *mock_readdir(DIR *dirp)
 {
     t_mock_dir *dir = (t_mock_dir *) dirp;
 
-    if (g_readdir_fail == 1 || g_dirent_names[dir->next_index] == NULL)
+    if (will_readdir_fail == 1 || next_dir_names[dir->next_index] == NULL)
         return NULL;
 
     ft_bzero(&dir->entry, sizeof(dir->entry));
-    ft_strlcpy(dir->entry.d_name, g_dirent_names[dir->next_index], sizeof(dir->entry.d_name));
+    ft_strlcpy(dir->entry.d_name, next_dir_names[dir->next_index], sizeof(dir->entry.d_name));
     dir->next_index++;
 
     return &dir->entry;
@@ -67,23 +67,23 @@ int mock_closedir(DIR *dirp)
 
 void ensure_opendir_will_open_a_dir_named(const char *dir_name)
 {
-    g_opendir_fail = 0;
-    g_readdir_fail = 0;
+    will_opendir_fail = 0;
+    will_readdir_fail = 0;
     free_expected_opendir_path();
 
-    g_expected_opendir_path = ft_safe_strdup(dir_name);
+    expected_opendir_path = ft_safe_strdup(dir_name);
 }
 
 void guarantee_readdir_will_return_N_files_named(const char **files_names)
 {
-    g_opendir_fail = 0;
-    g_readdir_fail = 0;
+    will_opendir_fail = 0;
+    will_readdir_fail = 0;
     free_dirent_names();
 
     unsigned int i = 0;
     for (; files_names[i] != NULL; i++)
-        g_dirent_names[i] = ft_safe_strdup(files_names[i]);
-    g_dirent_names[i] = NULL;
+        next_dir_names[i] = ft_safe_strdup(files_names[i]);
+    next_dir_names[i] = NULL;
 }
 
 void guarantee_readdir_will_return_a_file_named(const char *file_name)
@@ -95,24 +95,20 @@ void guarantee_readdir_will_return_a_file_named(const char *file_name)
 
 void guarantee_opendir_will_fail()
 {
-    g_opendir_fail = 1;
-    g_readdir_fail = 0;
-    free_dirent_names();
-    free_expected_opendir_path();
+    reset_dirent_guarantees();
+    will_opendir_fail = 1;
 }
 
 void guarantee_readdir_will_fail()
 {
-    g_opendir_fail = 0;
-    g_readdir_fail = 1;
-    free_dirent_names();
-    free_expected_opendir_path();
+    reset_dirent_guarantees();
+    will_readdir_fail = 1;
 }
 
 void reset_dirent_guarantees()
 {
-    g_opendir_fail = 0;
-    g_readdir_fail = 0;
+    will_opendir_fail = 0;
+    will_readdir_fail = 0;
     free_dirent_names();
     free_expected_opendir_path();
 }
