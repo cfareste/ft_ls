@@ -22,6 +22,11 @@ static void assert_file_data_retrieving_succeed(const int result)
     CU_ASSERT_EQUAL(result, FILE_DATA_SUCCESS);
 }
 
+static void assert_file_type_is(const unsigned int type)
+{
+    CU_ASSERT_EQUAL(file_stats.st_mode, type);
+}
+
 static void should_return_an_error_when_retrieving_the_data_from_a_NULL_path(void)
 {
     const int result = get_file_data(NULL, &file_stats);
@@ -50,7 +55,7 @@ static void should_populate_successfully_a_valid_struct_when_passed_a_valid_regu
     const int result = get_file_data("valid", &file_stats);
 
     assert_file_data_retrieving_succeed(result);
-    CU_ASSERT_EQUAL(file_stats.st_mode, S_IFREG);
+    assert_file_type_is(S_IFREG);
 }
 
 static void should_populate_successfully_a_valid_struct_when_passed_a_valid_directory_path(void)
@@ -60,7 +65,7 @@ static void should_populate_successfully_a_valid_struct_when_passed_a_valid_dire
     const int result = get_file_data("valid", &file_stats);
 
     assert_file_data_retrieving_succeed(result);
-    CU_ASSERT_EQUAL(file_stats.st_mode, S_IFDIR);
+    assert_file_type_is(S_IFDIR);
 }
 
 void register_file_data_suite(void)
