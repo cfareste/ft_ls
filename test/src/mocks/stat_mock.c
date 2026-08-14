@@ -1,5 +1,4 @@
 #include <sys/stat.h>
-#include "libft.h"
 
 static unsigned int mode = 0;
 
