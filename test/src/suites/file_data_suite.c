@@ -19,6 +19,15 @@ static void should_return_an_error_when_retrieving_the_data_from_a_NULL_path(voi
     CU_ASSERT_EQUAL(result, FILE_DATA_COULD_NOT_RETRIEVE_DATA);
 }
 
+static void should_return_an_error_when_retrieving_the_data_from_an_empty_path(void)
+{
+    struct stat valid_stat;
+
+    const int result = get_file_data("", &valid_stat);
+
+    CU_ASSERT_EQUAL(result, FILE_DATA_COULD_NOT_RETRIEVE_DATA);
+}
+
 void register_file_data_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, NULL);
@@ -26,5 +35,6 @@ void register_file_data_suite(void)
     if (suite != NULL)
     {
         CU_add_test(suite, "should_return_an_error_when_retrieving_the_data_from_a_NULL_path", should_return_an_error_when_retrieving_the_data_from_a_NULL_path);
+        CU_add_test(suite, "should_return_an_error_when_retrieving_the_data_from_an_empty_path", should_return_an_error_when_retrieving_the_data_from_an_empty_path);
     }
 }
