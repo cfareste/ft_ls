@@ -14,4 +14,5 @@ t_ft_ls_options *ft_ls_options_get()
 void ft_ls_options_destroy(t_ft_ls_options **options)
 {
     free(*options);
+    *options = NULL;
 }
