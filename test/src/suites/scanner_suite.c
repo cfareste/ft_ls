@@ -53,8 +53,6 @@ static void assert_file_entry_list_names_are(const char **files_names)
 
 static void should_return_NULL_if_a_NULL_path_is_specified(void)
 {
-    guarantee_stat_will_populate_data_of_a_directory_type_file();
-
     scan_directory(NULL);
 
     assert_file_entry_list_is_null();
@@ -62,8 +60,6 @@ static void should_return_NULL_if_a_NULL_path_is_specified(void)
 
 static void should_return_NULL_if_an_empty_path_is_specified(void)
 {
-    guarantee_stat_will_populate_data_of_a_directory_type_file();
-
     scan_directory("");
 
     assert_file_entry_list_is_null();
