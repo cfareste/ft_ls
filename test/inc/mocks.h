@@ -1,5 +1,6 @@
 #pragma once
 
+void ensure_opendir_will_open_a_dir_named(const char *dir_name);
 void guarantee_readdir_will_return_N_files_named(const char **files_names);
 void guarantee_readdir_will_return_a_file_named(const char *file_name);
 void guarantee_opendir_will_fail();

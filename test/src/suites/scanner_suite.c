@@ -12,6 +12,7 @@ static void test_setup(void)
 {
     reset_dirent_guarantees();
     reset_stat_guarantees();
+    ensure_opendir_will_open_a_dir_named(".");
 }
 
 static void test_teardown(void)
@@ -112,6 +113,7 @@ static void should_return_a_list_of_entries_if_one_non_empty_directory_path_is_s
 {
     const char *files_names[5] = { "file", "subdir", "file2", "subdir2", NULL };
     guarantee_stat_will_populate_stats_of_a_directory_type_file();
+    ensure_opendir_will_open_a_dir_named("dir");
     guarantee_readdir_will_return_N_files_named(files_names);
 
     scan_directory("dir");

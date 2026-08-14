@@ -43,6 +43,8 @@ static void should_return_NULL_when_opening_an_empty_path(void)
 
 static void should_return_a_directory_stream_when_opening_a_valid_path(void)
 {
+    ensure_opendir_will_open_a_dir_named("valid");
+
     open_directory_stream("valid");
 
     CU_ASSERT_PTR_NOT_NULL(dir_stream_sut);
@@ -50,6 +52,7 @@ static void should_return_a_directory_stream_when_opening_a_valid_path(void)
 
 static void should_return_NULL_when_reading_an_entry_from_a_null_directory(void)
 {
+    ensure_opendir_will_open_a_dir_named("valid");
     open_directory_stream("valid");
 
     const struct dirent *entry = directory_get_next_entry(NULL);
@@ -60,6 +63,7 @@ static void should_return_NULL_when_reading_an_entry_from_a_null_directory(void)
 static void should_return_an_entry_when_reading_from_a_valid_directory(void)
 {
     const char *file_name = "file";
+    ensure_opendir_will_open_a_dir_named("valid");
     guarantee_readdir_will_return_a_file_named(file_name);
 
     open_directory_stream("valid");
@@ -79,6 +83,7 @@ static void should_return_minus_one_when_closing_a_null_directory(void)
 
 static void should_return_zero_when_closing_a_valid_directory(void)
 {
+    ensure_opendir_will_open_a_dir_named("valid");
     open_directory_stream("valid");
 
     const int actual = directory_close(&dir_stream_sut);
