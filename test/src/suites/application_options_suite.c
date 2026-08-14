@@ -8,7 +8,7 @@ static t_ft_ls_options *sut;
 
 static void test_setup(void)
 {
-    const char *valid_args[] = { "valid", NULL };
+    const char *valid_args[] = { NULL };
     sut = ft_ls_options_get(0, valid_args);
 }
 
