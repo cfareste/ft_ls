@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include "libft.h"
-#include "file_data.h"
+#include "file_stats.h"
 
 int get_file_stats(const char *file_path, struct stat *stats)
 {

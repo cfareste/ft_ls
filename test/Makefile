@@ -67,7 +67,7 @@ vpath %.c	$(SRC):\
 
 #----SHARED----#
 ROOT_SRCS = directory.c \
-			file_data.c \
+			file_stats.c \
 			file_entry_list.c \
 			scanner.c \
 			renderer.c
@@ -80,7 +80,7 @@ SRCS = main.c \
 		file_entry_list_suite.c \
 		scanner_suite.c \
 		renderer_suite.c \
-		file_data_suite.c \
+		file_stats_suite.c \
 		$(ROOT_SRCS)
 
 OBJS = $(SRCS:%.c=$(BIN_DIR)%.o)

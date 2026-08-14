@@ -1,7 +1,7 @@
 #include "CUnit/CUnit.h"
 #include "CUnit/Basic.h"
 #include "mocks.h"
-#include "file_data.h"
+#include "file_stats.h"
 
 #define SUITE_NAME "file_stats"
 

@@ -53,7 +53,7 @@ vpath %.c	$(SRC):\
 SRCS = ft_ls.c \
 		application.c \
 		directory.c \
-		file_data.c \
+		file_stats.c \
 		file_entry_list.c \
 		scanner.c \
 		renderer.c
