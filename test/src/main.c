@@ -11,6 +11,7 @@ int	main(void)
 	register_scanner_suite();
 	register_directory_suite();
 	register_renderer_suite();
+	register_file_data_suite();
 
 	CU_basic_set_mode(CU_BRM_VERBOSE);
 	CU_basic_run_tests();

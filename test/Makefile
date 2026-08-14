@@ -80,6 +80,7 @@ SRCS = main.c \
 		file_entry_list_suite.c \
 		scanner_suite.c \
 		renderer_suite.c \
+		file_data_suite.c \
 		$(ROOT_SRCS)
 
 OBJS = $(SRCS:%.c=$(BIN_DIR)%.o)
