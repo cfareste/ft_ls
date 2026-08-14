@@ -6,8 +6,11 @@ struct s_ft_ls_options
 {
 };
 
-t_ft_ls_options *ft_ls_options_get()
+t_ft_ls_options *ft_ls_options_get(int argc)
 {
+    if (argc < 0)
+        return NULL;
+
     return ft_safe_calloc(1, sizeof(t_ft_ls_options));
 }
 

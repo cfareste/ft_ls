@@ -6,7 +6,7 @@
 
 static void should_be_created_correctly(void)
 {
-    t_ft_ls_options *options = ft_ls_options_get();
+    t_ft_ls_options *options = ft_ls_options_get(0);
 
     CU_ASSERT_PTR_NOT_NULL(options);
 
@@ -15,11 +15,20 @@ static void should_be_created_correctly(void)
 
 static void should_be_destroyed_correctly(void)
 {
-    t_ft_ls_options *options = ft_ls_options_get();
+    t_ft_ls_options *options = ft_ls_options_get(0);
 
     ft_ls_options_destroy(&options);
 
     CU_ASSERT_PTR_NULL(options);
+}
+
+static void should_return_NULL_if_the_number_of_arguments_is_negative(void)
+{
+    t_ft_ls_options *options = ft_ls_options_get(-1);
+
+    CU_ASSERT_PTR_NULL(options);
+
+    ft_ls_options_destroy(&options);
 }
 
 void register_application_options_suite(void)
@@ -30,5 +39,6 @@ void register_application_options_suite(void)
     {
         CU_add_test(suite, "should_be_created_correctly", should_be_created_correctly);
         CU_add_test(suite, "should_be_destroyed_correctly", should_be_destroyed_correctly);
+        CU_add_test(suite, "should_return_NULL_if_the_number_of_arguments_is_negative", should_return_NULL_if_the_number_of_arguments_is_negative);
     }
 }
