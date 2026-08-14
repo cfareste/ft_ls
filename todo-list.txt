@@ -1,6 +1,7 @@
 TODO:
 1. Tests integración / e2e en el ls real. Extraer el main a una función externa y testearla
-2. Testear el wrapper de stat
+3. Refactor tests file_data
+4. Quitar guarantees innecesarios en scanner
 
 
 TODO En algún momento:
