@@ -58,6 +58,7 @@ LDFLAGS = $(LIBFT_LIB)
 vpath %.c	$(SRC):\
 			$(SUITES_DIR):\
 			$(MOCKS_DIR):\
+			$(ROOT_SRC)/application:\
 			$(ROOT_SRC)/filesystem:\
 			$(ROOT_SRC)/file_entry_list:\
 			$(ROOT_SRC)/scanner:\
@@ -66,7 +67,8 @@ vpath %.c	$(SRC):\
 
 
 #----SHARED----#
-ROOT_SRCS = directory.c \
+ROOT_SRCS = application.c \
+			directory.c \
 			file_stats.c \
 			file_entry_list.c \
 			scanner.c \
