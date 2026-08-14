@@ -81,6 +81,7 @@ SRCS = main.c \
 		scanner_suite.c \
 		renderer_suite.c \
 		file_stats_suite.c \
+		application_suite.c \
 		$(ROOT_SRCS)
 
 OBJS = $(SRCS:%.c=$(BIN_DIR)%.o)
