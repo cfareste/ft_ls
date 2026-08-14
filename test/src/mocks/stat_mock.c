@@ -5,9 +5,7 @@ static unsigned int mode = 0;
 
 int stat_mock(const char *restrict pathname, struct stat *restrict statbuf)
 {
-    if (ft_is_str_empty(pathname))
-        return -1;
-
+    (void) pathname;
     statbuf->st_mode = mode;
 
     return 0;

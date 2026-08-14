@@ -25,9 +25,10 @@ static void free_dirent_names(void)
 
 DIR *mock_opendir(const char *path)
 {
-    if (g_opendir_fail == 1 || path[0] == '\0')
+    if (g_opendir_fail == 1)
         return NULL;
 
+    (void) path;
     t_mock_dir *dir = ft_safe_calloc(1, sizeof(t_mock_dir));
     dir->next_index = 0;
 
@@ -38,7 +39,7 @@ struct dirent *mock_readdir(DIR *dirp)
 {
     t_mock_dir *dir = (t_mock_dir *) dirp;
 
-    if (g_readdir_fail == 1 || dir == NULL || g_dirent_names[dir->next_index] == NULL)
+    if (g_readdir_fail == 1 || g_dirent_names[dir->next_index] == NULL)
         return NULL;
 
     ft_bzero(&dir->entry, sizeof(dir->entry));
