@@ -1,7 +1,17 @@
 #include "CUnit/CUnit.h"
 #include "CUnit/Basic.h"
+#include "application_options.h"
 
 #define SUITE_NAME "application_options"
+
+static void should_be_created_correctly(void)
+{
+    t_ft_ls_options *options = ft_ls_options_get();
+
+    CU_ASSERT_PTR_NOT_NULL(options);
+
+    ft_ls_options_destroy(&options);
+}
 
 void register_application_options_suite(void)
 {
@@ -9,5 +19,6 @@ void register_application_options_suite(void)
 
     if (suite != NULL)
     {
+        CU_add_test(suite, "should_be_created_correctly", should_be_created_correctly);
     }
 }
