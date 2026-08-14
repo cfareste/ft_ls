@@ -12,25 +12,30 @@ static void test_setup(void)
     reset_stat_guarantees();
 }
 
+static void assert_file_data_retrieving_failed(const int result)
+{
+    CU_ASSERT_EQUAL(result, FILE_DATA_COULD_NOT_RETRIEVE_DATA);
+}
+
 static void should_return_an_error_when_retrieving_the_data_from_a_NULL_path(void)
 {
     const int result = get_file_data(NULL, &file_stats);
 
-    CU_ASSERT_EQUAL(result, FILE_DATA_COULD_NOT_RETRIEVE_DATA);
+    assert_file_data_retrieving_failed(result);
 }
 
 static void should_return_an_error_when_retrieving_the_data_from_an_empty_path(void)
 {
     const int result = get_file_data("", &file_stats);
 
-    CU_ASSERT_EQUAL(result, FILE_DATA_COULD_NOT_RETRIEVE_DATA);
+    assert_file_data_retrieving_failed(result);
 }
 
 static void should_return_an_error_when_populating_the_data_to_a_NULL_stat_struct(void)
 {
     const int result = get_file_data("valid", NULL);
 
-    CU_ASSERT_EQUAL(result, FILE_DATA_COULD_NOT_RETRIEVE_DATA);
+    assert_file_data_retrieving_failed(result);
 }
 
 static void should_populate_successfully_a_valid_struct_when_passed_a_valid_regular_file_path(void)
