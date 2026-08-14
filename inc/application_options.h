@@ -2,5 +2,5 @@
 
 typedef struct s_ft_ls_options t_ft_ls_options;
 
-t_ft_ls_options *ft_ls_options_get(int argc);
+t_ft_ls_options *ft_ls_options_get(int argc, const char **argv);
 void ft_ls_options_destroy(t_ft_ls_options **options);

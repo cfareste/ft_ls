@@ -6,9 +6,9 @@ struct s_ft_ls_options
 {
 };
 
-t_ft_ls_options *ft_ls_options_get(int argc)
+t_ft_ls_options *ft_ls_options_get(const int argc, const char **argv)
 {
-    if (argc < 0)
+    if (argc < 0 || argv == NULL)
         return NULL;
 
     return ft_safe_calloc(1, sizeof(t_ft_ls_options));
