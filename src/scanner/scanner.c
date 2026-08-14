@@ -26,12 +26,12 @@ static t_file_entry_list *scan_directory(const char *path)
 
 t_file_entry_list *scan(const char *path)
 {
-    struct stat file_data;
+    struct stat file_stats;
 
-    if (get_file_data(path, &file_data) == FILE_DATA_COULD_NOT_RETRIEVE_DATA)
+    if (get_file_stats(path, &file_stats) == FILE_STATS_COULD_NOT_RETRIEVE_STATS)
         return NULL;
 
-    if (!S_ISDIR(file_data.st_mode))
+    if (!S_ISDIR(file_stats.st_mode))
     {
         return file_entry_list_create(path);
     }

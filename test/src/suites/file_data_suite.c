@@ -3,7 +3,7 @@
 #include "mocks.h"
 #include "file_data.h"
 
-#define SUITE_NAME "file_data"
+#define SUITE_NAME "file_stats"
 
 static struct stat file_stats;
 
@@ -12,14 +12,14 @@ static void test_setup(void)
     reset_stat_guarantees();
 }
 
-static void assert_file_data_retrieving_failed(const int result)
+static void assert_file_stats_retrieving_failed(const int result)
 {
-    CU_ASSERT_EQUAL(result, FILE_DATA_COULD_NOT_RETRIEVE_DATA);
+    CU_ASSERT_EQUAL(result, FILE_STATS_COULD_NOT_RETRIEVE_STATS);
 }
 
-static void assert_file_data_retrieving_succeed(const int result)
+static void assert_file_stats_retrieving_succeed(const int result)
 {
-    CU_ASSERT_EQUAL(result, FILE_DATA_SUCCESS);
+    CU_ASSERT_EQUAL(result, FILE_STATS_SUCCESS);
 }
 
 static void assert_file_type_is(const unsigned int type)
@@ -27,57 +27,57 @@ static void assert_file_type_is(const unsigned int type)
     CU_ASSERT_EQUAL(file_stats.st_mode, type);
 }
 
-static void should_return_an_error_when_retrieving_the_data_from_a_NULL_path(void)
+static void should_return_an_error_when_retrieving_the_stats_from_a_NULL_path(void)
 {
-    const int result = get_file_data(NULL, &file_stats);
+    const int result = get_file_stats(NULL, &file_stats);
 
-    assert_file_data_retrieving_failed(result);
+    assert_file_stats_retrieving_failed(result);
 }
 
-static void should_return_an_error_when_retrieving_the_data_from_an_empty_path(void)
+static void should_return_an_error_when_retrieving_the_stats_from_an_empty_path(void)
 {
-    const int result = get_file_data("", &file_stats);
+    const int result = get_file_stats("", &file_stats);
 
-    assert_file_data_retrieving_failed(result);
+    assert_file_stats_retrieving_failed(result);
 }
 
-static void should_return_an_error_when_populating_the_data_to_a_NULL_stat_struct(void)
+static void should_return_an_error_when_populating_the_stats_to_a_NULL_stat_struct(void)
 {
-    const int result = get_file_data("valid", NULL);
+    const int result = get_file_stats("valid", NULL);
 
-    assert_file_data_retrieving_failed(result);
+    assert_file_stats_retrieving_failed(result);
 }
 
-static void should_populate_successfully_a_valid_struct_when_passed_a_valid_regular_file_path(void)
+static void should_populate_successfully_the_file_stats_when_passed_a_valid_regular_file_path(void)
 {
-    guarantee_stat_will_populate_data_of_a_regular_type_file();
+    guarantee_stat_will_populate_stats_of_a_regular_type_file();
 
-    const int result = get_file_data("valid", &file_stats);
+    const int result = get_file_stats("valid", &file_stats);
 
-    assert_file_data_retrieving_succeed(result);
+    assert_file_stats_retrieving_succeed(result);
     assert_file_type_is(S_IFREG);
 }
 
-static void should_populate_successfully_a_valid_struct_when_passed_a_valid_directory_path(void)
+static void should_populate_successfully_the_file_stats_when_passed_a_valid_directory_path(void)
 {
-    guarantee_stat_will_populate_data_of_a_directory_type_file();
+    guarantee_stat_will_populate_stats_of_a_directory_type_file();
 
-    const int result = get_file_data("valid", &file_stats);
+    const int result = get_file_stats("valid", &file_stats);
 
-    assert_file_data_retrieving_succeed(result);
+    assert_file_stats_retrieving_succeed(result);
     assert_file_type_is(S_IFDIR);
 }
 
-void register_file_data_suite(void)
+void register_file_stats_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, NULL);
 
     if (suite != NULL)
     {
-        CU_add_test(suite, "should_return_an_error_when_retrieving_the_data_from_a_NULL_path", should_return_an_error_when_retrieving_the_data_from_a_NULL_path);
-        CU_add_test(suite, "should_return_an_error_when_retrieving_the_data_from_an_empty_path", should_return_an_error_when_retrieving_the_data_from_an_empty_path);
-        CU_add_test(suite, "should_return_an_error_when_populating_the_data_to_a_NULL_stat_struct", should_return_an_error_when_populating_the_data_to_a_NULL_stat_struct);
-        CU_add_test(suite, "should_populate_successfully_a_valid_struct_when_passed_a_valid_regular_file_path", should_populate_successfully_a_valid_struct_when_passed_a_valid_regular_file_path);
-        CU_add_test(suite, "should_populate_successfully_a_valid_struct_when_passed_a_valid_directory_path", should_populate_successfully_a_valid_struct_when_passed_a_valid_directory_path);
+        CU_add_test(suite, "should_return_an_error_when_retrieving_the_stats_from_a_NULL_path", should_return_an_error_when_retrieving_the_stats_from_a_NULL_path);
+        CU_add_test(suite, "should_return_an_error_when_retrieving_the_stats_from_an_empty_path", should_return_an_error_when_retrieving_the_stats_from_an_empty_path);
+        CU_add_test(suite, "should_return_an_error_when_populating_the_stats_to_a_NULL_stat_struct", should_return_an_error_when_populating_the_stats_to_a_NULL_stat_struct);
+        CU_add_test(suite, "should_populate_successfully_the_file_stats_when_passed_a_valid_regular_file_path", should_populate_successfully_the_file_stats_when_passed_a_valid_regular_file_path);
+        CU_add_test(suite, "should_populate_successfully_the_file_stats_when_passed_a_valid_directory_path", should_populate_successfully_the_file_stats_when_passed_a_valid_directory_path);
     }
 }

@@ -4,4 +4,4 @@ void register_file_entry_list_suite(void);
 void register_scanner_suite(void);
 void register_directory_suite(void);
 void register_renderer_suite(void);
-void register_file_data_suite(void);
+void register_file_stats_suite(void);

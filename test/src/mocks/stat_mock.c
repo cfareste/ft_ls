@@ -10,12 +10,12 @@ int stat_mock(const char *restrict pathname, struct stat *restrict statbuf)
     return 0;
 }
 
-void guarantee_stat_will_populate_data_of_a_regular_type_file()
+void guarantee_stat_will_populate_stats_of_a_regular_type_file()
 {
     mode = S_IFREG;
 }
 
-void guarantee_stat_will_populate_data_of_a_directory_type_file()
+void guarantee_stat_will_populate_stats_of_a_directory_type_file()
 {
     mode = S_IFDIR;
 }
