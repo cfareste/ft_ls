@@ -5,4 +5,5 @@ void register_scanner_suite(void);
 void register_directory_suite(void);
 void register_renderer_suite(void);
 void register_file_stats_suite(void);
+void register_application_options_suite(void);
 void register_application_suite(void);
