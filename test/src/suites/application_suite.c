@@ -17,7 +17,7 @@ static void should_successfully_print_a_list_of_names_one_per_line_if_no_path_is
     // TODO: Should erase the "."; this should test when no argument is passed. Will erase it in the future
     const char *arguments[] = { ".", NULL };
     const char *file_names[7] = { ".", "..", "file1", "subdir1", "symlink", "zz", NULL };
-    t_ft_ls_options *options = ft_ls_options_get(arguments);
+    t_ft_ls_options *options = ft_ls_options_get(1, arguments);
     guarantee_stat_will_populate_stats_of_a_directory_type_file();
     ensure_opendir_will_open_a_dir_named(".");
     guarantee_readdir_will_return_N_files_named(file_names);
@@ -42,7 +42,7 @@ static void should_successfully_print_the_file_name_if_a_regular_file_path_is_sp
 {
     const char *file_name = "regular file";
     const char *arguments[] = { file_name, NULL };
-    t_ft_ls_options *options = ft_ls_options_get(arguments);
+    t_ft_ls_options *options = ft_ls_options_get(1, arguments);
     guarantee_stat_will_populate_stats_of_a_regular_type_file();
     guarantee_readdir_will_return_a_file_named(file_name);
 

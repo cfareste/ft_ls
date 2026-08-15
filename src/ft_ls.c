@@ -3,8 +3,7 @@
 
 int	main(const int argc, const char **argv)
 {
-	(void) argc;
-	t_ft_ls_options *options = ft_ls_options_get(argv);
+	t_ft_ls_options *options = ft_ls_options_get(argc, argv);
 
 	const int result = run_application(options);
 

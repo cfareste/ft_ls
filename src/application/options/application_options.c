@@ -7,9 +7,9 @@ struct s_ft_ls_options
     const char **file_parameters;
 };
 
-t_ft_ls_options *ft_ls_options_get(const char **arguments)
+t_ft_ls_options *ft_ls_options_get(const int num_of_arguments, const char **arguments)
 {
-    if (arguments == NULL)
+    if (num_of_arguments < 0 || arguments == NULL)
         return NULL;
 
     t_ft_ls_options *options = ft_safe_calloc(1, sizeof(t_ft_ls_options));

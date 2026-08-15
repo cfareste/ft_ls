@@ -5,7 +5,6 @@
 
 int run_application(const t_ft_ls_options *options)
 {
-    (void) options;
     t_file_entry_list *file_entry_list = scan(ft_ls_options_get_file_parameters(options)[0]);
 
     render(file_entry_list);
