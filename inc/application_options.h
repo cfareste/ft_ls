@@ -1,7 +1,7 @@
 #pragma once
 
-typedef struct s_ft_ls_options t_ft_ls_options;
+typedef struct s_parsed_arguments t_parsed_arguments;
 
-t_ft_ls_options *ft_ls_options_get(int num_of_arguments, const char **arguments);
-const char **ft_ls_options_get_file_parameters(const t_ft_ls_options *options);
-void ft_ls_options_destroy(t_ft_ls_options **options);
+t_parsed_arguments *parse_arguments(int num_of_arguments, const char **arguments);
+const char **parsed_arguments_get_file_operands(const t_parsed_arguments *parsed_arguments);
+void parsed_arguments_destroy(t_parsed_arguments **parsed_arguments);

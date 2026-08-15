@@ -3,11 +3,11 @@
 
 int	main(const int argc, const char **argv)
 {
-	t_ft_ls_options *options = ft_ls_options_get(argc - 1, &argv[1]);
+	t_parsed_arguments *parsed_arguments = parse_arguments(argc - 1, &argv[1]);
 
-	const int result = run_application(options);
+	const int result = run_application(parsed_arguments);
 
-	ft_ls_options_destroy(&options);
+	parsed_arguments_destroy(&parsed_arguments);
 
 	return result;
 }

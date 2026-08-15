@@ -17,12 +17,12 @@ static void should_successfully_print_the_contents_of_the_current_directory_one_
 {
     const char *arguments[] = { NULL };
     const char *file_names[7] = { ".", "..", "file1", "subdir1", "symlink", "zz", NULL };
-    t_ft_ls_options *options = ft_ls_options_get(0, arguments);
+    t_parsed_arguments *parsed_arguments = parse_arguments(0, arguments);
     guarantee_stat_will_populate_stats_of_a_directory_type_file();
     ensure_opendir_will_open_a_dir_named(".");
     guarantee_readdir_will_return_N_files_named(file_names);
 
-    const int result = run_application(options);
+    const int result = run_application(parsed_arguments);
 
     verify_that_the_str_that_has_been_printed_is("%s\n%s\n%s\n%s\n%s\n%s\n",
         file_names[0],
@@ -34,34 +34,34 @@ static void should_successfully_print_the_contents_of_the_current_directory_one_
     );
     CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
 
-    ft_ls_options_destroy(&options);
+    parsed_arguments_destroy(&parsed_arguments);
 }
 
 static void should_successfully_print_the_file_name_if_a_regular_file_operand_is_specified(void)
 {
     const char *file_name = "../../ft_ls/test/./frameworks/../regular_file";
     const char *arguments[] = { file_name, NULL };
-    t_ft_ls_options *options = ft_ls_options_get(1, arguments);
+    t_parsed_arguments *parsed_arguments = parse_arguments(1, arguments);
     guarantee_stat_will_populate_stats_of_a_regular_type_file();
 
-    const int result = run_application(options);
+    const int result = run_application(parsed_arguments);
 
     verify_that_the_str_that_has_been_printed_is("%s\n", file_name);
     CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
 
-    ft_ls_options_destroy(&options);
+    parsed_arguments_destroy(&parsed_arguments);
 }
 
 static void should_successfully_print_the_contents_of_the_directory_specified_as_an_operand(void)
 {
     const char *arguments[] = { "dir", NULL };
     const char *file_names[7] = { ".", "..", "file_from_dir_1", "subdir_1", "block_device", "char_device", NULL };
-    t_ft_ls_options *options = ft_ls_options_get(1, arguments);
+    t_parsed_arguments *parsed_arguments = parse_arguments(1, arguments);
     guarantee_stat_will_populate_stats_of_a_directory_type_file();
     ensure_opendir_will_open_a_dir_named(arguments[0]);
     guarantee_readdir_will_return_N_files_named(file_names);
 
-    const int result = run_application(options);
+    const int result = run_application(parsed_arguments);
 
     verify_that_the_str_that_has_been_printed_is("%s\n%s\n%s\n%s\n%s\n%s\n",
         file_names[0],
@@ -73,7 +73,7 @@ static void should_successfully_print_the_contents_of_the_directory_specified_as
     );
     CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
 
-    ft_ls_options_destroy(&options);
+    parsed_arguments_destroy(&parsed_arguments);
 }
 
 void register_application_suite(void)

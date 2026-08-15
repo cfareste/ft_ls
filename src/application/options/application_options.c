@@ -2,66 +2,69 @@
 #include "application_options.h"
 #include "libft.h"
 
-struct s_ft_ls_options
+#define DEFAULT_NUM_OF_OPERANDS 1
+#define DEFAULT_FILE_OPERAND "."
+
+struct s_parsed_arguments
 {
-    char **file_parameters;
+    char **file_operands;
 };
 
-static char **get_default_file_operand()
+static char **get_default_file_operands()
 {
-    char **file_operands = ft_safe_calloc(2, sizeof(char *));
+    char **file_operands = ft_safe_calloc(DEFAULT_NUM_OF_OPERANDS + 1, sizeof(char *));
 
-    file_operands[0] = ft_safe_strdup(".");
+    file_operands[0] = ft_safe_strdup(DEFAULT_FILE_OPERAND);
 
     return file_operands;
 }
 
 static char **get_file_operands_from_arguments(const int num_of_arguments, const char **arguments)
 {
-    char **file_parameters = ft_safe_calloc(num_of_arguments + 1, sizeof(char *));
+    char **file_operands = ft_safe_calloc(num_of_arguments + 1, sizeof(char *));
 
     for (int i = 0; i < num_of_arguments; i++)
     {
-        file_parameters[i] = ft_safe_strdup(arguments[i]);
+        file_operands[i] = ft_safe_strdup(arguments[i]);
     }
 
-    return file_parameters;
+    return file_operands;
 }
 
-static char **get_file_parameters(const int num_of_arguments, const char **arguments)
+static char **get_file_operands(const int num_of_arguments, const char **arguments)
 {
     if (num_of_arguments == 0)
-        return get_default_file_operand();
+        return get_default_file_operands();
 
     return get_file_operands_from_arguments(num_of_arguments, arguments);
 }
 
-t_ft_ls_options *ft_ls_options_get(const int num_of_arguments, const char **arguments)
+t_parsed_arguments *parse_arguments(const int num_of_arguments, const char **arguments)
 {
     if (num_of_arguments < 0 || arguments == NULL)
         return NULL;
 
-    t_ft_ls_options *options = ft_safe_calloc(1, sizeof(t_ft_ls_options));
-    options->file_parameters = get_file_parameters(num_of_arguments, arguments);
+    t_parsed_arguments *parsed_arguments = ft_safe_calloc(1, sizeof(t_parsed_arguments));
+    parsed_arguments->file_operands = get_file_operands(num_of_arguments, arguments);
 
-    return options;
+    return parsed_arguments;
 }
 
-const char **ft_ls_options_get_file_parameters(const t_ft_ls_options *options)
+const char **parsed_arguments_get_file_operands(const t_parsed_arguments *parsed_arguments)
 {
-    if (options == NULL)
+    if (parsed_arguments == NULL)
         return NULL;
 
-    return (const char **) options->file_parameters;
+    return (const char **) parsed_arguments->file_operands;
 }
 
-void ft_ls_options_destroy(t_ft_ls_options **options)
+void parsed_arguments_destroy(t_parsed_arguments **parsed_arguments)
 {
-    if (options == NULL || *options == NULL)
+    if (parsed_arguments == NULL || *parsed_arguments == NULL)
         return ;
 
-    ft_free_str_matrix((*options)->file_parameters);
-    free(*options);
+    ft_free_str_matrix((*parsed_arguments)->file_operands);
+    free(*parsed_arguments);
 
-    *options = NULL;
+    *parsed_arguments = NULL;
 }
