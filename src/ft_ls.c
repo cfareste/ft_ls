@@ -1,5 +1,4 @@
 #include "application.h"
-#include "application_options.h"
 
 int	main(const int argc, const char **argv)
 {

@@ -59,7 +59,7 @@ vpath %.c	$(SRC):\
 			$(SUITES_DIR):\
 			$(MOCKS_DIR):\
 			$(ROOT_SRC)/application:\
-			$(ROOT_SRC)/application/options:\
+			$(ROOT_SRC)/application/parsed_arguments:\
 			$(ROOT_SRC)/filesystem:\
 			$(ROOT_SRC)/file_entry_list:\
 			$(ROOT_SRC)/scanner:\
@@ -69,7 +69,7 @@ vpath %.c	$(SRC):\
 
 #----SHARED----#
 ROOT_SRCS = application.c \
-			application_options.c \
+			parsed_arguments.c \
 			directory.c \
 			file_stats.c \
 			file_entry_list.c \
@@ -85,7 +85,7 @@ SRCS = main.c \
 		scanner_suite.c \
 		renderer_suite.c \
 		file_stats_suite.c \
-		application_options_suite.c \
+		parsed_arguments_suite.c \
 		application_suite.c \
 		$(ROOT_SRCS)
 

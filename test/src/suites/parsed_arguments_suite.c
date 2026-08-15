@@ -1,6 +1,6 @@
 #include "CUnit/CUnit.h"
 #include "CUnit/Basic.h"
-#include "application_options.h"
+#include "parsed_arguments.h"
 
 #define SUITE_NAME "parsed_arguments"
 

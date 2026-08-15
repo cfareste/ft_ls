@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include "application_options.h"
+#include "parsed_arguments.h"
 #include "libft.h"
 
 #define DEFAULT_NUM_OF_OPERANDS 1
