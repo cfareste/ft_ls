@@ -7,15 +7,7 @@ struct s_ft_ls_options
     char **file_parameters;
 };
 
-static size_t get_num_of_file_parameters(const int num_of_arguments)
-{
-    if (num_of_arguments < 1)
-        return 1;
-
-    return num_of_arguments;
-}
-
-static char **get_default_current_directory_operand()
+static char **get_default_operand()
 {
     char **file_operands = ft_safe_calloc(2, sizeof(char *));
 
@@ -27,15 +19,12 @@ static char **get_default_current_directory_operand()
 static char **get_file_parameters(const int num_of_arguments, const char **arguments)
 {
     if (num_of_arguments == 0)
-    {
-        return get_default_current_directory_operand();
-    }
+        return get_default_operand();
 
-    const size_t num_of_file_parameters = get_num_of_file_parameters(num_of_arguments);
-    char **file_parameters = ft_safe_calloc(num_of_file_parameters + 1, sizeof(const char *));
+    char **file_parameters = ft_safe_calloc(num_of_arguments + 1, sizeof(const char *));
 
-    size_t i = 0;
-    for (i = 0; i < num_of_file_parameters; i++)
+    int i = 0;
+    for (i = 0; i < num_of_arguments; i++)
     {
         file_parameters[i] = ft_safe_strdup(arguments[i]);
     }
