@@ -20,6 +20,9 @@ t_ft_ls_options *ft_ls_options_get(const int num_of_arguments, const char **argu
 
 void ft_ls_options_destroy(t_ft_ls_options **options)
 {
+    if (options == NULL)
+        return ;
+
     free(*options);
     *options = NULL;
 }
