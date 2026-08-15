@@ -29,8 +29,7 @@ static void should_successfully_print_the_contents_of_the_current_directory_one_
         file_names[2],
         file_names[3],
         file_names[4],
-        file_names[5],
-        file_names[6]
+        file_names[5]
     );
     CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
 
@@ -39,7 +38,7 @@ static void should_successfully_print_the_contents_of_the_current_directory_one_
 
 static void should_successfully_print_the_file_name_if_a_regular_file_operand_is_specified(void)
 {
-    const char *file_name = "regular file";
+    const char *file_name = "regular_file";
     const char *arguments[] = { file_name, NULL };
     t_ft_ls_options *options = ft_ls_options_get(1, arguments);
     guarantee_stat_will_populate_stats_of_a_regular_type_file();
@@ -53,12 +52,37 @@ static void should_successfully_print_the_file_name_if_a_regular_file_operand_is
     ft_ls_options_destroy(&options);
 }
 
+static void should_successfully_print_the_contents_of_the_directory_specified_as_an_operand(void)
+{
+    const char *arguments[] = { "dir", NULL };
+    const char *file_names[7] = { ".", "..", "file_from_dir_1", "subdir_1", "block_device", "char_device", NULL };
+    t_ft_ls_options *options = ft_ls_options_get(1, arguments);
+    guarantee_stat_will_populate_stats_of_a_directory_type_file();
+    ensure_opendir_will_open_a_dir_named(arguments[0]);
+    guarantee_readdir_will_return_N_files_named(file_names);
+
+    const int result = run_application(options);
+
+    verify_that_the_str_that_has_been_printed_is("%s\n%s\n%s\n%s\n%s\n%s\n",
+        file_names[0],
+        file_names[1],
+        file_names[2],
+        file_names[3],
+        file_names[4],
+        file_names[5]
+    );
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+
+    ft_ls_options_destroy(&options);
+}
+
 void register_application_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, NULL);
 
     if (suite != NULL)
     {
+        CU_add_test(suite, "should_successfully_print_the_contents_of_the_directory_specified_as_an_operand", should_successfully_print_the_contents_of_the_directory_specified_as_an_operand);
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_current_directory_one_per_line_if_no_file_operands_are_specified", should_successfully_print_the_contents_of_the_current_directory_one_per_line_if_no_file_operands_are_specified);
         CU_add_test(suite, "should_successfully_print_the_file_name_if_a_regular_file_operand_is_specified", should_successfully_print_the_file_name_if_a_regular_file_operand_is_specified);
     }
