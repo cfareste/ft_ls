@@ -4,6 +4,7 @@
 
 struct s_ft_ls_options
 {
+    const char **file_parameters;
 };
 
 t_ft_ls_options *ft_ls_options_get(const char **arguments)
@@ -11,11 +12,19 @@ t_ft_ls_options *ft_ls_options_get(const char **arguments)
     if (arguments == NULL)
         return NULL;
 
-    return ft_safe_calloc(1, sizeof(t_ft_ls_options));
+    t_ft_ls_options *options = ft_safe_calloc(1, sizeof(t_ft_ls_options));
+    options->file_parameters = arguments;
+
+    return options;
 }
 
 void ft_ls_options_destroy(t_ft_ls_options **options)
 {
     free(*options);
     *options = NULL;
+}
+
+const char **ft_ls_options_get_file_parameters(const t_ft_ls_options *options)
+{
+    return options->file_parameters;
 }

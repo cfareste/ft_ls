@@ -38,6 +38,21 @@ static void should_return_NULL_if_arguments_are_NULL(void)
     ft_ls_options_destroy(&options);
 }
 
+static void should_return_the_file_parameters(void)
+{
+    const char *args[] = { "valid", "file", "parameters", NULL };
+    t_ft_ls_options *options = ft_ls_options_get(args);
+
+    const char **file_parameters = ft_ls_options_get_file_parameters(options);
+
+    CU_ASSERT_STRING_EQUAL(file_parameters[0], args[0]);
+    CU_ASSERT_STRING_EQUAL(file_parameters[1], args[1]);
+    CU_ASSERT_STRING_EQUAL(file_parameters[2], args[2]);
+    CU_ASSERT_PTR_NULL(file_parameters[3]);
+
+    ft_ls_options_destroy(&options);
+}
+
 void register_application_options_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, test_teardown);
@@ -47,5 +62,6 @@ void register_application_options_suite(void)
         CU_add_test(suite, "should_be_created_correctly", should_be_created_correctly);
         CU_add_test(suite, "should_be_destroyed_correctly", should_be_destroyed_correctly);
         CU_add_test(suite, "should_return_NULL_if_arguments_are_NULL", should_return_NULL_if_arguments_are_NULL);
+        CU_add_test(suite, "should_return_the_file_parameters", should_return_the_file_parameters);
     }
 }
