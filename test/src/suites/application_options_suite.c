@@ -9,7 +9,7 @@ static t_ft_ls_options *sut;
 static void test_setup(void)
 {
     const char *valid_args[] = { NULL };
-    sut = ft_ls_options_get(0, valid_args);
+    sut = ft_ls_options_get(valid_args);
 }
 
 static void test_teardown(void)
@@ -29,19 +29,9 @@ static void should_be_destroyed_correctly(void)
     CU_ASSERT_PTR_NULL(sut);
 }
 
-static void should_return_NULL_if_the_number_of_arguments_is_negative(void)
-{
-    const char *valid_args[] = { "valid", NULL };
-    t_ft_ls_options *options = ft_ls_options_get(-1, valid_args);
-
-    CU_ASSERT_PTR_NULL(options);
-
-    ft_ls_options_destroy(&options);
-}
-
 static void should_return_NULL_if_arguments_are_NULL(void)
 {
-    t_ft_ls_options *options = ft_ls_options_get(1, NULL);
+    t_ft_ls_options *options = ft_ls_options_get(NULL);
 
     CU_ASSERT_PTR_NULL(options);
 
@@ -56,7 +46,6 @@ void register_application_options_suite(void)
     {
         CU_add_test(suite, "should_be_created_correctly", should_be_created_correctly);
         CU_add_test(suite, "should_be_destroyed_correctly", should_be_destroyed_correctly);
-        CU_add_test(suite, "should_return_NULL_if_the_number_of_arguments_is_negative", should_return_NULL_if_the_number_of_arguments_is_negative);
         CU_add_test(suite, "should_return_NULL_if_arguments_are_NULL", should_return_NULL_if_arguments_are_NULL);
     }
 }
