@@ -7,7 +7,7 @@ struct s_ft_ls_options
     char **file_parameters;
 };
 
-static char **get_default_operand()
+static char **get_default_file_operand()
 {
     char **file_operands = ft_safe_calloc(2, sizeof(char *));
 
@@ -16,20 +16,24 @@ static char **get_default_operand()
     return file_operands;
 }
 
-static char **get_file_parameters(const int num_of_arguments, const char **arguments)
+static char **get_file_operands_from_arguments(const int num_of_arguments, const char **arguments)
 {
-    if (num_of_arguments == 0)
-        return get_default_operand();
+    char **file_parameters = ft_safe_calloc(num_of_arguments + 1, sizeof(char *));
 
-    char **file_parameters = ft_safe_calloc(num_of_arguments + 1, sizeof(const char *));
-
-    int i = 0;
-    for (i = 0; i < num_of_arguments; i++)
+    for (int i = 0; i < num_of_arguments; i++)
     {
         file_parameters[i] = ft_safe_strdup(arguments[i]);
     }
 
     return file_parameters;
+}
+
+static char **get_file_parameters(const int num_of_arguments, const char **arguments)
+{
+    if (num_of_arguments == 0)
+        return get_default_file_operand();
+
+    return get_file_operands_from_arguments(num_of_arguments, arguments);
 }
 
 t_ft_ls_options *ft_ls_options_get(const int num_of_arguments, const char **arguments)
