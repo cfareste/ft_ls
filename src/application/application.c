@@ -2,6 +2,7 @@
 #include "file_entry_list.h"
 #include "scanner.h"
 #include "renderer.h"
+#include "error_codes.h"
 
 int run_application(const t_ft_ls_options *options)
 {

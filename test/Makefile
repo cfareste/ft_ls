@@ -150,6 +150,7 @@ run: all
 	@./tester
 
 e2e:
+	@echo "$(CYAN)Running $(WHITE_BOLD)E2E tests$(CYAN)...$(RESET)\n"
 	@cp ../ft_ls .
 	@./run_e2e.sh
 	@rm -rf ./ft_ls
