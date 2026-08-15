@@ -47,6 +47,14 @@ t_ft_ls_options *ft_ls_options_get(const int num_of_arguments, const char **argu
     return options;
 }
 
+const char **ft_ls_options_get_file_parameters(const t_ft_ls_options *options)
+{
+    if (options == NULL)
+        return NULL;
+
+    return (const char **) options->file_parameters;
+}
+
 void ft_ls_options_destroy(t_ft_ls_options **options)
 {
     if (options == NULL || *options == NULL)
@@ -60,13 +68,6 @@ void ft_ls_options_destroy(t_ft_ls_options **options)
     } while ((*options)->file_parameters[i] != NULL);
     free((*options)->file_parameters);
     free(*options);
+
     *options = NULL;
-}
-
-const char **ft_ls_options_get_file_parameters(const t_ft_ls_options *options)
-{
-    if (options == NULL)
-        return NULL;
-
-    return (const char **) options->file_parameters;
 }
