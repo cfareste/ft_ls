@@ -60,13 +60,7 @@ void ft_ls_options_destroy(t_ft_ls_options **options)
     if (options == NULL || *options == NULL)
         return ;
 
-    size_t i = 0;
-    do
-    {
-        free((*options)->file_parameters[i]);
-        i++;
-    } while ((*options)->file_parameters[i] != NULL);
-    free((*options)->file_parameters);
+    ft_free_str_matrix((*options)->file_parameters);
     free(*options);
 
     *options = NULL;
