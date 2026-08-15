@@ -3,6 +3,7 @@ TODO:
 1. Tests integración / e2e en el ls real. Extraer el main a una función externa y testearla
 2. Extraer return codes de application.h a error_codes.h
 3. run_application -> run_ft_ls_application
+4. Refactor options / arguments -> arguments / operands
 
 
 TODO En algún momento:

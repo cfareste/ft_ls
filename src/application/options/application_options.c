@@ -15,16 +15,24 @@ static size_t get_num_of_file_parameters(const int num_of_arguments)
     return num_of_arguments;
 }
 
+static char **get_default_current_directory_operand()
+{
+    char **file_operands = ft_safe_calloc(2, sizeof(char *));
+
+    file_operands[0] = ft_safe_strdup(".");
+
+    return file_operands;
+}
+
 static char **get_file_parameters(const int num_of_arguments, const char **arguments)
 {
-    const size_t num_of_file_parameters = get_num_of_file_parameters(num_of_arguments);
-    char **file_parameters = ft_safe_calloc(num_of_file_parameters + 1, sizeof(const char *));
-
     if (num_of_arguments == 0)
     {
-        file_parameters[0] = ft_safe_strdup(".");
-        return file_parameters;
+        return get_default_current_directory_operand();
     }
+
+    const size_t num_of_file_parameters = get_num_of_file_parameters(num_of_arguments);
+    char **file_parameters = ft_safe_calloc(num_of_file_parameters + 1, sizeof(const char *));
 
     size_t i = 0;
     for (i = 0; i < num_of_file_parameters; i++)
