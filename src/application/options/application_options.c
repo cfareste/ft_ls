@@ -29,5 +29,8 @@ void ft_ls_options_destroy(t_ft_ls_options **options)
 
 const char **ft_ls_options_get_file_parameters(const t_ft_ls_options *options)
 {
+    if (options == NULL)
+        return NULL;
+
     return options->file_parameters;
 }

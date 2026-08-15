@@ -59,6 +59,13 @@ static void should_return_NULL_if_arguments_are_NULL(void)
     ft_ls_options_destroy(&options);
 }
 
+static void should_return_NULL_for_file_parameters_if_NULL_options_are_passed(void)
+{
+    const char **file_parameters = ft_ls_options_get_file_parameters(NULL);
+
+    CU_ASSERT_PTR_NULL(file_parameters);
+}
+
 static void should_return_the_file_parameters(void)
 {
     const char *args[] = { "valid", "file", "parameters", NULL };
@@ -86,6 +93,7 @@ void register_application_options_suite(void)
         CU_add_test(suite, "should_not_fail_to_destroy_if_its_already_null", should_not_fail_to_destroy_if_its_already_null);
         CU_add_test(suite, "should_return_NULL_if_num_of_arguments_is_negative", should_return_NULL_if_num_of_arguments_is_negative);
         CU_add_test(suite, "should_return_NULL_if_arguments_are_NULL", should_return_NULL_if_arguments_are_NULL);
+        CU_add_test(suite, "should_return_NULL_for_file_parameters_if_NULL_options_are_passed", should_return_NULL_for_file_parameters_if_NULL_options_are_passed);
         CU_add_test(suite, "should_return_the_file_parameters", should_return_the_file_parameters);
     }
 }

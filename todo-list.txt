@@ -1,6 +1,5 @@
 TODO:
 0. Crear ft_ls_options suite y tests
-0,5. Crear test para destroy ft_ls_options
 1. Tests integración / e2e en el ls real. Extraer el main a una función externa y testearla
 2. Extraer return codes de application.h a error_codes.h
 3. run_application -> run_ft_ls_application
