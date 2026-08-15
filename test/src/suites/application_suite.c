@@ -38,11 +38,10 @@ static void should_successfully_print_the_contents_of_the_current_directory_one_
 
 static void should_successfully_print_the_file_name_if_a_regular_file_operand_is_specified(void)
 {
-    const char *file_name = "regular_file";
+    const char *file_name = "../../ft_ls/test/./frameworks/../regular_file";
     const char *arguments[] = { file_name, NULL };
     t_ft_ls_options *options = ft_ls_options_get(1, arguments);
     guarantee_stat_will_populate_stats_of_a_regular_type_file();
-    guarantee_readdir_will_return_a_file_named(file_name);
 
     const int result = run_application(options);
 
