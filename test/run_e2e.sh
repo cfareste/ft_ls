@@ -13,6 +13,7 @@ BOLD='\033[1m'
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TESTS_DIR="${SCRIPT_DIR}/e2e"
 TESTS_FILE="${TESTS_DIR}/tests.txt"
+TESTDIR_PATH="./testdir"
 DELIMITER="::"
 
 trim() {
@@ -36,6 +37,38 @@ print_info() {
 
 print_summary() {
     printf '%bSummary: %d tests executed, %d passed, %d failed%b\n' "${YELLOW}" "$1" "$2" "$3" "${RESET}"
+}
+
+prepare_test_environment() {
+    rm -rf "${TESTDIR_PATH}"
+    mkdir -p "${TESTDIR_PATH}/ssfaf"
+    mkdir -p "${TESTDIR_PATH}/testttttatatat"
+
+    touch "${TESTDIR_PATH}/'my"
+    touch "${TESTDIR_PATH}/'my file'"
+    touch "${TESTDIR_PATH}/\"file\""
+    touch "${TESTDIR_PATH}/file"
+    touch "${TESTDIR_PATH}/file'"
+    touch "${TESTDIR_PATH}/file2"
+    touch "${TESTDIR_PATH}/my file"
+    touch "${TESTDIR_PATH}/my-pdf.pdf"
+    touch "${TESTDIR_PATH}/myfiñe"
+    touch "${TESTDIR_PATH}/nwl"
+    touch "${TESTDIR_PATH}/test@pdf"
+    touch "${TESTDIR_PATH}/tab\tfile"
+    touch "${TESTDIR_PATH}/a"
+    touch "${TESTDIR_PATH}/file "
+    touch "${TESTDIR_PATH}/ "
+
+    ln -s "ssfaf" "${TESTDIR_PATH}/link_to_ssfaf"
+    printf 'hello' > "${TESTDIR_PATH}/file"
+    printf 'world' > "${TESTDIR_PATH}/file2"
+    printf 'sample' > "${TESTDIR_PATH}/a"
+    printf 'data' > "${TESTDIR_PATH}/nwl"
+}
+
+remove_test_environment() {
+    rm -rf "${TESTDIR_PATH}"
 }
 
 parse_test_entry() {
@@ -123,6 +156,8 @@ main() {
     export LANG=C
     export LC_ALL=C
 
+    prepare_test_environment
+
     local line=""
     local parsed=""
     local ft_cmd=""
@@ -147,6 +182,8 @@ main() {
 
     echo
     print_summary "${total}" "${passed}" "${failed}"
+
+    remove_test_environment
 
     if [[ "${failed}" -ne 0 ]]; then
         exit 1
