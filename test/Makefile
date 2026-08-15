@@ -149,11 +149,17 @@ run: all
 	@echo "$(CYAN)Running $(WHITE_BOLD)tests$(CYAN)...$(RESET)\n"
 	@./tester
 
+e2e:
+	@cp ../ft_ls .
+	@./run_e2e.sh
+	@rm -rf ./ft_ls
+
 .PHONY: all \
 	clean \
 	fclean \
 	re \
 	run \
+	e2e \
 	cover \
 	gcov_report \
 	setup-cunit

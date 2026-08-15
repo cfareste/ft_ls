@@ -1,0 +1,10 @@
+# Format: <ft_ls command> :: <ls model command>
+# Example: ./ft_ls testdir :: ls -aU testdir | cat
+#
+# Remember: Columns without tty: -C | Colors without tty: --colors
+#
+
+./ft_ls             ::    ls -aU | cat
+./ft_ls .           ::    ls -aU . | cat
+./ft_ls Makefile    ::    ls -aU Makefile | cat
+./ft_ls testdir     ::    ls -aU testdir | cat

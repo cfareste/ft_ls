@@ -106,6 +106,9 @@ test: make_libft
 test_cover: make_libft
 	@$(MAKE) --no-print-directory -C $(TEST_DIR) cover REPORT_OUTPUT_MODE="$(REPORT_OUTPUT_MODE)"
 
+test_e2e: bonus
+	@$(MAKE) --no-print-directory -C $(TEST_DIR) e2e
+
 test_clean:
 	@$(MAKE) --no-print-directory -C $(TEST_DIR) clean
 
@@ -132,6 +135,7 @@ libft_fclean:
 		bre \
 		test \
 		test_cover \
+		test_e2e \
 		test_clean \
 		test_fclean \
 		make_libft \
