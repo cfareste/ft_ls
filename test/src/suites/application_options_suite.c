@@ -34,6 +34,12 @@ static void should_not_fail_to_destroy_when_a_null_pointer_is_passed(void)
     ft_ls_options_destroy(NULL);
 }
 
+static void should_not_fail_to_destroy_if_its_already_null(void)
+{
+    ft_ls_options_destroy(&sut);
+    ft_ls_options_destroy(&sut);
+}
+
 static void should_return_NULL_if_num_of_arguments_is_negative(void)
 {
     const char *args[] = { "valid", "args", NULL };
@@ -77,6 +83,7 @@ void register_application_options_suite(void)
         CU_add_test(suite, "should_be_created_correctly", should_be_created_correctly);
         CU_add_test(suite, "should_be_destroyed_correctly", should_be_destroyed_correctly);
         CU_add_test(suite, "should_not_fail_to_destroy_when_a_null_pointer_is_passed", should_not_fail_to_destroy_when_a_null_pointer_is_passed);
+        CU_add_test(suite, "should_not_fail_to_destroy_if_its_already_null", should_not_fail_to_destroy_if_its_already_null);
         CU_add_test(suite, "should_return_NULL_if_num_of_arguments_is_negative", should_return_NULL_if_num_of_arguments_is_negative);
         CU_add_test(suite, "should_return_NULL_if_arguments_are_NULL", should_return_NULL_if_arguments_are_NULL);
         CU_add_test(suite, "should_return_the_file_parameters", should_return_the_file_parameters);
