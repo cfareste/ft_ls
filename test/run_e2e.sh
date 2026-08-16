@@ -65,6 +65,12 @@ prepare_test_environment() {
     printf 'world' > "${TESTDIR_PATH}/file2"
     printf 'sample' > "${TESTDIR_PATH}/a"
     printf 'data' > "${TESTDIR_PATH}/nwl"
+
+    touch "/tmp/tempfile"
+    mkdir -p "/tmp/tempdir"
+    touch "/tmp/tempdir/file1"
+    touch "/tmp/tempdir/file2"
+    touch "/tmp/tempdir/file3"
 }
 
 remove_test_environment() {

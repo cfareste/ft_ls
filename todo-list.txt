@@ -1,5 +1,5 @@
 TODO:
-
+1. Quitar la responsabilidad de saber si es un fichero o un directorio del scanner; solo debería escanear directorios
 
 
 TODO En algún momento:

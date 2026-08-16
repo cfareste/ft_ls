@@ -10,5 +10,5 @@
 ./ft_ls testdir                                ::        ls -aU testdir
 ./ft_ls ../../ft_ls/./test/testdir             ::        ls -aU ../../ft_ls/./test/testdir
 ./ft_ls ../../ft_ls/./test/testdir/file        ::        ls -aU ../../ft_ls/./test/testdir/file
-./ft_ls /home/chris/dev/42bcn/ft_ls/Makefile   ::        ls -aU /home/chris/dev/42bcn/ft_ls/Makefile
-./ft_ls /home/chris/dev/42bcn/ft_ls/test/      ::        ls -aU /home/chris/dev/42bcn/ft_ls/test/
+./ft_ls /tmp/tempfile                          ::        ls -aU /tmp/tempfile
+./ft_ls /tmp/tempdir/                          ::        ls -aU /tmp/tempdir/
