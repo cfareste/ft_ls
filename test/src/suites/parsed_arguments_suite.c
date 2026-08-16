@@ -61,7 +61,7 @@ static void should_return_NULL_if_arguments_are_NULL(void)
 
 static void should_return_NULL_file_operands_if_NULL_parsed_arguments_are_passed(void)
 {
-    const char **file_operands = parsed_arguments_get_file_operands(NULL);
+    const char * const *file_operands = parsed_arguments_get_file_operands(NULL);
 
     CU_ASSERT_PTR_NULL(file_operands);
 }
@@ -71,7 +71,7 @@ static void should_return_the_file_operands(void)
     const char *args[] = { "valid", "file", "operands", NULL };
     t_parsed_arguments *parsed_arguments = parse_arguments(3, args);
 
-    const char **file_operands = parsed_arguments_get_file_operands(parsed_arguments);
+    const char * const *file_operands = parsed_arguments_get_file_operands(parsed_arguments);
 
     CU_ASSERT_STRING_EQUAL(file_operands[0], args[0]);
     CU_ASSERT_STRING_EQUAL(file_operands[1], args[1]);

@@ -50,12 +50,12 @@ t_parsed_arguments *parse_arguments(const int num_of_arguments, const char **arg
     return parsed_arguments;
 }
 
-const char **parsed_arguments_get_file_operands(const t_parsed_arguments *parsed_arguments)
+const char * const *parsed_arguments_get_file_operands(const t_parsed_arguments *parsed_arguments)
 {
     if (parsed_arguments == NULL)
         return NULL;
 
-    return (const char **) parsed_arguments->file_operands;
+    return (const char * const *) parsed_arguments->file_operands;
 }
 
 void parsed_arguments_destroy(t_parsed_arguments **parsed_arguments)

@@ -1,6 +1,5 @@
 TODO:
-1. Refactor options / arguments -> parsed_arguments / operands / options...
-2. Revisar consts en donde devuelvo
+1. Preguntarle al gepetto que tal el tell dont ask y demeter
 
 
 TODO En algún momento:
@@ -24,6 +23,7 @@ el terreno allanado, como con los mocks, github actions, etc. Cada una de ellas 
   - Buscar al principio las fuentes necesarias para saber todos los requerimientos. TODAS, cuanto más oficiales mejor (POSIX, etc.)
   - Apuntar todos los requerimientos y separarlos por épicas (basic behavior, mandatory options...)
   - Reordenar los requerimientos de cada épica en historias
+- Mirar el casing de C
 
 
 TODO QA:
