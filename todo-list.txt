@@ -1,10 +1,14 @@
 TODO:
-1. Quitar la responsabilidad de saber si es un fichero o un directorio del scanner; solo debería escanear directorios
+2. Workflow:
+   - Stat argumentos (y errores aunque ahora no)
+   - Crear file entry list por cada argumento
+       - Support -R
+   - Render
+
 
 
 TODO En algún momento:
 - Meterle al mock del stat un mapping de cada nombre de fichero -> tipo (para cuando haya multiple llamadas al stat). Similar al readdir
-- Usar un struct para listas, otro para file data y rename de file data a file entry ******
 - Investigar si los tests están acoplados a la implementacion interna de las cosas
 - Usar un struct propio para los opendirs, readdirs, etc. (como t_dir_stream de antes)
 - Si tengo problemas, tendre que meter un wrapper al ft_printf para poder mockearlo

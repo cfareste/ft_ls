@@ -1,11 +1,9 @@
 #include <stdlib.h>
-#include <sys/stat.h>
 #include "scanner.h"
 #include "file_entry_list.h"
 #include "directory.h"
-#include "file_stats.h"
 
-static t_file_entry_list *scan_directory(const char *path)
+t_file_entry_list *scan(const char *path)
 {
     DIR *dir_stream = directory_open(path);
 
@@ -22,19 +20,4 @@ static t_file_entry_list *scan_directory(const char *path)
 
     directory_close(&dir_stream);
     return file_entry_list;
-}
-
-t_file_entry_list *scan(const char *path)
-{
-    struct stat file_stats;
-
-    if (get_file_stats(path, &file_stats) == FILE_STATS_COULD_NOT_RETRIEVE_STATS)
-        return NULL;
-
-    if (!S_ISDIR(file_stats.st_mode))
-    {
-        return file_entry_list_create(path);
-    }
-
-    return scan_directory(path);
 }

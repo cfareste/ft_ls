@@ -73,6 +73,7 @@ ROOT_SRCS = application.c \
 			directory.c \
 			file_stats.c \
 			file_entry_list.c \
+			file_entry_list_factory.c \
 			scanner.c \
 			renderer.c
 
@@ -82,7 +83,7 @@ SRCS = main.c \
 		stat_mock.c \
 		directory_suite.c \
 		file_entry_list_suite.c \
-		scanner_suite.c \
+		file_entry_list_factory_suite.c \
 		renderer_suite.c \
 		file_stats_suite.c \
 		parsed_arguments_suite.c \

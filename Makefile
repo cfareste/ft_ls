@@ -57,6 +57,7 @@ SRCS = ft_ls.c \
 		directory.c \
 		file_stats.c \
 		file_entry_list.c \
+		file_entry_list_factory.c \
 		scanner.c \
 		renderer.c
 

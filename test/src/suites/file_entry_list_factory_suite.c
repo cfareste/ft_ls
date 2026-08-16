@@ -2,9 +2,9 @@
 #include "CUnit/CUnit.h"
 #include "CUnit/Basic.h"
 #include "mocks.h"
-#include "scanner.h"
+#include "file_entry_list_factory.h"
 
-#define SUITE_NAME "scanner"
+#define SUITE_NAME "file_entry_list_factory"
 
 static t_file_entry_list *sut;
 
@@ -20,9 +20,9 @@ static void test_teardown(void)
     file_entry_list_destroy(&sut);
 }
 
-static void scan_directory(const char *path)
+static void create_file_entry_list(const char *path)
 {
-    sut = scan(path);
+    sut = create_file_entry_list_from_path(path);
 }
 
 static void assert_file_entry_list_is_null()
@@ -54,14 +54,14 @@ static void assert_file_entry_list_names_are(const char **files_names)
 
 static void should_return_NULL_if_a_NULL_path_is_specified(void)
 {
-    scan_directory(NULL);
+    create_file_entry_list(NULL);
 
     assert_file_entry_list_is_null();
 }
 
 static void should_return_NULL_if_an_empty_path_is_specified(void)
 {
-    scan_directory("");
+    create_file_entry_list("");
 
     assert_file_entry_list_is_null();
 }
@@ -70,7 +70,7 @@ static void should_return_NULL_if_the_current_directory_is_empty(void)
 {
     guarantee_stat_will_populate_stats_of_a_directory_type_file();
 
-    scan_directory(".");
+    create_file_entry_list(".");
 
     assert_file_entry_list_is_null();
 }
@@ -81,7 +81,7 @@ static void should_return_one_entry_if_the_current_directory_has_one_file(void)
     guarantee_stat_will_populate_stats_of_a_directory_type_file();
     guarantee_readdir_will_return_a_file_named(file_name);
 
-    scan_directory(".");
+    create_file_entry_list(".");
 
     assert_file_entry_list_length_is(1);
     assert_file_entry_list_name_is(sut, file_name);
@@ -93,7 +93,7 @@ static void should_return_multiple_entries_if_the_current_directory_has_more_tha
     guarantee_stat_will_populate_stats_of_a_directory_type_file();
     guarantee_readdir_will_return_N_files_named(files_names);
 
-    scan_directory(".");
+    create_file_entry_list(".");
 
     assert_file_entry_list_length_is(3);
     assert_file_entry_list_names_are(files_names);
@@ -103,7 +103,7 @@ static void should_return_one_entry_if_one_regular_file_path_is_specified(void)
 {
     guarantee_stat_will_populate_stats_of_a_regular_type_file();
 
-    scan_directory("file");
+    create_file_entry_list("file");
 
     assert_file_entry_list_length_is(1);
     assert_file_entry_list_name_is(sut, "file");
@@ -116,7 +116,7 @@ static void should_return_a_list_of_entries_if_one_non_empty_directory_path_is_s
     ensure_opendir_will_open_a_dir_named("dir");
     guarantee_readdir_will_return_N_files_named(files_names);
 
-    scan_directory("dir");
+    create_file_entry_list("dir");
 
     assert_file_entry_list_length_is(4);
     assert_file_entry_list_names_are(files_names);
@@ -127,7 +127,7 @@ static void should_return_NULL_if_fails_to_open_a_directory(void)
     guarantee_stat_will_populate_stats_of_a_directory_type_file();
     guarantee_opendir_will_fail();
 
-    scan_directory(".");
+    create_file_entry_list(".");
 
     assert_file_entry_list_is_null();
 }
@@ -137,12 +137,12 @@ static void should_return_NULL_if_fails_to_read_a_directory(void)
     guarantee_stat_will_populate_stats_of_a_directory_type_file();
     guarantee_readdir_will_fail();
 
-    scan_directory(".");
+    create_file_entry_list(".");
 
     assert_file_entry_list_is_null();
 }
 
-void register_scanner_suite(void)
+void register_file_entry_list_factory_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, test_teardown);
 

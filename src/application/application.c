@@ -1,12 +1,11 @@
 #include "application.h"
-#include "file_entry_list.h"
-#include "scanner.h"
+#include "file_entry_list_factory.h"
 #include "renderer.h"
 #include "error_codes.h"
 
 int run_application(const t_parsed_arguments *parsed_arguments)
 {
-    t_file_entry_list *file_entry_list = scan(parsed_arguments_get_file_operands(parsed_arguments)[0]);
+    t_file_entry_list *file_entry_list = create_file_entry_list_from_path(parsed_arguments_get_file_operands(parsed_arguments)[0]);
 
     render(file_entry_list);
 
