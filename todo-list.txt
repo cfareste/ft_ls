@@ -1,10 +1,5 @@
 TODO:
-2. Workflow:
-   - Stat argumentos (y errores aunque ahora no)
-   - Crear file entry list por cada argumento
-       - Support -R
-   - Render
-
+1. Implementar LS-11 Execution with multiple parameters
 
 
 TODO En algún momento:

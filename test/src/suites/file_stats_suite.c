@@ -50,9 +50,10 @@ static void should_return_an_error_when_populating_the_stats_to_a_NULL_stat_stru
 
 static void should_populate_successfully_the_file_stats_when_passed_a_valid_regular_file_path(void)
 {
-    guarantee_stat_will_populate_stats_of_a_regular_type_file();
+    const char *file_path = "valid";
+    guarantee_stat_will_populate_stats_of_a_regular_type_file(file_path);
 
-    const int result = get_file_stats("valid", &file_stats);
+    const int result = get_file_stats(file_path, &file_stats);
 
     assert_file_stats_retrieving_succeed(result);
     assert_file_type_is(S_IFREG);
@@ -60,9 +61,10 @@ static void should_populate_successfully_the_file_stats_when_passed_a_valid_regu
 
 static void should_populate_successfully_the_file_stats_when_passed_a_valid_directory_path(void)
 {
-    guarantee_stat_will_populate_stats_of_a_directory_type_file();
+    const char *dir_path = "valid_dir";
+    guarantee_stat_will_populate_stats_of_a_directory_type_file(dir_path);
 
-    const int result = get_file_stats("valid", &file_stats);
+    const int result = get_file_stats(dir_path, &file_stats);
 
     assert_file_stats_retrieving_succeed(result);
     assert_file_type_is(S_IFDIR);

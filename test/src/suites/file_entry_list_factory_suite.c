@@ -5,6 +5,7 @@
 #include "file_entry_list_factory.h"
 
 #define SUITE_NAME "file_entry_list_factory"
+#define CURRENT_DIRECTORY_PATH "."
 
 static t_file_entry_list *sut;
 
@@ -12,7 +13,7 @@ static void test_setup(void)
 {
     reset_dirent_guarantees();
     reset_stat_guarantees();
-    ensure_opendir_will_open_a_dir_named(".");
+    ensure_opendir_will_open_a_dir_named(CURRENT_DIRECTORY_PATH);
 }
 
 static void test_teardown(void)
@@ -68,9 +69,9 @@ static void should_return_NULL_if_an_empty_path_is_specified(void)
 
 static void should_return_NULL_if_the_current_directory_is_empty(void)
 {
-    guarantee_stat_will_populate_stats_of_a_directory_type_file();
+    guarantee_stat_will_populate_stats_of_a_directory_type_file(CURRENT_DIRECTORY_PATH);
 
-    create_file_entry_list(".");
+    create_file_entry_list(CURRENT_DIRECTORY_PATH);
 
     assert_file_entry_list_is_null();
 }
@@ -78,10 +79,10 @@ static void should_return_NULL_if_the_current_directory_is_empty(void)
 static void should_return_one_entry_if_the_current_directory_has_one_file(void)
 {
     const char *file_name = "file";
-    guarantee_stat_will_populate_stats_of_a_directory_type_file();
+    guarantee_stat_will_populate_stats_of_a_directory_type_file(CURRENT_DIRECTORY_PATH);
     guarantee_readdir_will_return_a_file_named(file_name);
 
-    create_file_entry_list(".");
+    create_file_entry_list(CURRENT_DIRECTORY_PATH);
 
     assert_file_entry_list_length_is(1);
     assert_file_entry_list_name_is(sut, file_name);
@@ -90,10 +91,10 @@ static void should_return_one_entry_if_the_current_directory_has_one_file(void)
 static void should_return_multiple_entries_if_the_current_directory_has_more_than_one_file(void)
 {
     const char *files_names[4] = { "multiple", "multiple2", "multiple3", NULL };
-    guarantee_stat_will_populate_stats_of_a_directory_type_file();
+    guarantee_stat_will_populate_stats_of_a_directory_type_file(CURRENT_DIRECTORY_PATH);
     guarantee_readdir_will_return_N_files_named(files_names);
 
-    create_file_entry_list(".");
+    create_file_entry_list(CURRENT_DIRECTORY_PATH);
 
     assert_file_entry_list_length_is(3);
     assert_file_entry_list_names_are(files_names);
@@ -101,22 +102,24 @@ static void should_return_multiple_entries_if_the_current_directory_has_more_tha
 
 static void should_return_one_entry_if_one_regular_file_path_is_specified(void)
 {
-    guarantee_stat_will_populate_stats_of_a_regular_type_file();
+    const char *file_path = "file";
+    guarantee_stat_will_populate_stats_of_a_regular_type_file(file_path);
 
-    create_file_entry_list("file");
+    create_file_entry_list(file_path);
 
     assert_file_entry_list_length_is(1);
-    assert_file_entry_list_name_is(sut, "file");
+    assert_file_entry_list_name_is(sut, file_path);
 }
 
 static void should_return_a_list_of_entries_if_one_non_empty_directory_path_is_specified(void)
 {
+    const char *dir_path = "valid_dir";
     const char *files_names[5] = { "file", "subdir", "file2", "subdir2", NULL };
-    guarantee_stat_will_populate_stats_of_a_directory_type_file();
-    ensure_opendir_will_open_a_dir_named("dir");
+    guarantee_stat_will_populate_stats_of_a_directory_type_file(dir_path);
+    ensure_opendir_will_open_a_dir_named(dir_path);
     guarantee_readdir_will_return_N_files_named(files_names);
 
-    create_file_entry_list("dir");
+    create_file_entry_list(dir_path);
 
     assert_file_entry_list_length_is(4);
     assert_file_entry_list_names_are(files_names);
@@ -124,20 +127,20 @@ static void should_return_a_list_of_entries_if_one_non_empty_directory_path_is_s
 
 static void should_return_NULL_if_fails_to_open_a_directory(void)
 {
-    guarantee_stat_will_populate_stats_of_a_directory_type_file();
+    guarantee_stat_will_populate_stats_of_a_directory_type_file(CURRENT_DIRECTORY_PATH);
     guarantee_opendir_will_fail();
 
-    create_file_entry_list(".");
+    create_file_entry_list(CURRENT_DIRECTORY_PATH);
 
     assert_file_entry_list_is_null();
 }
 
 static void should_return_NULL_if_fails_to_read_a_directory(void)
 {
-    guarantee_stat_will_populate_stats_of_a_directory_type_file();
+    guarantee_stat_will_populate_stats_of_a_directory_type_file(CURRENT_DIRECTORY_PATH);
     guarantee_readdir_will_fail();
 
-    create_file_entry_list(".");
+    create_file_entry_list(CURRENT_DIRECTORY_PATH);
 
     assert_file_entry_list_is_null();
 }

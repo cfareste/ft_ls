@@ -18,7 +18,7 @@ static void should_successfully_print_the_contents_of_the_current_directory_one_
     const char *arguments[] = { NULL };
     const char *file_names[7] = { ".", "..", "file1", "subdir1", "symlink", "zz", NULL };
     t_parsed_arguments *parsed_arguments = parse_arguments(0, arguments);
-    guarantee_stat_will_populate_stats_of_a_directory_type_file();
+    guarantee_stat_will_populate_stats_of_a_directory_type_file(".");
     ensure_opendir_will_open_a_dir_named(".");
     guarantee_readdir_will_return_N_files_named(file_names);
 
@@ -42,7 +42,7 @@ static void should_successfully_print_the_file_name_if_a_regular_file_operand_is
     const char *file_name = "../../ft_ls/test/./frameworks/../regular_file";
     const char *arguments[] = { file_name, NULL };
     t_parsed_arguments *parsed_arguments = parse_arguments(1, arguments);
-    guarantee_stat_will_populate_stats_of_a_regular_type_file();
+    guarantee_stat_will_populate_stats_of_a_regular_type_file(file_name);
 
     const int result = run_application(parsed_arguments);
 
@@ -57,7 +57,7 @@ static void should_successfully_print_the_contents_of_the_directory_specified_as
     const char *arguments[] = { "dir", NULL };
     const char *file_names[7] = { ".", "..", "file_from_dir_1", "subdir_1", "block_device", "char_device", NULL };
     t_parsed_arguments *parsed_arguments = parse_arguments(1, arguments);
-    guarantee_stat_will_populate_stats_of_a_directory_type_file();
+    guarantee_stat_will_populate_stats_of_a_directory_type_file(arguments[0]);
     ensure_opendir_will_open_a_dir_named(arguments[0]);
     guarantee_readdir_will_return_N_files_named(file_names);
 
