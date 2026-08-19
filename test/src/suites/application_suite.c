@@ -15,6 +15,11 @@ static void test_setup(void)
     reset_printing_buffer();
 }
 
+static void test_teardown(void)
+{
+    parsed_arguments_destroy(&parsed_arguments);
+}
+
 static void assert_application_execution_succeed(const int result)
 {
     CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
@@ -42,8 +47,6 @@ static void should_successfully_print_the_contents_of_the_current_directory_one_
         file_names[5]
     );
     assert_application_execution_succeed(result);
-
-    parsed_arguments_destroy(&parsed_arguments);
 }
 
 static void should_successfully_print_the_file_name_if_a_regular_file_operand_is_specified(void)
@@ -57,8 +60,6 @@ static void should_successfully_print_the_file_name_if_a_regular_file_operand_is
 
     verify_that_the_str_that_has_been_printed_is("%s\n", file_name);
     assert_application_execution_succeed(result);
-
-    parsed_arguments_destroy(&parsed_arguments);
 }
 
 static void should_successfully_print_the_contents_of_the_directory_specified_as_an_operand(void)
@@ -83,13 +84,11 @@ static void should_successfully_print_the_contents_of_the_directory_specified_as
         file_names[5]
     );
     assert_application_execution_succeed(result);
-
-    parsed_arguments_destroy(&parsed_arguments);
 }
 
 void register_application_suite(void)
 {
-    const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, NULL);
+    const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, test_teardown);
 
     if (suite != NULL)
     {
