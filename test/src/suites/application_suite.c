@@ -13,6 +13,11 @@ static void test_setup(void)
     reset_printing_buffer();
 }
 
+static void assert_application_execution_succeed(const int result)
+{
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
 static void should_successfully_print_the_contents_of_the_current_directory_one_per_line_if_no_file_operands_are_specified(void)
 {
     const char *arguments[] = { NULL };
@@ -34,7 +39,7 @@ static void should_successfully_print_the_contents_of_the_current_directory_one_
         file_names[4],
         file_names[5]
     );
-    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+    assert_application_execution_succeed(result);
 
     parsed_arguments_destroy(&parsed_arguments);
 }
@@ -49,7 +54,7 @@ static void should_successfully_print_the_file_name_if_a_regular_file_operand_is
     const int result = run_application(parsed_arguments);
 
     verify_that_the_str_that_has_been_printed_is("%s\n", file_name);
-    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+    assert_application_execution_succeed(result);
 
     parsed_arguments_destroy(&parsed_arguments);
 }
@@ -75,7 +80,7 @@ static void should_successfully_print_the_contents_of_the_directory_specified_as
         file_names[4],
         file_names[5]
     );
-    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+    assert_application_execution_succeed(result);
 
     parsed_arguments_destroy(&parsed_arguments);
 }
