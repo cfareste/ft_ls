@@ -1,3 +1,6 @@
+#include <sys/stat.h>
+#include "libft.h"
+#include "mocks.h"
 #include "CUnit/CUnit.h"
 #include "CUnit/Basic.h"
 #include "parsed_arguments.h"
@@ -69,6 +72,8 @@ static void should_return_NULL_file_operands_if_NULL_parsed_arguments_are_passed
 static void should_return_the_file_operands(void)
 {
     const char *args[] = { "valid", "file", "operands", NULL };
+    const unsigned int args_types[] = { S_IFREG, S_IFREG, S_IFREG, 0 };
+    guarantee_stat_will_populate_stats_of_N_file_types_for_paths(args, args_types);
     t_parsed_arguments *parsed_arguments = parse_arguments(3, args);
 
     const char * const *file_operands = parsed_arguments_get_file_operands(parsed_arguments);
@@ -77,6 +82,28 @@ static void should_return_the_file_operands(void)
     CU_ASSERT_STRING_EQUAL(file_operands[1], args[1]);
     CU_ASSERT_STRING_EQUAL(file_operands[2], args[2]);
     CU_ASSERT_PTR_NULL(file_operands[3]);
+
+    parsed_arguments_destroy(&parsed_arguments);
+}
+
+static void should_return_the_non_directory_file_operands(void)
+{
+    const char *args[] = { "socket", "symlink", "char_device", "reg_file", "pipe", "dir", "block_device", NULL };
+    const unsigned int args_types[] = { S_IFSOCK, S_IFLNK, S_IFCHR, S_IFREG, S_IFIFO, S_IFDIR, S_IFBLK, 0 };
+    guarantee_stat_will_populate_stats_of_N_file_types_for_paths(args, args_types);
+    t_parsed_arguments *parsed_arguments = parse_arguments(7, args);
+
+    const char * const *file_operands = parsed_arguments_get_non_directory_file_operands(parsed_arguments);
+
+    (void) file_operands[4];
+
+    CU_ASSERT_STRING_EQUAL(file_operands[0], args[0]);
+    CU_ASSERT_STRING_EQUAL(file_operands[1], args[1]);
+    CU_ASSERT_STRING_EQUAL(file_operands[2], args[2]);
+    CU_ASSERT_STRING_EQUAL(file_operands[3], args[3]);
+    CU_ASSERT_STRING_EQUAL(file_operands[4], args[4]);
+    CU_ASSERT_STRING_EQUAL(file_operands[5], args[6]);
+    CU_ASSERT_PTR_NULL(file_operands[6]);
 
     parsed_arguments_destroy(&parsed_arguments);
 }
@@ -95,5 +122,6 @@ void register_parsed_arguments_suite(void)
         CU_add_test(suite, "should_return_NULL_if_arguments_are_NULL", should_return_NULL_if_arguments_are_NULL);
         CU_add_test(suite, "should_return_NULL_file_operands_if_NULL_parsed_arguments_are_passed", should_return_NULL_file_operands_if_NULL_parsed_arguments_are_passed);
         CU_add_test(suite, "should_return_the_file_operands", should_return_the_file_operands);
+        CU_add_test(suite, "should_return_the_non_directory_file_operands", should_return_the_non_directory_file_operands);
     }
 }

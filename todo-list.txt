@@ -1,14 +1,14 @@
 TODO:
 1. Implementar LS-11 Execution with multiple parameters
+2. Refactor e implementar mi propio enum para los tipos de ficheros
+3. Refactor y usar solo file_operands y dir_operands
+4. Refactor the arguments of the file_operands functions
+5. Usar valgrind en los tests E2E
+6. Usar un struct propio para los opendirs, stat, etc. (como t_dir_stream de antes)
 
 
 TODO En algún momento:
-- Meterle al mock del stat un mapping de cada nombre de fichero -> tipo (para cuando haya multiple llamadas al stat). Similar al readdir
 - Investigar si los tests están acoplados a la implementacion interna de las cosas
-- Usar un struct propio para los opendirs, readdirs, etc. (como t_dir_stream de antes)
-- Si tengo problemas, tendre que meter un wrapper al ft_printf para poder mockearlo
-- Tests de aceptación (comparando a ls) y e2e, con un script de bash o lo que sea
-  - En los tests, usar valgrind
 - Investigar porque no puedo debugar desde proyecto ft_ls los tests
 
 
@@ -30,7 +30,7 @@ TODO QA:
 - Probar que este hecho, tanto a mano como con tests
 
 
-QA LS-8 Execution without parameters (`ls | cat`)
+QA LS-8 Execution without parameters (`ls -aU | cat`)
 1. Directorio vacío - NO ACCESIBLE (siempre hay '.' y '..')
 2. Un solo fichero - NO ACCESIBLE (siempre hay '.' y '..')
 3. Multiples ficheros
