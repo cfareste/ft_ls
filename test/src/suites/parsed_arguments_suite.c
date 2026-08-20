@@ -88,9 +88,9 @@ static void should_return_the_file_operands(void)
 
 static void should_return_NULL_non_directory_file_operands_if_NULL_parsed_arguments_are_passed(void)
 {
-    const char * const *file_operands = parsed_arguments_get_non_directory_file_operands(NULL);
+    const char * const *non_directory_file_operands = parsed_arguments_get_non_directory_file_operands(NULL);
 
-    CU_ASSERT_PTR_NULL(file_operands);
+    CU_ASSERT_PTR_NULL(non_directory_file_operands);
 }
 
 static void should_return_the_non_directory_file_operands(void)
@@ -111,6 +111,13 @@ static void should_return_the_non_directory_file_operands(void)
     CU_ASSERT_PTR_NULL(non_directory_file_operands[6]);
 
     parsed_arguments_destroy(&parsed_arguments);
+}
+
+static void should_return_NULL_directory_file_operands_if_NULL_parsed_arguments_are_passed(void)
+{
+    const char * const *directory_file_operands = parsed_arguments_get_directory_file_operands(NULL);
+
+    CU_ASSERT_PTR_NULL(directory_file_operands);
 }
 
 static void should_return_the_directory_file_operands(void)
@@ -145,6 +152,7 @@ void register_parsed_arguments_suite(void)
         CU_add_test(suite, "should_return_the_file_operands", should_return_the_file_operands);
         CU_add_test(suite, "should_return_NULL_non_directory_file_operands_if_NULL_parsed_arguments_are_passed", should_return_NULL_non_directory_file_operands_if_NULL_parsed_arguments_are_passed);
         CU_add_test(suite, "should_return_the_non_directory_file_operands", should_return_the_non_directory_file_operands);
+        CU_add_test(suite, "should_return_NULL_directory_file_operands_if_NULL_parsed_arguments_are_passed", should_return_NULL_directory_file_operands_if_NULL_parsed_arguments_are_passed);
         CU_add_test(suite, "should_return_the_directory_file_operands", should_return_the_directory_file_operands);
     }
 }

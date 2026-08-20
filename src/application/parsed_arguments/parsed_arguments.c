@@ -156,6 +156,9 @@ const char * const *parsed_arguments_get_non_directory_file_operands(const t_par
 
 const char * const *parsed_arguments_get_directory_file_operands(const t_parsed_arguments *parsed_arguments)
 {
+    if (parsed_arguments == NULL)
+        return NULL;
+
     return (const char * const *) parsed_arguments->directory_file_operands;
 }
 
