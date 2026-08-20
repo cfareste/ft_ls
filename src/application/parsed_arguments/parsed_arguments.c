@@ -124,7 +124,9 @@ void parsed_arguments_destroy(t_parsed_arguments **parsed_arguments)
     if (parsed_arguments == NULL || *parsed_arguments == NULL)
         return ;
 
+    free((*parsed_arguments)->file_operand_types);
     ft_free_str_matrix((*parsed_arguments)->file_operands);
+    ft_free_str_matrix((*parsed_arguments)->non_directory_file_operands);
     free(*parsed_arguments);
 
     *parsed_arguments = NULL;
