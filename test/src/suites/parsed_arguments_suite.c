@@ -100,17 +100,31 @@ static void should_return_the_non_directory_file_operands(void)
     guarantee_stat_will_populate_stats_of_N_file_types_for_paths(args, args_types);
     t_parsed_arguments *parsed_arguments = parse_arguments(7, args);
 
-    const char * const *file_operands = parsed_arguments_get_non_directory_file_operands(parsed_arguments);
+    const char * const *non_directory_file_operands = parsed_arguments_get_non_directory_file_operands(parsed_arguments);
 
-    (void) file_operands[4];
+    CU_ASSERT_STRING_EQUAL(non_directory_file_operands[0], args[0]);
+    CU_ASSERT_STRING_EQUAL(non_directory_file_operands[1], args[1]);
+    CU_ASSERT_STRING_EQUAL(non_directory_file_operands[2], args[2]);
+    CU_ASSERT_STRING_EQUAL(non_directory_file_operands[3], args[3]);
+    CU_ASSERT_STRING_EQUAL(non_directory_file_operands[4], args[4]);
+    CU_ASSERT_STRING_EQUAL(non_directory_file_operands[5], args[6]);
+    CU_ASSERT_PTR_NULL(non_directory_file_operands[6]);
 
-    CU_ASSERT_STRING_EQUAL(file_operands[0], args[0]);
-    CU_ASSERT_STRING_EQUAL(file_operands[1], args[1]);
-    CU_ASSERT_STRING_EQUAL(file_operands[2], args[2]);
-    CU_ASSERT_STRING_EQUAL(file_operands[3], args[3]);
-    CU_ASSERT_STRING_EQUAL(file_operands[4], args[4]);
-    CU_ASSERT_STRING_EQUAL(file_operands[5], args[6]);
-    CU_ASSERT_PTR_NULL(file_operands[6]);
+    parsed_arguments_destroy(&parsed_arguments);
+}
+
+static void should_return_the_directory_file_operands(void)
+{
+    const char *args[] = { "socket", "symlink", "dir1", "char_device", "reg_file", "pipe", "dir2", "block_device", NULL };
+    const unsigned int args_types[] = { S_IFSOCK, S_IFLNK, S_IFDIR, S_IFCHR, S_IFREG, S_IFIFO, S_IFDIR, S_IFBLK, 0 };
+    guarantee_stat_will_populate_stats_of_N_file_types_for_paths(args, args_types);
+    t_parsed_arguments *parsed_arguments = parse_arguments(8, args);
+
+    const char * const *directory_file_operands = parsed_arguments_get_directory_file_operands(parsed_arguments);
+
+    CU_ASSERT_STRING_EQUAL(directory_file_operands[0], args[2]);
+    CU_ASSERT_STRING_EQUAL(directory_file_operands[1], args[6]);
+    CU_ASSERT_PTR_NULL(directory_file_operands[2]);
 
     parsed_arguments_destroy(&parsed_arguments);
 }
@@ -131,5 +145,6 @@ void register_parsed_arguments_suite(void)
         CU_add_test(suite, "should_return_the_file_operands", should_return_the_file_operands);
         CU_add_test(suite, "should_return_NULL_non_directory_file_operands_if_NULL_parsed_arguments_are_passed", should_return_NULL_non_directory_file_operands_if_NULL_parsed_arguments_are_passed);
         CU_add_test(suite, "should_return_the_non_directory_file_operands", should_return_the_non_directory_file_operands);
+        CU_add_test(suite, "should_return_the_directory_file_operands", should_return_the_directory_file_operands);
     }
 }
