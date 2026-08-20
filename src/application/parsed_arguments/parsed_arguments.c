@@ -8,7 +8,6 @@
 
 struct s_parsed_arguments
 {
-    unsigned int num_of_file_operands;
     char **file_operands;
     unsigned int *file_operand_types;
     char **non_directory_file_operands;
@@ -97,7 +96,6 @@ t_parsed_arguments *parse_arguments(const int num_of_arguments, const char **arg
         return NULL;
 
     t_parsed_arguments *parsed_arguments = ft_safe_calloc(1, sizeof(t_parsed_arguments));
-    parsed_arguments->num_of_file_operands = num_of_arguments;
     parsed_arguments->file_operands = get_file_operands(num_of_arguments, arguments);
     parsed_arguments->file_operand_types = get_file_operand_types(num_of_arguments, parsed_arguments->file_operands);
     parsed_arguments->non_directory_file_operands = get_non_directory_file_operands(parsed_arguments->file_operands, parsed_arguments->file_operand_types);
