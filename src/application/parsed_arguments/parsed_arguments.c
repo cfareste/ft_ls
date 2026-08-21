@@ -73,8 +73,9 @@ static char **get_file_operands(const int num_of_arguments, const char **argumen
     return get_file_operands_from_arguments(num_of_arguments, arguments);
 }
 
-static unsigned int *get_file_operand_types(const unsigned int num_of_operands, char **file_operands)
+static unsigned int *get_file_operand_types(char **file_operands)
 {
+    const unsigned int num_of_operands = ft_str_matrix_length(file_operands);
     unsigned int *file_operands_types = ft_safe_calloc(num_of_operands + 1, sizeof(int));
     struct stat file_stats;
 
@@ -131,7 +132,7 @@ t_parsed_arguments *parse_arguments(const int num_of_arguments, const char **arg
 
     t_parsed_arguments *parsed_arguments = ft_safe_calloc(1, sizeof(t_parsed_arguments));
     parsed_arguments->file_operands = get_file_operands(num_of_arguments, arguments);
-    parsed_arguments->file_operand_types = get_file_operand_types(num_of_arguments, parsed_arguments->file_operands);
+    parsed_arguments->file_operand_types = get_file_operand_types(parsed_arguments->file_operands);
     parsed_arguments->non_directory_file_operands = get_non_directory_file_operands(parsed_arguments->file_operands, parsed_arguments->file_operand_types);
     parsed_arguments->directory_file_operands = get_directory_file_operands(parsed_arguments->file_operands, parsed_arguments->file_operand_types);
 
