@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_free_matrix.c                                   :+:      :+:    :+:   */
+/*   ft_matrix.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: cfidalgo <cfidalgo@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -12,6 +12,23 @@
 
 #include "libft.h"
 #include <stdlib.h>
+
+int	ft_matrix_length(void **matrix)
+{
+	int	i;
+
+	if (!matrix)
+		return (0);
+	i = 0;
+	while (matrix[i])
+		i++;
+	return (i);
+}
+
+int	ft_str_matrix_length(char **matrix)
+{
+	return (ft_matrix_length((void **) matrix));
+}
 
 void	ft_free_matrix(void **matrix)
 {
