@@ -20,10 +20,11 @@ int run_application(const t_parsed_arguments *parsed_arguments)
     }
     render_config_destroy(&non_directory_render_config);
 
+    const int has_multiple_entries = non_directory_file_operands[0] != NULL;
     for (unsigned int i = 0; directory_file_operands[i] != NULL; i++)
     {
-        const char *dir_header = non_directory_file_operands[0] != NULL ? directory_file_operands[i] : NULL;
-        t_render_config *directory_render_config = directory_render_config = render_config_create_for_directory_file_operands(dir_header);
+        t_render_config *directory_render_config = directory_render_config = render_config_create_for_directory_file_operands(directory_file_operands[i]);
+        render_config_set_should_print_directory_header(directory_render_config, has_multiple_entries);
         t_file_entry_list *file_entry_list = file_entry_list_create_from_path(directory_file_operands[i]);
 
         render(file_entry_list, directory_render_config);
