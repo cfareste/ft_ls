@@ -59,7 +59,7 @@ vpath %.c	$(SRC):\
 			$(SUITES_DIR):\
 			$(MOCKS_DIR):\
 			$(ROOT_SRC)/application:\
-			$(ROOT_SRC)/application/parsed_arguments:\
+			$(ROOT_SRC)/parsed_arguments:\
 			$(ROOT_SRC)/filesystem:\
 			$(ROOT_SRC)/file_entry_list:\
 			$(ROOT_SRC)/scanner:\

@@ -44,7 +44,7 @@ export GNL_BUFFER_SIZE := 50000
 #----VPATH----#
 vpath %.c	$(SRC):\
 			$(SRC)/application:\
-			$(SRC)/application/parsed_arguments:\
+			$(SRC)/parsed_arguments:\
 			$(SRC)/filesystem:\
 			$(SRC)/file_entry_list:\
 			$(SRC)/scanner:\
