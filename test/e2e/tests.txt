@@ -12,4 +12,5 @@
 ./ft_ls ../../ft_ls/./test/testdir/file                                ::        ls -aU ../../ft_ls/./test/testdir/file
 ./ft_ls /tmp/tempfile                                                  ::        ls -aU /tmp/tempfile
 ./ft_ls /tmp/tempdir/                                                  ::        ls -aU /tmp/tempdir/
+./ft_ls Makefile run_e2e.sh Makefile tester                            ::        ls -aU Makefile run_e2e.sh Makefile tester
 ./ft_ls testdir/file2 testdir/firstDir testdir/secondDir testdir/file  ::        ls -aU testdir/file2 testdir/firstDir testdir/secondDir testdir/file
