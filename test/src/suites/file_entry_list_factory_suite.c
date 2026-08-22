@@ -24,7 +24,7 @@ static void test_teardown(void)
 
 static void create_file_entry_list(const char *path)
 {
-    sut = create_file_entry_list_from_path(path);
+    sut = file_entry_list_create_from_path(path);
 }
 
 static void assert_file_entry_list_is_null()

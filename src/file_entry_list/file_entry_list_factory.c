@@ -3,7 +3,7 @@
 #include "file_stats.h"
 #include "scanner.h"
 
-t_file_entry_list *create_file_entry_list_from_path(const char *file_path)
+t_file_entry_list *file_entry_list_create_from_path(const char *file_path)
 {
     struct stat file_stats;
 
