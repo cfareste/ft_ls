@@ -87,6 +87,25 @@ static void should_successfully_print_the_contents_of_the_directory_specified_as
     assert_application_execution_succeed(result);
 }
 
+static void should_successfully_print_the_contents_of_multiple_non_directory_files(void)
+{
+    const char *arguments[] = { "file1", "cd1", "cd1", "block_device", NULL };
+    const unsigned int types[] = { S_IFREG, S_IFCHR, S_IFCHR, S_IFBLK, 0 };
+    guarantee_stat_will_populate_stats_of_N_file_types_for_paths(arguments, types);
+    parsed_arguments = parse_arguments(4, arguments);
+
+    const int result = run_application(parsed_arguments);
+
+    verify_that_the_str_that_has_been_printed_is(
+        "%s\n%s\n%s\n%s\n",
+        arguments[0],
+        arguments[1],
+        arguments[2],
+        arguments[3]
+    );
+    assert_application_execution_succeed(result);
+}
+
 static void should_successfully_print_the_contents_of_the_mixed_types_specified_operands(void)
 {
     const char *arguments[] = { "dir", "file1", "file1", "symlink", "dir1", NULL };
@@ -137,6 +156,7 @@ void register_application_suite(void)
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_current_directory_one_per_line_if_no_file_operands_are_specified", should_successfully_print_the_contents_of_the_current_directory_one_per_line_if_no_file_operands_are_specified);
         CU_add_test(suite, "should_successfully_print_the_file_name_if_a_regular_file_operand_is_specified", should_successfully_print_the_file_name_if_a_regular_file_operand_is_specified);
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_directory_specified_as_an_operand", should_successfully_print_the_contents_of_the_directory_specified_as_an_operand);
+        CU_add_test(suite, "should_successfully_print_the_contents_of_multiple_non_directory_files", should_successfully_print_the_contents_of_multiple_non_directory_files);
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_mixed_types_specified_operands", should_successfully_print_the_contents_of_the_mixed_types_specified_operands);
     }
 }
