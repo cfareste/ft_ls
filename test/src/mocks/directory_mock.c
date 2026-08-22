@@ -69,7 +69,7 @@ DIR *mock_opendir(const char *path)
 
     t_mock_dir *dir = ft_safe_calloc(1, sizeof(t_mock_dir));
     dir->next_index = 0;
-    dir->dir_name = ft_strdup(path);
+    dir->dir_name = ft_safe_strdup(path);
 
     return (DIR *) dir;
 }
