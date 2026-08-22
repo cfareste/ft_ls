@@ -52,6 +52,15 @@ static void should_print_the_name_of_every_entry_with_a_file_entry_list_of_vario
     file_entry_list_destroy(&file_entry_list);
 }
 
+static void should_create_a_configuration_for_non_directory_file_operands(void)
+{
+    t_render_config *config = render_config_create_for_non_directory_file_operands();
+
+    CU_ASSERT_PTR_NOT_NULL(config);
+
+    render_config_destroy(&config);
+}
+
 /*static void should_print_the_name_of_every_entry_with_a_file_entry_list_of_various_elements_separated_by_two_spaces(void)
 {
     const char *expected_file_name[5] = { "file", "file2", "file3", "file4", "file5" };
@@ -84,6 +93,7 @@ void register_renderer_suite(void)
         CU_add_test(suite, "should_not_print_anything_if_the_file_entry_list_is_null", should_not_print_anything_if_the_file_entry_list_is_null);
         CU_add_test(suite, "should_print_the_name_of_the_entry_with_a_file_entry_list_of_one_element", should_print_the_name_of_the_entry_with_a_file_entry_list_of_one_element);
         CU_add_test(suite, "should_print_the_name_of_every_entry_with_a_file_entry_list_of_various_elements_separated_by_new_lines", should_print_the_name_of_every_entry_with_a_file_entry_list_of_various_elements_separated_by_new_lines);
+        CU_add_test(suite, "should_create_a_configuration_for_non_directory_file_operands", should_create_a_configuration_for_non_directory_file_operands);
         // CU_add_test(suite, "should_print_the_name_of_every_entry_with_a_file_entry_list_of_various_elements_separated_by_two_spaces", should_print_the_name_of_every_entry_with_a_file_entry_list_of_various_elements_separated_by_two_spaces);
     }
 }

@@ -87,7 +87,7 @@ static void should_successfully_print_the_contents_of_the_directory_specified_as
     assert_application_execution_succeed(result);
 }
 
-    static void should_successfully_print_the_contents_of_the_mixed_types_specified_operands(void)
+static void should_successfully_print_the_contents_of_the_mixed_types_specified_operands(void)
 {
     const char *arguments[] = { "dir", "file1", "file1", "symlink", "dir1", NULL };
     const unsigned int types[] = { S_IFDIR, S_IFREG, S_IFREG, S_IFLNK, S_IFDIR, 0 };
