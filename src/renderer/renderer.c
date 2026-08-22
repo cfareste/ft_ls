@@ -14,6 +14,13 @@ t_render_config *render_config_create_for_non_directory_file_operands()
     return config;
 }
 
+t_render_config *render_config_create_for_directory_file_operands()
+{
+    t_render_config *config = ft_safe_calloc(1, sizeof(t_render_config));
+
+    return config;
+}
+
 void render_config_destroy(t_render_config **config)
 {
     if (config == NULL || *config == NULL)
