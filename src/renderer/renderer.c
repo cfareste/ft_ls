@@ -16,6 +16,9 @@ t_render_config *render_config_create_for_non_directory_file_operands()
 
 void render_config_destroy(t_render_config **config)
 {
+    if (config == NULL)
+        return ;
+
     free(*config);
     *config = NULL;
 }
