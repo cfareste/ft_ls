@@ -10,6 +10,45 @@ static void test_setup()
     reset_printing_buffer();
 }
 
+static void should_create_a_configuration_for_non_directory_file_operands(void)
+{
+    t_render_config *config = render_config_create_for_non_directory_file_operands();
+
+    CU_ASSERT_PTR_NOT_NULL(config);
+
+    render_config_destroy(&config);
+}
+
+static void should_create_a_configuration_for_directory_file_operands(void)
+{
+    t_render_config *config = render_config_create_for_directory_file_operands("dir");
+
+    CU_ASSERT_PTR_NOT_NULL(config);
+
+    render_config_destroy(&config);
+}
+
+static void should_destroy_a_configuration(void)
+{
+    t_render_config *config = render_config_create_for_non_directory_file_operands();
+
+    render_config_destroy(&config);
+
+    CU_ASSERT_PTR_NULL(config);
+}
+
+static void should_not_fail_to_destroy_a_configuration_when_a_null_pointer_is_passed(void)
+{
+    render_config_destroy(NULL);
+}
+
+static void should_not_fail_to_destroy_a_configuration_when_an_already_null_configuration_is_passed(void)
+{
+    t_render_config *invalid = NULL;
+
+    render_config_destroy(&invalid);
+}
+
 static void should_not_print_anything_if_the_file_entry_list_is_null(void)
 {
     t_render_config *config = render_config_create_for_non_directory_file_operands();
@@ -81,45 +120,6 @@ static void should_print_a_leading_dir_header_if_a_directory_config_is_specified
 
     file_entry_list_destroy(&file_entry_list);
     render_config_destroy(&config);
-}
-
-static void should_create_a_configuration_for_non_directory_file_operands(void)
-{
-    t_render_config *config = render_config_create_for_non_directory_file_operands();
-
-    CU_ASSERT_PTR_NOT_NULL(config);
-
-    render_config_destroy(&config);
-}
-
-static void should_create_a_configuration_for_directory_file_operands(void)
-{
-    t_render_config *config = render_config_create_for_directory_file_operands("dir");
-
-    CU_ASSERT_PTR_NOT_NULL(config);
-
-    render_config_destroy(&config);
-}
-
-static void should_destroy_a_configuration(void)
-{
-    t_render_config *config = render_config_create_for_non_directory_file_operands();
-
-    render_config_destroy(&config);
-
-    CU_ASSERT_PTR_NULL(config);
-}
-
-static void should_not_fail_to_destroy_a_configuration_when_a_null_pointer_is_passed(void)
-{
-    render_config_destroy(NULL);
-}
-
-static void should_not_fail_to_destroy_a_configuration_when_an_already_null_configuration_is_passed(void)
-{
-    t_render_config *invalid = NULL;
-
-    render_config_destroy(&invalid);
 }
 
 /*static void should_print_the_name_of_every_entry_with_a_file_entry_list_of_various_elements_separated_by_two_spaces(void)
