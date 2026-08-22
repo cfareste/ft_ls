@@ -41,8 +41,8 @@ print_summary() {
 
 prepare_test_environment() {
     rm -rf "${TESTDIR_PATH}"
-    mkdir -p "${TESTDIR_PATH}/ssfaf"
-    mkdir -p "${TESTDIR_PATH}/testttttatatat"
+    mkdir -p "${TESTDIR_PATH}/firstDir"
+    mkdir -p "${TESTDIR_PATH}/secondDir"
 
     touch "${TESTDIR_PATH}/'my"
     touch "${TESTDIR_PATH}/'my file'"
@@ -59,8 +59,12 @@ prepare_test_environment() {
     touch "${TESTDIR_PATH}/a"
     touch "${TESTDIR_PATH}/file "
     touch "${TESTDIR_PATH}/ "
+    touch "${TESTDIR_PATH}/firstDir/file"
+    touch "${TESTDIR_PATH}/firstDir/file2"
+    touch "${TESTDIR_PATH}/secondDir/file3"
+    touch "${TESTDIR_PATH}/secondDir/file4"
 
-    ln -s "ssfaf" "${TESTDIR_PATH}/link_to_ssfaf"
+    ln -s "firstDir" "${TESTDIR_PATH}/link_to_firstDir"
     printf 'hello' > "${TESTDIR_PATH}/file"
     printf 'world' > "${TESTDIR_PATH}/file2"
     printf 'sample' > "${TESTDIR_PATH}/a"
