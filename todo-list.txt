@@ -1,10 +1,11 @@
 TODO:
 1. Implementar LS-11 Execution with multiple parameters
 2. Refactor e implementar mi propio enum para los tipos de ficheros
-3. Refactor y usar solo file_operands y dir_operands
-4. Refactor the arguments of the file_operands functions
-5. Usar valgrind en los tests E2E
-6. Usar un struct propio para los opendirs, stat, etc. (como t_dir_stream de antes)
+3. Refactor y usar solo file_operands y dir_operands, y calcularlos en application
+4. Usar valgrind en los tests E2E
+5. Usar un struct propio para los opendirs, stat, etc. (como t_dir_stream de antes)
+6. Reflexionar si coger file_operands concretos en el run application o no, de esta forma los errores no dependen de parsed args, etc.
+7. Añadir más tests E2E y tests en general (file file, file dir, dir file, dir dir, ...)
 
 
 TODO En algún momento:
