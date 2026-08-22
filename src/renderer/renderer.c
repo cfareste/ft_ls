@@ -28,7 +28,7 @@ t_render_config *render_config_create_for_directory_file_operands(const char *di
     return config;
 }
 
-void render_config_set_should_print_directory_header(t_render_config *config, int should_print_directory_header)
+void render_config_set_should_print_directory_header(t_render_config *config, const int should_print_directory_header)
 {
     config->should_print_directory_header = should_print_directory_header;
 }
