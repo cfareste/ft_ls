@@ -75,6 +75,13 @@ static void should_not_fail_to_destroy_a_configuration_when_a_null_pointer_is_pa
     render_config_destroy(NULL);
 }
 
+static void should_not_fail_to_destroy_a_configuration_when_an_already_null_configuration_is_passed(void)
+{
+    t_render_config *invalid = NULL;
+
+    render_config_destroy(&invalid);
+}
+
 /*static void should_print_the_name_of_every_entry_with_a_file_entry_list_of_various_elements_separated_by_two_spaces(void)
 {
     const char *expected_file_name[5] = { "file", "file2", "file3", "file4", "file5" };
@@ -110,6 +117,7 @@ void register_renderer_suite(void)
         CU_add_test(suite, "should_create_a_configuration_for_non_directory_file_operands", should_create_a_configuration_for_non_directory_file_operands);
         CU_add_test(suite, "should_destroy_a_configuration", should_destroy_a_configuration);
         CU_add_test(suite, "should_not_fail_to_destroy_a_configuration_when_a_null_pointer_is_passed", should_not_fail_to_destroy_a_configuration_when_a_null_pointer_is_passed);
+        CU_add_test(suite, "should_not_fail_to_destroy_a_configuration_when_an_already_null_configuration_is_passed", should_not_fail_to_destroy_a_configuration_when_an_already_null_configuration_is_passed);
         // CU_add_test(suite, "should_print_the_name_of_every_entry_with_a_file_entry_list_of_various_elements_separated_by_two_spaces", should_print_the_name_of_every_entry_with_a_file_entry_list_of_various_elements_separated_by_two_spaces);
     }
 }
