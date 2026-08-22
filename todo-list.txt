@@ -1,12 +1,13 @@
 TODO:
 1. Implementar LS-11 Execution with multiple parameters
-2. Refactor e implementar mi propio enum para los tipos de ficheros
-3. Refactor render para incluir "\n%s:\n" (application | parsed_arguments | file_operands | "renderer" | "factory")
+2. Refactor e implementar mi propio enum para los tipos de ficheros y otro para los booleanos del renderer
+3. Refactor render para incluir "\n%s:\n" (application)
 4. Usar valgrind en los tests E2E
 5. Usar un struct propio para los opendirs, stat, etc. (como t_dir_stream de antes)
 6. Añadir más tests E2E y tests en general (file file, file dir, dir file, dir dir, ...)
 7. Refactor naming run_application -> application_run, etc. (application, file_stats, file_operands)
 8. Revisar si todas las funciones están probadas (menos file operands que es submodulo)
+9. Revisar si hace falta tantos file_operands operations
 
 
 TODO En algún momento:
