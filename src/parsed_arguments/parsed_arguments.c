@@ -57,6 +57,11 @@ int parsed_arguments_has_multiple_file_operands(const t_parsed_arguments *parsed
     return parsed_arguments->file_operands[1] != NULL;
 }
 
+int parsed_arguments_has_directory_file_operands(const t_parsed_arguments *parsed_arguments)
+{
+    return parsed_arguments->directory_file_operands[0] != NULL;
+}
+
 void parsed_arguments_destroy(t_parsed_arguments **parsed_arguments)
 {
     if (parsed_arguments == NULL || *parsed_arguments == NULL)
