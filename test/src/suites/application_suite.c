@@ -106,6 +106,45 @@ static void should_successfully_print_the_contents_of_multiple_non_directory_fil
     assert_application_execution_succeed(result);
 }
 
+static void should_successfully_print_the_contents_of_multiple_directory_files(void)
+{
+    const char *arguments[] = { "dir3", "dir", "dir2", NULL };
+    const unsigned int types[] = { S_IFDIR, S_IFDIR, S_IFDIR, 0 };
+    const char *first_dir_file_names[] = { ".", "file_dir_1", "..", NULL };
+    const char *second_dir_file_names[] = { "file_dir_2", "..", ".", "symlink", NULL };
+    const char *third_dir_file_names[] = { "..", ".", "file_dir_3", NULL };
+    const char **entry_names[] = { first_dir_file_names, second_dir_file_names, third_dir_file_names, NULL };
+    guarantee_stat_will_populate_stats_of_N_file_types_for_paths(arguments, types);
+    ensure_opendir_will_open_N_dirs_named(arguments);
+    guarantee_readdir_will_return_N_files_named(entry_names);
+    parsed_arguments = parse_arguments(3, arguments);
+
+    const int result = run_application(parsed_arguments);
+
+    verify_that_the_str_that_has_been_printed_is(
+        "%s:\n"
+        "%s\n%s\n%s\n"
+        "\n%s:\n"
+        "%s\n%s\n%s\n%s\n"
+        "\n%s:\n"
+        "%s\n%s\n%s\n",
+        arguments[0],
+        first_dir_file_names[0],
+        first_dir_file_names[1],
+        first_dir_file_names[2],
+        arguments[1],
+        second_dir_file_names[0],
+        second_dir_file_names[1],
+        second_dir_file_names[2],
+        second_dir_file_names[3],
+        arguments[2],
+        third_dir_file_names[0],
+        third_dir_file_names[1],
+        third_dir_file_names[2]
+    );
+    assert_application_execution_succeed(result);
+}
+
 static void should_successfully_print_the_contents_of_the_mixed_types_specified_operands(void)
 {
     const char *arguments[] = { "dir", "file1", "file1", "symlink", "dir1", NULL };
@@ -157,6 +196,7 @@ void register_application_suite(void)
         CU_add_test(suite, "should_successfully_print_the_file_name_if_a_regular_file_operand_is_specified", should_successfully_print_the_file_name_if_a_regular_file_operand_is_specified);
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_directory_specified_as_an_operand", should_successfully_print_the_contents_of_the_directory_specified_as_an_operand);
         CU_add_test(suite, "should_successfully_print_the_contents_of_multiple_non_directory_files", should_successfully_print_the_contents_of_multiple_non_directory_files);
+        CU_add_test(suite, "should_successfully_print_the_contents_of_multiple_directory_files", should_successfully_print_the_contents_of_multiple_directory_files);
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_mixed_types_specified_operands", should_successfully_print_the_contents_of_the_mixed_types_specified_operands);
     }
 }

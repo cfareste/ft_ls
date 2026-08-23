@@ -31,6 +31,20 @@ void verify_that_the_str_that_has_been_printed_is(const char *str, ...)
     vsnprintf(expected, PRINT_BUFFER_SIZE, str, args);
     va_end(args);
 
+    if (!ft_are_string_equals(printing_buffer, expected))
+    {
+        fprintf(stderr,
+            "FAILED:\n"
+            "-----\n"
+            "expected:\n"
+            "-----\n"
+            "%s"
+            "-----\n"
+            "actual:\n"
+            "-----\n"
+            "%s"
+            "-----\n", expected, printing_buffer);
+    }
     assert(ft_are_string_equals(printing_buffer, expected));
 }
 
