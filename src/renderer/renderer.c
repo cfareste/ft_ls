@@ -18,35 +18,35 @@ t_render_context *render_context_create()
     return config;
 }
 
-void render_context_set_directory_header(t_render_context *config, const char *directory_header)
+void render_context_set_directory_header(t_render_context *context, const char *directory_header)
 {
-    if (config == NULL || directory_header == NULL)
+    if (context == NULL || directory_header == NULL)
         return;
 
-    free(config->directory_header);
-    config->directory_header = ft_safe_strdup(directory_header);
+    free(context->directory_header);
+    context->directory_header = ft_safe_strdup(directory_header);
 }
 
-void render_context_destroy(t_render_context **config)
+void render_context_destroy(t_render_context **context)
 {
-    if (config == NULL || *config == NULL)
+    if (context == NULL || *context == NULL)
         return ;
 
-    free((*config)->directory_header);
-    free(*config);
-    *config = NULL;
+    free((*context)->directory_header);
+    free(*context);
+    *context = NULL;
 }
 
-void render(const t_file_entry_list *file_entry_list, t_render_context *config)
+void render(const t_file_entry_list *file_entry_list, t_render_context *context)
 {
     if (file_entry_list == NULL)
         return;
 
-    if (config->directory_header != NULL)
+    if (context->directory_header != NULL)
     {
-        if (config->is_first_render)
+        if (context->is_first_render)
             ft_printf("\n");
-        ft_printf("%s:\n", config->directory_header);
+        ft_printf("%s:\n", context->directory_header);
     }
 
     const t_file_entry_list *entry = file_entry_list;
@@ -56,5 +56,5 @@ void render(const t_file_entry_list *file_entry_list, t_render_context *config)
         entry = file_entry_list_get_next(entry);
     }
 
-    config->is_first_render = 1;
+    context->is_first_render = 1;
 }
