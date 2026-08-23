@@ -6,9 +6,8 @@
 
 static int check_if_should_print_directory_header(const t_parsed_arguments *parsed_arguments)
 {
-    const char * const *directory_file_operands = parsed_arguments_get_directory_file_operands(parsed_arguments);
     const int has_multiple_file_operands = parsed_arguments_has_multiple_file_operands(parsed_arguments);
-    const int has_directory_file_operands = directory_file_operands[0] != NULL;
+    const int has_directory_file_operands = parsed_arguments_has_directory_file_operands(parsed_arguments);
 
     return has_multiple_file_operands && has_directory_file_operands;
 }
