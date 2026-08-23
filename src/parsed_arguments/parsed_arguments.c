@@ -17,8 +17,8 @@ t_parsed_arguments *parse_arguments(const int num_of_arguments, const char **arg
         return NULL;
 
     t_parsed_arguments *parsed_arguments = ft_safe_calloc(1, sizeof(t_parsed_arguments));
-    parsed_arguments->file_operands = get_file_operands(num_of_arguments, arguments);
-    parsed_arguments->file_operand_types = get_file_operand_types(parsed_arguments->file_operands);
+    parsed_arguments->file_operands = file_operands_get(num_of_arguments, arguments);
+    parsed_arguments->file_operand_types = file_operands_get_types(parsed_arguments->file_operands);
     parsed_arguments->non_directory_file_operands = file_operands_get_non_directory(parsed_arguments->file_operands, parsed_arguments->file_operand_types);
     parsed_arguments->directory_file_operands = file_operands_get_directory(parsed_arguments->file_operands, parsed_arguments->file_operand_types);
 

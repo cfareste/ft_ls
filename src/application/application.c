@@ -43,7 +43,7 @@ static void process_directory_file_operands(const t_parsed_arguments *parsed_arg
     }
 }
 
-int run_application(const t_parsed_arguments *parsed_arguments)
+int application_run(const t_parsed_arguments *parsed_arguments)
 {
     t_render_context *render_context = render_context_create();
 

@@ -57,7 +57,7 @@ static unsigned int get_num_of_directory_file_operands(const unsigned int *file_
     return num_of_directory_file_operands;
 }
 
-char **get_file_operands(const int num_of_arguments, const char **arguments)
+char **file_operands_get(const int num_of_arguments, const char **arguments)
 {
     if (num_of_arguments == 0)
         return get_default_file_operands();
@@ -65,7 +65,7 @@ char **get_file_operands(const int num_of_arguments, const char **arguments)
     return get_file_operands_from_arguments(num_of_arguments, arguments);
 }
 
-unsigned int *get_file_operand_types(char **file_operands)
+unsigned int *file_operands_get_types(char **file_operands)
 {
     const unsigned int num_of_operands = ft_str_matrix_length(file_operands);
     unsigned int *file_operands_types = ft_safe_calloc(num_of_operands + 1, sizeof(int));
@@ -73,7 +73,7 @@ unsigned int *get_file_operand_types(char **file_operands)
 
     for (unsigned int i = 0; i < num_of_operands; i++)
     {
-        get_file_stats(file_operands[i], &file_stats);
+        file_stats_get(file_operands[i], &file_stats);
 
         file_operands_types[i] = file_stats.st_mode & S_IFMT;
     }

@@ -37,7 +37,7 @@ static void should_successfully_print_the_contents_of_the_current_directory_one_
     guarantee_readdir_will_return_N_files_named(entry_names);
     parsed_arguments = parse_arguments(0, arguments);
 
-    const int result = run_application(parsed_arguments);
+    const int result = application_run(parsed_arguments);
 
     verify_that_the_str_that_has_been_printed_is("%s\n%s\n%s\n%s\n%s\n%s\n",
         file_names[0],
@@ -57,7 +57,7 @@ static void should_successfully_print_the_file_name_if_a_regular_file_operand_is
     guarantee_stat_will_populate_stats_of_a_regular_type_file(file_name);
     parsed_arguments = parse_arguments(1, arguments);
 
-    const int result = run_application(parsed_arguments);
+    const int result = application_run(parsed_arguments);
 
     verify_that_the_str_that_has_been_printed_is("%s\n", file_name);
     assert_application_execution_succeed(result);
@@ -74,7 +74,7 @@ static void should_successfully_print_the_contents_of_the_directory_specified_as
     guarantee_readdir_will_return_N_files_named(entry_names);
     parsed_arguments = parse_arguments(1, arguments);
 
-    const int result = run_application(parsed_arguments);
+    const int result = application_run(parsed_arguments);
 
     verify_that_the_str_that_has_been_printed_is("%s\n%s\n%s\n%s\n%s\n%s\n",
         file_names[0],
@@ -94,7 +94,7 @@ static void should_successfully_print_the_contents_of_multiple_non_directory_fil
     guarantee_stat_will_populate_stats_of_N_file_types_for_paths(arguments, types);
     parsed_arguments = parse_arguments(4, arguments);
 
-    const int result = run_application(parsed_arguments);
+    const int result = application_run(parsed_arguments);
 
     verify_that_the_str_that_has_been_printed_is(
         "%s\n%s\n%s\n%s\n",
@@ -119,7 +119,7 @@ static void should_successfully_print_the_contents_of_multiple_directory_files(v
     guarantee_readdir_will_return_N_files_named(entry_names);
     parsed_arguments = parse_arguments(3, arguments);
 
-    const int result = run_application(parsed_arguments);
+    const int result = application_run(parsed_arguments);
 
     verify_that_the_str_that_has_been_printed_is(
         "%s:\n"
@@ -158,7 +158,7 @@ static void should_successfully_print_the_contents_of_the_mixed_types_specified_
     guarantee_readdir_will_return_N_files_named(entry_names);
     parsed_arguments = parse_arguments(5, arguments);
 
-    const int result = run_application(parsed_arguments);
+    const int result = application_run(parsed_arguments);
 
     verify_that_the_str_that_has_been_printed_is(
         "%s\n%s\n%s\n"
