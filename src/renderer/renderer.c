@@ -8,6 +8,17 @@ struct s_render_context
     int is_first_render;
 };
 
+static void print_directory_header(const t_render_context *context)
+{
+    if (context == NULL)
+        return;
+
+    if (context->is_first_render)
+        ft_printf("\n");
+
+    ft_printf("%s:\n", context->directory_header);
+}
+
 t_render_context *render_context_create()
 {
     t_render_context *config = ft_safe_calloc(1, sizeof(t_render_context));
@@ -43,11 +54,7 @@ void render(const t_file_entry_list *file_entry_list, t_render_context *context)
         return;
 
     if (context->directory_header != NULL)
-    {
-        if (context->is_first_render)
-            ft_printf("\n");
-        ft_printf("%s:\n", context->directory_header);
-    }
+        print_directory_header(context);
 
     const t_file_entry_list *entry = file_entry_list;
     while (entry != NULL)
