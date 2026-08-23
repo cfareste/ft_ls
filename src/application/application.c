@@ -4,8 +4,10 @@
 #include "error_codes.h"
 #include "scanner.h"
 
-static void process_non_directory_file_operands(const char * const *non_directory_file_operands)
+static void process_non_directory_file_operands(const t_parsed_arguments *parsed_arguments)
 {
+    const char * const *non_directory_file_operands = parsed_arguments_get_non_directory_file_operands(parsed_arguments);
+
     for (unsigned int i = 0; non_directory_file_operands[i] != NULL; i++)
     {
         t_file_entry_list *file_entry_list = file_entry_list_create(non_directory_file_operands[i]);
@@ -18,8 +20,13 @@ static void process_non_directory_file_operands(const char * const *non_director
     }
 }
 
-static void process_directory_file_operands(const char * const *directory_file_operands, const int should_print_directory_header)
+static void process_directory_file_operands(const t_parsed_arguments *parsed_arguments)
 {
+    const char * const *non_directory_file_operands = parsed_arguments_get_non_directory_file_operands(parsed_arguments);
+    const char * const *directory_file_operands = parsed_arguments_get_directory_file_operands(parsed_arguments);
+    // TODO: Calcularlo mediante file_operands_length > 1 [&& dir_operands > 0?]
+    const int should_print_directory_header = non_directory_file_operands[0] != NULL;
+
     for (unsigned int i = 0; directory_file_operands[i] != NULL; i++)
     {
         t_file_entry_list *file_entry_list = scan(directory_file_operands[i]);
@@ -35,12 +42,8 @@ static void process_directory_file_operands(const char * const *directory_file_o
 
 int run_application(const t_parsed_arguments *parsed_arguments)
 {
-    const char * const *non_directory_file_operands = parsed_arguments_get_non_directory_file_operands(parsed_arguments);
-    const char * const *directory_file_operands = parsed_arguments_get_directory_file_operands(parsed_arguments);
-    const int should_print_directory_header = non_directory_file_operands[0] != NULL;
-
-    process_non_directory_file_operands(non_directory_file_operands);
-    process_directory_file_operands(directory_file_operands, should_print_directory_header);
+    process_non_directory_file_operands(parsed_arguments);
+    process_directory_file_operands(parsed_arguments);
 
     return FT_LS_APPLICATION_SUCCESS;
 }
