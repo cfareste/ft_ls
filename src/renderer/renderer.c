@@ -5,7 +5,6 @@
 struct s_render_context
 {
     char *directory_header;
-    int should_print_directory_header;
     int should_print_directory_header_leading_newline;
 };
 
@@ -14,26 +13,15 @@ t_render_context *render_context_create()
     t_render_context *config = ft_safe_calloc(1, sizeof(t_render_context));
 
     config->directory_header = NULL;
-    config->should_print_directory_header = 0;
     config->should_print_directory_header_leading_newline = 0;
 
     return config;
 }
 
-t_render_context *render_context_create_for_directory_file_operands(const char *directory_header)
+void render_context_set_directory_header(t_render_context *config, const char *directory_header)
 {
-    t_render_context *config = ft_safe_calloc(1, sizeof(t_render_context));
-
+    free(config->directory_header);
     config->directory_header = ft_safe_strdup(directory_header);
-    config->should_print_directory_header = 1;
-    config->should_print_directory_header_leading_newline = 1;
-
-    return config;
-}
-
-void render_context_set_should_print_directory_header(t_render_context *config, const int should_print_directory_header)
-{
-    config->should_print_directory_header = should_print_directory_header;
 }
 
 void render_context_set_should_print_directory_header_leading_newline(t_render_context *config, const int should_print_directory_header_leading_newline)
@@ -56,7 +44,7 @@ void render(const t_file_entry_list *file_entry_list, const t_render_context *co
     if (file_entry_list == NULL)
         return;
 
-    if (config->should_print_directory_header)
+    if (config->directory_header != NULL)
     {
         if (config->should_print_directory_header_leading_newline)
             ft_printf("\n");

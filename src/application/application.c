@@ -5,7 +5,7 @@
 #include "libft.h"
 #include "scanner.h"
 
-static void process_non_directory_file_operands(const t_parsed_arguments *parsed_arguments, t_render_context *render_context)
+static void process_non_directory_file_operands(const t_parsed_arguments *parsed_arguments, const t_render_context *render_context)
 {
     const char * const *non_directory_file_operands = parsed_arguments_get_non_directory_file_operands(parsed_arguments);
 
@@ -31,15 +31,14 @@ static void process_directory_file_operands(const t_parsed_arguments *parsed_arg
 
     for (unsigned int i = 0; directory_file_operands[i] != NULL; i++)
     {
+        const char *directory_header = should_print_directory_header ? directory_file_operands[i] : NULL;
         t_file_entry_list *file_entry_list = scan(directory_file_operands[i]);
-        render_context = render_context_create_for_directory_file_operands(directory_file_operands[i]);
 
-        render_context_set_should_print_directory_header(render_context, should_print_directory_header);
+        render_context_set_directory_header(render_context, directory_header);
         render_context_set_should_print_directory_header_leading_newline(render_context, has_non_directory_file_operands || i > 0);
         render(file_entry_list, render_context);
 
         file_entry_list_destroy(&file_entry_list);
-        render_context_destroy(&render_context);
     }
 }
 
@@ -48,8 +47,9 @@ int run_application(const t_parsed_arguments *parsed_arguments)
     t_render_context *render_context = render_context_create();
 
     process_non_directory_file_operands(parsed_arguments, render_context);
-    render_context_destroy(&render_context);
     process_directory_file_operands(parsed_arguments, render_context);
+
+    render_context_destroy(&render_context);
 
     return FT_LS_APPLICATION_SUCCESS;
 }

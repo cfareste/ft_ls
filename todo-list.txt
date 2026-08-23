@@ -10,7 +10,6 @@ TODO:
 9. Revisar si hace falta tantos file_operands operations
 10. Refactor y cambiar como se calcula el should_print... No cumple tell dont ask, se conoce la implementacion del render
     en la application
-11. Meter ft_fprintf y sustituirlo en print_mock verify (hacerlo cuando Manage invalid options)
 
 
 TODO En algún momento:

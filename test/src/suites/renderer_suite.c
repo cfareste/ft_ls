@@ -19,15 +19,6 @@ static void should_create_a_context(void)
     render_context_destroy(&context);
 }
 
-static void should_create_a_context_for_directory_file_operands(void)
-{
-    t_render_context *context = render_context_create_for_directory_file_operands("dir");
-
-    CU_ASSERT_PTR_NOT_NULL(context);
-
-    render_context_destroy(&context);
-}
-
 static void should_destroy_a_context(void)
 {
     t_render_context *context = render_context_create();
@@ -103,7 +94,9 @@ static void should_print_a_leading_dir_header_if_a_directory_context_is_specifie
 {
     const char *expected_file_name[3] = { "file", "file2", "file3" };
     const char *dir_header = "dir";
-    t_render_context *context = render_context_create_for_directory_file_operands(dir_header);
+    t_render_context *context = render_context_create();
+    render_context_set_directory_header(context, dir_header);
+    render_context_set_should_print_directory_header_leading_newline(context, 1);
     t_file_entry_list *file_entry_list = file_entry_list_create(expected_file_name[0]);
     file_entry_list_add_entry(&file_entry_list, file_entry_list_create(expected_file_name[1]));
     file_entry_list_add_entry(&file_entry_list, file_entry_list_create(expected_file_name[2]));
@@ -125,9 +118,9 @@ static void should_print_a_leading_dir_header_if_a_directory_context_is_specifie
 static void should_not_print_a_leading_dir_header_if_specified_in_the_directory_context(void)
 {
     const char *expected_file_name[3] = { "file", "file2", "file3" };
-    const char *dir_header = "dir";
-    t_render_context *context = render_context_create_for_directory_file_operands(dir_header);
-    render_context_set_should_print_directory_header(context, 0);
+    t_render_context *context = render_context_create();
+    render_context_set_directory_header(context, NULL);
+    render_context_set_directory_header(context, 0);
     t_file_entry_list *file_entry_list = file_entry_list_create(expected_file_name[0]);
     file_entry_list_add_entry(&file_entry_list, file_entry_list_create(expected_file_name[1]));
     file_entry_list_add_entry(&file_entry_list, file_entry_list_create(expected_file_name[2]));
@@ -149,7 +142,8 @@ static void should_not_print_a_leading_dir_header_newline_if_specified_in_the_di
 {
     const char *expected_file_name[3] = { "file", "file2", "file3" };
     const char *dir_header = "dir";
-    t_render_context *context = render_context_create_for_directory_file_operands(dir_header);
+    t_render_context *context = render_context_create();
+    render_context_set_directory_header(context, dir_header);
     render_context_set_should_print_directory_header_leading_newline(context, 0);
     t_file_entry_list *file_entry_list = file_entry_list_create(expected_file_name[0]);
     file_entry_list_add_entry(&file_entry_list, file_entry_list_create(expected_file_name[1]));
@@ -199,7 +193,6 @@ void register_renderer_suite(void)
     if (suite != NULL)
     {
         CU_add_test(suite, "should_create_a_context", should_create_a_context);
-        CU_add_test(suite, "should_create_a_context_for_directory_file_operands", should_create_a_context_for_directory_file_operands);
         CU_add_test(suite, "should_destroy_a_context", should_destroy_a_context);
         CU_add_test(suite, "should_not_fail_to_destroy_a_context_when_a_null_pointer_is_passed", should_not_fail_to_destroy_a_context_when_a_null_pointer_is_passed);
         CU_add_test(suite, "should_not_fail_to_destroy_a_context_when_an_already_null_context_is_passed", should_not_fail_to_destroy_a_context_when_an_already_null_context_is_passed);
