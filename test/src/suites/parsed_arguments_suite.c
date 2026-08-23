@@ -136,6 +136,20 @@ static void should_return_the_directory_file_operands(void)
     parsed_arguments_destroy(&parsed_arguments);
 }
 
+static void should_return_false_for_multiple_file_operands_if_has_less_than_two(void)
+{
+    const char *args[] = { NULL };
+    const unsigned int args_types[] = { 0 };
+    guarantee_stat_will_populate_stats_of_N_file_types_for_paths(args, args_types);
+    t_parsed_arguments *parsed_arguments = parse_arguments(0, args);
+
+    const int has_multiple_file_operands = parsed_arguments_has_multiple_file_operands(parsed_arguments);
+
+    CU_ASSERT_EQUAL(has_multiple_file_operands, 0);
+
+    parsed_arguments_destroy(&parsed_arguments);
+}
+
 void register_parsed_arguments_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, test_teardown);
@@ -154,5 +168,6 @@ void register_parsed_arguments_suite(void)
         CU_add_test(suite, "should_return_the_non_directory_file_operands", should_return_the_non_directory_file_operands);
         CU_add_test(suite, "should_return_NULL_directory_file_operands_if_NULL_parsed_arguments_are_passed", should_return_NULL_directory_file_operands_if_NULL_parsed_arguments_are_passed);
         CU_add_test(suite, "should_return_the_directory_file_operands", should_return_the_directory_file_operands);
+        CU_add_test(suite, "should_return_false_for_multiple_file_operands_if_has_less_than_two", should_return_false_for_multiple_file_operands_if_has_less_than_two);
     }
 }
