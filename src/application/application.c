@@ -12,12 +12,10 @@ static void process_non_directory_file_operands(const t_parsed_arguments *parsed
     for (unsigned int i = 0; non_directory_file_operands[i] != NULL; i++)
     {
         t_file_entry_list *file_entry_list = file_entry_list_create(non_directory_file_operands[i]);
-        render_context = render_context_create();
 
         render(file_entry_list, render_context);
 
         file_entry_list_destroy(&file_entry_list);
-        render_context_destroy(&render_context);
     }
 }
 
@@ -47,9 +45,10 @@ static void process_directory_file_operands(const t_parsed_arguments *parsed_arg
 
 int run_application(const t_parsed_arguments *parsed_arguments)
 {
-    t_render_context *render_context = NULL;
+    t_render_context *render_context = render_context_create();
 
     process_non_directory_file_operands(parsed_arguments, render_context);
+    render_context_destroy(&render_context);
     process_directory_file_operands(parsed_arguments, render_context);
 
     return FT_LS_APPLICATION_SUCCESS;
