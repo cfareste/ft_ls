@@ -2,17 +2,15 @@
 #include "application.h"
 #include "renderer.h"
 #include "error_codes.h"
-#include "libft.h"
 #include "scanner.h"
 
 static int check_if_should_print_directory_header(const t_parsed_arguments *parsed_arguments)
 {
-    const char * const *file_operands = parsed_arguments_get_file_operands(parsed_arguments);
     const char * const *directory_file_operands = parsed_arguments_get_directory_file_operands(parsed_arguments);
-    const int num_of_file_operands = ft_str_matrix_length((char **) file_operands);
+    const int has_multiple_file_operands = parsed_arguments_has_multiple_file_operands(parsed_arguments);
     const int has_directory_file_operands = directory_file_operands[0] != NULL;
 
-    return num_of_file_operands > 1 && has_directory_file_operands;
+    return has_multiple_file_operands && has_directory_file_operands;
 }
 
 static void process_non_directory_file_operands(const t_parsed_arguments *parsed_arguments, t_render_context *render_context)
