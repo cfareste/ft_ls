@@ -51,6 +51,9 @@ const char * const *parsed_arguments_get_directory_file_operands(const t_parsed_
 
 int parsed_arguments_has_multiple_file_operands(const t_parsed_arguments *parsed_arguments)
 {
+    if (parsed_arguments == NULL)
+        return 0;
+
     return parsed_arguments->file_operands[1] != NULL;
 }
 
