@@ -4,6 +4,7 @@
 #include "mocks.h"
 
 #define SUITE_NAME "directory"
+#define VALID_DIRECTORY_PATH "valid"
 
 static DIR *dir_stream_sut;
 
@@ -43,14 +44,19 @@ static void should_return_NULL_when_opening_an_empty_path(void)
 
 static void should_return_a_directory_stream_when_opening_a_valid_path(void)
 {
-    open_directory_stream("valid");
+    const char *dir_names[] = { VALID_DIRECTORY_PATH, NULL };
+    ensure_opendir_will_open_N_dirs_named(dir_names);
+
+    open_directory_stream(VALID_DIRECTORY_PATH);
 
     CU_ASSERT_PTR_NOT_NULL(dir_stream_sut);
 }
 
 static void should_return_NULL_when_reading_an_entry_from_a_null_directory(void)
 {
-    open_directory_stream("valid");
+    const char *dir_names[] = { VALID_DIRECTORY_PATH, NULL };
+    ensure_opendir_will_open_N_dirs_named(dir_names);
+    open_directory_stream(VALID_DIRECTORY_PATH);
 
     const struct dirent *entry = directory_get_next_entry(NULL);
 
@@ -59,15 +65,18 @@ static void should_return_NULL_when_reading_an_entry_from_a_null_directory(void)
 
 static void should_return_an_entry_when_reading_from_a_valid_directory(void)
 {
-    const char *file_name = "file";
-    guarantee_readdir_will_return_a_file_named(file_name);
+    const char *file_names[] = { "file", NULL };
+    const char *dir_names[] = { VALID_DIRECTORY_PATH, NULL };
+    const char **entry_names[] = { file_names, NULL };
+    ensure_opendir_will_open_N_dirs_named(dir_names);
+    guarantee_readdir_will_return_N_files_named(entry_names);
 
-    open_directory_stream("valid");
+    open_directory_stream(VALID_DIRECTORY_PATH);
 
     const struct dirent *entry = directory_get_next_entry(dir_stream_sut);
 
     CU_ASSERT_PTR_NOT_NULL(entry);
-    CU_ASSERT_STRING_EQUAL(entry->d_name, file_name);
+    CU_ASSERT_STRING_EQUAL(entry->d_name, file_names[0]);
 }
 
 static void should_return_minus_one_when_closing_a_null_directory(void)
@@ -79,7 +88,9 @@ static void should_return_minus_one_when_closing_a_null_directory(void)
 
 static void should_return_zero_when_closing_a_valid_directory(void)
 {
-    open_directory_stream("valid");
+    const char *dir_names[] = { VALID_DIRECTORY_PATH, NULL };
+    ensure_opendir_will_open_N_dirs_named(dir_names);
+    open_directory_stream(VALID_DIRECTORY_PATH);
 
     const int actual = directory_close(&dir_stream_sut);
 

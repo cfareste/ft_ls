@@ -26,3 +26,14 @@ jobs:
 
       - name: Run make test_cover
         run: make test_cover REPORT_OUTPUT_MODE=stdout
+
+  test_e2e:
+    name: make test_e2e
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run make test_e2e
+        run: make test_e2e

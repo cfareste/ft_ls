@@ -16,7 +16,7 @@ CYAN = \033[1;36m
 
 #----COMPILER----#
 CC = cc
-CCFLAGS += -g -Wall -Wextra -Werror -fsanitize=address -Dopendir=mock_opendir -Dreaddir=mock_readdir -Dclosedir=mock_closedir -Dft_printf=printf_mock
+CCFLAGS += -g -Wall -Wextra -Werror -fsanitize=address -Dopendir=mock_opendir -Dreaddir=mock_readdir -Dclosedir=mock_closedir -Dft_printf=printf_mock -Dstat=stat_mock
 COVERAGE_FLAGS = -fprofile-arcs -ftest-coverage
 
 
@@ -58,26 +58,36 @@ LDFLAGS = $(LIBFT_LIB)
 vpath %.c	$(SRC):\
 			$(SUITES_DIR):\
 			$(MOCKS_DIR):\
+			$(ROOT_SRC)/application:\
+			$(ROOT_SRC)/parsed_arguments:\
+			$(ROOT_SRC)/parsed_arguments/file_operands:\
 			$(ROOT_SRC)/filesystem:\
-			$(ROOT_SRC)/file_data:\
+			$(ROOT_SRC)/file_entry_list:\
 			$(ROOT_SRC)/scanner:\
 			$(ROOT_SRC)/renderer
 
 
 
 #----SHARED----#
-ROOT_SRCS = directory.c \
-			file_data.c \
+ROOT_SRCS = application.c \
+			parsed_arguments.c \
+			file_operands.c \
+			directory.c \
+			file_stats.c \
+			file_entry_list.c \
 			scanner.c \
 			renderer.c
 
 SRCS = main.c \
 		directory_mock.c \
 		print_mock.c \
+		stat_mock.c \
 		directory_suite.c \
-		file_data_suite.c \
-		scanner_suite.c \
+		file_entry_list_suite.c \
 		renderer_suite.c \
+		file_stats_suite.c \
+		parsed_arguments_suite.c \
+		application_suite.c \
 		$(ROOT_SRCS)
 
 OBJS = $(SRCS:%.c=$(BIN_DIR)%.o)
@@ -140,11 +150,18 @@ run: all
 	@echo "$(CYAN)Running $(WHITE_BOLD)tests$(CYAN)...$(RESET)\n"
 	@./tester
 
+e2e:
+	@echo "$(CYAN)Running $(WHITE_BOLD)E2E tests$(CYAN)...$(RESET)\n"
+	@cp ../ft_ls .
+	@./run_e2e.sh
+	@rm -rf ./ft_ls
+
 .PHONY: all \
 	clean \
 	fclean \
 	re \
 	run \
+	e2e \
 	cover \
 	gcov_report \
 	setup-cunit

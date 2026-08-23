@@ -1,14 +1,12 @@
-#include "scanner.h"
-#include "renderer.h"
+#include "application.h"
 
-int	main(int argc, char **argv)
+int	main(const int argc, const char **argv)
 {
-	(void) argc;
-	(void) argv;
-	t_file_data *file_list = scan(".");
+	t_parsed_arguments *parsed_arguments = parse_arguments(argc - 1, &argv[1]);
 
-	render(file_list);
+	const int result = application_run(parsed_arguments);
 
-	file_data_destroy(&file_list);
-	return 0;
+	parsed_arguments_destroy(&parsed_arguments);
+
+	return result;
 }

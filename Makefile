@@ -23,7 +23,7 @@ TEST_DIR = test/
 
 #----COMPILER----#
 CC = cc
-CCFLAGS += -g -Wall -Werror -Wextra
+CCFLAGS += -g -Wall -Werror -Wextra -fsanitize=address
 INCLUDES = -I$(INC)
 
 
@@ -43,15 +43,22 @@ export GNL_BUFFER_SIZE := 50000
 
 #----VPATH----#
 vpath %.c	$(SRC):\
+			$(SRC)/application:\
+			$(SRC)/parsed_arguments:\
+			$(SRC)/parsed_arguments/file_operands:\
 			$(SRC)/filesystem:\
-			$(SRC)/file_data:\
+			$(SRC)/file_entry_list:\
 			$(SRC)/scanner:\
 			$(SRC)/renderer
 
 #----SHARED----#
 SRCS = ft_ls.c \
+		application.c \
+		parsed_arguments.c \
+		file_operands.c \
 		directory.c \
-		file_data.c \
+		file_stats.c \
+		file_entry_list.c \
 		scanner.c \
 		renderer.c
 
@@ -101,6 +108,9 @@ test: make_libft
 test_cover: make_libft
 	@$(MAKE) --no-print-directory -C $(TEST_DIR) cover REPORT_OUTPUT_MODE="$(REPORT_OUTPUT_MODE)"
 
+test_e2e: bonus
+	@$(MAKE) --no-print-directory -C $(TEST_DIR) e2e
+
 test_clean:
 	@$(MAKE) --no-print-directory -C $(TEST_DIR) clean
 
@@ -127,6 +137,7 @@ libft_fclean:
 		bre \
 		test \
 		test_cover \
+		test_e2e \
 		test_clean \
 		test_fclean \
 		make_libft \
