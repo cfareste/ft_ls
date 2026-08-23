@@ -10,7 +10,7 @@ struct s_render_context
 
 static void print_directory_header(const t_render_context *context)
 {
-    if (context->is_first_render)
+    if (!context->is_first_render)
         ft_printf("\n");
 
     ft_printf("%s:\n", context->directory_header);
@@ -21,7 +21,7 @@ t_render_context *render_context_create()
     t_render_context *config = ft_safe_calloc(1, sizeof(t_render_context));
 
     config->directory_header = NULL;
-    config->is_first_render = 0;
+    config->is_first_render = 1;
 
     return config;
 }
@@ -60,5 +60,5 @@ void render(const t_file_entry_list *file_entry_list, t_render_context *context)
         entry = file_entry_list_get_next(entry);
     }
 
-    context->is_first_render = 1;
+    context->is_first_render = 0;
 }
