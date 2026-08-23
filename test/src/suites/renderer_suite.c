@@ -40,6 +40,15 @@ static void should_not_fail_to_destroy_a_context_when_an_already_null_context_is
     render_context_destroy(&invalid);
 }
 
+static void should_not_fail_set_a_null_directory_header(void)
+{
+    t_render_context *valid = render_context_create();
+
+    render_context_set_directory_header(valid, NULL);
+
+    render_context_destroy(&valid);
+}
+
 static void should_not_print_anything_if_the_file_entry_list_is_null(void)
 {
     t_render_context *context = render_context_create();
@@ -199,6 +208,7 @@ void register_renderer_suite(void)
         CU_add_test(suite, "should_destroy_a_context", should_destroy_a_context);
         CU_add_test(suite, "should_not_fail_to_destroy_a_context_when_a_null_pointer_is_passed", should_not_fail_to_destroy_a_context_when_a_null_pointer_is_passed);
         CU_add_test(suite, "should_not_fail_to_destroy_a_context_when_an_already_null_context_is_passed", should_not_fail_to_destroy_a_context_when_an_already_null_context_is_passed);
+        CU_add_test(suite, "should_not_fail_set_a_null_directory_header", should_not_fail_set_a_null_directory_header);
         CU_add_test(suite, "should_not_print_anything_if_the_file_entry_list_is_null", should_not_print_anything_if_the_file_entry_list_is_null);
         CU_add_test(suite, "should_print_the_name_of_the_entry_with_a_file_entry_list_of_one_element", should_print_the_name_of_the_entry_with_a_file_entry_list_of_one_element);
         CU_add_test(suite, "should_print_the_name_of_every_entry_with_a_file_entry_list_of_various_elements_separated_by_new_lines", should_print_the_name_of_every_entry_with_a_file_entry_list_of_various_elements_separated_by_new_lines);

@@ -20,6 +20,9 @@ t_render_context *render_context_create()
 
 void render_context_set_directory_header(t_render_context *config, const char *directory_header)
 {
+    if (directory_header == NULL)
+        return;
+
     free(config->directory_header);
     config->directory_header = ft_safe_strdup(directory_header);
 }
