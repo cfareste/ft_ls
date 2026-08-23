@@ -43,6 +43,7 @@ prepare_test_environment() {
     rm -rf "${TESTDIR_PATH}"
     mkdir -p "${TESTDIR_PATH}/firstDir"
     mkdir -p "${TESTDIR_PATH}/secondDir"
+    mkdir -p "${TESTDIR_PATH}/empty"
 
     touch "${TESTDIR_PATH}/'my"
     touch "${TESTDIR_PATH}/'my file'"

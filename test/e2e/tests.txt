@@ -4,14 +4,15 @@
 # Remember: Columns without tty: -C | Colors without tty: --colors
 #
 
-./ft_ls                                                                ::        ls -aU
-./ft_ls .                                                              ::        ls -aU .
-./ft_ls Makefile                                                       ::        ls -aU Makefile
-./ft_ls testdir                                                        ::        ls -aU testdir
-./ft_ls ../../ft_ls/./test/testdir                                     ::        ls -aU ../../ft_ls/./test/testdir
-./ft_ls ../../ft_ls/./test/testdir/file                                ::        ls -aU ../../ft_ls/./test/testdir/file
-./ft_ls /tmp/tempfile                                                  ::        ls -aU /tmp/tempfile
-./ft_ls /tmp/tempdir/                                                  ::        ls -aU /tmp/tempdir/
-./ft_ls Makefile run_e2e.sh Makefile generate_coverage_reports.sh      ::        ls -aU Makefile run_e2e.sh Makefile generate_coverage_reports.sh
-./ft_ls inc src testdir src                                            ::        ls -aU inc src testdir src
-./ft_ls testdir/file2 testdir/firstDir testdir/secondDir testdir/file  ::        ls -aU testdir/file2 testdir/firstDir testdir/secondDir testdir/file
+./ft_ls                                                                      ::        ls -aU
+./ft_ls .                                                                    ::        ls -aU .
+./ft_ls Makefile                                                             ::        ls -aU Makefile
+./ft_ls testdir                                                              ::        ls -aU testdir
+./ft_ls ../../ft_ls/./test/testdir                                           ::        ls -aU ../../ft_ls/./test/testdir
+./ft_ls ../../ft_ls/./test/testdir/file                                      ::        ls -aU ../../ft_ls/./test/testdir/file
+./ft_ls /tmp/tempfile                                                        ::        ls -aU /tmp/tempfile
+./ft_ls /tmp/tempdir/                                                        ::        ls -aU /tmp/tempdir/
+./ft_ls Makefile run_e2e.sh Makefile generate_coverage_reports.sh            ::        ls -aU Makefile run_e2e.sh Makefile generate_coverage_reports.sh
+./ft_ls inc/ src testdir src                                                 ::        ls -aU inc/ src testdir src
+./ft_ls testdir/file2 testdir/firstDir testdir/secondDir testdir/file        ::        ls -aU testdir/file2 testdir/firstDir testdir/secondDir testdir/file
+./ft_ls testdir/empty                                                        ::        ls -aU testdir/empty

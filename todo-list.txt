@@ -1,9 +1,4 @@
 TODO:
-1. Implementar LS-11 Execution with multiple parameters
-2. Revisar si todas las funciones están probadas (menos file operands que es submodulo)
-3. Revisar si hace falta tantos file_operands operations
-4. Reflexionar si meter el should print header en render pasando parsed arguments
-5. QA LS-11
 
 
 TODO En algún momento:
@@ -12,6 +7,8 @@ TODO En algún momento:
 - Refactor renderer, donde render llama a render_strategy o lo que sea basado en options
 - Refactor e implementar mi propio enum para los tipos de ficheros y otro para los booleanos del renderer
 - Usar un struct propio para los opendirs, stat, etc. (como t_dir_stream de antes)
+- Reflexionar si meter el should print header en render pasando parsed arguments. Si al hacer las options se necesita
+  pasar parsed arguments al render, entonces calcularlo ahi
 
 
 TODO Para mejorar siguientes proyectos:
@@ -32,6 +29,7 @@ TODO QA:
 - Probar que este hecho, tanto a mano como con tests
 
 
+
 QA LS-8 Execution without parameters (`ls -aU | cat`)
 1. Directorio vacío - NO ACCESIBLE (siempre hay '.' y '..')
 2. Un solo fichero - NO ACCESIBLE (siempre hay '.' y '..')
@@ -39,3 +37,11 @@ QA LS-8 Execution without parameters (`ls -aU | cat`)
 4. Ficheros con nombres raros se ven bien
 5. No memory leaks
 
+
+QA LS-11 Execution with parameters (`ls -aU file ... | cat`)
+1. 1 fichero
+2. 1 directorio
+3. 2+ ficheros
+4. 2+ directorios
+5. Mezcla ficheros + directorios
+6. No memory leaks
