@@ -145,6 +145,30 @@ static void should_not_print_a_leading_dir_header_if_specified_in_the_directory_
     render_config_destroy(&config);
 }
 
+static void should_not_print_a_leading_dir_header_newline_if_specified_in_the_directory_configuration(void)
+{
+    const char *expected_file_name[3] = { "file", "file2", "file3" };
+    const char *dir_header = "dir";
+    t_render_config *config = render_config_create_for_directory_file_operands(dir_header);
+    render_config_set_should_print_directory_header_leading_newline(config, 0);
+    t_file_entry_list *file_entry_list = file_entry_list_create(expected_file_name[0]);
+    file_entry_list_add_entry(&file_entry_list, file_entry_list_create(expected_file_name[1]));
+    file_entry_list_add_entry(&file_entry_list, file_entry_list_create(expected_file_name[2]));
+
+    render(file_entry_list, config);
+
+    verify_that_the_str_that_has_been_printed_is(
+        "%s:\n%s\n%s\n%s\n",
+        dir_header,
+        expected_file_name[0],
+        expected_file_name[1],
+        expected_file_name[2]
+    );
+
+    file_entry_list_destroy(&file_entry_list);
+    render_config_destroy(&config);
+}
+
 /*static void should_print_the_name_of_every_entry_with_a_file_entry_list_of_various_elements_separated_by_two_spaces(void)
 {
     const char *expected_file_name[5] = { "file", "file2", "file3", "file4", "file5" };
@@ -184,6 +208,7 @@ void register_renderer_suite(void)
         CU_add_test(suite, "should_print_the_name_of_every_entry_with_a_file_entry_list_of_various_elements_separated_by_new_lines", should_print_the_name_of_every_entry_with_a_file_entry_list_of_various_elements_separated_by_new_lines);
         CU_add_test(suite, "should_print_a_leading_dir_header_if_a_directory_config_is_specified", should_print_a_leading_dir_header_if_a_directory_config_is_specified);
         CU_add_test(suite, "should_not_print_a_leading_dir_header_if_specified_in_the_directory_configuration", should_not_print_a_leading_dir_header_if_specified_in_the_directory_configuration);
+        CU_add_test(suite, "should_not_print_a_leading_dir_header_newline_if_specified_in_the_directory_configuration", should_not_print_a_leading_dir_header_newline_if_specified_in_the_directory_configuration);
         // CU_add_test(suite, "should_print_the_name_of_every_entry_with_a_file_entry_list_of_various_elements_separated_by_two_spaces", should_print_the_name_of_every_entry_with_a_file_entry_list_of_various_elements_separated_by_two_spaces);
     }
 }
