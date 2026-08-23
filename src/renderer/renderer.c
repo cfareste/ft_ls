@@ -10,9 +10,6 @@ struct s_render_context
 
 static void print_directory_header(const t_render_context *context)
 {
-    if (context == NULL)
-        return;
-
     if (context->is_first_render)
         ft_printf("\n");
 
