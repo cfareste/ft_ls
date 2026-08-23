@@ -24,11 +24,6 @@ void render_context_set_directory_header(t_render_context *config, const char *d
     config->directory_header = ft_safe_strdup(directory_header);
 }
 
-void render_context_set_should_print_directory_header_leading_newline(t_render_context *config, const int should_print_directory_header_leading_newline)
-{
-    config->should_print_directory_header_leading_newline = should_print_directory_header_leading_newline;
-}
-
 void render_context_destroy(t_render_context **config)
 {
     if (config == NULL || *config == NULL)
@@ -39,7 +34,7 @@ void render_context_destroy(t_render_context **config)
     *config = NULL;
 }
 
-void render(const t_file_entry_list *file_entry_list, const t_render_context *config)
+void render(const t_file_entry_list *file_entry_list, t_render_context *config)
 {
     if (file_entry_list == NULL)
         return;
@@ -57,4 +52,6 @@ void render(const t_file_entry_list *file_entry_list, const t_render_context *co
         ft_printf("%s\n", file_entry_list_get_name(entry));
         entry = file_entry_list_get_next(entry);
     }
+
+    config->should_print_directory_header_leading_newline = 1;
 }

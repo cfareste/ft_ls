@@ -90,37 +90,11 @@ static void should_print_the_name_of_every_entry_with_a_file_entry_list_of_vario
     render_context_destroy(&context);
 }
 
-static void should_print_a_leading_dir_header_if_a_directory_context_is_specified(void)
-{
-    const char *expected_file_name[3] = { "file", "file2", "file3" };
-    const char *dir_header = "dir";
-    t_render_context *context = render_context_create();
-    render_context_set_directory_header(context, dir_header);
-    render_context_set_should_print_directory_header_leading_newline(context, 1);
-    t_file_entry_list *file_entry_list = file_entry_list_create(expected_file_name[0]);
-    file_entry_list_add_entry(&file_entry_list, file_entry_list_create(expected_file_name[1]));
-    file_entry_list_add_entry(&file_entry_list, file_entry_list_create(expected_file_name[2]));
-
-    render(file_entry_list, context);
-
-    verify_that_the_str_that_has_been_printed_is(
-        "\n%s:\n%s\n%s\n%s\n",
-        dir_header,
-        expected_file_name[0],
-        expected_file_name[1],
-        expected_file_name[2]
-    );
-
-    file_entry_list_destroy(&file_entry_list);
-    render_context_destroy(&context);
-}
-
-static void should_not_print_a_leading_dir_header_if_specified_in_the_directory_context(void)
+static void should_not_print_a_dir_header_if_specified_in_the_context(void)
 {
     const char *expected_file_name[3] = { "file", "file2", "file3" };
     t_render_context *context = render_context_create();
     render_context_set_directory_header(context, NULL);
-    render_context_set_directory_header(context, 0);
     t_file_entry_list *file_entry_list = file_entry_list_create(expected_file_name[0]);
     file_entry_list_add_entry(&file_entry_list, file_entry_list_create(expected_file_name[1]));
     file_entry_list_add_entry(&file_entry_list, file_entry_list_create(expected_file_name[2]));
@@ -138,13 +112,12 @@ static void should_not_print_a_leading_dir_header_if_specified_in_the_directory_
     render_context_destroy(&context);
 }
 
-static void should_not_print_a_leading_dir_header_newline_if_specified_in_the_directory_context(void)
+static void should_not_print_a_leading_dir_header_newline_if_its_the_first_render(void)
 {
     const char *expected_file_name[3] = { "file", "file2", "file3" };
     const char *dir_header = "dir";
     t_render_context *context = render_context_create();
     render_context_set_directory_header(context, dir_header);
-    render_context_set_should_print_directory_header_leading_newline(context, 0);
     t_file_entry_list *file_entry_list = file_entry_list_create(expected_file_name[0]);
     file_entry_list_add_entry(&file_entry_list, file_entry_list_create(expected_file_name[1]));
     file_entry_list_add_entry(&file_entry_list, file_entry_list_create(expected_file_name[2]));
@@ -157,6 +130,36 @@ static void should_not_print_a_leading_dir_header_newline_if_specified_in_the_di
         expected_file_name[0],
         expected_file_name[1],
         expected_file_name[2]
+    );
+
+    file_entry_list_destroy(&file_entry_list);
+    render_context_destroy(&context);
+}
+
+static void should_print_a_leading_dir_header_newline_if_its_not_first_render(void)
+{
+    const char *expected_file_name[3] = { "file", "file2" };
+    const char *dir_header = "dir";
+    t_render_context *context = render_context_create();
+    render_context_set_directory_header(context, dir_header);
+    t_file_entry_list *file_entry_list = file_entry_list_create(expected_file_name[0]);
+    file_entry_list_add_entry(&file_entry_list, file_entry_list_create(expected_file_name[1]));
+    file_entry_list_add_entry(&file_entry_list, file_entry_list_create(expected_file_name[2]));
+
+    render(file_entry_list, context);
+    render(file_entry_list, context);
+
+    verify_that_the_str_that_has_been_printed_is(
+        "%s:\n"
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n%s\n",
+        dir_header,
+        expected_file_name[0],
+        expected_file_name[1],
+        dir_header,
+        expected_file_name[0],
+        expected_file_name[1]
     );
 
     file_entry_list_destroy(&file_entry_list);
@@ -199,9 +202,9 @@ void register_renderer_suite(void)
         CU_add_test(suite, "should_not_print_anything_if_the_file_entry_list_is_null", should_not_print_anything_if_the_file_entry_list_is_null);
         CU_add_test(suite, "should_print_the_name_of_the_entry_with_a_file_entry_list_of_one_element", should_print_the_name_of_the_entry_with_a_file_entry_list_of_one_element);
         CU_add_test(suite, "should_print_the_name_of_every_entry_with_a_file_entry_list_of_various_elements_separated_by_new_lines", should_print_the_name_of_every_entry_with_a_file_entry_list_of_various_elements_separated_by_new_lines);
-        CU_add_test(suite, "should_print_a_leading_dir_header_if_a_directory_context_is_specified", should_print_a_leading_dir_header_if_a_directory_context_is_specified);
-        CU_add_test(suite, "should_not_print_a_leading_dir_header_if_specified_in_the_directory_context", should_not_print_a_leading_dir_header_if_specified_in_the_directory_context);
-        CU_add_test(suite, "should_not_print_a_leading_dir_header_newline_if_specified_in_the_directory_context", should_not_print_a_leading_dir_header_newline_if_specified_in_the_directory_context);
+        CU_add_test(suite, "should_not_print_a_dir_header_if_specified_in_the_context", should_not_print_a_dir_header_if_specified_in_the_context);
+        CU_add_test(suite, "should_not_print_a_leading_dir_header_newline_if_its_the_first_render", should_not_print_a_leading_dir_header_newline_if_its_the_first_render);
+        CU_add_test(suite, "should_print_a_leading_dir_header_newline_if_its_not_first_render", should_print_a_leading_dir_header_newline_if_its_not_first_render);
         // CU_add_test(suite, "should_print_the_name_of_every_entry_with_a_file_entry_list_of_various_elements_separated_by_two_spaces", should_print_the_name_of_every_entry_with_a_file_entry_list_of_various_elements_separated_by_two_spaces);
     }
 }
