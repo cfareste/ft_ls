@@ -5,6 +5,16 @@
 #include "libft.h"
 #include "scanner.h"
 
+static int check_if_should_print_directory_header(const t_parsed_arguments *parsed_arguments)
+{
+    const char * const *file_operands = parsed_arguments_get_file_operands(parsed_arguments);
+    const char * const *directory_file_operands = parsed_arguments_get_directory_file_operands(parsed_arguments);
+    const int num_of_file_operands = ft_str_matrix_length((char **) file_operands);
+    const int has_directory_file_operands = directory_file_operands[0] != NULL;
+
+    return num_of_file_operands > 1 && has_directory_file_operands;
+}
+
 static void process_non_directory_file_operands(const t_parsed_arguments *parsed_arguments, t_render_context *render_context)
 {
     const char * const *non_directory_file_operands = parsed_arguments_get_non_directory_file_operands(parsed_arguments);
@@ -21,11 +31,8 @@ static void process_non_directory_file_operands(const t_parsed_arguments *parsed
 
 static void process_directory_file_operands(const t_parsed_arguments *parsed_arguments, t_render_context *render_context)
 {
-    const char * const *file_operands = parsed_arguments_get_file_operands(parsed_arguments);
     const char * const *directory_file_operands = parsed_arguments_get_directory_file_operands(parsed_arguments);
-    const int num_of_file_operands = ft_str_matrix_length((char **) file_operands);
-    const int has_directory_file_operands = directory_file_operands[0] != NULL;
-    const int should_print_directory_header = num_of_file_operands > 1 && has_directory_file_operands;
+    const int should_print_directory_header = check_if_should_print_directory_header(parsed_arguments);
 
     for (unsigned int i = 0; directory_file_operands[i] != NULL; i++)
     {
