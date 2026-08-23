@@ -10,39 +10,39 @@ static void test_setup()
     reset_printing_buffer();
 }
 
-static void should_create_a_configuration_for_non_directory_file_operands(void)
+static void should_create_a_context(void)
 {
-    t_render_context *config = render_context_create_for_non_directory_file_operands();
+    t_render_context *context = render_context_create();
 
-    CU_ASSERT_PTR_NOT_NULL(config);
+    CU_ASSERT_PTR_NOT_NULL(context);
 
-    render_context_destroy(&config);
+    render_context_destroy(&context);
 }
 
-static void should_create_a_configuration_for_directory_file_operands(void)
+static void should_create_a_context_for_directory_file_operands(void)
 {
-    t_render_context *config = render_context_create_for_directory_file_operands("dir");
+    t_render_context *context = render_context_create_for_directory_file_operands("dir");
 
-    CU_ASSERT_PTR_NOT_NULL(config);
+    CU_ASSERT_PTR_NOT_NULL(context);
 
-    render_context_destroy(&config);
+    render_context_destroy(&context);
 }
 
-static void should_destroy_a_configuration(void)
+static void should_destroy_a_context(void)
 {
-    t_render_context *config = render_context_create_for_non_directory_file_operands();
+    t_render_context *context = render_context_create();
 
-    render_context_destroy(&config);
+    render_context_destroy(&context);
 
-    CU_ASSERT_PTR_NULL(config);
+    CU_ASSERT_PTR_NULL(context);
 }
 
-static void should_not_fail_to_destroy_a_configuration_when_a_null_pointer_is_passed(void)
+static void should_not_fail_to_destroy_a_context_when_a_null_pointer_is_passed(void)
 {
     render_context_destroy(NULL);
 }
 
-static void should_not_fail_to_destroy_a_configuration_when_an_already_null_configuration_is_passed(void)
+static void should_not_fail_to_destroy_a_context_when_an_already_null_context_is_passed(void)
 {
     t_render_context *invalid = NULL;
 
@@ -51,32 +51,32 @@ static void should_not_fail_to_destroy_a_configuration_when_an_already_null_conf
 
 static void should_not_print_anything_if_the_file_entry_list_is_null(void)
 {
-    t_render_context *config = render_context_create_for_non_directory_file_operands();
+    t_render_context *context = render_context_create();
 
-    render(NULL, config);
+    render(NULL, context);
 
     verify_that_the_str_that_has_been_printed_is("");
 
-    render_context_destroy(&config);
+    render_context_destroy(&context);
 }
 
 static void should_print_the_name_of_the_entry_with_a_file_entry_list_of_one_element(void)
 {
     const char *expected_file_name = "file";
     t_file_entry_list *file_entry_list = file_entry_list_create(expected_file_name);
-    t_render_context *config = render_context_create_for_non_directory_file_operands();
+    t_render_context *context = render_context_create();
 
-    render(file_entry_list, config);
+    render(file_entry_list, context);
 
     verify_that_the_str_that_has_been_printed_is("%s\n", expected_file_name);
 
     file_entry_list_destroy(&file_entry_list);
-    render_context_destroy(&config);
+    render_context_destroy(&context);
 }
 
 static void should_print_the_name_of_every_entry_with_a_file_entry_list_of_various_elements_separated_by_new_lines(void)
 {
-    t_render_context *config = render_context_create_for_non_directory_file_operands();
+    t_render_context *context = render_context_create();
     const char *expected_file_name[5] = { "file", "file2", "file3", "file4", "file5" };
     t_file_entry_list *file_entry_list = file_entry_list_create(expected_file_name[0]);
     file_entry_list_add_entry(&file_entry_list, file_entry_list_create(expected_file_name[1]));
@@ -84,7 +84,7 @@ static void should_print_the_name_of_every_entry_with_a_file_entry_list_of_vario
     file_entry_list_add_entry(&file_entry_list, file_entry_list_create(expected_file_name[3]));
     file_entry_list_add_entry(&file_entry_list, file_entry_list_create(expected_file_name[4]));
 
-    render(file_entry_list, config);
+    render(file_entry_list, context);
 
     verify_that_the_str_that_has_been_printed_is(
         "%s\n%s\n%s\n%s\n%s\n",
@@ -96,19 +96,19 @@ static void should_print_the_name_of_every_entry_with_a_file_entry_list_of_vario
     );
 
     file_entry_list_destroy(&file_entry_list);
-    render_context_destroy(&config);
+    render_context_destroy(&context);
 }
 
-static void should_print_a_leading_dir_header_if_a_directory_config_is_specified(void)
+static void should_print_a_leading_dir_header_if_a_directory_context_is_specified(void)
 {
     const char *expected_file_name[3] = { "file", "file2", "file3" };
     const char *dir_header = "dir";
-    t_render_context *config = render_context_create_for_directory_file_operands(dir_header);
+    t_render_context *context = render_context_create_for_directory_file_operands(dir_header);
     t_file_entry_list *file_entry_list = file_entry_list_create(expected_file_name[0]);
     file_entry_list_add_entry(&file_entry_list, file_entry_list_create(expected_file_name[1]));
     file_entry_list_add_entry(&file_entry_list, file_entry_list_create(expected_file_name[2]));
 
-    render(file_entry_list, config);
+    render(file_entry_list, context);
 
     verify_that_the_str_that_has_been_printed_is(
         "\n%s:\n%s\n%s\n%s\n",
@@ -119,20 +119,20 @@ static void should_print_a_leading_dir_header_if_a_directory_config_is_specified
     );
 
     file_entry_list_destroy(&file_entry_list);
-    render_context_destroy(&config);
+    render_context_destroy(&context);
 }
 
-static void should_not_print_a_leading_dir_header_if_specified_in_the_directory_configuration(void)
+static void should_not_print_a_leading_dir_header_if_specified_in_the_directory_context(void)
 {
     const char *expected_file_name[3] = { "file", "file2", "file3" };
     const char *dir_header = "dir";
-    t_render_context *config = render_context_create_for_directory_file_operands(dir_header);
-    render_context_set_should_print_directory_header(config, 0);
+    t_render_context *context = render_context_create_for_directory_file_operands(dir_header);
+    render_context_set_should_print_directory_header(context, 0);
     t_file_entry_list *file_entry_list = file_entry_list_create(expected_file_name[0]);
     file_entry_list_add_entry(&file_entry_list, file_entry_list_create(expected_file_name[1]));
     file_entry_list_add_entry(&file_entry_list, file_entry_list_create(expected_file_name[2]));
 
-    render(file_entry_list, config);
+    render(file_entry_list, context);
 
     verify_that_the_str_that_has_been_printed_is(
         "%s\n%s\n%s\n",
@@ -142,20 +142,20 @@ static void should_not_print_a_leading_dir_header_if_specified_in_the_directory_
     );
 
     file_entry_list_destroy(&file_entry_list);
-    render_context_destroy(&config);
+    render_context_destroy(&context);
 }
 
-static void should_not_print_a_leading_dir_header_newline_if_specified_in_the_directory_configuration(void)
+static void should_not_print_a_leading_dir_header_newline_if_specified_in_the_directory_context(void)
 {
     const char *expected_file_name[3] = { "file", "file2", "file3" };
     const char *dir_header = "dir";
-    t_render_context *config = render_context_create_for_directory_file_operands(dir_header);
-    render_context_set_should_print_directory_header_leading_newline(config, 0);
+    t_render_context *context = render_context_create_for_directory_file_operands(dir_header);
+    render_context_set_should_print_directory_header_leading_newline(context, 0);
     t_file_entry_list *file_entry_list = file_entry_list_create(expected_file_name[0]);
     file_entry_list_add_entry(&file_entry_list, file_entry_list_create(expected_file_name[1]));
     file_entry_list_add_entry(&file_entry_list, file_entry_list_create(expected_file_name[2]));
 
-    render(file_entry_list, config);
+    render(file_entry_list, context);
 
     verify_that_the_str_that_has_been_printed_is(
         "%s:\n%s\n%s\n%s\n",
@@ -166,7 +166,7 @@ static void should_not_print_a_leading_dir_header_newline_if_specified_in_the_di
     );
 
     file_entry_list_destroy(&file_entry_list);
-    render_context_destroy(&config);
+    render_context_destroy(&context);
 }
 
 /*static void should_print_the_name_of_every_entry_with_a_file_entry_list_of_various_elements_separated_by_two_spaces(void)
@@ -198,17 +198,17 @@ void register_renderer_suite(void)
 
     if (suite != NULL)
     {
-        CU_add_test(suite, "should_create_a_configuration_for_non_directory_file_operands", should_create_a_configuration_for_non_directory_file_operands);
-        CU_add_test(suite, "should_create_a_configuration_for_directory_file_operands", should_create_a_configuration_for_directory_file_operands);
-        CU_add_test(suite, "should_destroy_a_configuration", should_destroy_a_configuration);
-        CU_add_test(suite, "should_not_fail_to_destroy_a_configuration_when_a_null_pointer_is_passed", should_not_fail_to_destroy_a_configuration_when_a_null_pointer_is_passed);
-        CU_add_test(suite, "should_not_fail_to_destroy_a_configuration_when_an_already_null_configuration_is_passed", should_not_fail_to_destroy_a_configuration_when_an_already_null_configuration_is_passed);
+        CU_add_test(suite, "should_create_a_context", should_create_a_context);
+        CU_add_test(suite, "should_create_a_context_for_directory_file_operands", should_create_a_context_for_directory_file_operands);
+        CU_add_test(suite, "should_destroy_a_context", should_destroy_a_context);
+        CU_add_test(suite, "should_not_fail_to_destroy_a_context_when_a_null_pointer_is_passed", should_not_fail_to_destroy_a_context_when_a_null_pointer_is_passed);
+        CU_add_test(suite, "should_not_fail_to_destroy_a_context_when_an_already_null_context_is_passed", should_not_fail_to_destroy_a_context_when_an_already_null_context_is_passed);
         CU_add_test(suite, "should_not_print_anything_if_the_file_entry_list_is_null", should_not_print_anything_if_the_file_entry_list_is_null);
         CU_add_test(suite, "should_print_the_name_of_the_entry_with_a_file_entry_list_of_one_element", should_print_the_name_of_the_entry_with_a_file_entry_list_of_one_element);
         CU_add_test(suite, "should_print_the_name_of_every_entry_with_a_file_entry_list_of_various_elements_separated_by_new_lines", should_print_the_name_of_every_entry_with_a_file_entry_list_of_various_elements_separated_by_new_lines);
-        CU_add_test(suite, "should_print_a_leading_dir_header_if_a_directory_config_is_specified", should_print_a_leading_dir_header_if_a_directory_config_is_specified);
-        CU_add_test(suite, "should_not_print_a_leading_dir_header_if_specified_in_the_directory_configuration", should_not_print_a_leading_dir_header_if_specified_in_the_directory_configuration);
-        CU_add_test(suite, "should_not_print_a_leading_dir_header_newline_if_specified_in_the_directory_configuration", should_not_print_a_leading_dir_header_newline_if_specified_in_the_directory_configuration);
+        CU_add_test(suite, "should_print_a_leading_dir_header_if_a_directory_context_is_specified", should_print_a_leading_dir_header_if_a_directory_context_is_specified);
+        CU_add_test(suite, "should_not_print_a_leading_dir_header_if_specified_in_the_directory_context", should_not_print_a_leading_dir_header_if_specified_in_the_directory_context);
+        CU_add_test(suite, "should_not_print_a_leading_dir_header_newline_if_specified_in_the_directory_context", should_not_print_a_leading_dir_header_newline_if_specified_in_the_directory_context);
         // CU_add_test(suite, "should_print_the_name_of_every_entry_with_a_file_entry_list_of_various_elements_separated_by_two_spaces", should_print_the_name_of_every_entry_with_a_file_entry_list_of_various_elements_separated_by_two_spaces);
     }
 }

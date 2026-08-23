@@ -12,7 +12,7 @@ static void process_non_directory_file_operands(const t_parsed_arguments *parsed
     for (unsigned int i = 0; non_directory_file_operands[i] != NULL; i++)
     {
         t_file_entry_list *file_entry_list = file_entry_list_create(non_directory_file_operands[i]);
-        render_context = render_context_create_for_non_directory_file_operands();
+        render_context = render_context_create();
 
         render(file_entry_list, render_context);
 

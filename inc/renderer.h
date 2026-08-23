@@ -4,7 +4,7 @@
 
 typedef struct s_render_context t_render_context;
 
-t_render_context *render_context_create_for_non_directory_file_operands();
+t_render_context *render_context_create();
 t_render_context *render_context_create_for_directory_file_operands(const char *directory_header);
 void render_context_set_should_print_directory_header(t_render_context *config, int should_print_directory_header);
 void render_context_set_should_print_directory_header_leading_newline(t_render_context *config, int should_print_directory_header_leading_newline);

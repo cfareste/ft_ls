@@ -9,7 +9,7 @@ struct s_render_context
     int should_print_directory_header_leading_newline;
 };
 
-t_render_context *render_context_create_for_non_directory_file_operands()
+t_render_context *render_context_create()
 {
     t_render_context *config = ft_safe_calloc(1, sizeof(t_render_context));
 
