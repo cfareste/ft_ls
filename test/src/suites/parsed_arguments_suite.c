@@ -171,6 +171,13 @@ static void should_return_true_for_multiple_file_operands_if_has_equal_or_more_t
     parsed_arguments_destroy(&parsed_arguments);
 }
 
+static void should_return_false_for_has_directory_file_operands_if_NULL_parsed_arguments_are_passed(void)
+{
+    const int has_directory_file_operands = parsed_arguments_has_directory_file_operands(NULL);
+
+    CU_ASSERT_EQUAL(has_directory_file_operands, 0);
+}
+
 static void should_return_false_for_has_directory_file_operands_if_it_does_not_have_any(void)
 {
     const char *args[] = { "file", "file2", "file3", NULL };
@@ -206,6 +213,7 @@ void register_parsed_arguments_suite(void)
         CU_add_test(suite, "should_return_false_for_multiple_file_operands_if_NULL_parsed_arguments_are_passed", should_return_false_for_multiple_file_operands_if_NULL_parsed_arguments_are_passed);
         CU_add_test(suite, "should_return_false_for_multiple_file_operands_if_has_less_than_two", should_return_false_for_multiple_file_operands_if_has_less_than_two);
         CU_add_test(suite, "should_return_true_for_multiple_file_operands_if_has_equal_or_more_than_two", should_return_true_for_multiple_file_operands_if_has_equal_or_more_than_two);
+        CU_add_test(suite, "should_return_false_for_has_directory_file_operands_if_NULL_parsed_arguments_are_passed", should_return_false_for_has_directory_file_operands_if_NULL_parsed_arguments_are_passed);
         CU_add_test(suite, "should_return_false_for_has_directory_file_operands_if_it_does_not_have_any", should_return_false_for_has_directory_file_operands_if_it_does_not_have_any);
     }
 }

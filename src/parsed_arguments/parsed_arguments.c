@@ -59,6 +59,9 @@ int parsed_arguments_has_multiple_file_operands(const t_parsed_arguments *parsed
 
 int parsed_arguments_has_directory_file_operands(const t_parsed_arguments *parsed_arguments)
 {
+    if (parsed_arguments == NULL)
+        return 0;
+
     return parsed_arguments->directory_file_operands[0] != NULL;
 }
 
