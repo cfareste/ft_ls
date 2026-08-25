@@ -3,8 +3,6 @@ TODO:
 2. Mirar si cada suite tiene los tests que tocan o hay alguno fuera de lugar
 3. Añadir tests para
    - Hidden files explícitos sí se ven
-     - scanner
-     - application
      - e2e
    - Hidden files no se ven
      - scanner
