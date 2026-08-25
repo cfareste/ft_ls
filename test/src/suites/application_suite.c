@@ -39,14 +39,14 @@ static void should_successfully_print_the_contents_of_the_current_directory_one_
 
     const int result = application_run(parsed_arguments);
 
-    verify_that_the_str_that_has_been_printed_is("%s\n%s\n%s\n%s\n%s\n%s\n",
+    CU_ASSERT(verify_that_the_str_that_has_been_printed_is("%s\n%s\n%s\n%s\n%s\n%s\n",
         file_names[0],
         file_names[1],
         file_names[2],
         file_names[3],
         file_names[4],
         file_names[5]
-    );
+    ));
     assert_application_execution_succeed(result);
 }
 
@@ -59,7 +59,7 @@ static void should_successfully_print_the_file_name_if_a_regular_file_operand_is
 
     const int result = application_run(parsed_arguments);
 
-    verify_that_the_str_that_has_been_printed_is("%s\n", file_name);
+    CU_ASSERT(verify_that_the_str_that_has_been_printed_is("%s\n", file_name));
     assert_application_execution_succeed(result);
 }
 
@@ -76,14 +76,14 @@ static void should_successfully_print_the_contents_of_the_directory_specified_as
 
     const int result = application_run(parsed_arguments);
 
-    verify_that_the_str_that_has_been_printed_is("%s\n%s\n%s\n%s\n%s\n%s\n",
+    CU_ASSERT(verify_that_the_str_that_has_been_printed_is("%s\n%s\n%s\n%s\n%s\n%s\n",
         file_names[0],
         file_names[1],
         file_names[2],
         file_names[3],
         file_names[4],
         file_names[5]
-    );
+    ));
     assert_application_execution_succeed(result);
 }
 
@@ -96,13 +96,13 @@ static void should_successfully_print_the_contents_of_multiple_non_directory_fil
 
     const int result = application_run(parsed_arguments);
 
-    verify_that_the_str_that_has_been_printed_is(
+    CU_ASSERT(verify_that_the_str_that_has_been_printed_is(
         "%s\n%s\n%s\n%s\n",
         arguments[0],
         arguments[1],
         arguments[2],
         arguments[3]
-    );
+    ));
     assert_application_execution_succeed(result);
 }
 
@@ -121,7 +121,7 @@ static void should_successfully_print_the_contents_of_multiple_directory_files(v
 
     const int result = application_run(parsed_arguments);
 
-    verify_that_the_str_that_has_been_printed_is(
+    CU_ASSERT(verify_that_the_str_that_has_been_printed_is(
         "%s:\n"
         "%s\n%s\n%s\n"
         "\n%s:\n"
@@ -141,7 +141,7 @@ static void should_successfully_print_the_contents_of_multiple_directory_files(v
         third_dir_file_names[0],
         third_dir_file_names[1],
         third_dir_file_names[2]
-    );
+    ));
     assert_application_execution_succeed(result);
 }
 
@@ -160,7 +160,7 @@ static void should_successfully_print_the_contents_of_the_mixed_types_specified_
 
     const int result = application_run(parsed_arguments);
 
-    verify_that_the_str_that_has_been_printed_is(
+    CU_ASSERT(verify_that_the_str_that_has_been_printed_is(
         "%s\n%s\n%s\n"
         "\n%s:\n"
         "%s\n%s\n%s\n%s\n%s\n%s\n"
@@ -182,7 +182,7 @@ static void should_successfully_print_the_contents_of_the_mixed_types_specified_
         second_dir_file_names[2],
         second_dir_file_names[3],
         second_dir_file_names[4]
-    );
+    ));
     assert_application_execution_succeed(result);
 }
 

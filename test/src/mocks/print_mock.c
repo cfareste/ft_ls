@@ -1,4 +1,3 @@
-#include <assert.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include <unistd.h>
@@ -23,7 +22,7 @@ int printf_mock(const char *str, ...)
     return printing_buffer_length + written_length;
 }
 
-void verify_that_the_str_that_has_been_printed_is(const char *str, ...)
+int verify_that_the_str_that_has_been_printed_is(const char *str, ...)
 {
     char expected[PRINT_BUFFER_SIZE];
     va_list args;
@@ -32,7 +31,9 @@ void verify_that_the_str_that_has_been_printed_is(const char *str, ...)
     vsnprintf(expected, PRINT_BUFFER_SIZE, str, args);
     va_end(args);
 
-    if (!ft_are_string_equals(printing_buffer, expected))
+    const int strings_are_equal = ft_are_string_equals(printing_buffer, expected);
+
+    if (!strings_are_equal)
     {
         ft_fprintf(STDERR_FILENO,
             "FAILED:\n"
@@ -46,7 +47,7 @@ void verify_that_the_str_that_has_been_printed_is(const char *str, ...)
             "%s"
             "-----\n", expected, printing_buffer);
     }
-    assert(ft_are_string_equals(printing_buffer, expected));
+    return strings_are_equal;
 }
 
 void reset_printing_buffer()

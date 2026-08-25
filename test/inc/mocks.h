@@ -12,5 +12,5 @@ void guarantee_stat_will_populate_stats_of_a_regular_type_file(const char *file_
 void guarantee_stat_will_populate_stats_of_a_directory_type_file(const char *dir_path);
 void reset_stat_guarantees();
 
-void verify_that_the_str_that_has_been_printed_is(const char *str, ...);
+int verify_that_the_str_that_has_been_printed_is(const char *str, ...);
 void reset_printing_buffer();

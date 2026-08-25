@@ -60,7 +60,7 @@ static void should_not_print_anything_if_the_file_entry_list_is_null(void)
 
     render(NULL, context);
 
-    verify_that_the_str_that_has_been_printed_is("");
+    CU_ASSERT(verify_that_the_str_that_has_been_printed_is(""));
 
     render_context_destroy(&context);
 }
@@ -73,7 +73,7 @@ static void should_print_the_name_of_the_entry_with_a_file_entry_list_of_one_ele
 
     render(file_entry_list, context);
 
-    verify_that_the_str_that_has_been_printed_is("%s\n", expected_file_name);
+    CU_ASSERT(verify_that_the_str_that_has_been_printed_is("%s\n", expected_file_name));
 
     file_entry_list_destroy(&file_entry_list);
     render_context_destroy(&context);
@@ -91,14 +91,14 @@ static void should_print_the_name_of_every_entry_with_a_file_entry_list_of_vario
 
     render(file_entry_list, context);
 
-    verify_that_the_str_that_has_been_printed_is(
+    CU_ASSERT(verify_that_the_str_that_has_been_printed_is(
         "%s\n%s\n%s\n%s\n%s\n",
         expected_file_name[0],
         expected_file_name[1],
         expected_file_name[2],
         expected_file_name[3],
         expected_file_name[4]
-    );
+    ));
 
     file_entry_list_destroy(&file_entry_list);
     render_context_destroy(&context);
@@ -115,12 +115,12 @@ static void should_not_print_a_dir_header_if_specified_in_the_context(void)
 
     render(file_entry_list, context);
 
-    verify_that_the_str_that_has_been_printed_is(
+    CU_ASSERT(verify_that_the_str_that_has_been_printed_is(
         "%s\n%s\n%s\n",
         expected_file_name[0],
         expected_file_name[1],
         expected_file_name[2]
-    );
+    ));
 
     file_entry_list_destroy(&file_entry_list);
     render_context_destroy(&context);
@@ -138,13 +138,13 @@ static void should_not_print_a_leading_dir_header_newline_if_its_the_first_rende
 
     render(file_entry_list, context);
 
-    verify_that_the_str_that_has_been_printed_is(
+    CU_ASSERT(verify_that_the_str_that_has_been_printed_is(
         "%s:\n%s\n%s\n%s\n",
         dir_header,
         expected_file_name[0],
         expected_file_name[1],
         expected_file_name[2]
-    );
+    ));
 
     file_entry_list_destroy(&file_entry_list);
     render_context_destroy(&context);
@@ -163,7 +163,7 @@ static void should_print_a_leading_dir_header_newline_if_its_not_first_render(vo
     render(file_entry_list, context);
     render(file_entry_list, context);
 
-    verify_that_the_str_that_has_been_printed_is(
+    CU_ASSERT(verify_that_the_str_that_has_been_printed_is(
         "%s:\n"
         "%s\n%s\n"
         "\n%s:\n"
@@ -174,7 +174,7 @@ static void should_print_a_leading_dir_header_newline_if_its_not_first_render(vo
         dir_header,
         expected_file_name[0],
         expected_file_name[1]
-    );
+    ));
 
     file_entry_list_destroy(&file_entry_list);
     render_context_destroy(&context);
