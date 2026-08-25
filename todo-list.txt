@@ -1,7 +1,24 @@
 TODO:
 1. Implementar LS-15 Filter hidden files
 2. Mirar si cada suite tiene los tests que tocan o hay alguno fuera de lugar
-3. Cambiar los tests para adaptarlos a los nuevos requerimientos (application | renderer NO | scanner)
+3. Añadir tests para
+   - Hidden files explícitos sí se ven
+     - scanner
+     - application
+     - e2e
+   - Hidden files no se ven
+     - scanner
+     - application
+     - e2e: Meter un directorio hidden y un file hidden específico
+   - Directorio vacío
+     - scanner sustiuir el actual por '.' y '..' (es decir, lo mismo)
+     - application
+     - e2e
+4. Mover toda la test data a testdir y no tener que poner testdir todo el rato
+   - Me evito errores por ficheros que no están en el ci
+   - Menos verboso
+   - Más cohesionado
+5. Añadir test al render de context = NULL
 
 
 TODO En algún momento:

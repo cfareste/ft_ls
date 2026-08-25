@@ -46,7 +46,7 @@ static void assert_file_entry_list_names_are(const char **files_names)
 {
     unsigned int i = 0;
     const t_file_entry_list *current = sut;
-    while (current != NULL)
+    while (current != NULL && files_names[i] != NULL)
     {
         assert_file_entry_list_name_is(current, files_names[i]);
         current = file_entry_list_get_next(current);
@@ -118,6 +118,23 @@ static void should_return_a_list_of_entries_if_one_non_empty_directory_path_is_s
     assert_file_entry_list_names_are(files_names);
 }
 
+static void should_return_a_list_of_entries_without_hidden_files_if_a_directory_with_hidden_files_is_specified(void)
+{
+    const char *valid_dir = "dir";
+    const char *dir_names[] = { valid_dir, NULL };
+    const char *files_names[] = { ".", "subdir", "..", "subdir2", "file", ".gitignore", NULL };
+    const char **entry_names[] = { files_names, NULL };
+    const char *expected_file_names[] = { files_names[1], files_names[3], files_names[4], NULL };
+    guarantee_stat_will_populate_stats_of_a_directory_type_file(valid_dir);
+    ensure_opendir_will_open_N_dirs_named(dir_names);
+    guarantee_readdir_will_return_N_files_named(entry_names);
+
+    scan_directory(valid_dir);
+
+    assert_file_entry_list_length_is(3);
+    assert_file_entry_list_names_are(expected_file_names);
+}
+
 static void should_return_NULL_if_fails_to_open_a_directory(void)
 {
     guarantee_stat_will_populate_stats_of_a_directory_type_file(CURRENT_DIRECTORY_PATH);
@@ -150,6 +167,7 @@ void register_scanner_suite(void)
         CU_add_test(suite, "should_return_one_entry_if_the_current_directory_has_one_file", should_return_one_entry_if_the_current_directory_has_one_file);
         CU_add_test(suite, "should_return_multiple_entries_if_the_current_directory_has_more_than_one_file", should_return_multiple_entries_if_the_current_directory_has_more_than_one_file);
         CU_add_test(suite, "should_return_a_list_of_entries_if_one_non_empty_directory_path_is_specified", should_return_a_list_of_entries_if_one_non_empty_directory_path_is_specified);
+        CU_add_test(suite, "should_return_a_list_of_entries_without_hidden_files_if_a_directory_with_hidden_files_is_specified", should_return_a_list_of_entries_without_hidden_files_if_a_directory_with_hidden_files_is_specified);
         CU_add_test(suite, "should_return_NULL_if_fails_to_open_a_directory", should_return_NULL_if_fails_to_open_a_directory);
         CU_add_test(suite, "should_return_NULL_if_fails_to_read_a_directory", should_return_NULL_if_fails_to_read_a_directory);
     }

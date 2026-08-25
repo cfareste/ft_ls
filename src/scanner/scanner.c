@@ -11,9 +11,12 @@ t_file_entry_list *scan(const char *path)
     const struct dirent *dir_entry = directory_get_next_entry(dir_stream);
     while (dir_entry != NULL)
     {
-        t_file_entry_list *next = file_entry_list_create(dir_entry->d_name);
+        if (dir_entry->d_name[0] != '.')
+        {
+            t_file_entry_list *next = file_entry_list_create(dir_entry->d_name);
 
-        file_entry_list_add_entry(&file_entry_list, next);
+            file_entry_list_add_entry(&file_entry_list, next);
+        }
 
         dir_entry = directory_get_next_entry(dir_stream);
     }
