@@ -179,7 +179,7 @@ static void should_successfully_print_the_contents_of_the_mixed_types_specified_
     assert_application_execution_succeed(result);
 }
 
-static void should_successfully_print_the_contents_of_the_explicitly_specified_file_operands(void)
+static void should_successfully_print_the_contents_of_the_explicitly_specified_mixed_file_operands(void)
 {
     const char *arguments[] = { ".dir", ".dir1", ".file1", ".symlink", NULL };
     const unsigned int types[] = { S_IFDIR, S_IFDIR, S_IFREG, S_IFLNK, 0 };
@@ -226,6 +226,6 @@ void register_application_suite(void)
         CU_add_test(suite, "should_successfully_print_the_contents_of_multiple_non_directory_files", should_successfully_print_the_contents_of_multiple_non_directory_files);
         CU_add_test(suite, "should_successfully_print_the_contents_of_multiple_directory_files", should_successfully_print_the_contents_of_multiple_directory_files);
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_mixed_types_specified_operands", should_successfully_print_the_contents_of_the_mixed_types_specified_operands);
-        CU_add_test(suite, "should_successfully_print_the_contents_of_the_explicitly_specified_file_operands", should_successfully_print_the_contents_of_the_explicitly_specified_file_operands);
+        CU_add_test(suite, "should_successfully_print_the_contents_of_the_explicitly_specified_mixed_file_operands", should_successfully_print_the_contents_of_the_explicitly_specified_mixed_file_operands);
     }
 }
