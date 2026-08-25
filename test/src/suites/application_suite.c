@@ -179,7 +179,24 @@ static void should_successfully_print_the_contents_of_the_mixed_types_specified_
     assert_application_execution_succeed(result);
 }
 
-static void should_successfully_print_the_contents_of_the_explicitly_specified_mixed_file_operands(void)
+static void should_successfully_print_the_contents_of_the_explicitly_specified_hidden_non_directory_file_operands(void)
+{
+    const char *arguments[] = { ".file1", ".char_device", NULL };
+    const unsigned int types[] = { S_IFREG, S_IFCHR, 0 };
+    guarantee_stat_will_populate_stats_of_N_file_types_for_paths(arguments, types);
+    parsed_arguments = parse_arguments(2, arguments);
+
+    const int result = application_run(parsed_arguments);
+
+    CU_ASSERT(verify_that_the_str_that_has_been_printed_is(
+        "%s\n%s\n",
+        arguments[0],
+        arguments[1]
+    ));
+    assert_application_execution_succeed(result);
+}
+
+static void should_successfully_print_the_contents_of_the_explicitly_specified_hidden_mixed_file_operands(void)
 {
     const char *arguments[] = { ".dir", ".dir1", ".file1", ".symlink", NULL };
     const unsigned int types[] = { S_IFDIR, S_IFDIR, S_IFREG, S_IFLNK, 0 };
@@ -226,6 +243,7 @@ void register_application_suite(void)
         CU_add_test(suite, "should_successfully_print_the_contents_of_multiple_non_directory_files", should_successfully_print_the_contents_of_multiple_non_directory_files);
         CU_add_test(suite, "should_successfully_print_the_contents_of_multiple_directory_files", should_successfully_print_the_contents_of_multiple_directory_files);
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_mixed_types_specified_operands", should_successfully_print_the_contents_of_the_mixed_types_specified_operands);
-        CU_add_test(suite, "should_successfully_print_the_contents_of_the_explicitly_specified_mixed_file_operands", should_successfully_print_the_contents_of_the_explicitly_specified_mixed_file_operands);
+        CU_add_test(suite, "should_successfully_print_the_contents_of_the_explicitly_specified_hidden_non_directory_file_operands", should_successfully_print_the_contents_of_the_explicitly_specified_hidden_non_directory_file_operands);
+        CU_add_test(suite, "should_successfully_print_the_contents_of_the_explicitly_specified_hidden_mixed_file_operands", should_successfully_print_the_contents_of_the_explicitly_specified_hidden_mixed_file_operands);
     }
 }
