@@ -19,7 +19,6 @@ t_file_entry_list *scan(const char *path)
         if (!is_hidden_file(dir_entry->d_name))
         {
             t_file_entry_list *next = file_entry_list_create(dir_entry->d_name);
-
             file_entry_list_add_entry(&file_entry_list, next);
         }
 
