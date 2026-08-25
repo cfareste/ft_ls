@@ -1,4 +1,7 @@
 TODO:
+1. Implementar LS-15 Filter hidden files
+2. Mirar si cada suite tiene los tests que tocan o hay alguno fuera de lugar
+3. Cambiar los tests para adaptarlos a los nuevos requerimientos (application | renderer NO | scanner)
 
 
 TODO En algún momento:
