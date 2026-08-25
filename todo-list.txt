@@ -1,7 +1,7 @@
 TODO:
 1. Implementar LS-15 Filter hidden files
 2. Mirar si cada suite tiene los tests que tocan o hay alguno fuera de lugar
-3. Añadir tests para
+3. Añadir tests para (PROBAR FILE FILE, DIR DIR y FILE <-> DIR, LOS DIR HEADERS NO SON LOS MISMOS)
    - Hidden files explícitos sí se ven
      - e2e
    - Hidden files no se ven
@@ -9,7 +9,7 @@ TODO:
      - application
      - e2e: Meter un directorio hidden y un file hidden específico
    - Directorio vacío
-     - scanner sustiuir el actual por '.' y '..' (es decir, lo mismo)
+     - scanner sustituir el actual por '.' y '..' (es decir, lo mismo)
      - application
      - e2e
 4. Mover toda la test data a testdir y no tener que poner testdir todo el rato
@@ -17,7 +17,7 @@ TODO:
    - Menos verboso
    - Más cohesionado
 5. Añadir test al render de context = NULL
-
+6. MIRAR EL TÍTULO DEL PUNTO 3.
 
 TODO En algún momento:
 - Investigar si los tests están acoplados a la implementacion interna de las cosas

@@ -76,6 +76,14 @@ prepare_test_environment() {
     touch "/tmp/tempdir/file1"
     touch "/tmp/tempdir/file2"
     touch "/tmp/tempdir/file3"
+
+    touch "${TESTDIR_PATH}/.hidden"
+    touch "${TESTDIR_PATH}/.hidden2"
+    mkdir "${TESTDIR_PATH}/.hiddir"
+    mkdir "${TESTDIR_PATH}/.hiddir2"
+    touch "${TESTDIR_PATH}/.hiddir/.hidden1"
+    touch "${TESTDIR_PATH}/.hiddir2/.hidden3"
+    touch "${TESTDIR_PATH}/.hiddir2/.hidden4"
 }
 
 remove_test_environment() {
