@@ -65,6 +65,17 @@ static void should_not_print_anything_if_the_file_entry_list_is_null(void)
     render_context_destroy(&context);
 }
 
+static void should_not_print_anything_if_the_context_is_null(void)
+{
+    t_file_entry_list *file_entry_list = file_entry_list_create("valid");
+
+    render(file_entry_list, NULL);
+
+    CU_ASSERT(verify_that_the_str_that_has_been_printed_is(""));
+
+    file_entry_list_destroy(&file_entry_list);
+}
+
 static void should_print_the_name_of_the_entry_with_a_file_entry_list_of_one_element(void)
 {
     const char *expected_file_name = "file";
@@ -216,6 +227,7 @@ void register_renderer_suite(void)
         CU_add_test(suite, "should_not_fail_set_a_directory_header_when_passed_a_null_context", should_not_fail_set_a_directory_header_when_passed_a_null_context);
         CU_add_test(suite, "should_not_fail_set_a_null_directory_header", should_not_fail_set_a_null_directory_header);
         CU_add_test(suite, "should_not_print_anything_if_the_file_entry_list_is_null", should_not_print_anything_if_the_file_entry_list_is_null);
+        CU_add_test(suite, "should_not_print_anything_if_the_context_is_null", should_not_print_anything_if_the_context_is_null);
         CU_add_test(suite, "should_print_the_name_of_the_entry_with_a_file_entry_list_of_one_element", should_print_the_name_of_the_entry_with_a_file_entry_list_of_one_element);
         CU_add_test(suite, "should_print_the_name_of_every_entry_with_a_file_entry_list_of_various_elements_separated_by_new_lines", should_print_the_name_of_every_entry_with_a_file_entry_list_of_various_elements_separated_by_new_lines);
         CU_add_test(suite, "should_not_print_a_dir_header_if_specified_in_the_context", should_not_print_a_dir_header_if_specified_in_the_context);

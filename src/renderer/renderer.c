@@ -47,6 +47,9 @@ void render_context_destroy(t_render_context **context)
 
 void render(const t_file_entry_list *file_entry_list, t_render_context *context)
 {
+    if (context == NULL)
+        return;
+
     if (context->directory_header != NULL)
         print_directory_header(context);
 
