@@ -354,6 +354,33 @@ static void should_successfully_only_print_dir_headers_if_the_specified_director
     assert_application_execution_succeed(result);
 }
 
+static void should_successfully_only_print_dir_headers_with_non_directory_files_if_the_specified_directories_only_are_empty(void)
+{
+    const char *arguments[] = { ".hidden", ".dir1", "dir", "file", NULL };
+    const unsigned int types[] = { S_IFREG, S_IFDIR, S_IFDIR, S_IFREG, 0 };
+    const char *dir_names[] = { arguments[1], arguments[2], NULL };
+    const char *first_dir_file_names[] = { "..", ".", NULL };
+    const char *second_dir_file_names[] = { ".", "..", NULL };
+    const char **entry_names[] = { first_dir_file_names, second_dir_file_names, NULL };
+    guarantee_stat_will_populate_stats_of_N_file_types_for_paths(arguments, types);
+    ensure_opendir_will_open_N_dirs_named(dir_names);
+    guarantee_readdir_will_return_N_files_named(entry_names);
+    parsed_arguments = parse_arguments(4, arguments);
+
+    const int result = application_run(parsed_arguments);
+
+    CU_ASSERT(verify_that_the_str_that_has_been_printed_is(
+        "%s\n%s\n"
+        "\n%s:\n"
+        "\n%s:\n",
+        arguments[0],
+        arguments[3],
+        dir_names[0],
+        dir_names[1]
+    ));
+    assert_application_execution_succeed(result);
+}
+
 void register_application_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, test_teardown);
@@ -373,5 +400,6 @@ void register_application_suite(void)
         CU_add_test(suite, "should_successfully_not_print_anything_if_the_specified_directory_only_has_hidden_files", should_successfully_not_print_anything_if_the_specified_directory_only_has_hidden_files);
         CU_add_test(suite, "should_successfully_only_print_dir_headers_if_the_specified_directories_are_empty", should_successfully_only_print_dir_headers_if_the_specified_directories_are_empty);
         CU_add_test(suite, "should_successfully_only_print_dir_headers_if_the_specified_directories_only_have_hidden_files", should_successfully_only_print_dir_headers_if_the_specified_directories_only_have_hidden_files);
+        CU_add_test(suite, "should_successfully_only_print_dir_headers_with_non_directory_files_if_the_specified_directories_only_are_empty", should_successfully_only_print_dir_headers_with_non_directory_files_if_the_specified_directories_only_are_empty);
     }
 }
