@@ -3,7 +3,7 @@ TODO:
 2. Mirar si cada suite tiene los tests que tocan o hay alguno fuera de lugar
 3. Añadir tests para:
    - Directorio vacío
-     - application (d, fd)
+     - application (d with hidd, dd with hidd, fd, fd with hidd)
      - e2e (d, dd, fd)
    - E2E: Test combo con files normales, hidden, dirs normales, hidden, empty dirs normales, hiddens
 4. Mover toda la testdata a testdir y no tener que poner testdir todo el rato

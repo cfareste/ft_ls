@@ -272,6 +272,23 @@ static void should_successfully_print_the_contents_of_the_explicitly_specified_h
     assert_application_execution_succeed(result);
 }
 
+static void should_successfully_not_print_anything_if_the_specified_directory_is_empty(void)
+{
+    const char *arguments[] = { "dir", NULL };
+    const char *dir_names[] = { arguments[0], NULL };
+    const char *first_dir_file_names[] = { ".", "..", NULL };
+    const char **entry_names[] = { first_dir_file_names, NULL };
+    guarantee_stat_will_populate_stats_of_a_directory_type_file(dir_names[0]);
+    ensure_opendir_will_open_N_dirs_named(dir_names);
+    guarantee_readdir_will_return_N_files_named(entry_names);
+    parsed_arguments = parse_arguments(1, arguments);
+
+    const int result = application_run(parsed_arguments);
+
+    CU_ASSERT(verify_that_the_str_that_has_been_printed_is(""));
+    assert_application_execution_succeed(result);
+}
+
 static void should_successfully_only_print_dir_headers_if_the_specified_directories_are_empty(void)
 {
     const char *arguments[] = { "dir1", ".dir", NULL };
@@ -311,6 +328,7 @@ void register_application_suite(void)
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_explicitly_specified_hidden_non_directory_file_operands", should_successfully_print_the_contents_of_the_explicitly_specified_hidden_non_directory_file_operands);
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_explicitly_specified_hidden_directory_file_operands", should_successfully_print_the_contents_of_the_explicitly_specified_hidden_directory_file_operands);
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_explicitly_specified_hidden_mixed_file_operands", should_successfully_print_the_contents_of_the_explicitly_specified_hidden_mixed_file_operands);
+        CU_add_test(suite, "should_successfully_not_print_anything_if_the_specified_directory_is_empty", should_successfully_not_print_anything_if_the_specified_directory_is_empty);
         CU_add_test(suite, "should_successfully_only_print_dir_headers_if_the_specified_directories_are_empty", should_successfully_only_print_dir_headers_if_the_specified_directories_are_empty);
     }
 }
