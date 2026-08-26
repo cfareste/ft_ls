@@ -15,7 +15,9 @@
 ./ft_ls Makefile run_e2e.sh Makefile generate_coverage_reports.sh            ::        ls -U Makefile run_e2e.sh Makefile generate_coverage_reports.sh
 ./ft_ls inc/ src testdir src                                                 ::        ls -U inc/ src testdir src
 ./ft_ls testdir/file2 testdir/firstDir testdir/secondDir testdir/file        ::        ls -U testdir/file2 testdir/firstDir testdir/secondDir testdir/file
-./ft_ls testdir/empty                                                        ::        ls -U testdir/empty
 ./ft_ls testdir/.hidden2 testdir/.hidden                                     ::        ls -U testdir/.hidden2 testdir/.hidden
 ./ft_ls testdir/.hiddir2 testdir/.hiddir                                     ::        ls -U testdir/.hiddir2 testdir/.hiddir
+./ft_ls testdir/.hidden2 testdir/.hiddir testdir/.hiddir2 testdir/.hidden    ::        ls -U testdir/.hidden2 testdir/.hiddir testdir/.hiddir2 testdir/.hidden
+./ft_ls testdir/empty                                                        ::        ls -U testdir/empty
+./ft_ls testdir/dir_only_hidden                                              ::        ls -U testdir/dir_only_hidden
 ./ft_ls testdir/.hidden2 testdir/.hiddir testdir/.hiddir2 testdir/.hidden    ::        ls -U testdir/.hidden2 testdir/.hiddir testdir/.hiddir2 testdir/.hidden

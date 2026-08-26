@@ -79,8 +79,12 @@ prepare_test_environment() {
 
     touch "${TESTDIR_PATH}/.hidden"
     touch "${TESTDIR_PATH}/.hidden2"
+    mkdir "${TESTDIR_PATH}/dir_only_hidden"
     mkdir "${TESTDIR_PATH}/.hiddir"
     mkdir "${TESTDIR_PATH}/.hiddir2"
+    touch "${TESTDIR_PATH}/dir_only_hidden/.hidden1"
+    touch "${TESTDIR_PATH}/dir_only_hidden/.fileee"
+    touch "${TESTDIR_PATH}/dir_only_hidden/.file2"
     touch "${TESTDIR_PATH}/.hiddir/hidden1"
     touch "${TESTDIR_PATH}/.hiddir/.invis"
     touch "${TESTDIR_PATH}/.hiddir/.invis2"
