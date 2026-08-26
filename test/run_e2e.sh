@@ -81,9 +81,9 @@ prepare_test_environment() {
     touch "${TESTDIR_PATH}/.hidden2"
     mkdir "${TESTDIR_PATH}/.hiddir"
     mkdir "${TESTDIR_PATH}/.hiddir2"
-    touch "${TESTDIR_PATH}/.hiddir/.hidden1"
-    touch "${TESTDIR_PATH}/.hiddir2/.hidden3"
-    touch "${TESTDIR_PATH}/.hiddir2/.hidden4"
+    touch "${TESTDIR_PATH}/.hiddir/hidden1"
+    touch "${TESTDIR_PATH}/.hiddir2/hidden3"
+    touch "${TESTDIR_PATH}/.hiddir2/hidden4"
 }
 
 remove_test_environment() {

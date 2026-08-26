@@ -2,8 +2,6 @@ TODO:
 1. Implementar LS-15 Filter hidden files
 2. Mirar si cada suite tiene los tests que tocan o hay alguno fuera de lugar
 3. Añadir tests para:
-   - Hidden files explícitos sí se ven
-     - e2e (dd, fd)
    - Hidden files no se ven
      - scanner
      - application (ff, dd, fd)
