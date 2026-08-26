@@ -159,6 +159,20 @@ static void should_return_NULL_if_the_specified_directory_is_empty(void)
     assert_file_entry_list_is_null();
 }
 
+static void should_return_NULL_if_the_specified_directory_only_contains_hidden_files(void)
+{
+    const char *dir_names[] = { "dir", NULL };
+    const char *files_names[] = { ".gitignore", ".", ".idea/", "..", ".run", NULL };
+    const char **entry_names[] = { files_names, NULL };
+    guarantee_stat_will_populate_stats_of_a_directory_type_file("dir");
+    ensure_opendir_will_open_N_dirs_named(dir_names);
+    guarantee_readdir_will_return_N_files_named(entry_names);
+
+    scan_directory("dir");
+
+    assert_file_entry_list_is_null();
+}
+
 static void should_return_NULL_if_fails_to_open_a_directory(void)
 {
     guarantee_stat_will_populate_stats_of_a_directory_type_file(CURRENT_DIRECTORY_PATH);
@@ -193,6 +207,7 @@ void register_scanner_suite(void)
         CU_add_test(suite, "should_return_a_list_of_entries_without_hidden_files_if_a_directory_with_hidden_files_is_specified", should_return_a_list_of_entries_without_hidden_files_if_a_directory_with_hidden_files_is_specified);
         CU_add_test(suite, "should_return_a_list_of_entries_if_a_hidden_directory_is_specified", should_return_a_list_of_entries_if_a_hidden_directory_is_specified);
         CU_add_test(suite, "should_return_NULL_if_the_specified_directory_is_empty", should_return_NULL_if_the_specified_directory_is_empty);
+        CU_add_test(suite, "should_return_NULL_if_the_specified_directory_only_contains_hidden_files", should_return_NULL_if_the_specified_directory_only_contains_hidden_files);
         CU_add_test(suite, "should_return_NULL_if_fails_to_open_a_directory", should_return_NULL_if_fails_to_open_a_directory);
         CU_add_test(suite, "should_return_NULL_if_fails_to_read_a_directory", should_return_NULL_if_fails_to_read_a_directory);
     }
