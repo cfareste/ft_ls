@@ -24,3 +24,4 @@
 ./ft_ls testdir/dir_only_hidden testdir/dir_only_hidden/                     ::        ls -U testdir/dir_only_hidden testdir/dir_only_hidden/
 ./ft_ls testdir/empty testdir/.hidden                                        ::        ls -U testdir/empty testdir/.hidden
 ./ft_ls testdir/.hidden testdir/dir_only_hidden/                             ::        ls -U testdir/.hidden testdir/dir_only_hidden/
+./ft_ls testdir/.hidden testdir/firstDir testdir/file testdir/dir_only_hidden/ testdir/.hiddir testdir/empty                           ::        ls -U testdir/.hidden testdir/firstDir testdir/file testdir/dir_only_hidden/ testdir/.hiddir testdir/empty
