@@ -3,8 +3,7 @@ TODO:
 2. Mirar si cada suite tiene los tests que tocan o hay alguno fuera de lugar
 3. Añadir tests para:
    - Hidden files no se ven
-     - scanner
-     - application (ff, dd, fd)
+     - application (fd)
      - e2e: (ff, dd, fd)
    - Directorio vacío
      - scanner sustituir el actual por '.' y '..' (es decir, lo mismo)

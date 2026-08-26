@@ -201,8 +201,8 @@ static void should_successfully_print_the_contents_of_the_explicitly_specified_h
     const char *arguments[] = { ".dir1", ".dir", NULL };
     const unsigned int types[] = { S_IFDIR, S_IFDIR, 0 };
     const char *dir_names[] = { arguments[0], arguments[1], NULL };
-    const char *first_dir_file_names[] = { ".", "file_from_dir_1", "..", "char_device", NULL };
-    const char *second_dir_file_names[] = { "..", "file_from_dir_2", ".", "symlink", NULL };
+    const char *first_dir_file_names[] = { ".", "file_from_dir_1", "..", "char_device", ".gitignore", NULL };
+    const char *second_dir_file_names[] = { "..", "file_from_dir_2", ".", "symlink", ".idea", NULL };
     const char *expected_first_dir_file_names[] = { first_dir_file_names[1], first_dir_file_names[3], NULL };
     const char *expected_second_dir_file_names[] = { second_dir_file_names[1], second_dir_file_names[3], NULL };
     const char **entry_names[] = { first_dir_file_names, second_dir_file_names, NULL };
