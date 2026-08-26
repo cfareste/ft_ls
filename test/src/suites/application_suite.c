@@ -181,35 +181,38 @@ static void should_successfully_print_the_contents_of_the_mixed_types_specified_
 
 static void should_successfully_print_the_contents_of_the_explicitly_specified_hidden_non_directory_file_operands(void)
 {
-    const char *arguments[] = { ".file1", ".char_device", NULL };
-    const unsigned int types[] = { S_IFREG, S_IFCHR, 0 };
+    const char *arguments[] = { ".file1", "symlink", ".char_device", NULL };
+    const unsigned int types[] = { S_IFREG, S_IFLNK, S_IFCHR, 0 };
     guarantee_stat_will_populate_stats_of_N_file_types_for_paths(arguments, types);
-    parsed_arguments = parse_arguments(2, arguments);
+    parsed_arguments = parse_arguments(3, arguments);
 
     const int result = application_run(parsed_arguments);
 
     CU_ASSERT(verify_that_the_str_that_has_been_printed_is(
-        "%s\n%s\n",
+        "%s\n%s\n%s\n",
         arguments[0],
-        arguments[1]
+        arguments[1],
+        arguments[2]
     ));
     assert_application_execution_succeed(result);
 }
 
 static void should_successfully_print_the_contents_of_the_explicitly_specified_hidden_directory_file_operands(void)
 {
-    const char *arguments[] = { ".dir1", ".dir", NULL };
-    const unsigned int types[] = { S_IFDIR, S_IFDIR, 0 };
-    const char *dir_names[] = { arguments[0], arguments[1], NULL };
+    const char *arguments[] = { "dir1", ".dir2", ".dir", NULL };
+    const unsigned int types[] = { S_IFDIR, S_IFDIR , S_IFDIR, 0 };
+    const char *dir_names[] = { arguments[0], arguments[1], arguments[2], NULL };
     const char *first_dir_file_names[] = { ".", "file_from_dir_1", "..", "char_device", ".gitignore", NULL };
     const char *second_dir_file_names[] = { "..", "file_from_dir_2", ".", "symlink", ".idea", NULL };
+    const char *third_dir_file_names[] = { "file_from_dir_3", ".", "char_device", ".run", "..", "normal_file", NULL };
     const char *expected_first_dir_file_names[] = { first_dir_file_names[1], first_dir_file_names[3], NULL };
     const char *expected_second_dir_file_names[] = { second_dir_file_names[1], second_dir_file_names[3], NULL };
-    const char **entry_names[] = { first_dir_file_names, second_dir_file_names, NULL };
+    const char *expected_third_dir_file_names[] = { third_dir_file_names[0], third_dir_file_names[2], third_dir_file_names[5], NULL };
+    const char **entry_names[] = { first_dir_file_names, second_dir_file_names, third_dir_file_names, NULL };
     guarantee_stat_will_populate_stats_of_N_file_types_for_paths(arguments, types);
     ensure_opendir_will_open_N_dirs_named(dir_names);
     guarantee_readdir_will_return_N_files_named(entry_names);
-    parsed_arguments = parse_arguments(2, arguments);
+    parsed_arguments = parse_arguments(3, arguments);
 
     const int result = application_run(parsed_arguments);
 
@@ -217,13 +220,19 @@ static void should_successfully_print_the_contents_of_the_explicitly_specified_h
         "%s:\n"
         "%s\n%s\n"
         "\n%s:\n"
-        "%s\n%s\n",
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n%s\n%s\n",
         dir_names[0],
         expected_first_dir_file_names[0],
         expected_first_dir_file_names[1],
         dir_names[1],
         expected_second_dir_file_names[0],
-        expected_second_dir_file_names[1]
+        expected_second_dir_file_names[1],
+        dir_names[2],
+        expected_third_dir_file_names[0],
+        expected_third_dir_file_names[1],
+        expected_third_dir_file_names[2]
     ));
     assert_application_execution_succeed(result);
 }
