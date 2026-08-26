@@ -121,10 +121,10 @@ run_single_test() {
     bash -lc "${model_cmd}" >"${model_output}" 2>&1 || model_status=$?
 
     if [[ "${ft_status}" -eq "${model_status}" ]] && diff -u "${model_output}" "${ft_output}" >/dev/null 2>&1; then
-        print_pass "${ft_cmd}"
+        print_pass "ft_ls ${ft_args}"
         passed=$((passed + 1))
     else
-        print_fail "${ft_cmd}"
+        print_fail "ft_ls ${ft_args}"
         printf '%b-> ft_ls status: %s | ls status: %s%b\n' "${RED_THIN}" "${ft_status}" "${model_status}" "${RESET}"
         printf '%b-> model command: %s%b\n' "${RED_THIN}" "${model_cmd}" "${RESET}"
 
