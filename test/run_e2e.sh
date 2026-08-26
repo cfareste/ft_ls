@@ -13,8 +13,8 @@ BOLD='\033[1m'
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TESTS_DIR="${SCRIPT_DIR}/e2e"
 TESTS_FILE="${TESTS_DIR}/tests.txt"
-TESTDIR_PATH="./testdir"
 DELIMITER="::"
+FT_CMD="../ft_ls"
 
 trim() {
     local value="$1"
@@ -40,36 +40,21 @@ print_summary() {
 }
 
 prepare_test_environment() {
-    rm -rf "${TESTDIR_PATH}"
-    mkdir -p "${TESTDIR_PATH}/firstDir"
-    mkdir -p "${TESTDIR_PATH}/secondDir"
-    mkdir -p "${TESTDIR_PATH}/empty"
+    mkdir -p firstDir secondDir empty
 
-    touch "${TESTDIR_PATH}/'my"
-    touch "${TESTDIR_PATH}/'my file'"
-    touch "${TESTDIR_PATH}/\"file\""
-    touch "${TESTDIR_PATH}/file"
-    touch "${TESTDIR_PATH}/file'"
-    touch "${TESTDIR_PATH}/file2"
-    touch "${TESTDIR_PATH}/my file"
-    touch "${TESTDIR_PATH}/my-pdf.pdf"
-    touch "${TESTDIR_PATH}/myfiñe"
-    touch "${TESTDIR_PATH}/nwl"
-    touch "${TESTDIR_PATH}/test@pdf"
-    touch "${TESTDIR_PATH}/tab\tfile"
-    touch "${TESTDIR_PATH}/a"
-    touch "${TESTDIR_PATH}/file "
-    touch "${TESTDIR_PATH}/ "
-    touch "${TESTDIR_PATH}/firstDir/file"
-    touch "${TESTDIR_PATH}/firstDir/file2"
-    touch "${TESTDIR_PATH}/secondDir/file3"
-    touch "${TESTDIR_PATH}/secondDir/file4"
+    cp -rf ../inc ./inc
+    cp -rf ../src ./src
+    cp -rf ../Makefile ./Makefile
 
-    ln -s "firstDir" "${TESTDIR_PATH}/link_to_firstDir"
-    printf 'hello' > "${TESTDIR_PATH}/file"
-    printf 'world' > "${TESTDIR_PATH}/file2"
-    printf 'sample' > "${TESTDIR_PATH}/a"
-    printf 'data' > "${TESTDIR_PATH}/nwl"
+    touch "'my" "'my file'" '"file"' file "file'" file2 "my file"
+    touch my-pdf.pdf myfiñe nwl test@pdf $'tab\tfile' a "file " " "
+    touch firstDir/file firstDir/file2 secondDir/file3 secondDir/file4
+
+    ln -s firstDir link_to_firstDir
+    printf 'hello' > file
+    printf 'world' > file2
+    printf 'sample' > a
+    printf 'data' > nwl
 
     touch "/tmp/tempfile"
     mkdir -p "/tmp/tempdir"
@@ -77,25 +62,15 @@ prepare_test_environment() {
     touch "/tmp/tempdir/file2"
     touch "/tmp/tempdir/file3"
 
-    touch "${TESTDIR_PATH}/.hidden"
-    touch "${TESTDIR_PATH}/.hidden2"
-    mkdir "${TESTDIR_PATH}/dir_only_hidden"
-    mkdir "${TESTDIR_PATH}/.hiddir"
-    mkdir "${TESTDIR_PATH}/.hiddir2"
-    touch "${TESTDIR_PATH}/dir_only_hidden/.hidden1"
-    touch "${TESTDIR_PATH}/dir_only_hidden/.fileee"
-    touch "${TESTDIR_PATH}/dir_only_hidden/.file2"
-    touch "${TESTDIR_PATH}/.hiddir/hidden1"
-    touch "${TESTDIR_PATH}/.hiddir/.invis"
-    touch "${TESTDIR_PATH}/.hiddir/.invis2"
-    touch "${TESTDIR_PATH}/.hiddir/hidden1"
-    touch "${TESTDIR_PATH}/.hiddir2/hidden3"
-    touch "${TESTDIR_PATH}/.hiddir2/hidden4"
-    touch "${TESTDIR_PATH}/.hiddir2/.invis1"
+    touch .hidden .hidden2
+    mkdir dir_only_hidden .hiddir .hiddir2
+    touch dir_only_hidden/.hidden1 dir_only_hidden/.fileee dir_only_hidden/.file2
+    touch .hiddir/hidden1 .hiddir/.invis .hiddir/.invis2
+    touch .hiddir2/hidden3 .hiddir2/hidden4 .hiddir2/.invis1
 }
 
 remove_test_environment() {
-    rm -rf "${TESTDIR_PATH}"
+    rm -rf "${SCRIPT_DIR}/testdir"
 }
 
 parse_test_entry() {
@@ -111,8 +86,8 @@ parse_test_entry() {
     ft_cmd="$(trim "${line%%"${DELIMITER}"*}")"
     model_cmd="$(trim "${line#*"${DELIMITER}"}")"
 
-    if [[ -z "${ft_cmd}" || -z "${model_cmd}" ]]; then
-        printf '%b[ERROR] Missing command or model in test entry: %s%b\n' "${RED}" "$line" "${RESET}" >&2
+    if [[ -z "${model_cmd}" ]]; then
+        printf '%b[ERROR] Missing model command in test entry: %s%b\n' "${RED}" "$line" "${RESET}" >&2
         return 1
     fi
 
@@ -130,12 +105,17 @@ print_output_block() {
 }
 
 run_single_test() {
-    local ft_cmd="$1"
+    local ft_args="$1"
     local model_cmd="$2"
+    local ft_cmd="${FT_CMD}"
     local ft_output="$(mktemp)"
     local model_output="$(mktemp)"
     local ft_status=0
     local model_status=0
+
+    if [[ -n "${ft_args}" ]]; then
+        ft_cmd="${ft_cmd} ${ft_args}"
+    fi
 
     bash -lc "${ft_cmd}" >"${ft_output}" 2>&1 || ft_status=$?
     bash -lc "${model_cmd}" >"${model_output}" 2>&1 || model_status=$?
@@ -183,6 +163,9 @@ main() {
     export LANG=C
     export LC_ALL=C
 
+    rm -rf "${SCRIPT_DIR}/testdir"
+    mkdir -p "${SCRIPT_DIR}/testdir"
+    cd "${SCRIPT_DIR}/testdir" || exit 1
     prepare_test_environment
 
     local line=""
