@@ -145,7 +145,7 @@ static void should_return_a_list_of_entries_if_a_hidden_directory_is_specified(v
     assert_file_entry_list_names_are(expected_file_names);
 }
 
-static void should_return_NULL_if_the_current_directory_is_empty(void)
+static void should_return_NULL_if_the_specified_directory_is_empty(void)
 {
     const char *dir_names[] = { CURRENT_DIRECTORY_PATH, NULL };
     const char *files_names[] = { ".", "..", NULL };
@@ -192,7 +192,7 @@ void register_scanner_suite(void)
         CU_add_test(suite, "should_return_a_list_of_entries_if_one_non_empty_directory_path_is_specified", should_return_a_list_of_entries_if_one_non_empty_directory_path_is_specified);
         CU_add_test(suite, "should_return_a_list_of_entries_without_hidden_files_if_a_directory_with_hidden_files_is_specified", should_return_a_list_of_entries_without_hidden_files_if_a_directory_with_hidden_files_is_specified);
         CU_add_test(suite, "should_return_a_list_of_entries_if_a_hidden_directory_is_specified", should_return_a_list_of_entries_if_a_hidden_directory_is_specified);
-        CU_add_test(suite, "should_return_NULL_if_the_current_directory_is_empty", should_return_NULL_if_the_current_directory_is_empty);
+        CU_add_test(suite, "should_return_NULL_if_the_specified_directory_is_empty", should_return_NULL_if_the_specified_directory_is_empty);
         CU_add_test(suite, "should_return_NULL_if_fails_to_open_a_directory", should_return_NULL_if_fails_to_open_a_directory);
         CU_add_test(suite, "should_return_NULL_if_fails_to_read_a_directory", should_return_NULL_if_fails_to_read_a_directory);
     }
