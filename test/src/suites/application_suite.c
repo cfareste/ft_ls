@@ -196,6 +196,38 @@ static void should_successfully_print_the_contents_of_the_explicitly_specified_h
     assert_application_execution_succeed(result);
 }
 
+static void should_successfully_print_the_contents_of_the_explicitly_specified_hidden_directory_file_operands(void)
+{
+    const char *arguments[] = { ".dir1", ".dir", NULL };
+    const unsigned int types[] = { S_IFDIR, S_IFDIR, 0 };
+    const char *dir_names[] = { arguments[0], arguments[1], NULL };
+    const char *first_dir_file_names[] = { ".", "file_from_dir_1", "..", "char_device", NULL };
+    const char *second_dir_file_names[] = { "..", "file_from_dir_2", ".", "symlink", NULL };
+    const char *expected_first_dir_file_names[] = { first_dir_file_names[1], first_dir_file_names[3], NULL };
+    const char *expected_second_dir_file_names[] = { second_dir_file_names[1], second_dir_file_names[3], NULL };
+    const char **entry_names[] = { first_dir_file_names, second_dir_file_names, NULL };
+    guarantee_stat_will_populate_stats_of_N_file_types_for_paths(arguments, types);
+    ensure_opendir_will_open_N_dirs_named(dir_names);
+    guarantee_readdir_will_return_N_files_named(entry_names);
+    parsed_arguments = parse_arguments(2, arguments);
+
+    const int result = application_run(parsed_arguments);
+
+    CU_ASSERT(verify_that_the_str_that_has_been_printed_is(
+        "%s:\n"
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n%s\n",
+        dir_names[0],
+        expected_first_dir_file_names[0],
+        expected_first_dir_file_names[1],
+        dir_names[1],
+        expected_second_dir_file_names[0],
+        expected_second_dir_file_names[1]
+    ));
+    assert_application_execution_succeed(result);
+}
+
 static void should_successfully_print_the_contents_of_the_explicitly_specified_hidden_mixed_file_operands(void)
 {
     const char *arguments[] = { ".dir", ".dir1", ".file1", ".symlink", NULL };
@@ -244,6 +276,7 @@ void register_application_suite(void)
         CU_add_test(suite, "should_successfully_print_the_contents_of_multiple_directory_files", should_successfully_print_the_contents_of_multiple_directory_files);
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_mixed_types_specified_operands", should_successfully_print_the_contents_of_the_mixed_types_specified_operands);
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_explicitly_specified_hidden_non_directory_file_operands", should_successfully_print_the_contents_of_the_explicitly_specified_hidden_non_directory_file_operands);
+        CU_add_test(suite, "should_successfully_print_the_contents_of_the_explicitly_specified_hidden_directory_file_operands", should_successfully_print_the_contents_of_the_explicitly_specified_hidden_directory_file_operands);
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_explicitly_specified_hidden_mixed_file_operands", should_successfully_print_the_contents_of_the_explicitly_specified_hidden_mixed_file_operands);
     }
 }
