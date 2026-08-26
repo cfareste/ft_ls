@@ -272,7 +272,7 @@ static void should_successfully_print_the_contents_of_the_explicitly_specified_h
     assert_application_execution_succeed(result);
 }
 
-static void should_successfully_not_print_anything_if_the_specified_directories_are_empty(void)
+static void should_successfully_only_print_dir_headers_if_the_specified_directories_are_empty(void)
 {
     const char *arguments[] = { "dir1", ".dir", NULL };
     const unsigned int types[] = { S_IFDIR, S_IFDIR, 0 };
@@ -311,6 +311,6 @@ void register_application_suite(void)
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_explicitly_specified_hidden_non_directory_file_operands", should_successfully_print_the_contents_of_the_explicitly_specified_hidden_non_directory_file_operands);
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_explicitly_specified_hidden_directory_file_operands", should_successfully_print_the_contents_of_the_explicitly_specified_hidden_directory_file_operands);
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_explicitly_specified_hidden_mixed_file_operands", should_successfully_print_the_contents_of_the_explicitly_specified_hidden_mixed_file_operands);
-        CU_add_test(suite, "should_successfully_not_print_anything_if_the_specified_directories_are_empty", should_successfully_not_print_anything_if_the_specified_directories_are_empty);
+        CU_add_test(suite, "should_successfully_only_print_dir_headers_if_the_specified_directories_are_empty", should_successfully_only_print_dir_headers_if_the_specified_directories_are_empty);
     }
 }
