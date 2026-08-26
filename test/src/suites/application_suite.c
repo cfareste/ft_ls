@@ -233,10 +233,10 @@ static void should_successfully_print_the_contents_of_the_explicitly_specified_h
     const char *arguments[] = { ".dir", ".dir1", ".file1", ".symlink", NULL };
     const unsigned int types[] = { S_IFDIR, S_IFDIR, S_IFREG, S_IFLNK, 0 };
     const char *dir_names[] = { arguments[0], arguments[1], NULL };
-    const char *first_dir_file_names[] = { ".", "file_from_dir_1", "..", "char_device", NULL };
-    const char *second_dir_file_names[] = { "..", "file_from_dir_2", ".", "symlink", NULL };
-    const char *expected_first_dir_file_names[] = { first_dir_file_names[1], first_dir_file_names[3], NULL };
-    const char *expected_second_dir_file_names[] = { second_dir_file_names[1], second_dir_file_names[3], NULL };
+    const char *first_dir_file_names[] = { ".run", ".", "file_from_dir_1", "..", "char_device", NULL };
+    const char *second_dir_file_names[] = { "..", ".gitignore", "file_from_dir_2", ".", "symlink", ".vscode", NULL };
+    const char *expected_first_dir_file_names[] = { first_dir_file_names[2], first_dir_file_names[4], NULL };
+    const char *expected_second_dir_file_names[] = { second_dir_file_names[2], second_dir_file_names[4], NULL };
     const char **entry_names[] = { first_dir_file_names, second_dir_file_names, NULL };
     guarantee_stat_will_populate_stats_of_N_file_types_for_paths(arguments, types);
     ensure_opendir_will_open_N_dirs_named(dir_names);
