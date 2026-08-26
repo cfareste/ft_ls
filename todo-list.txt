@@ -2,8 +2,6 @@ TODO:
 1. Implementar LS-15 Filter hidden files
 2. Mirar si cada suite tiene los tests que tocan o hay alguno fuera de lugar
 3. Añadir tests para:
-   - Directorio vacío
-     - e2e (fd)
    - E2E: Test combo con files normales, hidden, dirs normales, hidden, empty dirs normales, hiddens
 4. Mover toda la testdata a testdir y no tener que poner testdir todo el rato
    - Me evito errores por ficheros que no están en el ci

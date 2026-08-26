@@ -1,5 +1,5 @@
 # Format: <ft_ls command> :: <ls model command>
-# Example: ./ft_ls testdir :: ls -aU testdir | cat
+# Example: ./ft_ls testdir :: ls testdir
 #
 # Remember: Columns without tty: -C | Colors without tty: --colors
 #
@@ -23,3 +23,4 @@
 ./ft_ls testdir/empty testdir/empty/                                         ::        ls -U testdir/empty testdir/empty/
 ./ft_ls testdir/dir_only_hidden testdir/dir_only_hidden/                     ::        ls -U testdir/dir_only_hidden testdir/dir_only_hidden/
 ./ft_ls testdir/empty testdir/.hidden                                        ::        ls -U testdir/empty testdir/.hidden
+./ft_ls testdir/.hidden testdir/dir_only_hidden/                             ::        ls -U testdir/.hidden testdir/dir_only_hidden/
