@@ -4,19 +4,19 @@
 
 #define SUITE_NAME "sorter"
 
-static void should_not_fail_when_passed_a_NULL_pointer(void)
+static void should_not_fail_when_passing_a_NULL_pointer(void)
 {
     sort(NULL);
 }
 
-static void should_not_fail_when_passed_a_pointer_pointing_at_NULL(void)
+static void should_not_fail_when_passing_a_NULL_file_entry_list(void)
 {
     t_file_entry_list *invalid_list = NULL;
 
     sort(&invalid_list);
 }
 
-static void should_not_sort_when_a_list_with_one_item_is_passed(void)
+static void should_do_nothing_when_a_file_entry_list_with_one_entry_is_passed(void)
 {
     t_file_entry_list *file_entry_list = file_entry_list_create("file");
 
@@ -28,7 +28,7 @@ static void should_not_sort_when_a_list_with_one_item_is_passed(void)
     file_entry_list_destroy(&file_entry_list);
 }
 
-static void should_not_sort_when_an_already_sorted_list_is_passed(void)
+static void should_do_nothing_when_an_already_sorted_file_entry_list_is_passed(void)
 {
     t_file_entry_list *file_entry_list = file_entry_list_create("file");
     file_entry_list_add_entry(&file_entry_list, file_entry_list_create("file2"));
@@ -55,9 +55,9 @@ void register_sorter_suite(void)
 
     if (suite != NULL)
     {
-        CU_add_test(suite, "should_not_fail_when_passed_a_NULL_pointer", should_not_fail_when_passed_a_NULL_pointer);
-        CU_add_test(suite, "should_not_fail_when_passed_a_pointer_pointing_at_NULL", should_not_fail_when_passed_a_pointer_pointing_at_NULL);
-        CU_add_test(suite, "should_not_sort_when_a_list_with_one_item_is_passed", should_not_sort_when_a_list_with_one_item_is_passed);
-        CU_add_test(suite, "should_not_sort_when_an_already_sorted_list_is_passed", should_not_sort_when_an_already_sorted_list_is_passed);
+        CU_add_test(suite, "should_not_fail_when_passing_a_NULL_pointer", should_not_fail_when_passing_a_NULL_pointer);
+        CU_add_test(suite, "should_not_fail_when_passing_a_NULL_file_entry_list", should_not_fail_when_passing_a_NULL_file_entry_list);
+        CU_add_test(suite, "should_do_nothing_when_a_file_entry_list_with_one_entry_is_passed", should_do_nothing_when_a_file_entry_list_with_one_entry_is_passed);
+        CU_add_test(suite, "should_do_nothing_when_an_already_sorted_file_entry_list_is_passed", should_do_nothing_when_an_already_sorted_file_entry_list_is_passed);
     }
 }
