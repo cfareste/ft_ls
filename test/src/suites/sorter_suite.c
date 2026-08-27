@@ -1,11 +1,12 @@
 #include "CUnit/CUnit.h"
 #include "CUnit/Basic.h"
+#include "sorter.h"
 
 #define SUITE_NAME "sorter"
 
-static void example_test(void)
+static void should_not_fail_when_passed_a_NULL_pointer(void)
 {
-    CU_ASSERT_EQUAL(1, 1);
+    sort(NULL);
 }
 
 void register_sorter_suite(void)
@@ -14,6 +15,6 @@ void register_sorter_suite(void)
 
     if (suite != NULL)
     {
-        CU_add_test(suite, "example_test", example_test);
+        CU_add_test(suite, "should_not_fail_when_passed_a_NULL_pointer", should_not_fail_when_passed_a_NULL_pointer);
     }
 }
