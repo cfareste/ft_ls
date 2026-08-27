@@ -66,5 +66,6 @@ QA LS-15 Filter hidden files (`ls -U file ... | cat`)
    - Si hay mezcla
      - Con y sin hidden files
      - Vacíos / Solo hidden files
-4. Parámetros ocultos (ficheros y directorios)
+   - Mezcla de lo anterior y comprobar dir headers
+4. Parámetros ocultos (ficheros y directorios | .env .idea/)
 5. No memory leaks
