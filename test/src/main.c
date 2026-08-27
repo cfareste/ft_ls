@@ -11,6 +11,7 @@ int	main(void)
 	register_directory_suite();
 	register_renderer_suite();
 	register_scanner_suite();
+	register_sorter_suite();
 	register_file_stats_suite();
 	register_parsed_arguments_suite();
 	register_application_suite();

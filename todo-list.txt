@@ -1,4 +1,5 @@
 TODO:
+1. Implementar LS-14 Default sorting output
 
 
 TODO En algún momento:

@@ -64,7 +64,8 @@ vpath %.c	$(SRC):\
 			$(ROOT_SRC)/filesystem:\
 			$(ROOT_SRC)/file_entry_list:\
 			$(ROOT_SRC)/scanner:\
-			$(ROOT_SRC)/renderer
+			$(ROOT_SRC)/renderer:\
+			$(ROOT_SRC)/sorter
 
 
 
@@ -76,7 +77,8 @@ ROOT_SRCS = application.c \
 			file_stats.c \
 			file_entry_list.c \
 			scanner.c \
-			renderer.c
+			renderer.c \
+			sorter.c
 
 SRCS = main.c \
 		directory_mock.c \
@@ -87,6 +89,7 @@ SRCS = main.c \
 		renderer_suite.c \
 		scanner_suite.c \
 		file_stats_suite.c \
+		sorter_suite.c \
 		parsed_arguments_suite.c \
 		application_suite.c \
 		$(ROOT_SRCS)
