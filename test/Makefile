@@ -85,6 +85,7 @@ SRCS = main.c \
 		directory_suite.c \
 		file_entry_list_suite.c \
 		renderer_suite.c \
+		scanner_suite.c \
 		file_stats_suite.c \
 		parsed_arguments_suite.c \
 		application_suite.c \

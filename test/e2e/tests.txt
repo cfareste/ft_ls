@@ -1,18 +1,27 @@
-# Format: <ft_ls command> :: <ls model command>
-# Example: ./ft_ls testdir :: ls -aU testdir | cat
+# Format: <ft_ls arguments> :: <ls model command>
+# Example: file :: ls file -> this will compare 'ft_ls file' to 'ls file'
 #
 # Remember: Columns without tty: -C | Colors without tty: --colors
 #
 
-./ft_ls                                                                      ::        ls -aU
-./ft_ls .                                                                    ::        ls -aU .
-./ft_ls Makefile                                                             ::        ls -aU Makefile
-./ft_ls testdir                                                              ::        ls -aU testdir
-./ft_ls ../../ft_ls/./test/testdir                                           ::        ls -aU ../../ft_ls/./test/testdir
-./ft_ls ../../ft_ls/./test/testdir/file                                      ::        ls -aU ../../ft_ls/./test/testdir/file
-./ft_ls /tmp/tempfile                                                        ::        ls -aU /tmp/tempfile
-./ft_ls /tmp/tempdir/                                                        ::        ls -aU /tmp/tempdir/
-./ft_ls Makefile run_e2e.sh Makefile generate_coverage_reports.sh            ::        ls -aU Makefile run_e2e.sh Makefile generate_coverage_reports.sh
-./ft_ls inc/ src testdir src                                                 ::        ls -aU inc/ src testdir src
-./ft_ls testdir/file2 testdir/firstDir testdir/secondDir testdir/file        ::        ls -aU testdir/file2 testdir/firstDir testdir/secondDir testdir/file
-./ft_ls testdir/empty                                                        ::        ls -aU testdir/empty
+                                                           ::       ls -U
+.                                                          ::       ls -U .
+Makefile                                                   ::       ls -U Makefile
+src                                                        ::       ls -U src
+../../../ft_ls/./test/testdir                              ::       ls -U ../../../ft_ls/./test/testdir
+../../../ft_ls/./test/testdir/file                         ::       ls -U ../../../ft_ls/./test/testdir/file
+/tmp/tempfile                                              ::       ls -U /tmp/tempfile
+/tmp/tempdir/                                              ::       ls -U /tmp/tempdir/
+Makefile file Makefile file2                               ::       ls -U Makefile file Makefile file2
+inc/ src firstDir src                                      ::       ls -U inc/ src firstDir src
+file2 firstDir secondDir file                              ::       ls -U file2 firstDir secondDir file
+.hidden2 .hidden                                           ::       ls -U .hidden2 .hidden
+.hiddir2 .hiddir                                           ::       ls -U .hiddir2 .hiddir
+.hidden2 .hiddir .hiddir2 .hidden                          ::       ls -U .hidden2 .hiddir .hiddir2 .hidden
+empty                                                      ::       ls -U empty
+dir_only_hidden                                            ::       ls -U dir_only_hidden
+empty empty/                                               ::       ls -U empty empty/
+dir_only_hidden dir_only_hidden/                           ::       ls -U dir_only_hidden dir_only_hidden/
+empty .hidden                                              ::       ls -U empty .hidden
+.hidden dir_only_hidden/                                   ::       ls -U .hidden dir_only_hidden/
+.hidden firstDir file dir_only_hidden/ .hiddir empty       ::       ls -U .hidden firstDir file dir_only_hidden/ .hiddir empty
