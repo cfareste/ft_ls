@@ -1,6 +1,6 @@
 #pragma once
 
-#include "file_entry_list.h"
+#include "file_entry.h"
 
 typedef struct s_render_context t_render_context;
 

@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include "file_entry_list.h"
+#include "file_entry.h"
 #include "libft.h"
 
 struct s_file_entry_array

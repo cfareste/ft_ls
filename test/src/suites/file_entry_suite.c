@@ -1,8 +1,8 @@
 #include "CUnit/CUnit.h"
 #include "CUnit/Basic.h"
-#include "file_entry_list.h"
+#include "file_entry.h"
 
-#define SUITE_NAME "file_entry_array"
+#define SUITE_NAME "file_entry"
 #define DEFAULT_NAME "default"
 
 static t_file_entry_array *sut;
@@ -158,7 +158,7 @@ static void should_return_the_next_instance_correctly(void)
     CU_ASSERT_STRING_EQUAL(file_name, next_file_name);
 }
 
-void register_file_entry_array_suite(void)
+void register_file_entry_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, test_teardown);
 

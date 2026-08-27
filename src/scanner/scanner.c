@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include "scanner.h"
-#include "file_entry_list.h"
+#include "file_entry.h"
 #include "directory.h"
 
 static int is_hidden_file(const char *file_entry_name)
