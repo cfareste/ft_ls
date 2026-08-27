@@ -45,7 +45,7 @@ void render_context_destroy(t_render_context **context)
     *context = NULL;
 }
 
-void render(const t_file_entry_list *file_entry_list, t_render_context *context)
+void render(const t_file_entry_array *file_entry_array, t_render_context *context)
 {
     if (context == NULL)
         return;
@@ -53,11 +53,11 @@ void render(const t_file_entry_list *file_entry_list, t_render_context *context)
     if (context->directory_header != NULL)
         print_directory_header(context);
 
-    const t_file_entry_list *entry = file_entry_list;
+    const t_file_entry_array *entry = file_entry_array;
     while (entry != NULL)
     {
-        ft_printf("%s\n", file_entry_list_get_name(entry));
-        entry = file_entry_list_get_next(entry);
+        ft_printf("%s\n", file_entry_array_get_name(entry));
+        entry = file_entry_array_get_next(entry);
     }
 
     context->is_first_render = 0;

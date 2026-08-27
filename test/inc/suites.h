@@ -1,7 +1,7 @@
 #pragma once
 
-void register_file_entry_list_suite(void);
-void register_file_entry_list_factory_suite(void);
+void register_file_entry_array_suite(void);
+void register_file_entry_array_factory_suite(void);
 void register_directory_suite(void);
 void register_renderer_suite(void);
 void register_scanner_suite(void);

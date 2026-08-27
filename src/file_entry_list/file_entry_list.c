@@ -2,65 +2,65 @@
 #include "file_entry_list.h"
 #include "libft.h"
 
-struct s_file_entry_list
+struct s_file_entry_array
 {
     char *name;
-    t_file_entry_list *next;
+    t_file_entry_array *next;
 };
 
-static int is_valid_file_name(const char *_name)
+static int is_valid_file_name(const char *name)
 {
-    return (_name != NULL && !ft_is_str_empty(_name));
+    return (name != NULL && !ft_is_str_empty(name));
 }
 
-t_file_entry_list *file_entry_list_create(const char *file_name)
+t_file_entry_array *file_entry_array_create(const char *file_name)
 {
     if (!is_valid_file_name(file_name))
         return NULL;
 
-    t_file_entry_list *file_entry_list = ft_safe_calloc(1, sizeof(t_file_entry_list));
-    file_entry_list_set_name(file_entry_list, file_name);
+    t_file_entry_array *file_entry_array = ft_safe_calloc(1, sizeof(t_file_entry_array));
+    file_entry_array_set_name(file_entry_array, file_name);
 
-    return file_entry_list;
+    return file_entry_array;
 }
 
-const char *file_entry_list_get_name(const t_file_entry_list *file_entry_list)
+const char *file_entry_array_get_name(const t_file_entry_array *file_entry_array)
 {
-    if (file_entry_list == NULL)
+    if (file_entry_array == NULL)
         return NULL;
 
-    return file_entry_list->name;
+    return file_entry_array->name;
 }
 
-void file_entry_list_set_name(t_file_entry_list *file_entry_list, const char *name)
+void file_entry_array_set_name(t_file_entry_array *file_entry_array, const char *name)
 {
-    if (file_entry_list == NULL || !is_valid_file_name(name))
+    if (file_entry_array == NULL || !is_valid_file_name(name))
         return;
 
-    free(file_entry_list->name);
-    file_entry_list->name = ft_safe_strdup(name);
+    free(file_entry_array->name);
+    file_entry_array->name = ft_safe_strdup(name);
 }
 
-t_file_entry_list *file_entry_list_get_next(const t_file_entry_list *file_entry_list)
+t_file_entry_array *file_entry_array_get_next(const t_file_entry_array *file_entry_array)
 {
-    if (file_entry_list == NULL)
+    if (file_entry_array == NULL)
         return NULL;
 
-    return file_entry_list->next;
+    return file_entry_array->next;
 }
 
-void file_entry_list_add_entry(t_file_entry_list **file_entry_list, t_file_entry_list *next)
+void file_entry_array_add_entry(t_file_entry_array **file_entry_array, t_file_entry_array *next)
 {
-    if (file_entry_list == NULL)
+    if (file_entry_array == NULL)
         return;
 
-    if (*file_entry_list == NULL)
+    if (*file_entry_array == NULL)
     {
-        *file_entry_list = next;
+        *file_entry_array = next;
         return;
     }
 
-    t_file_entry_list *temp = *file_entry_list;
+    t_file_entry_array *temp = *file_entry_array;
     while (temp->next != NULL)
     {
         temp = temp->next;
@@ -69,26 +69,26 @@ void file_entry_list_add_entry(t_file_entry_list **file_entry_list, t_file_entry
     temp->next = next;
 }
 
-unsigned int file_entry_list_get_length(const t_file_entry_list *file_entry_list)
+unsigned int file_entry_array_get_length(const t_file_entry_array *file_entry_array)
 {
     unsigned int count = 0;
 
-    while (file_entry_list != NULL)
+    while (file_entry_array != NULL)
     {
         count++;
-        file_entry_list = file_entry_list->next;
+        file_entry_array = file_entry_array->next;
     }
 
     return count;
 }
 
-void file_entry_list_destroy(t_file_entry_list **file_entry_list)
+void file_entry_array_destroy(t_file_entry_array **file_entry_array)
 {
-    if (file_entry_list == NULL || *file_entry_list == NULL)
+    if (file_entry_array == NULL || *file_entry_array == NULL)
         return;
 
-    t_file_entry_list *to_free = *file_entry_list;
-    t_file_entry_list *next = to_free->next;
+    t_file_entry_array *to_free = *file_entry_array;
+    t_file_entry_array *next = to_free->next;
     do
     {
         free(to_free->name);
@@ -98,5 +98,5 @@ void file_entry_list_destroy(t_file_entry_list **file_entry_list)
             next = next->next;
     } while (to_free != NULL);
 
-    *file_entry_list = NULL;
+    *file_entry_array = NULL;
 }

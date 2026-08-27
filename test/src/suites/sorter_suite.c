@@ -9,44 +9,44 @@ static void should_not_fail_when_passing_a_NULL_pointer(void)
     sort(NULL);
 }
 
-static void should_not_fail_when_passing_a_NULL_file_entry_list(void)
+static void should_not_fail_when_passing_a_NULL_file_entry_array(void)
 {
-    t_file_entry_list *invalid_list = NULL;
+    t_file_entry_array *invalid_array = NULL;
 
-    sort(&invalid_list);
+    sort(&invalid_array);
 }
 
-static void should_do_nothing_when_a_file_entry_list_with_one_entry_is_passed(void)
+static void should_do_nothing_when_a_file_entry_array_with_one_entry_is_passed(void)
 {
-    t_file_entry_list *file_entry_list = file_entry_list_create("file");
+    t_file_entry_array *file_entry_array = file_entry_array_create("file");
 
-    sort(&file_entry_list);
+    sort(&file_entry_array);
 
-    CU_ASSERT_STRING_EQUAL(file_entry_list_get_name(file_entry_list), "file");
-    CU_ASSERT_EQUAL(file_entry_list_get_length(file_entry_list), 1);
+    CU_ASSERT_STRING_EQUAL(file_entry_array_get_name(file_entry_array), "file");
+    CU_ASSERT_EQUAL(file_entry_array_get_length(file_entry_array), 1);
 
-    file_entry_list_destroy(&file_entry_list);
+    file_entry_array_destroy(&file_entry_array);
 }
 
-static void should_do_nothing_when_an_already_sorted_file_entry_list_is_passed(void)
+static void should_do_nothing_when_an_already_sorted_file_entry_array_is_passed(void)
 {
-    t_file_entry_list *file_entry_list = file_entry_list_create("file");
-    file_entry_list_add_entry(&file_entry_list, file_entry_list_create("file2"));
-    file_entry_list_add_entry(&file_entry_list, file_entry_list_create("file3"));
-    file_entry_list_add_entry(&file_entry_list, file_entry_list_create("file4"));
+    t_file_entry_array *file_entry_array = file_entry_array_create("file");
+    file_entry_array_add_entry(&file_entry_array, file_entry_array_create("file2"));
+    file_entry_array_add_entry(&file_entry_array, file_entry_array_create("file3"));
+    file_entry_array_add_entry(&file_entry_array, file_entry_array_create("file4"));
 
-    sort(&file_entry_list);
-    const t_file_entry_list *second_entry = file_entry_list_get_next(file_entry_list);
-    const t_file_entry_list *third_entry = file_entry_list_get_next(second_entry);
-    const t_file_entry_list *fourth_entry = file_entry_list_get_next(third_entry);
+    sort(&file_entry_array);
+    const t_file_entry_array *second_entry = file_entry_array_get_next(file_entry_array);
+    const t_file_entry_array *third_entry = file_entry_array_get_next(second_entry);
+    const t_file_entry_array *fourth_entry = file_entry_array_get_next(third_entry);
 
-    CU_ASSERT_STRING_EQUAL(file_entry_list_get_name(file_entry_list), "file");
-    CU_ASSERT_STRING_EQUAL(file_entry_list_get_name(second_entry), "file2");
-    CU_ASSERT_STRING_EQUAL(file_entry_list_get_name(third_entry), "file3");
-    CU_ASSERT_STRING_EQUAL(file_entry_list_get_name(fourth_entry), "file4");
-    CU_ASSERT_EQUAL(file_entry_list_get_length(file_entry_list), 4);
+    CU_ASSERT_STRING_EQUAL(file_entry_array_get_name(file_entry_array), "file");
+    CU_ASSERT_STRING_EQUAL(file_entry_array_get_name(second_entry), "file2");
+    CU_ASSERT_STRING_EQUAL(file_entry_array_get_name(third_entry), "file3");
+    CU_ASSERT_STRING_EQUAL(file_entry_array_get_name(fourth_entry), "file4");
+    CU_ASSERT_EQUAL(file_entry_array_get_length(file_entry_array), 4);
 
-    file_entry_list_destroy(&file_entry_list);
+    file_entry_array_destroy(&file_entry_array);
 }
 
 void register_sorter_suite(void)
@@ -56,8 +56,8 @@ void register_sorter_suite(void)
     if (suite != NULL)
     {
         CU_add_test(suite, "should_not_fail_when_passing_a_NULL_pointer", should_not_fail_when_passing_a_NULL_pointer);
-        CU_add_test(suite, "should_not_fail_when_passing_a_NULL_file_entry_list", should_not_fail_when_passing_a_NULL_file_entry_list);
-        CU_add_test(suite, "should_do_nothing_when_a_file_entry_list_with_one_entry_is_passed", should_do_nothing_when_a_file_entry_list_with_one_entry_is_passed);
-        CU_add_test(suite, "should_do_nothing_when_an_already_sorted_file_entry_list_is_passed", should_do_nothing_when_an_already_sorted_file_entry_list_is_passed);
+        CU_add_test(suite, "should_not_fail_when_passing_a_NULL_file_entry_array", should_not_fail_when_passing_a_NULL_file_entry_array);
+        CU_add_test(suite, "should_do_nothing_when_a_file_entry_array_with_one_entry_is_passed", should_do_nothing_when_a_file_entry_array_with_one_entry_is_passed);
+        CU_add_test(suite, "should_do_nothing_when_an_already_sorted_file_entry_array_is_passed", should_do_nothing_when_an_already_sorted_file_entry_array_is_passed);
     }
 }
