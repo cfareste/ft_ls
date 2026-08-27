@@ -46,7 +46,8 @@ prepare_test_environment() {
     cp -rf ../src ./src
     cp -rf ../Makefile ./Makefile
 
-    touch "'my" "'my file'" '"file"' file "file'" file2 "my file"
+    touch src/.hidden
+    touch "'my" "'my file'" '"file"' file "file'" file2 "my file" ".hidden" ".env"
     touch my-pdf.pdf myfiñe nwl test@pdf $'tab\tfile' a "file " " "
     touch firstDir/file firstDir/file2 secondDir/file3 secondDir/file4
 

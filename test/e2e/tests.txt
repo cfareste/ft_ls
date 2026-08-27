@@ -1,5 +1,5 @@
 # Format: <ft_ls arguments> :: <ls model command>
-# Example: file :: ls file
+# Example: file :: ls file -> this will compare 'ft_ls file' to 'ls file'
 #
 # Remember: Columns without tty: -C | Colors without tty: --colors
 #

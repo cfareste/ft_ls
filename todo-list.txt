@@ -1,7 +1,4 @@
 TODO:
-1. Implementar LS-15 Filter hidden files
-2. Mirar si cada suite tiene los tests que tocan o hay alguno fuera de lugar
-6. Reflexionar si hay más casos que se me pueden estar escapando relativo a dir headers y demás
 
 
 TODO En algún momento:
@@ -36,7 +33,7 @@ TODO QA:
 QA LS-8 Execution without parameters (`ls -aU | cat`)
 1. Directorio vacío - NO ACCESIBLE (siempre hay '.' y '..')
 2. Un solo fichero - NO ACCESIBLE (siempre hay '.' y '..')
-3. Multiples ficheros
+3. Múltiples ficheros
 4. Ficheros con nombres raros se ven bien
 5. No memory leaks
 
@@ -48,3 +45,26 @@ QA LS-11 Execution with parameters (`ls -aU file ... | cat`)
 4. 2+ directorios
 5. Mezcla ficheros + directorios
 6. No memory leaks
+
+
+QA LS-15 Filter hidden files (`ls -U file ... | cat`)
+1. Sin parámetros (directorio actual)
+   - Con y sin hidden files
+   - Vacío / Solo hidden files
+2. 1 parámetro
+   - Si es un fichero
+     - Normal y oculto
+   - Si es un directorio
+     - Con y sin hidden files
+     - Vacío / Solo hidden files
+3. Múltiples parámetros
+   - Si solo hay ficheros
+     - Solo normales, solo ocultos y mezcla
+   - Si solo hay directorios
+     - Con y sin hidden files
+     - Vacíos / Solo hidden files
+   - Si hay mezcla
+     - Con y sin hidden files
+     - Vacíos / Solo hidden files
+4. Parámetros ocultos (ficheros y directorios)
+5. No memory leaks
