@@ -86,6 +86,18 @@ static void should_return_NULL_if_a_null_file_entry_array_is_passed_the_correct_
     CU_ASSERT_PTR_NULL(entry_name);
 }
 
+static void should_return_the_entry_name_correctly(void)
+{
+    t_file_entry *file_entry = file_entry_create("name");
+    file_entry_set_name(file_entry, "valid name");
+
+    const char *entry_name = file_entry_get_name(file_entry);
+
+    CU_ASSERT_STRING_EQUAL(entry_name, "valid name");
+
+    file_entry_destroy(&file_entry);
+}
+
 static void should_return_the_correct_name(void)
 {
     const char *file_name = "valid_name";
@@ -204,6 +216,7 @@ void register_file_entry_suite(void)
         CU_add_test(suite, "should_fail_to_create_if_an_empty_file_name_is_passed", should_fail_to_create_if_an_empty_file_name_is_passed);
         CU_add_test(suite, "should_return_NULL_if_a_null_file_entry_array_is_passed_the_correct_name", should_return_NULL_if_a_null_file_entry_array_is_passed_the_correct_name);
         CU_add_test(suite, "should_return_length_of_zero_when_passed_a_null_file_entry_array", should_return_length_of_zero_when_passed_a_null_file_entry_array);
+        CU_add_test(suite, "should_return_the_entry_name_correctly", should_return_the_entry_name_correctly);
         CU_add_test(suite, "should_return_the_correct_name", should_return_the_correct_name);
         CU_add_test(suite, "should_not_fail_setting_the_name_if_a_null_file_entry_array_is_passed", should_not_fail_setting_the_name_if_a_null_file_entry_array_is_passed);
         CU_add_test(suite, "should_not_fail_setting_the_name_if_a_null_file_name_is_passed", should_not_fail_setting_the_name_if_a_null_file_name_is_passed);
