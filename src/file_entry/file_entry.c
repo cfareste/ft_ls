@@ -2,6 +2,11 @@
 #include "file_entry.h"
 #include "libft.h"
 
+struct s_file_entry
+{
+    char *name;
+};
+
 struct s_file_entry_array
 {
     char *name;
@@ -13,6 +18,18 @@ static int is_valid_file_name(const char *name)
     return (name != NULL && !ft_is_str_empty(name));
 }
 
+t_file_entry *file_entry_create(const char *file_name)
+{
+    if (!is_valid_file_name(file_name))
+        return NULL;
+
+    t_file_entry *file_entry = ft_safe_calloc(1, sizeof(t_file_entry));
+    free(file_entry->name);
+    file_entry->name = ft_safe_strdup(file_name);
+
+    return file_entry;
+}
+
 t_file_entry_array *file_entry_array_create(const char *file_name)
 {
     if (!is_valid_file_name(file_name))
@@ -22,6 +39,14 @@ t_file_entry_array *file_entry_array_create(const char *file_name)
     file_entry_array_set_name(file_entry_array, file_name);
 
     return file_entry_array;
+}
+
+const char *file_entry_get_name(const t_file_entry *file_entry)
+{
+    if (file_entry == NULL)
+        return NULL;
+
+    return file_entry->name;
 }
 
 const char *file_entry_array_get_name(const t_file_entry_array *file_entry_array)
@@ -80,6 +105,16 @@ unsigned int file_entry_array_get_length(const t_file_entry_array *file_entry_ar
     }
 
     return count;
+}
+
+void file_entry_destroy(t_file_entry **file_entry)
+{
+    if (file_entry == NULL || *file_entry == NULL)
+        return;
+
+    free((*file_entry)->name);
+    free((*file_entry));
+    *file_entry = NULL;
 }
 
 void file_entry_array_destroy(t_file_entry_array **file_entry_array)

@@ -27,6 +27,16 @@ static void assert_file_entry_array_is_null(const t_file_entry_array *file_entry
     CU_ASSERT_PTR_NULL(file_entry_array);
 }
 
+static void should_create_file_entry_correctly(void)
+{
+    t_file_entry *file_entry = file_entry_create(DEFAULT_NAME);
+
+    CU_ASSERT_PTR_NOT_NULL(file_entry);
+    CU_ASSERT_STRING_EQUAL(file_entry_get_name(file_entry), DEFAULT_NAME);
+
+    file_entry_destroy(&file_entry);
+}
+
 static void should_create_file_entry_array_correctly(void)
 {
     CU_ASSERT_PTR_NOT_NULL(sut);
@@ -164,6 +174,7 @@ void register_file_entry_suite(void)
 
     if (suite != NULL)
     {
+        CU_add_test(suite, "should_create_file_entry_correctly", should_create_file_entry_correctly);
         CU_add_test(suite, "should_create_file_entry_array_correctly", should_create_file_entry_array_correctly);
         CU_add_test(suite, "should_destroy_file_entry_array_correctly", should_destroy_file_entry_array_correctly);
         CU_add_test(suite, "should_not_fail_to_destroy_a_file_entry_array_when_a_null_pointer_is_passed", should_not_fail_to_destroy_a_file_entry_array_when_a_null_pointer_is_passed);
