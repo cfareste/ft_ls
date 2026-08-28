@@ -31,9 +31,9 @@ static void should_do_nothing_when_a_file_entry_array_with_one_entry_is_passed(v
 static void should_do_nothing_when_an_already_sorted_file_entry_array_is_passed(void)
 {
     t_file_entry_array *file_entry_array = file_entry_array_create("file");
-    file_entry_array_add_entry(&file_entry_array, file_entry_array_create("file2"));
-    file_entry_array_add_entry(&file_entry_array, file_entry_array_create("file3"));
-    file_entry_array_add_entry(&file_entry_array, file_entry_array_create("file4"));
+    file_entry_array_push(&file_entry_array, file_entry_array_create("file2"));
+    file_entry_array_push(&file_entry_array, file_entry_array_create("file3"));
+    file_entry_array_push(&file_entry_array, file_entry_array_create("file4"));
 
     sort(&file_entry_array);
     const t_file_entry_array *second_entry = file_entry_array_get_next(file_entry_array);

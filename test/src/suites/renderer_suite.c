@@ -95,10 +95,10 @@ static void should_print_the_name_of_every_entry_with_a_file_entry_array_of_vari
     t_render_context *context = render_context_create();
     const char *expected_file_name[5] = { "file", "file2", "file3", "file4", "file5" };
     t_file_entry_array *file_entry_array = file_entry_array_create(expected_file_name[0]);
-    file_entry_array_add_entry(&file_entry_array, file_entry_array_create(expected_file_name[1]));
-    file_entry_array_add_entry(&file_entry_array, file_entry_array_create(expected_file_name[2]));
-    file_entry_array_add_entry(&file_entry_array, file_entry_array_create(expected_file_name[3]));
-    file_entry_array_add_entry(&file_entry_array, file_entry_array_create(expected_file_name[4]));
+    file_entry_array_push(&file_entry_array, file_entry_array_create(expected_file_name[1]));
+    file_entry_array_push(&file_entry_array, file_entry_array_create(expected_file_name[2]));
+    file_entry_array_push(&file_entry_array, file_entry_array_create(expected_file_name[3]));
+    file_entry_array_push(&file_entry_array, file_entry_array_create(expected_file_name[4]));
 
     render(file_entry_array, context);
 
@@ -121,8 +121,8 @@ static void should_not_print_a_dir_header_if_specified_in_the_context(void)
     t_render_context *context = render_context_create();
     render_context_set_directory_header(context, NULL);
     t_file_entry_array *file_entry_array = file_entry_array_create(expected_file_name[0]);
-    file_entry_array_add_entry(&file_entry_array, file_entry_array_create(expected_file_name[1]));
-    file_entry_array_add_entry(&file_entry_array, file_entry_array_create(expected_file_name[2]));
+    file_entry_array_push(&file_entry_array, file_entry_array_create(expected_file_name[1]));
+    file_entry_array_push(&file_entry_array, file_entry_array_create(expected_file_name[2]));
 
     render(file_entry_array, context);
 
@@ -144,8 +144,8 @@ static void should_not_print_a_leading_dir_header_newline_if_its_the_first_rende
     t_render_context *context = render_context_create();
     render_context_set_directory_header(context, dir_header);
     t_file_entry_array *file_entry_array = file_entry_array_create(expected_file_name[0]);
-    file_entry_array_add_entry(&file_entry_array, file_entry_array_create(expected_file_name[1]));
-    file_entry_array_add_entry(&file_entry_array, file_entry_array_create(expected_file_name[2]));
+    file_entry_array_push(&file_entry_array, file_entry_array_create(expected_file_name[1]));
+    file_entry_array_push(&file_entry_array, file_entry_array_create(expected_file_name[2]));
 
     render(file_entry_array, context);
 
@@ -168,8 +168,8 @@ static void should_print_a_leading_dir_header_newline_if_its_not_first_render(vo
     t_render_context *context = render_context_create();
     render_context_set_directory_header(context, dir_header);
     t_file_entry_array *file_entry_array = file_entry_array_create(expected_file_name[0]);
-    file_entry_array_add_entry(&file_entry_array, file_entry_array_create(expected_file_name[1]));
-    file_entry_array_add_entry(&file_entry_array, file_entry_array_create(expected_file_name[2]));
+    file_entry_array_push(&file_entry_array, file_entry_array_create(expected_file_name[1]));
+    file_entry_array_push(&file_entry_array, file_entry_array_create(expected_file_name[2]));
 
     render(file_entry_array, context);
     render(file_entry_array, context);
@@ -195,10 +195,10 @@ static void should_print_a_leading_dir_header_newline_if_its_not_first_render(vo
 {
     const char *expected_file_name[5] = { "file", "file2", "file3", "file4", "file5" };
     t_file_entry_array *file_entry_array = file_entry_array_create(expected_file_name[0]);
-    file_entry_array_add_entry(&file_entry_array, file_entry_array_create(expected_file_name[1]));
-    file_entry_array_add_entry(&file_entry_array, file_entry_array_create(expected_file_name[2]));
-    file_entry_array_add_entry(&file_entry_array, file_entry_array_create(expected_file_name[3]));
-    file_entry_array_add_entry(&file_entry_array, file_entry_array_create(expected_file_name[4]));
+    file_entry_array_push(&file_entry_array, file_entry_array_create(expected_file_name[1]));
+    file_entry_array_push(&file_entry_array, file_entry_array_create(expected_file_name[2]));
+    file_entry_array_push(&file_entry_array, file_entry_array_create(expected_file_name[3]));
+    file_entry_array_push(&file_entry_array, file_entry_array_create(expected_file_name[4]));
 
     render(file_entry_array);
 

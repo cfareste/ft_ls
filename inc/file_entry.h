@@ -9,7 +9,7 @@ const char *file_entry_get_name(const t_file_entry *file_entry);
 const char *file_entry_array_get_name(const t_file_entry_array *file_entry_array);
 void file_entry_array_set_name(t_file_entry_array *file_entry_array, const char *name);
 t_file_entry_array *file_entry_array_get_next(const t_file_entry_array *file_entry_array);
-void file_entry_array_add_entry(t_file_entry_array **file_entry_array, t_file_entry_array *next);
+void file_entry_array_push(t_file_entry_array **file_entry_array, t_file_entry_array *next);
 unsigned int file_entry_array_get_length(const t_file_entry_array *file_entry_array);
 void file_entry_destroy(t_file_entry **file_entry);
 void file_entry_array_destroy(t_file_entry_array **file_entry_array);

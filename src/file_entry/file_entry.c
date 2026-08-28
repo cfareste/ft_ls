@@ -74,7 +74,7 @@ t_file_entry_array *file_entry_array_get_next(const t_file_entry_array *file_ent
     return file_entry_array->next;
 }
 
-void file_entry_array_add_entry(t_file_entry_array **file_entry_array, t_file_entry_array *next)
+void file_entry_array_push(t_file_entry_array **file_entry_array, t_file_entry_array *next)
 {
     if (file_entry_array == NULL)
         return;
