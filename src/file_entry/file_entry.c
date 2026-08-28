@@ -11,6 +11,10 @@ struct s_file_entry_array
 {
     char *name;
     t_file_entry_array *next;
+    //
+    t_file_entry **entries;
+    unsigned int count;
+    unsigned int max_capacity;
 };
 
 static int is_valid_file_name(const char *name)
@@ -66,12 +70,33 @@ void file_entry_array_set_name(t_file_entry_array *file_entry_array, const char 
     file_entry_array->name = ft_safe_strdup(name);
 }
 
+const t_file_entry *file_entry_array_get_at(const t_file_entry_array *file_entry_array, const unsigned int index)
+{
+    if (file_entry_array == NULL)
+        return NULL;
+
+    return file_entry_array->entries[index];
+}
+
 t_file_entry_array *file_entry_array_get_next(const t_file_entry_array *file_entry_array)
 {
     if (file_entry_array == NULL)
         return NULL;
 
     return file_entry_array->next;
+}
+
+void file_entry_array_push_TEMP(t_file_entry_array *array, t_file_entry *entry)
+{
+    if (array->count >= array->max_capacity)
+    {
+        array->max_capacity = (array->max_capacity == 0) ? 16 : array->max_capacity * 2;
+        array->entries = ft_realloc(array->entries,
+                            (array->max_capacity / 2) * sizeof(t_file_entry *),
+                            array->max_capacity * sizeof(t_file_entry *));
+    }
+    array->entries[array->count] = entry;
+    array->count++;
 }
 
 void file_entry_array_push(t_file_entry_array **file_entry_array, t_file_entry_array *next)
@@ -121,6 +146,16 @@ void file_entry_array_destroy(t_file_entry_array **file_entry_array)
 {
     if (file_entry_array == NULL || *file_entry_array == NULL)
         return;
+
+    const t_file_entry_array *file_entry_array_temp = *file_entry_array;
+
+    for (unsigned int i = 0; i < file_entry_array_temp->count; i++)
+    {
+        file_entry_destroy(&file_entry_array_temp->entries[i]);
+    }
+
+    free(file_entry_array_temp->entries);
+
 
     t_file_entry_array *to_free = *file_entry_array;
     t_file_entry_array *next = to_free->next;
