@@ -138,6 +138,14 @@ static void should_return_length_of_zero_when_passed_a_null_file_entry_array(voi
     CU_ASSERT_EQUAL(file_entry_array_get_length(NULL), 0);
 }
 
+static void should_return_the_correct_length_TEMP(void)
+{
+    file_entry_array_push_TEMP(sut, file_entry_create(DEFAULT_NAME));
+    file_entry_array_push_TEMP(sut, file_entry_create(DEFAULT_NAME));
+
+    CU_ASSERT_EQUAL(file_entry_array_get_length_TEMP(sut), 2);
+}
+
 static void should_return_the_correct_length(void)
 {
     file_entry_array_push(&sut, file_entry_array_create(DEFAULT_NAME));
@@ -221,6 +229,7 @@ void register_file_entry_suite(void)
         CU_add_test(suite, "should_not_fail_setting_the_name_if_a_null_file_entry_array_is_passed", should_not_fail_setting_the_name_if_a_null_file_entry_array_is_passed);
         CU_add_test(suite, "should_not_fail_setting_the_name_if_a_null_file_name_is_passed", should_not_fail_setting_the_name_if_a_null_file_name_is_passed);
         CU_add_test(suite, "should_not_fail_setting_the_name_if_an_empty_file_name_is_passed", should_not_fail_setting_the_name_if_an_empty_file_name_is_passed);
+        CU_add_test(suite, "should_return_the_correct_length_TEMP", should_return_the_correct_length_TEMP);
         CU_add_test(suite, "should_return_the_correct_length", should_return_the_correct_length);
         CU_add_test(suite, "should_not_fail_returning_the_next_instance_if_a_null_file_entry_array_is_passed", should_not_fail_returning_the_next_instance_if_a_null_file_entry_array_is_passed);
         CU_add_test(suite, "should_not_fail_when_attempting_to_push_an_entry_to_a_null_pointer", should_not_fail_when_attempting_to_push_an_entry_to_a_null_pointer);

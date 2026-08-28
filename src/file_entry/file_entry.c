@@ -128,6 +128,11 @@ void file_entry_array_push(t_file_entry_array **file_entry_array, t_file_entry_a
     temp->next = next;
 }
 
+unsigned int file_entry_array_get_length_TEMP(const t_file_entry_array *file_entry_array)
+{
+    return file_entry_array->count;
+}
+
 unsigned int file_entry_array_get_length(const t_file_entry_array *file_entry_array)
 {
     unsigned int count = 0;
