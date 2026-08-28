@@ -47,17 +47,17 @@ void render_context_destroy(t_render_context **context)
 
 void render(const t_file_entry_array *file_entry_array, t_render_context *context)
 {
-    if (context == NULL)
+    if (file_entry_array == NULL || context == NULL)
         return;
 
     if (context->directory_header != NULL)
         print_directory_header(context);
 
-    const t_file_entry_array *entry = file_entry_array;
-    while (entry != NULL)
+    const unsigned int count = file_entry_array_get_length_TEMP(file_entry_array);
+    for (unsigned int i = 0; i < count; i++)
     {
-        ft_printf("%s\n", file_entry_array_get_name(entry));
-        entry = file_entry_array_get_next(entry);
+        const t_file_entry *file_entry = file_entry_array_get_at(file_entry_array, i);
+        ft_printf("%s\n", file_entry_get_name(file_entry));
     }
 
     context->is_first_render = 0;

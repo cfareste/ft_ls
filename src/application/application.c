@@ -19,6 +19,8 @@ static void process_non_directory_file_operands(const t_parsed_arguments *parsed
     for (unsigned int i = 0; non_directory_file_operands[i] != NULL; i++)
     {
         t_file_entry_array *file_entry_array = file_entry_array_create(non_directory_file_operands[i]);
+        t_file_entry *file_entry = file_entry_create(non_directory_file_operands[i]);
+        file_entry_array_push_TEMP(file_entry_array, file_entry);
 
         render(file_entry_array, render_context);
 

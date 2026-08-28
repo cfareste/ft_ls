@@ -34,25 +34,26 @@ static void assert_file_entry_array_is_null()
 
 static void assert_file_entry_array_length_is(const unsigned int length)
 {
-    CU_ASSERT_EQUAL(file_entry_array_get_length(sut), length);
+    CU_ASSERT_EQUAL(file_entry_array_get_length_TEMP(sut), length);
 }
 
-static void assert_file_entry_array_name_is(const t_file_entry_array *file_entry_array, const char *name)
+static void assert_file_entry_name_is(const t_file_entry *file_entry, const char *name)
 {
-    CU_ASSERT_STRING_EQUAL(file_entry_array_get_name(file_entry_array), name);
+    CU_ASSERT_STRING_EQUAL(file_entry_get_name(file_entry), name);
 }
 
 static void assert_file_entry_array_names_are(const char **files_names)
 {
     unsigned int i = 0;
-    const t_file_entry_array *current = sut;
-    while (current != NULL && files_names[i] != NULL)
+    const unsigned int count = file_entry_array_get_length_TEMP(sut);
+
+    while (i < count)
     {
-        assert_file_entry_array_name_is(current, files_names[i]);
-        current = file_entry_array_get_next(current);
+        const t_file_entry *file_entry = file_entry_array_get_at(sut, i);
+        assert_file_entry_name_is(file_entry, files_names[i]);
         i++;
     }
-    CU_ASSERT_PTR_NULL(current);
+
     CU_ASSERT_PTR_NULL(files_names[i]);
 }
 
@@ -80,12 +81,13 @@ static void should_return_one_entry_if_the_current_directory_has_one_file(void)
     scan_directory(CURRENT_DIRECTORY_PATH);
 
     assert_file_entry_array_length_is(1);
-    assert_file_entry_array_name_is(sut, file_names[0]);
+    // TODO: Refactor
+    assert_file_entry_name_is(file_entry_array_get_at(sut, 0), file_names[0]);
 }
 
 static void should_return_multiple_entries_if_the_current_directory_has_more_than_one_file(void)
 {
-    const char *files_names[4] = { "multiple", "multiple2", "multiple3", NULL };
+    const char *files_names[] = { "multiple", "multiple2", "multiple3", NULL };
     const char **entry_names[] = { files_names, NULL };
     guarantee_stat_will_populate_stats_of_a_directory_type_file(CURRENT_DIRECTORY_PATH);
     guarantee_readdir_will_return_N_files_named(entry_names);
@@ -99,7 +101,7 @@ static void should_return_multiple_entries_if_the_current_directory_has_more_tha
 static void should_return_a_array_of_entries_if_one_non_empty_directory_path_is_specified(void)
 {
     const char *dir_names[] = { "valid_dir", NULL };
-    const char *files_names[5] = { "file", "subdir", "file2", "subdir2", NULL };
+    const char *files_names[] = { "file", "subdir", "file2", "subdir2", NULL };
     const char **entry_names[] = { files_names, NULL };
     guarantee_stat_will_populate_stats_of_a_directory_type_file(dir_names[0]);
     ensure_opendir_will_open_N_dirs_named(dir_names);
@@ -156,7 +158,7 @@ static void should_return_NULL_if_the_specified_directory_is_empty(void)
 
     scan_directory(CURRENT_DIRECTORY_PATH);
 
-    assert_file_entry_array_is_null();
+    assert_file_entry_array_length_is(0);
 }
 
 static void should_return_NULL_if_the_specified_directory_only_contains_hidden_files(void)
@@ -170,7 +172,7 @@ static void should_return_NULL_if_the_specified_directory_only_contains_hidden_f
 
     scan_directory("dir");
 
-    assert_file_entry_array_is_null();
+    assert_file_entry_array_length_is(0);
 }
 
 static void should_return_NULL_if_fails_to_open_a_directory(void)
@@ -180,7 +182,7 @@ static void should_return_NULL_if_fails_to_open_a_directory(void)
 
     scan_directory(CURRENT_DIRECTORY_PATH);
 
-    assert_file_entry_array_is_null();
+    assert_file_entry_array_length_is(0);
 }
 
 static void should_return_NULL_if_fails_to_read_a_directory(void)
@@ -190,7 +192,7 @@ static void should_return_NULL_if_fails_to_read_a_directory(void)
 
     scan_directory(CURRENT_DIRECTORY_PATH);
 
-    assert_file_entry_array_is_null();
+    assert_file_entry_array_length_is(0);
 }
 
 void register_scanner_suite(void)
