@@ -27,13 +27,13 @@ static void assert_file_entry_array_is_null(const t_file_entry_array *file_entry
     CU_ASSERT_PTR_NULL(file_entry_array);
 }
 
-static void should_be_created_correctly(void)
+static void should_create_file_entry_array_correctly(void)
 {
     CU_ASSERT_PTR_NOT_NULL(sut);
     CU_ASSERT_STRING_EQUAL(file_entry_array_get_name(sut), DEFAULT_NAME);
 }
 
-static void should_be_destroyed_correctly(void)
+static void should_destroy_file_entry_array_correctly(void)
 {
     file_entry_array_destroy(&sut);
 
@@ -164,8 +164,8 @@ void register_file_entry_suite(void)
 
     if (suite != NULL)
     {
-        CU_add_test(suite, "should_be_created_correctly", should_be_created_correctly);
-        CU_add_test(suite, "should_be_destroyed_correctly", should_be_destroyed_correctly);
+        CU_add_test(suite, "should_create_file_entry_array_correctly", should_create_file_entry_array_correctly);
+        CU_add_test(suite, "should_destroy_file_entry_array_correctly", should_destroy_file_entry_array_correctly);
         CU_add_test(suite, "should_not_fail_to_destroy_a_file_entry_array_when_a_null_pointer_is_passed", should_not_fail_to_destroy_a_file_entry_array_when_a_null_pointer_is_passed);
         CU_add_test(suite, "should_not_fail_to_destroy_a_file_entry_array_that_is_already_null", should_not_fail_to_destroy_a_file_entry_array_that_is_already_null);
         CU_add_test(suite, "should_fail_to_create_if_a_null_file_name_is_passed", should_fail_to_create_if_a_null_file_name_is_passed);
