@@ -104,26 +104,12 @@ void file_entry_array_destroy(t_file_entry_array **file_entry_array)
     if (file_entry_array == NULL || *file_entry_array == NULL)
         return;
 
-    const t_file_entry_array *file_entry_array_temp = *file_entry_array;
-
-    for (unsigned int i = 0; i < file_entry_array_temp->count; i++)
+    for (unsigned int i = 0; i < (*file_entry_array)->count; i++)
     {
-        file_entry_destroy(&file_entry_array_temp->entries[i]);
+        t_file_entry *entry = (*file_entry_array)->entries[i];
+        file_entry_destroy(&entry);
     }
-
-    free(file_entry_array_temp->entries);
-
-
-    t_file_entry_array *to_free = *file_entry_array;
-    t_file_entry_array *next = to_free->next;
-    do
-    {
-        free(to_free->name);
-        free(to_free);
-        to_free = next;
-        if (next != NULL)
-            next = next->next;
-    } while (to_free != NULL);
-
+    free((*file_entry_array)->entries);
+    free(*file_entry_array);
     *file_entry_array = NULL;
 }
