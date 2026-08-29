@@ -84,26 +84,6 @@ void file_entry_array_push_TEMP(t_file_entry_array *array, t_file_entry *entry)
     array->count++;
 }
 
-void file_entry_array_push(t_file_entry_array **file_entry_array, t_file_entry_array *next)
-{
-    if (file_entry_array == NULL)
-        return;
-
-    if (*file_entry_array == NULL)
-    {
-        *file_entry_array = next;
-        return;
-    }
-
-    t_file_entry_array *temp = *file_entry_array;
-    while (temp->next != NULL)
-    {
-        temp = temp->next;
-    }
-
-    temp->next = next;
-}
-
 unsigned int file_entry_array_get_length_TEMP(const t_file_entry_array *file_entry_array)
 {
     return file_entry_array->count;
