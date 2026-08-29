@@ -18,7 +18,7 @@ static void should_not_fail_when_passing_a_NULL_file_entry_array(void)
 
 static void should_do_nothing_when_a_file_entry_array_with_one_entry_is_passed(void)
 {
-    t_file_entry_array *file_entry_array = file_entry_array_create("file");
+    t_file_entry_array *file_entry_array = file_entry_array_create();
     t_file_entry *file_entry = file_entry_create("file");
     file_entry_array_push_TEMP(file_entry_array, file_entry);
 
@@ -32,10 +32,7 @@ static void should_do_nothing_when_a_file_entry_array_with_one_entry_is_passed(v
 
 static void should_do_nothing_when_an_already_sorted_file_entry_array_is_passed(void)
 {
-    t_file_entry_array *file_entry_array = file_entry_array_create("file");
-    file_entry_array_push(&file_entry_array, file_entry_array_create("file2"));
-    file_entry_array_push(&file_entry_array, file_entry_array_create("file3"));
-    file_entry_array_push(&file_entry_array, file_entry_array_create("file4"));
+    t_file_entry_array *file_entry_array = file_entry_array_create();
     file_entry_array_push_TEMP(file_entry_array, file_entry_create("file"));
     file_entry_array_push_TEMP(file_entry_array, file_entry_create("file2"));
     file_entry_array_push_TEMP(file_entry_array, file_entry_create("file3"));

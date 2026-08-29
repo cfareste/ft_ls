@@ -2,6 +2,8 @@
 #include "file_entry.h"
 #include "libft.h"
 
+#define DEFAULT_CAPACITY 8
+
 struct s_file_entry
 {
     char *name;
@@ -33,13 +35,13 @@ t_file_entry *file_entry_create(const char *file_name)
     return file_entry;
 }
 
-t_file_entry_array *file_entry_array_create(const char *file_name)
+t_file_entry_array *file_entry_array_create()
 {
-    if (!is_valid_file_name(file_name))
-        return NULL;
-
     t_file_entry_array *file_entry_array = ft_safe_calloc(1, sizeof(t_file_entry_array));
-    file_entry_array_set_name(file_entry_array, file_name);
+
+    file_entry_array->entries = ft_safe_calloc(DEFAULT_CAPACITY, sizeof(t_file_entry *));
+    file_entry_array->count = 0;
+    file_entry_array->max_capacity = DEFAULT_CAPACITY;
 
     return file_entry_array;
 }
@@ -98,7 +100,7 @@ void file_entry_array_push_TEMP(t_file_entry_array *array, t_file_entry *entry)
 {
     if (array->count >= array->max_capacity)
     {
-        array->max_capacity = (array->max_capacity == 0) ? 16 : array->max_capacity * 2;
+        array->max_capacity *= 2;
         array->entries = ft_realloc(array->entries,
                             (array->max_capacity / 2) * sizeof(t_file_entry *),
                             array->max_capacity * sizeof(t_file_entry *));

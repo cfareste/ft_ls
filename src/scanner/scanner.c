@@ -10,9 +10,13 @@ static int is_hidden_file(const char *file_entry_name)
 
 t_file_entry_array *scan(const char *path)
 {
+    // TODO: Refactor
+    if (path == NULL || path[0] == '\0')
+        return NULL;
+
     DIR *dir_stream = directory_open(path);
 
-    t_file_entry_array *file_entry_array = file_entry_array_create(path);
+    t_file_entry_array *file_entry_array = file_entry_array_create();
     const struct dirent *dir_entry = directory_get_next_entry(dir_stream);
     while (dir_entry != NULL)
     {
