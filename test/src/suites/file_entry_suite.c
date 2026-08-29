@@ -72,11 +72,6 @@ static void should_return_the_entry_name_correctly(void)
     file_entry_destroy(&file_entry);
 }
 
-static void should_not_fail_setting_the_name_if_a_null_file_entry_array_is_passed(void)
-{
-    file_entry_array_set_name(NULL, "name");
-}
-
 static void should_return_length_of_zero_when_passed_a_null_file_entry_array(void)
 {
     CU_ASSERT_EQUAL(file_entry_array_get_length(NULL), 0);
@@ -134,7 +129,6 @@ void register_file_entry_suite(void)
         CU_add_test(suite, "should_not_fail_to_destroy_a_file_entry_array_that_is_already_null", should_not_fail_to_destroy_a_file_entry_array_that_is_already_null);
         CU_add_test(suite, "should_return_length_of_zero_when_passed_a_null_file_entry_array", should_return_length_of_zero_when_passed_a_null_file_entry_array);
         CU_add_test(suite, "should_return_the_entry_name_correctly", should_return_the_entry_name_correctly);
-        CU_add_test(suite, "should_not_fail_setting_the_name_if_a_null_file_entry_array_is_passed", should_not_fail_setting_the_name_if_a_null_file_entry_array_is_passed);
         CU_add_test(suite, "should_return_the_correct_length_TEMP", should_return_the_correct_length_TEMP);
         CU_add_test(suite, "should_not_fail_returning_the_next_instance_if_a_null_file_entry_array_is_passed", should_not_fail_returning_the_next_instance_if_a_null_file_entry_array_is_passed);
         CU_add_test(suite, "should_not_fail_when_attempting_to_push_an_entry_to_a_null_pointer", should_not_fail_when_attempting_to_push_an_entry_to_a_null_pointer);

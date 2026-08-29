@@ -63,15 +63,6 @@ void file_entry_set_name(t_file_entry *entry, const char *name)
     entry->name = ft_safe_strdup(name);
 }
 
-void file_entry_array_set_name(t_file_entry_array *file_entry_array, const char *name)
-{
-    if (file_entry_array == NULL || !is_valid_file_name(name))
-        return;
-
-    free(file_entry_array->name);
-    file_entry_array->name = ft_safe_strdup(name);
-}
-
 const t_file_entry *file_entry_array_get_at(const t_file_entry_array *file_entry_array, const unsigned int index)
 {
     if (file_entry_array == NULL)
