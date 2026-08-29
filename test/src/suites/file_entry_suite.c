@@ -7,14 +7,9 @@
 
 static t_file_entry_array *sut;
 
-static void initialize_file_entry_array()
-{
-    sut = file_entry_array_create();
-}
-
 static void test_setup(void)
 {
-    initialize_file_entry_array();
+    sut = file_entry_array_create();
 }
 
 static void test_teardown(void)
