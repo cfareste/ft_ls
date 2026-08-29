@@ -53,7 +53,7 @@ void render(const t_file_entry_array *file_entry_array, t_render_context *contex
     if (context->directory_header != NULL)
         print_directory_header(context);
 
-    const unsigned int count = file_entry_array_get_length_TEMP(file_entry_array);
+    const unsigned int count = file_entry_array_get_length(file_entry_array);
     for (unsigned int i = 0; i < count; i++)
     {
         const t_file_entry *file_entry = file_entry_array_get_at(file_entry_array, i);

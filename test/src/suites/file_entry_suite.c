@@ -77,7 +77,7 @@ static void should_return_the_correct_length(void)
     file_entry_array_push(sut, file_entry_create(DEFAULT_NAME));
     file_entry_array_push(sut, file_entry_create(DEFAULT_NAME));
 
-    CU_ASSERT_EQUAL(file_entry_array_get_length_TEMP(sut), 2);
+    CU_ASSERT_EQUAL(file_entry_array_get_length(sut), 2);
 }
 
 static void should_push_an_entry_to_the_array_correctly(void)

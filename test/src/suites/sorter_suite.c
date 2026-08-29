@@ -25,7 +25,7 @@ static void should_do_nothing_when_a_file_entry_array_with_one_entry_is_passed(v
     sort(&file_entry_array);
 
     CU_ASSERT_STRING_EQUAL(file_entry_get_name(file_entry_array_get_at(file_entry_array, 0)), "file");
-    CU_ASSERT_EQUAL(file_entry_array_get_length_TEMP(file_entry_array), 1);
+    CU_ASSERT_EQUAL(file_entry_array_get_length(file_entry_array), 1);
 
     file_entry_array_destroy(&file_entry_array);
 }
@@ -48,7 +48,7 @@ static void should_do_nothing_when_an_already_sorted_file_entry_array_is_passed(
     CU_ASSERT_STRING_EQUAL(file_entry_get_name(second_entry), "file2");
     CU_ASSERT_STRING_EQUAL(file_entry_get_name(third_entry), "file3");
     CU_ASSERT_STRING_EQUAL(file_entry_get_name(fourth_entry), "file4");
-    CU_ASSERT_EQUAL(file_entry_array_get_length_TEMP(file_entry_array), 4);
+    CU_ASSERT_EQUAL(file_entry_array_get_length(file_entry_array), 4);
 
     file_entry_array_destroy(&file_entry_array);
 }

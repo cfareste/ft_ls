@@ -34,7 +34,7 @@ static void assert_file_entry_array_is_null()
 
 static void assert_file_entry_array_length_is(const unsigned int length)
 {
-    CU_ASSERT_EQUAL(file_entry_array_get_length_TEMP(sut), length);
+    CU_ASSERT_EQUAL(file_entry_array_get_length(sut), length);
 }
 
 static void assert_file_entry_name_is(const t_file_entry *file_entry, const char *name)
@@ -45,7 +45,7 @@ static void assert_file_entry_name_is(const t_file_entry *file_entry, const char
 static void assert_file_entry_array_names_are(const char **files_names)
 {
     unsigned int i = 0;
-    const unsigned int count = file_entry_array_get_length_TEMP(sut);
+    const unsigned int count = file_entry_array_get_length(sut);
 
     while (i < count)
     {

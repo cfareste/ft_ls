@@ -84,7 +84,7 @@ void file_entry_array_push(t_file_entry_array *array, t_file_entry *entry)
     array->count++;
 }
 
-unsigned int file_entry_array_get_length_TEMP(const t_file_entry_array *file_entry_array)
+unsigned int file_entry_array_get_length(const t_file_entry_array *file_entry_array)
 {
     return file_entry_array->count;
 }
