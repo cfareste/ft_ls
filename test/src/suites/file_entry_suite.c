@@ -77,10 +77,10 @@ static void should_return_length_of_zero_when_passed_a_null_file_entry_array(voi
     CU_ASSERT_EQUAL(file_entry_array_get_length(NULL), 0);
 }
 
-static void should_return_the_correct_length_TEMP(void)
+static void should_return_the_correct_length(void)
 {
-    file_entry_array_push_TEMP(sut, file_entry_create(DEFAULT_NAME));
-    file_entry_array_push_TEMP(sut, file_entry_create(DEFAULT_NAME));
+    file_entry_array_push(sut, file_entry_create(DEFAULT_NAME));
+    file_entry_array_push(sut, file_entry_create(DEFAULT_NAME));
 
     CU_ASSERT_EQUAL(file_entry_array_get_length_TEMP(sut), 2);
 }
@@ -92,9 +92,9 @@ static void should_push_an_entry_to_the_array_correctly(void)
     t_file_entry *third_entry = file_entry_create("valid entry 3");
     t_file_entry_array *array = file_entry_array_create();
 
-    file_entry_array_push_TEMP(array, first_entry);
-    file_entry_array_push_TEMP(array, second_entry);
-    file_entry_array_push_TEMP(array, third_entry);
+    file_entry_array_push(array, first_entry);
+    file_entry_array_push(array, second_entry);
+    file_entry_array_push(array, third_entry);
     const char *first_entry_name = file_entry_get_name(file_entry_array_get_at(array, 0));
     const char *second_entry_name = file_entry_get_name(file_entry_array_get_at(array, 1));
     const char *third_entry_name = file_entry_get_name(file_entry_array_get_at(array, 2));
@@ -119,7 +119,7 @@ void register_file_entry_suite(void)
         CU_add_test(suite, "should_not_fail_to_destroy_a_file_entry_array_that_is_already_null", should_not_fail_to_destroy_a_file_entry_array_that_is_already_null);
         CU_add_test(suite, "should_return_length_of_zero_when_passed_a_null_file_entry_array", should_return_length_of_zero_when_passed_a_null_file_entry_array);
         CU_add_test(suite, "should_return_the_entry_name_correctly", should_return_the_entry_name_correctly);
-        CU_add_test(suite, "should_return_the_correct_length_TEMP", should_return_the_correct_length_TEMP);
+        CU_add_test(suite, "should_return_the_correct_length", should_return_the_correct_length);
         CU_add_test(suite, "should_push_an_entry_to_the_array_correctly", should_push_an_entry_to_the_array_correctly);
     }
 }

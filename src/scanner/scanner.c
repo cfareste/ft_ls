@@ -23,7 +23,7 @@ t_file_entry_array *scan(const char *path)
         if (!is_hidden_file(dir_entry->d_name))
         {
             t_file_entry *entry = file_entry_create(dir_entry->d_name);
-            file_entry_array_push_TEMP(file_entry_array, entry);
+            file_entry_array_push(file_entry_array, entry);
         }
 
         dir_entry = directory_get_next_entry(dir_stream);

@@ -71,7 +71,7 @@ const t_file_entry *file_entry_array_get_at(const t_file_entry_array *file_entry
     return file_entry_array->entries[index];
 }
 
-void file_entry_array_push_TEMP(t_file_entry_array *array, t_file_entry *entry)
+void file_entry_array_push(t_file_entry_array *array, t_file_entry *entry)
 {
     if (array->count >= array->max_capacity)
     {
