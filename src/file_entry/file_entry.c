@@ -28,8 +28,7 @@ t_file_entry *file_entry_create(const char *file_name)
         return NULL;
 
     t_file_entry *file_entry = ft_safe_calloc(1, sizeof(t_file_entry));
-    free(file_entry->name);
-    file_entry->name = ft_safe_strdup(file_name);
+    file_entry_set_name(file_entry, file_name);
 
     return file_entry;
 }

@@ -1,5 +1,6 @@
 TODO:
 1. Implementar LS-14 Default sorting output
+2. Refactor de file entry
 
 
 TODO En algún momento:
