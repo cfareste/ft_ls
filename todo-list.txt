@@ -1,6 +1,5 @@
 TODO:
 1. Implementar LS-14 Default sorting output
-2. Refactor de file entry
 3. Al terminar el refactor, mirar qué tests de file entry faltan y meterlos
 4. Posibles refactors que me he dejado por ahí (file entry suite, scanenr...)
 5. Meter funciones necesarias (set_name_at(), get_name_at(), ...)

@@ -42,11 +42,32 @@ static void should_create_file_entry_array_correctly(void)
     CU_ASSERT_PTR_NOT_NULL(sut);
 }
 
+static void should_destroy_file_entry_correctly(void)
+{
+    t_file_entry *entry = file_entry_create("valid");
+
+    file_entry_destroy(&entry);
+
+    CU_ASSERT_PTR_NULL(entry);
+}
+
 static void should_destroy_file_entry_array_correctly(void)
 {
     file_entry_array_destroy(&sut);
 
     assert_file_entry_array_is_null(sut);
+}
+
+static void should_not_fail_to_destroy_a_file_entry_when_a_null_pointer_is_passed(void)
+{
+    file_entry_destroy(NULL);
+}
+
+static void should_not_fail_to_destroy_a_file_entry_that_is_already_null(void)
+{
+    t_file_entry *entry = NULL;
+
+    file_entry_destroy(&entry);
 }
 
 static void should_not_fail_to_destroy_a_file_entry_array_when_a_null_pointer_is_passed(void)
@@ -109,7 +130,10 @@ void register_file_entry_suite(void)
     {
         CU_add_test(suite, "should_create_file_entry_correctly", should_create_file_entry_correctly);
         CU_add_test(suite, "should_create_file_entry_array_correctly", should_create_file_entry_array_correctly);
+        CU_add_test(suite, "should_destroy_file_entry_correctly", should_destroy_file_entry_correctly);
         CU_add_test(suite, "should_destroy_file_entry_array_correctly", should_destroy_file_entry_array_correctly);
+        CU_add_test(suite, "should_not_fail_to_destroy_a_file_entry_when_a_null_pointer_is_passed", should_not_fail_to_destroy_a_file_entry_when_a_null_pointer_is_passed);
+        CU_add_test(suite, "should_not_fail_to_destroy_a_file_entry_that_is_already_null", should_not_fail_to_destroy_a_file_entry_that_is_already_null);
         CU_add_test(suite, "should_not_fail_to_destroy_a_file_entry_array_when_a_null_pointer_is_passed", should_not_fail_to_destroy_a_file_entry_array_when_a_null_pointer_is_passed);
         CU_add_test(suite, "should_not_fail_to_destroy_a_file_entry_array_that_is_already_null", should_not_fail_to_destroy_a_file_entry_array_that_is_already_null);
         CU_add_test(suite, "should_return_the_entry_name_correctly", should_return_the_entry_name_correctly);
