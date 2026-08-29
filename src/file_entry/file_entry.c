@@ -11,9 +11,6 @@ struct s_file_entry
 
 struct s_file_entry_array
 {
-    char *name;
-    t_file_entry_array *next;
-    //
     t_file_entry **entries;
     unsigned int count;
     unsigned int max_capacity;
