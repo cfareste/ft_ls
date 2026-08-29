@@ -89,19 +89,6 @@ unsigned int file_entry_array_get_length_TEMP(const t_file_entry_array *file_ent
     return file_entry_array->count;
 }
 
-unsigned int file_entry_array_get_length(const t_file_entry_array *file_entry_array)
-{
-    unsigned int count = 0;
-
-    while (file_entry_array != NULL)
-    {
-        count++;
-        file_entry_array = file_entry_array->next;
-    }
-
-    return count;
-}
-
 void file_entry_destroy(t_file_entry **file_entry)
 {
     if (file_entry == NULL || *file_entry == NULL)
