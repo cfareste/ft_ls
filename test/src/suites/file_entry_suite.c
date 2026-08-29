@@ -60,13 +60,6 @@ static void should_not_fail_to_destroy_a_file_entry_array_that_is_already_null(v
     file_entry_array_destroy(&sut);
 }
 
-static void should_return_NULL_if_a_null_file_entry_array_is_passed_the_correct_name(void)
-{
-    const char *entry_name = file_entry_array_get_name(NULL);
-
-    CU_ASSERT_PTR_NULL(entry_name);
-}
-
 static void should_return_the_entry_name_correctly(void)
 {
     t_file_entry *file_entry = file_entry_create("name");
@@ -77,16 +70,6 @@ static void should_return_the_entry_name_correctly(void)
     CU_ASSERT_STRING_EQUAL(entry_name, "valid name");
 
     file_entry_destroy(&file_entry);
-}
-
-static void should_return_the_correct_name(void)
-{
-    const char *file_name = "valid_name";
-    file_entry_array_set_name(sut, file_name);
-
-    const char *entry_name = file_entry_array_get_name(sut);
-
-    CU_ASSERT_STRING_EQUAL(entry_name, file_name);
 }
 
 static void should_not_fail_setting_the_name_if_a_null_file_entry_array_is_passed(void)
@@ -115,18 +98,6 @@ static void should_not_fail_returning_the_next_instance_if_a_null_file_entry_arr
 static void should_not_fail_when_attempting_to_push_an_entry_to_a_null_pointer(void)
 {
     file_entry_array_push(NULL, sut);
-}
-
-static void should_push_the_next_instance_as_the_first_element_if_a_null_file_entry_array_is_passed(void)
-{
-    t_file_entry_array *array = NULL;
-    const char *sut_name = "first_element";
-    file_entry_array_set_name(sut, sut_name);
-
-    file_entry_array_push(&array, sut);
-    const char *file_name = file_entry_array_get_name(array);
-
-    CU_ASSERT_STRING_EQUAL(file_name, sut_name);
 }
 
 static void should_push_an_entry_to_the_array_correctly(void)
@@ -161,15 +132,12 @@ void register_file_entry_suite(void)
         CU_add_test(suite, "should_destroy_file_entry_array_correctly", should_destroy_file_entry_array_correctly);
         CU_add_test(suite, "should_not_fail_to_destroy_a_file_entry_array_when_a_null_pointer_is_passed", should_not_fail_to_destroy_a_file_entry_array_when_a_null_pointer_is_passed);
         CU_add_test(suite, "should_not_fail_to_destroy_a_file_entry_array_that_is_already_null", should_not_fail_to_destroy_a_file_entry_array_that_is_already_null);
-        CU_add_test(suite, "should_return_NULL_if_a_null_file_entry_array_is_passed_the_correct_name", should_return_NULL_if_a_null_file_entry_array_is_passed_the_correct_name);
         CU_add_test(suite, "should_return_length_of_zero_when_passed_a_null_file_entry_array", should_return_length_of_zero_when_passed_a_null_file_entry_array);
         CU_add_test(suite, "should_return_the_entry_name_correctly", should_return_the_entry_name_correctly);
-        CU_add_test(suite, "should_return_the_correct_name", should_return_the_correct_name);
         CU_add_test(suite, "should_not_fail_setting_the_name_if_a_null_file_entry_array_is_passed", should_not_fail_setting_the_name_if_a_null_file_entry_array_is_passed);
         CU_add_test(suite, "should_return_the_correct_length_TEMP", should_return_the_correct_length_TEMP);
         CU_add_test(suite, "should_not_fail_returning_the_next_instance_if_a_null_file_entry_array_is_passed", should_not_fail_returning_the_next_instance_if_a_null_file_entry_array_is_passed);
         CU_add_test(suite, "should_not_fail_when_attempting_to_push_an_entry_to_a_null_pointer", should_not_fail_when_attempting_to_push_an_entry_to_a_null_pointer);
         CU_add_test(suite, "should_push_an_entry_to_the_array_correctly", should_push_an_entry_to_the_array_correctly);
-        CU_add_test(suite, "should_push_the_next_instance_as_the_first_element_if_a_null_file_entry_array_is_passed", should_push_the_next_instance_as_the_first_element_if_a_null_file_entry_array_is_passed);
     }
 }

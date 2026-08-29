@@ -6,7 +6,6 @@ typedef struct s_file_entry_array t_file_entry_array;
 t_file_entry *file_entry_create(const char *file_name);
 t_file_entry_array *file_entry_array_create();
 const char *file_entry_get_name(const t_file_entry *file_entry);
-const char *file_entry_array_get_name(const t_file_entry_array *file_entry_array);
 void file_entry_set_name(t_file_entry *entry, const char *name);
 void file_entry_array_set_name(t_file_entry_array *file_entry_array, const char *name);
 const t_file_entry *file_entry_array_get_at(const t_file_entry_array *file_entry_array, unsigned int index);

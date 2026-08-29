@@ -54,14 +54,6 @@ const char *file_entry_get_name(const t_file_entry *file_entry)
     return file_entry->name;
 }
 
-const char *file_entry_array_get_name(const t_file_entry_array *file_entry_array)
-{
-    if (file_entry_array == NULL)
-        return NULL;
-
-    return file_entry_array->name;
-}
-
 void file_entry_set_name(t_file_entry *entry, const char *name)
 {
     if (entry == NULL || !is_valid_file_name(name))
