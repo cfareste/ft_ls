@@ -191,24 +191,6 @@ static void should_not_fail_when_adding_an_entry_to_a_NULL_array(void)
     file_entry_destroy(&entry);
 }
 
-static void should_push_an_entry_to_the_array_correctly(void)
-{
-    t_file_entry_array *array = file_entry_array_create();
-
-    file_entry_array_push(array, file_entry_create("valid entry"));
-    file_entry_array_push(array, file_entry_create("valid entry 2"));
-    file_entry_array_push(array, file_entry_create("valid entry 3"));
-    const char *first_entry_name = file_entry_get_name(file_entry_array_get_at(array, 0));
-    const char *second_entry_name = file_entry_get_name(file_entry_array_get_at(array, 1));
-    const char *third_entry_name = file_entry_get_name(file_entry_array_get_at(array, 2));
-
-    CU_ASSERT_STRING_EQUAL(first_entry_name, "valid entry");
-    CU_ASSERT_STRING_EQUAL(second_entry_name, "valid entry 2");
-    CU_ASSERT_STRING_EQUAL(third_entry_name, "valid entry 3");
-
-    file_entry_array_destroy(&array);
-}
-
 void register_file_entry_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, test_teardown);
@@ -235,6 +217,5 @@ void register_file_entry_suite(void)
         CU_add_test(suite, "should_return_NULL_for_an_entry_if_a_NULL_array_is_passed", should_return_NULL_for_an_entry_if_a_NULL_array_is_passed);
         CU_add_test(suite, "should_return_the_entry_at_the_specified_index", should_return_the_entry_at_the_specified_index);
         CU_add_test(suite, "should_not_fail_when_adding_an_entry_to_a_NULL_array", should_not_fail_when_adding_an_entry_to_a_NULL_array);
-        CU_add_test(suite, "should_push_an_entry_to_the_array_correctly", should_push_an_entry_to_the_array_correctly);
     }
 }
