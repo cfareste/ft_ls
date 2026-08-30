@@ -62,6 +62,9 @@ static void should_destroy_file_entry_correctly(void)
 
 static void should_destroy_file_entry_array_correctly(void)
 {
+    file_entry_array_push(sut, file_entry_create("entry"));
+    file_entry_array_push(sut, file_entry_create("entry2"));
+
     file_entry_array_destroy(&sut);
 
     assert_file_entry_array_is_null(sut);
