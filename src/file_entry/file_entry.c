@@ -70,6 +70,9 @@ const t_file_entry *file_entry_array_get_at(const t_file_entry_array *file_entry
 
 void file_entry_array_push(t_file_entry_array *array, t_file_entry *entry)
 {
+    if (array == NULL)
+        return;
+
     if (array->count >= array->max_capacity)
     {
         array->max_capacity *= 2;
