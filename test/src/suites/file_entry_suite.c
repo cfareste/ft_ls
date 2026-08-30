@@ -140,7 +140,9 @@ static void should_return_the_entry_name_correctly(void)
 
 static void should_return_a_length_of_zero_when_passed_a_NULL_file_entry_array(void)
 {
-    CU_ASSERT_EQUAL(file_entry_array_get_length(NULL), 0);
+    const unsigned int length = file_entry_array_get_length(NULL);
+
+    CU_ASSERT_EQUAL(length, 0);
 }
 
 static void should_return_the_correct_length(void)
