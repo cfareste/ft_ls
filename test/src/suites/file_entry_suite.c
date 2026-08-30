@@ -163,7 +163,7 @@ static void should_return_NULL_for_an_entry_if_a_NULL_array_is_passed(void)
     CU_ASSERT_PTR_NULL(entry);
 }
 
-static void should_not_fail_when_adding_an_entry_to_a_NULL_array(void)
+static void should_not_fail_pushing_an_entry_to_a_NULL_array(void)
 {
     t_file_entry *entry = file_entry_create("valid");
 
@@ -218,7 +218,7 @@ void register_file_entry_suite(void)
         CU_add_test(suite, "should_return_a_length_of_zero_when_passed_a_NULL_file_entry_array", should_return_a_length_of_zero_when_passed_a_NULL_file_entry_array);
         CU_add_test(suite, "should_return_the_correct_length", should_return_the_correct_length);
         CU_add_test(suite, "should_return_NULL_for_an_entry_if_a_NULL_array_is_passed", should_return_NULL_for_an_entry_if_a_NULL_array_is_passed);
-        CU_add_test(suite, "should_not_fail_when_adding_an_entry_to_a_NULL_array", should_not_fail_when_adding_an_entry_to_a_NULL_array);
+        CU_add_test(suite, "should_not_fail_pushing_an_entry_to_a_NULL_array", should_not_fail_pushing_an_entry_to_a_NULL_array);
         CU_add_test(suite, "should_return_the_entry_at_the_specified_index", should_return_the_entry_at_the_specified_index);
     }
 }
