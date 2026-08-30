@@ -138,6 +138,11 @@ static void should_return_the_entry_name_correctly(void)
     file_entry_destroy(&file_entry);
 }
 
+static void should_return_a_length_of_zero_when_passed_a_NULL_file_entry_array(void)
+{
+    CU_ASSERT_EQUAL(file_entry_array_get_length(NULL), 0);
+}
+
 static void should_return_the_correct_length(void)
 {
     file_entry_array_push(sut, file_entry_create(DEFAULT_NAME));
@@ -188,6 +193,7 @@ void register_file_entry_suite(void)
         CU_add_test(suite, "should_not_set_the_entry_name_if_a_NULL_file_name_is_passed", should_not_set_the_entry_name_if_a_NULL_file_name_is_passed);
         CU_add_test(suite, "should_not_set_the_entry_name_if_an_empty_file_name_is_passed", should_not_set_the_entry_name_if_an_empty_file_name_is_passed);
         CU_add_test(suite, "should_return_the_entry_name_correctly", should_return_the_entry_name_correctly);
+        CU_add_test(suite, "should_return_a_length_of_zero_when_passed_a_NULL_file_entry_array", should_return_a_length_of_zero_when_passed_a_NULL_file_entry_array);
         CU_add_test(suite, "should_return_the_correct_length", should_return_the_correct_length);
         CU_add_test(suite, "should_push_an_entry_to_the_array_correctly", should_push_an_entry_to_the_array_correctly);
     }

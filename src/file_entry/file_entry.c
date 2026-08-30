@@ -83,6 +83,9 @@ void file_entry_array_push(t_file_entry_array *array, t_file_entry *entry)
 
 unsigned int file_entry_array_get_length(const t_file_entry_array *file_entry_array)
 {
+    if (file_entry_array == NULL)
+        return 0;
+
     return file_entry_array->count;
 }
 
