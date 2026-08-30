@@ -160,6 +160,28 @@ static void should_return_NULL_for_an_entry_if_a_NULL_array_is_passed(void)
     CU_ASSERT_PTR_NULL(entry);
 }
 
+static void should_return_the_entry_at_the_specified_index(void)
+{
+    file_entry_array_push(sut, file_entry_create("entry 0"));
+    file_entry_array_push(sut, file_entry_create("entry 1"));
+    file_entry_array_push(sut, file_entry_create("entry 2"));
+    file_entry_array_push(sut, file_entry_create("entry 3"));
+
+    const t_file_entry *first_entry = file_entry_array_get_at(sut, 0);
+    const t_file_entry *second_entry = file_entry_array_get_at(sut, 1);
+    const t_file_entry *third_entry = file_entry_array_get_at(sut, 2);
+    const t_file_entry *fourth_entry = file_entry_array_get_at(sut, 3);
+    const char *first_entry_name = file_entry_get_name(first_entry);
+    const char *second_entry_name = file_entry_get_name(second_entry);
+    const char *third_entry_name = file_entry_get_name(third_entry);
+    const char *fourth_entry_name = file_entry_get_name(fourth_entry);
+
+    CU_ASSERT_STRING_EQUAL(first_entry_name, "entry 0");
+    CU_ASSERT_STRING_EQUAL(second_entry_name, "entry 1");
+    CU_ASSERT_STRING_EQUAL(third_entry_name, "entry 2");
+    CU_ASSERT_STRING_EQUAL(fourth_entry_name, "entry 3");
+}
+
 static void should_not_fail_when_adding_an_entry_to_a_NULL_array(void)
 {
     t_file_entry *entry = file_entry_create("valid");
@@ -211,6 +233,7 @@ void register_file_entry_suite(void)
         CU_add_test(suite, "should_return_a_length_of_zero_when_passed_a_NULL_file_entry_array", should_return_a_length_of_zero_when_passed_a_NULL_file_entry_array);
         CU_add_test(suite, "should_return_the_correct_length", should_return_the_correct_length);
         CU_add_test(suite, "should_return_NULL_for_an_entry_if_a_NULL_array_is_passed", should_return_NULL_for_an_entry_if_a_NULL_array_is_passed);
+        CU_add_test(suite, "should_return_the_entry_at_the_specified_index", should_return_the_entry_at_the_specified_index);
         CU_add_test(suite, "should_not_fail_when_adding_an_entry_to_a_NULL_array", should_not_fail_when_adding_an_entry_to_a_NULL_array);
         CU_add_test(suite, "should_push_an_entry_to_the_array_correctly", should_push_an_entry_to_the_array_correctly);
     }
