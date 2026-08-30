@@ -76,7 +76,7 @@ void file_entry_array_push(t_file_entry_array *array, t_file_entry *entry)
     if (array->count >= array->max_capacity)
     {
         array->max_capacity *= 2;
-        array->entries = ft_realloc(array->entries,
+        array->entries = ft_safe_realloc(array->entries,
                             (array->max_capacity / 2) * sizeof(t_file_entry *),
                             array->max_capacity * sizeof(t_file_entry *));
     }
