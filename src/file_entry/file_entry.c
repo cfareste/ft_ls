@@ -21,6 +21,15 @@ static int is_valid_file_name(const char *name)
     return (name != NULL && !ft_is_str_empty(name));
 }
 
+static void increase_entries_capacity(t_file_entry_array *array)
+{
+    const unsigned int old_capacity = array->max_capacity;
+    const unsigned int new_capacity = array->max_capacity * 2;
+
+    array->max_capacity = new_capacity;
+    array->entries = ft_safe_realloc(array->entries, old_capacity * sizeof(t_file_entry *), new_capacity * sizeof(t_file_entry *));
+}
+
 t_file_entry *file_entry_create(const char *file_name)
 {
     if (!is_valid_file_name(file_name))
@@ -74,12 +83,7 @@ void file_entry_array_push(t_file_entry_array *array, t_file_entry *entry)
         return;
 
     if (array->count >= array->max_capacity)
-    {
-        array->max_capacity *= 2;
-        array->entries = ft_safe_realloc(array->entries,
-                            (array->max_capacity / 2) * sizeof(t_file_entry *),
-                            array->max_capacity * sizeof(t_file_entry *));
-    }
+        increase_entries_capacity(array);
     array->entries[array->count] = entry;
     array->count++;
 }
