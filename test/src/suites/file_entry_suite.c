@@ -102,6 +102,18 @@ static void should_not_fail_setting_the_entry_name_if_a_NULL_file_entry_is_passe
     file_entry_set_name(NULL, "name");
 }
 
+static void should_not_set_the_entry_name_if_a_NULL_file_name_is_passed(void)
+{
+    t_file_entry *entry = file_entry_create("valid");
+    file_entry_set_name(entry, NULL);
+
+    const char *entry_name = file_entry_get_name(entry);
+
+    CU_ASSERT_STRING_EQUAL(entry_name, "valid");
+
+    file_entry_destroy(&entry);
+}
+
 static void should_return_the_entry_name_correctly(void)
 {
     t_file_entry *file_entry = file_entry_create("name");
@@ -161,6 +173,7 @@ void register_file_entry_suite(void)
         CU_add_test(suite, "should_not_fail_to_destroy_a_file_entry_array_that_is_already_null", should_not_fail_to_destroy_a_file_entry_array_that_is_already_null);
         CU_add_test(suite, "should_return_NULL_for_the_entry_name_if_a_NULL_entry_is_passed", should_return_NULL_for_the_entry_name_if_a_NULL_entry_is_passed);
         CU_add_test(suite, "should_not_fail_setting_the_entry_name_if_a_NULL_file_entry_is_passed", should_not_fail_setting_the_entry_name_if_a_NULL_file_entry_is_passed);
+        CU_add_test(suite, "should_not_set_the_entry_name_if_a_NULL_file_name_is_passed", should_not_set_the_entry_name_if_a_NULL_file_name_is_passed);
         CU_add_test(suite, "should_return_the_entry_name_correctly", should_return_the_entry_name_correctly);
         CU_add_test(suite, "should_return_the_correct_length", should_return_the_correct_length);
         CU_add_test(suite, "should_push_an_entry_to_the_array_correctly", should_push_an_entry_to_the_array_correctly);
