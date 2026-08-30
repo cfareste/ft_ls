@@ -163,6 +163,17 @@ static void should_return_NULL_for_an_entry_if_a_NULL_array_is_passed(void)
     CU_ASSERT_PTR_NULL(entry);
 }
 
+static void should_return_NULL_for_an_entry_if_an_out_of_bounds_index_is_specified(void)
+{
+    file_entry_array_push(sut, file_entry_create("entry 0"));
+    file_entry_array_push(sut, file_entry_create("entry 1"));
+    file_entry_array_push(sut, file_entry_create("entry 2"));
+
+    CU_ASSERT_PTR_NULL(file_entry_array_get_at(sut, 3));
+    CU_ASSERT_PTR_NULL(file_entry_array_get_at(sut, 17));
+    CU_ASSERT_PTR_NULL(file_entry_array_get_at(sut, -1));
+}
+
 static void should_not_fail_pushing_an_entry_to_a_NULL_array(void)
 {
     t_file_entry *entry = file_entry_create("valid");
@@ -218,6 +229,7 @@ void register_file_entry_suite(void)
         CU_add_test(suite, "should_return_a_length_of_zero_when_passed_a_NULL_file_entry_array", should_return_a_length_of_zero_when_passed_a_NULL_file_entry_array);
         CU_add_test(suite, "should_return_the_correct_length", should_return_the_correct_length);
         CU_add_test(suite, "should_return_NULL_for_an_entry_if_a_NULL_array_is_passed", should_return_NULL_for_an_entry_if_a_NULL_array_is_passed);
+        CU_add_test(suite, "should_return_NULL_for_an_entry_if_an_out_of_bounds_index_is_specified", should_return_NULL_for_an_entry_if_an_out_of_bounds_index_is_specified);
         CU_add_test(suite, "should_not_fail_pushing_an_entry_to_a_NULL_array", should_not_fail_pushing_an_entry_to_a_NULL_array);
         CU_add_test(suite, "should_return_the_entry_at_the_specified_index", should_return_the_entry_at_the_specified_index);
     }
