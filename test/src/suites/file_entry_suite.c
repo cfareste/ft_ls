@@ -210,6 +210,21 @@ static void should_not_fail_pushing_a_NULL_entry_to_an_array(void)
     file_entry_array_push(sut, NULL);
 }
 
+static void should_push_correctly_an_specified_entry(void)
+{
+    for (unsigned int i = 0; i < 10; i++)
+    {
+        file_entry_array_push(sut, file_entry_create("entry"));
+    }
+
+    unsigned int i = 0;
+    for (; i < 10; i++)
+    {
+        CU_ASSERT_PTR_NOT_NULL(file_entry_array_get_at(sut, i));
+    }
+    CU_ASSERT_PTR_NULL(file_entry_array_get_at(sut, i));
+}
+
 void register_file_entry_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, test_teardown);
@@ -238,5 +253,6 @@ void register_file_entry_suite(void)
         CU_add_test(suite, "should_return_the_entry_at_the_specified_index", should_return_the_entry_at_the_specified_index);
         CU_add_test(suite, "should_not_fail_pushing_an_entry_to_a_NULL_array", should_not_fail_pushing_an_entry_to_a_NULL_array);
         CU_add_test(suite, "should_not_fail_pushing_a_NULL_entry_to_an_array", should_not_fail_pushing_a_NULL_entry_to_an_array);
+        CU_add_test(suite, "should_push_correctly_an_specified_entry", should_push_correctly_an_specified_entry);
     }
 }
