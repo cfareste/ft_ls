@@ -37,6 +37,13 @@ static void should_create_file_entry_array_correctly(void)
     CU_ASSERT_PTR_NOT_NULL(sut);
 }
 
+static void should_fail_to_create_an_entry_if_a_NULL_file_name_is_passed(void)
+{
+    const t_file_entry *invalid = file_entry_create(NULL);
+
+    CU_ASSERT_PTR_NULL(invalid);
+}
+
 static void should_destroy_file_entry_correctly(void)
 {
     t_file_entry *entry = file_entry_create("valid");
@@ -125,6 +132,7 @@ void register_file_entry_suite(void)
     {
         CU_add_test(suite, "should_create_file_entry_correctly", should_create_file_entry_correctly);
         CU_add_test(suite, "should_create_file_entry_array_correctly", should_create_file_entry_array_correctly);
+        CU_add_test(suite, "should_fail_to_create_an_entry_if_a_NULL_file_name_is_passed", should_fail_to_create_an_entry_if_a_NULL_file_name_is_passed);
         CU_add_test(suite, "should_destroy_file_entry_correctly", should_destroy_file_entry_correctly);
         CU_add_test(suite, "should_destroy_file_entry_array_correctly", should_destroy_file_entry_array_correctly);
         CU_add_test(suite, "should_not_fail_to_destroy_a_file_entry_when_a_null_pointer_is_passed", should_not_fail_to_destroy_a_file_entry_when_a_null_pointer_is_passed);
