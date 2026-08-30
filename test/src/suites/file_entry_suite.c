@@ -171,14 +171,11 @@ static void should_not_fail_when_adding_an_entry_to_a_NULL_array(void)
 
 static void should_push_an_entry_to_the_array_correctly(void)
 {
-    t_file_entry *first_entry = file_entry_create("valid entry");
-    t_file_entry *second_entry = file_entry_create("valid entry 2");
-    t_file_entry *third_entry = file_entry_create("valid entry 3");
     t_file_entry_array *array = file_entry_array_create();
 
-    file_entry_array_push(array, first_entry);
-    file_entry_array_push(array, second_entry);
-    file_entry_array_push(array, third_entry);
+    file_entry_array_push(array, file_entry_create("valid entry"));
+    file_entry_array_push(array, file_entry_create("valid entry 2"));
+    file_entry_array_push(array, file_entry_create("valid entry 3"));
     const char *first_entry_name = file_entry_get_name(file_entry_array_get_at(array, 0));
     const char *second_entry_name = file_entry_get_name(file_entry_array_get_at(array, 1));
     const char *third_entry_name = file_entry_get_name(file_entry_array_get_at(array, 2));
