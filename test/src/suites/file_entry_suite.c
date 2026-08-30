@@ -132,11 +132,11 @@ static void should_not_set_the_entry_name_if_an_empty_file_name_is_passed(void)
 static void should_return_the_entry_name_correctly(void)
 {
     t_file_entry *file_entry = file_entry_create("name");
-    file_entry_set_name(file_entry, "valid name");
+    file_entry_set_name(file_entry, "changed name");
 
     const char *entry_name = file_entry_get_name(file_entry);
 
-    CU_ASSERT_STRING_EQUAL(entry_name, "valid name");
+    CU_ASSERT_STRING_EQUAL(entry_name, "changed name");
 
     file_entry_destroy(&file_entry);
 }
