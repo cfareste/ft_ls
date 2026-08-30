@@ -153,6 +153,13 @@ static void should_return_the_correct_length(void)
     CU_ASSERT_EQUAL(file_entry_array_get_length(sut), 2);
 }
 
+static void should_return_NULL_for_an_entry_if_a_NULL_array_is_passed(void)
+{
+    const t_file_entry *entry = file_entry_array_get_at(NULL, 0);
+
+    CU_ASSERT_PTR_NULL(entry);
+}
+
 static void should_push_an_entry_to_the_array_correctly(void)
 {
     t_file_entry *first_entry = file_entry_create("valid entry");
@@ -197,6 +204,7 @@ void register_file_entry_suite(void)
         CU_add_test(suite, "should_return_the_entry_name_correctly", should_return_the_entry_name_correctly);
         CU_add_test(suite, "should_return_a_length_of_zero_when_passed_a_NULL_file_entry_array", should_return_a_length_of_zero_when_passed_a_NULL_file_entry_array);
         CU_add_test(suite, "should_return_the_correct_length", should_return_the_correct_length);
+        CU_add_test(suite, "should_return_NULL_for_an_entry_if_a_NULL_array_is_passed", should_return_NULL_for_an_entry_if_a_NULL_array_is_passed);
         CU_add_test(suite, "should_push_an_entry_to_the_array_correctly", should_push_an_entry_to_the_array_correctly);
     }
 }
