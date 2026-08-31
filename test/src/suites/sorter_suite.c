@@ -34,17 +34,18 @@ static void should_do_nothing_when_a_file_entry_array_with_one_entry_is_passed(v
 
 static void should_do_nothing_when_an_already_sorted_file_entry_array_is_passed(void)
 {
-    void *array[] = { "file", "_file", "f", "a", "2file", "FILE", NULL };
+    void *array[] = { ".hidden", "2file", "FILE", "_file", "a", "f", "file", NULL };
 
     sort_pointer_array(array, compare_by_ascii);
 
-    CU_ASSERT_STRING_EQUAL(array[0], "file");
-    CU_ASSERT_STRING_EQUAL(array[1], "_file");
-    CU_ASSERT_STRING_EQUAL(array[2], "f");
-    CU_ASSERT_STRING_EQUAL(array[3], "a");
-    CU_ASSERT_STRING_EQUAL(array[4], "2file");
-    CU_ASSERT_STRING_EQUAL(array[5], "FILE");
-    CU_ASSERT_PTR_NULL(array[6]);
+    CU_ASSERT_STRING_EQUAL(array[0], ".hidden");
+    CU_ASSERT_STRING_EQUAL(array[1], "2file");
+    CU_ASSERT_STRING_EQUAL(array[2], "FILE");
+    CU_ASSERT_STRING_EQUAL(array[3], "_file");
+    CU_ASSERT_STRING_EQUAL(array[4], "a");
+    CU_ASSERT_STRING_EQUAL(array[5], "f");
+    CU_ASSERT_STRING_EQUAL(array[6], "file");
+    CU_ASSERT_PTR_NULL(array[7]);
 }
 
 void register_sorter_suite(void)
