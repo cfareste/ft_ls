@@ -1,9 +1,7 @@
 TODO:
 1. Implementar LS-14 Default sorting output
-2. Posibles refactors que me he dejado por ahí (file entry suite, scanner...)
-3. ft_is_valid_path
-4. Meter funciones necesarias (set_name_at(), get_name_at(), ...)
-5. Terminar sorter (meter las funciones de sort dentro de cada módulo, y que estos llamen a sort)
+2. Terminar sorter (meter las funciones de sort dentro de cada módulo, y que estos llamen a sort)
+3. Si da tiempo, posibles refactors...
 
 
 TODO En algún momento:
@@ -14,6 +12,7 @@ TODO En algún momento:
 - Usar un struct propio para los opendirs, stat, etc. (como t_dir_stream de antes)
 - Reflexionar si meter el should print header en render pasando parsed arguments. Si al hacer las options se necesita
   pasar parsed arguments al render, entonces calcularlo ahi
+- Posibles refactors que me he dejado por ahí (test suites, etc.)
 
 
 TODO Para mejorar siguientes proyectos:
