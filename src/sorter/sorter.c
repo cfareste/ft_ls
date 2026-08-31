@@ -3,7 +3,7 @@
 
 void sort_pointer_array(void **array, const t_comparator_fn compare_fn)
 {
-    if (array == NULL || *array == NULL)
+    if (array == NULL || *array == NULL || compare_fn == NULL)
         return;
 
     for (unsigned int i = 0; array[i] != NULL; i++)

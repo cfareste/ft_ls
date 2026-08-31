@@ -22,6 +22,13 @@ static void should_not_fail_when_passing_a_NULL_file_entry_array(void)
     sort_pointer_array(&invalid_array, compare_by_ascii);
 }
 
+static void should_not_fail_when_passing_a_NULL_comparator_function(void)
+{
+    void *array[] = { "valid", NULL };
+
+    sort_pointer_array(array, NULL);
+}
+
 static void should_do_nothing_when_a_file_entry_array_with_one_entry_is_passed(void)
 {
     void *array[] = { "file", NULL };
@@ -72,6 +79,7 @@ void register_sorter_suite(void)
     {
         CU_add_test(suite, "should_not_fail_when_passing_a_NULL_pointer", should_not_fail_when_passing_a_NULL_pointer);
         CU_add_test(suite, "should_not_fail_when_passing_a_NULL_file_entry_array", should_not_fail_when_passing_a_NULL_file_entry_array);
+        CU_add_test(suite, "should_not_fail_when_passing_a_NULL_comparator_function", should_not_fail_when_passing_a_NULL_comparator_function);
         CU_add_test(suite, "should_do_nothing_when_a_file_entry_array_with_one_entry_is_passed", should_do_nothing_when_a_file_entry_array_with_one_entry_is_passed);
         CU_add_test(suite, "should_do_nothing_when_an_already_sorted_file_entry_array_is_passed", should_do_nothing_when_an_already_sorted_file_entry_array_is_passed);
         CU_add_test(suite, "should_sort_an_unsorted_array", should_sort_an_unsorted_array);
