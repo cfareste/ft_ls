@@ -27,7 +27,7 @@ static void scan_directory(const char *path)
     sut = scan(path);
 }
 
-static void assert_file_entry_array_is_null()
+static void assert_file_entry_array_is_null(void)
 {
     CU_ASSERT_PTR_NULL(sut);
 }

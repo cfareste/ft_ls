@@ -6,7 +6,7 @@
 #define DEFAULT_NUM_OF_OPERANDS 1
 #define DEFAULT_FILE_OPERAND "."
 
-static char **get_default_file_operands()
+static char **get_default_file_operands(void)
 {
     char **file_operands = ft_safe_calloc(DEFAULT_NUM_OF_OPERANDS + 1, sizeof(char *));
 

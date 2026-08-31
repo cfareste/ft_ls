@@ -50,7 +50,7 @@ int verify_that_the_str_that_has_been_printed_is(const char *str, ...)
     return strings_are_equal;
 }
 
-void reset_printing_buffer()
+void reset_printing_buffer(void)
 {
     printing_buffer[0] = '\0';
 }

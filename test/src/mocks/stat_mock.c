@@ -59,7 +59,7 @@ void guarantee_stat_will_populate_stats_of_a_directory_type_file(const char *dir
     guarantee_stat_will_populate_stats_of_N_file_types_for_paths(path, type);
 }
 
-void reset_stat_guarantees()
+void reset_stat_guarantees(void)
 {
     free_stat_guarantees();
 }

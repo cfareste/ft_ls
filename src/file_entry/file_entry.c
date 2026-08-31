@@ -36,7 +36,7 @@ t_file_entry *file_entry_create(const char *file_name)
     return file_entry;
 }
 
-t_file_entry_array *file_entry_array_create()
+t_file_entry_array *file_entry_array_create(void)
 {
     t_file_entry_array *file_entry_array = ft_safe_calloc(1, sizeof(t_file_entry_array));
 

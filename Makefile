@@ -23,7 +23,7 @@ TEST_DIR = test/
 
 #----COMPILER----#
 CC = cc
-CCFLAGS += -g -Wall -Werror -Wextra -fsanitize=address
+CCFLAGS += -g -Wall -Werror -Wextra -Wpedantic -fsanitize=address
 INCLUDES = -I$(INC)
 
 

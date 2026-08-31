@@ -5,7 +5,7 @@
 
 #define SUITE_NAME "renderer"
 
-static void test_setup()
+static void test_setup(void)
 {
     reset_printing_buffer();
 }
