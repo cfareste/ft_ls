@@ -1,5 +1,3 @@
 #pragma once
 
-#include "file_entry.h"
-
-void sort(t_file_entry_array **file_entry_array);
+void sort_pointer_array(void **array);

@@ -6,14 +6,14 @@
 
 static void should_not_fail_when_passing_a_NULL_pointer(void)
 {
-    sort(NULL);
+    sort_pointer_array(NULL);
 }
 
 static void should_not_fail_when_passing_a_NULL_file_entry_array(void)
 {
-    t_file_entry_array *invalid_array = NULL;
+    void *invalid_array = NULL;
 
-    sort(&invalid_array);
+    sort_pointer_array(&invalid_array);
 }
 
 static void should_do_nothing_when_a_file_entry_array_with_one_entry_is_passed(void)
@@ -22,7 +22,7 @@ static void should_do_nothing_when_a_file_entry_array_with_one_entry_is_passed(v
     t_file_entry *file_entry = file_entry_create("file");
     file_entry_array_push(file_entry_array, file_entry);
 
-    sort(&file_entry_array);
+    sort_pointer_array((void **) &file_entry_array);
 
     CU_ASSERT_STRING_EQUAL(file_entry_get_name(file_entry_array_get_at(file_entry_array, 0)), "file");
     CU_ASSERT_EQUAL(file_entry_array_get_length(file_entry_array), 1);
@@ -38,7 +38,7 @@ static void should_do_nothing_when_an_already_sorted_file_entry_array_is_passed(
     file_entry_array_push(file_entry_array, file_entry_create("file3"));
     file_entry_array_push(file_entry_array, file_entry_create("file4"));
 
-    sort(&file_entry_array);
+    sort_pointer_array((void **) &file_entry_array);
     const t_file_entry *first_entry = file_entry_array_get_at(file_entry_array, 0);
     const t_file_entry *second_entry = file_entry_array_get_at(file_entry_array, 1);
     const t_file_entry *third_entry = file_entry_array_get_at(file_entry_array, 2);

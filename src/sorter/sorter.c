@@ -1,6 +1,6 @@
 #include "sorter.h"
 
-void sort(t_file_entry_array **file_entry_array)
+void sort_pointer_array(void **array)
 {
-    (void) *file_entry_array;
+    (void) *array;
 }
