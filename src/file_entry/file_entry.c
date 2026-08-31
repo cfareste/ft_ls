@@ -16,11 +16,6 @@ struct s_file_entry_array
     unsigned int max_capacity;
 };
 
-static int is_valid_file_name(const char *name)
-{
-    return (name != NULL && !ft_is_str_empty(name));
-}
-
 static void increase_entries_capacity(t_file_entry_array *array)
 {
     const unsigned int old_capacity = array->max_capacity;
@@ -32,7 +27,7 @@ static void increase_entries_capacity(t_file_entry_array *array)
 
 t_file_entry *file_entry_create(const char *file_name)
 {
-    if (!is_valid_file_name(file_name))
+    if (!ft_is_valid_path(file_name))
         return NULL;
 
     t_file_entry *file_entry = ft_safe_calloc(1, sizeof(t_file_entry));
@@ -62,7 +57,7 @@ const char *file_entry_get_name(const t_file_entry *file_entry)
 
 void file_entry_set_name(t_file_entry *entry, const char *name)
 {
-    if (entry == NULL || !is_valid_file_name(name))
+    if (entry == NULL || !ft_is_valid_path(name))
         return;
 
     free(entry->name);

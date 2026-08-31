@@ -4,11 +4,6 @@
 #include "directory.h"
 #include "libft.h"
 
-static int is_valid_path(const char *path)
-{
-    return path != NULL && !ft_is_str_empty(path);
-}
-
 static int is_hidden_file(const char *file_entry_name)
 {
     return file_entry_name[0] == '.';
@@ -16,7 +11,7 @@ static int is_hidden_file(const char *file_entry_name)
 
 t_file_entry_array *scan(const char *path)
 {
-    if (!is_valid_path(path))
+    if (!ft_is_valid_path(path))
         return NULL;
 
     DIR *dir_stream = directory_open(path);
