@@ -1,27 +1,27 @@
-# Format: <ft_ls arguments> :: <ls model command>
-# Example: file :: ls file -> this will compare 'ft_ls file' to 'ls file'
+# Format: <ft_ls arguments> :: <model ls/gls args>
+# Example: file :: -U file -> this will compare 'ft_ls file' to 'ls/gls -U file'
 #
 # Remember: Columns without tty: -C | Colors without tty: --colors
 #
 
-                                                           ::       ls -U
-.                                                          ::       ls -U .
-Makefile                                                   ::       ls -U Makefile
-src                                                        ::       ls -U src
-../../../ft_ls/./test/testdir                              ::       ls -U ../../../ft_ls/./test/testdir
-../../../ft_ls/./test/testdir/file                         ::       ls -U ../../../ft_ls/./test/testdir/file
-/tmp/tempfile                                              ::       ls -U /tmp/tempfile
-/tmp/tempdir/                                              ::       ls -U /tmp/tempdir/
-Makefile file Makefile file2                               ::       ls -U Makefile file Makefile file2
-inc/ src firstDir src                                      ::       ls -U inc/ src firstDir src
-file2 firstDir secondDir file                              ::       ls -U file2 firstDir secondDir file
-.hidden2 .hidden                                           ::       ls -U .hidden2 .hidden
-.hiddir2 .hiddir                                           ::       ls -U .hiddir2 .hiddir
-.hidden2 .hiddir .hiddir2 .hidden                          ::       ls -U .hidden2 .hiddir .hiddir2 .hidden
-empty                                                      ::       ls -U empty
-dir_only_hidden                                            ::       ls -U dir_only_hidden
-empty empty/                                               ::       ls -U empty empty/
-dir_only_hidden dir_only_hidden/                           ::       ls -U dir_only_hidden dir_only_hidden/
-empty .hidden                                              ::       ls -U empty .hidden
-.hidden dir_only_hidden/                                   ::       ls -U .hidden dir_only_hidden/
-.hidden firstDir file dir_only_hidden/ .hiddir empty       ::       ls -U .hidden firstDir file dir_only_hidden/ .hiddir empty
+                                                           ::       -U
+.                                                          ::       -U .
+Makefile                                                   ::       -U Makefile
+src                                                        ::       -U src
+../../../ft_ls/./test/testdir                              ::       -U ../../../ft_ls/./test/testdir
+../../../ft_ls/./test/testdir/file                         ::       -U ../../../ft_ls/./test/testdir/file
+/tmp/tempfile                                              ::       -U /tmp/tempfile
+/tmp/tempdir/                                              ::       -U /tmp/tempdir/
+Makefile file Makefile file2                               ::       -U Makefile file Makefile file2
+inc/ src firstDir src                                      ::       -U inc/ src firstDir src
+file2 firstDir secondDir file                              ::       -U file2 firstDir secondDir file
+.hidden2 .hidden                                           ::       -U .hidden2 .hidden
+.hiddir2 .hiddir                                           ::       -U .hiddir2 .hiddir
+.hidden2 .hiddir .hiddir2 .hidden                          ::       -U .hidden2 .hiddir .hiddir2 .hidden
+empty                                                      ::       -U empty
+dir_only_hidden                                            ::       -U dir_only_hidden
+empty empty/                                               ::       -U empty empty/
+dir_only_hidden dir_only_hidden/                           ::       -U dir_only_hidden dir_only_hidden/
+empty .hidden                                              ::       -U empty .hidden
+.hidden dir_only_hidden/                                   ::       -U .hidden dir_only_hidden/
+.hidden firstDir file dir_only_hidden/ .hiddir empty       ::       -U .hidden firstDir file dir_only_hidden/ .hiddir empty

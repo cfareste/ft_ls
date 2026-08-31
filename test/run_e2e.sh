@@ -15,6 +15,7 @@ TESTS_DIR="${SCRIPT_DIR}/e2e"
 TESTS_FILE="${TESTS_DIR}/tests.txt"
 DELIMITER="::"
 FT_CMD="../ft_ls"
+MODEL_LS_BIN="$(uname -s | grep -q 'Darwin' && printf '%s' 'gls' || printf '%s' 'ls')"
 
 trim() {
     local value="$1"
@@ -92,6 +93,15 @@ parse_test_entry() {
         return 1
     fi
 
+    if [[ "${model_cmd}" =~ ^(ls|gls)([[:space:]]+|$) ]]; then
+        model_cmd="$(trim "${model_cmd#${BASH_REMATCH[1]}}")"
+    fi
+
+    if [[ -z "${model_cmd}" ]]; then
+        printf '%b[ERROR] Missing model arguments in test entry: %s%b\n' "${RED}" "$line" "${RESET}" >&2
+        return 1
+    fi
+
     printf '%s\n%s\n' "${ft_cmd}" "${model_cmd}"
 }
 
@@ -107,7 +117,8 @@ print_output_block() {
 
 run_single_test() {
     local ft_args="$1"
-    local model_cmd="$2"
+    local model_args="$2"
+    local model_cmd="${MODEL_LS_BIN} ${model_args}"
     local ft_cmd="${FT_CMD}"
     local ft_output="$(mktemp)"
     local model_output="$(mktemp)"
