@@ -88,18 +88,8 @@ parse_test_entry() {
     ft_cmd="$(trim "${line%%"${DELIMITER}"*}")"
     model_cmd="$(trim "${line#*"${DELIMITER}"}")"
 
-    if [[ -z "${model_cmd}" ]]; then
-        printf '%b[ERROR] Missing model command in test entry: %s%b\n' "${RED}" "$line" "${RESET}" >&2
-        return 1
-    fi
-
     if [[ "${model_cmd}" =~ ^(ls|gls)([[:space:]]+|$) ]]; then
         model_cmd="$(trim "${model_cmd#${BASH_REMATCH[1]}}")"
-    fi
-
-    if [[ -z "${model_cmd}" ]]; then
-        printf '%b[ERROR] Missing model arguments in test entry: %s%b\n' "${RED}" "$line" "${RESET}" >&2
-        return 1
     fi
 
     printf '%s\n%s\n' "${ft_cmd}" "${model_cmd}"

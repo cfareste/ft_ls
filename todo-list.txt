@@ -2,8 +2,6 @@ TODO:
 1. Implementar LS-14 Default sorting output
 2. Meter:
    - Tests en el application suite
-   - Refactor para sort non y directory separados parsed args
-   - Arreglar E2E tests para que pueda ejecutar ls a solas (sin opciones ni operandos)
    - Tests E2E
 
 

@@ -4,7 +4,7 @@
 # Remember: Columns without tty: -C | Colors without tty: --colors
 #
 
-                                                           ::       .
+                                                           ::
 .                                                          ::       .
 Makefile                                                   ::       Makefile
 src                                                        ::       src
