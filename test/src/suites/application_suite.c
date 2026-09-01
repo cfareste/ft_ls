@@ -551,6 +551,54 @@ static void should_successfully_print_the_specified_directory_file_operands_and_
     assert_application_execution_succeed(result);
 }
 
+static void should_successfully_print_the_specified_mixed_types_file_operands_and_their_contents_sorted(void)
+{
+    const char *arguments[] = { "a", "2file", "_DIR", ".hiddir", "_file", "f", "dir", ".hidden_file", "FILE", NULL };
+    const char *dir_names[] = { arguments[2], arguments[3], arguments[6], NULL };
+    const unsigned int types[] = { S_IFREG, S_IFREG, S_IFDIR, S_IFDIR, S_IFREG, S_IFREG, S_IFDIR, S_IFREG, S_IFREG, 0 };
+    const char *first_dir_file_names[] = { "~file", ".", "file1", "..", "-file", NULL };
+    const char *second_dir_file_names[] = { "file2", "..", "FILE", ".", "symlink", NULL };
+    const char *third_dir_file_names[] = { "..", "2FILE", ".", "file3", NULL };
+    const char *expected_first_dir_file_names[] = { first_dir_file_names[4], first_dir_file_names[2], first_dir_file_names[0], NULL };
+    const char *expected_second_dir_file_names[] = { second_dir_file_names[2], second_dir_file_names[0], second_dir_file_names[4], NULL };
+    const char *expected_third_dir_file_names[] = { third_dir_file_names[1], third_dir_file_names[3], NULL };
+    const char **entry_names[] = { first_dir_file_names, second_dir_file_names, third_dir_file_names, NULL };
+    guarantee_stat_will_populate_stats_of_N_file_types_for_paths(arguments, types);
+    ensure_opendir_will_open_N_dirs_named(dir_names);
+    guarantee_readdir_will_return_N_files_named(entry_names);
+    parsed_arguments = parse_arguments(9, arguments);
+
+    const int result = application_run(parsed_arguments);
+
+    CU_ASSERT(verify_that_the_str_that_has_been_printed_is(
+        "%s\n%s\n%s\n%s\n%s\n%s\n"
+        "\n%s:\n"
+        "%s\n%s\n%s\n"
+        "\n%s:\n"
+        "%s\n%s\n%s\n"
+        "\n%s:\n"
+        "%s\n%s\n",
+        arguments[7],
+        arguments[1],
+        arguments[8],
+        arguments[4],
+        arguments[0],
+        arguments[5],
+        dir_names[1],
+        expected_second_dir_file_names[0],
+        expected_second_dir_file_names[1],
+        expected_second_dir_file_names[2],
+        dir_names[0],
+        expected_first_dir_file_names[0],
+        expected_first_dir_file_names[1],
+        expected_first_dir_file_names[2],
+        dir_names[2],
+        expected_third_dir_file_names[0],
+        expected_third_dir_file_names[1]
+    ));
+    assert_application_execution_succeed(result);
+}
+
 void register_application_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, test_teardown);
@@ -576,5 +624,6 @@ void register_application_suite(void)
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_specified_directory_sorted", should_successfully_print_the_contents_of_the_specified_directory_sorted);
         CU_add_test(suite, "should_successfully_print_the_specified_non_directory_file_operands_sorted", should_successfully_print_the_specified_non_directory_file_operands_sorted);
         CU_add_test(suite, "should_successfully_print_the_specified_directory_file_operands_and_their_contents_sorted", should_successfully_print_the_specified_directory_file_operands_and_their_contents_sorted);
+        CU_add_test(suite, "should_successfully_print_the_specified_mixed_types_file_operands_and_their_contents_sorted", should_successfully_print_the_specified_mixed_types_file_operands_and_their_contents_sorted);
     }
 }
