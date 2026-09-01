@@ -225,6 +225,11 @@ static void should_push_correctly_an_specified_entry(void)
     CU_ASSERT_PTR_NULL(file_entry_array_get_at(sut, i));
 }
 
+static void should_not_fail_when_sorting_a_NULL_file_entry_array(void)
+{
+    file_entry_array_sort(NULL);
+}
+
 static void should_sort_the_file_operands_by_entry_name(void)
 {
     const char *entry_names[] = { "2file", ".hiddir", "_file", "dir", "FILE", NULL };
@@ -278,6 +283,7 @@ void register_file_entry_suite(void)
         CU_add_test(suite, "should_not_fail_pushing_an_entry_to_a_NULL_array", should_not_fail_pushing_an_entry_to_a_NULL_array);
         CU_add_test(suite, "should_not_fail_pushing_a_NULL_entry_to_an_array", should_not_fail_pushing_a_NULL_entry_to_an_array);
         CU_add_test(suite, "should_push_correctly_an_specified_entry", should_push_correctly_an_specified_entry);
+        CU_add_test(suite, "should_not_fail_when_sorting_a_NULL_file_entry_array", should_not_fail_when_sorting_a_NULL_file_entry_array);
         CU_add_test(suite, "should_sort_the_file_operands_by_ascii", should_sort_the_file_operands_by_entry_name);
     }
 }

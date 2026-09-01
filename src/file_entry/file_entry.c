@@ -102,6 +102,9 @@ unsigned int file_entry_array_get_length(const t_file_entry_array *file_entry_ar
 
 void file_entry_array_sort(const t_file_entry_array *file_entry_array)
 {
+    if (file_entry_array == NULL)
+        return ;
+
     sort_pointer_array((void **) file_entry_array->entries, compare_by_entry_name);
 }
 
