@@ -146,10 +146,9 @@ static void should_return_false_for_multiple_file_operands_if_NULL_parsed_argume
 
 static void should_return_false_for_multiple_file_operands_if_has_less_than_two(void)
 {
-    const char *args[] = { "file", NULL };
-    const unsigned int args_types[] = { S_IFREG, 0 };
-    guarantee_stat_will_populate_stats_of_N_file_types_for_paths(args, args_types);
-    t_parsed_arguments *parsed_arguments = parse_arguments(1, args);
+    const char *args[] = { NULL };
+    guarantee_stat_will_populate_stats_of_a_directory_type_file(".");
+    t_parsed_arguments *parsed_arguments = parse_arguments(0, args);
 
     const int has_multiple_file_operands = parsed_arguments_has_multiple_file_operands(parsed_arguments);
 
