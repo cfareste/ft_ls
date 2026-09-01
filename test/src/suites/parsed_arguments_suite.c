@@ -205,7 +205,7 @@ static void should_return_true_for_has_directory_file_operands_if_it_has_at_leas
     parsed_arguments_destroy(&parsed_arguments);
 }
 
-static void should_sort_the_file_operands_by_ascii_by_default(void)
+static void should_sort_the_non_directory_file_operands_by_ascii_by_default(void)
 {
     const char *args[] = { "a", "2file", "_DIR", ".hiddir", "_file", "f", "dir", ".hidden_file", "FILE", NULL };
     const unsigned int args_types[] = { S_IFREG, S_IFLNK, S_IFDIR, S_IFDIR, S_IFREG, S_IFCHR, S_IFDIR, S_IFREG, S_IFREG, 0 };
@@ -213,7 +213,6 @@ static void should_sort_the_file_operands_by_ascii_by_default(void)
     t_parsed_arguments *parsed_arguments = parse_arguments(9, args);
 
     const char * const *non_directory_file_operands = parsed_arguments_get_non_directory_file_operands(parsed_arguments);
-    const char * const *directory_file_operands = parsed_arguments_get_directory_file_operands(parsed_arguments);
 
     CU_ASSERT_STRING_EQUAL(non_directory_file_operands[0], args[7]);
     CU_ASSERT_STRING_EQUAL(non_directory_file_operands[1], args[1]);
@@ -221,10 +220,23 @@ static void should_sort_the_file_operands_by_ascii_by_default(void)
     CU_ASSERT_STRING_EQUAL(non_directory_file_operands[3], args[4]);
     CU_ASSERT_STRING_EQUAL(non_directory_file_operands[4], args[0]);
     CU_ASSERT_STRING_EQUAL(non_directory_file_operands[5], args[5]);
+    CU_ASSERT_PTR_NULL(non_directory_file_operands[6]);
+
+    parsed_arguments_destroy(&parsed_arguments);
+}
+
+static void should_sort_the_directory_file_operands_by_ascii_by_default(void)
+{
+    const char *args[] = { "a", "2file", "_DIR", ".hiddir", "_file", "f", "dir", ".hidden_file", "FILE", NULL };
+    const unsigned int args_types[] = { S_IFREG, S_IFLNK, S_IFDIR, S_IFDIR, S_IFREG, S_IFCHR, S_IFDIR, S_IFREG, S_IFREG, 0 };
+    guarantee_stat_will_populate_stats_of_N_file_types_for_paths(args, args_types);
+    t_parsed_arguments *parsed_arguments = parse_arguments(9, args);
+
+    const char * const *directory_file_operands = parsed_arguments_get_directory_file_operands(parsed_arguments);
+
     CU_ASSERT_STRING_EQUAL(directory_file_operands[0], args[3]);
     CU_ASSERT_STRING_EQUAL(directory_file_operands[1], args[2]);
     CU_ASSERT_STRING_EQUAL(directory_file_operands[2], args[6]);
-    CU_ASSERT_PTR_NULL(non_directory_file_operands[6]);
     CU_ASSERT_PTR_NULL(directory_file_operands[3]);
 
     parsed_arguments_destroy(&parsed_arguments);
@@ -254,6 +266,7 @@ void register_parsed_arguments_suite(void)
         CU_add_test(suite, "should_return_false_for_has_directory_file_operands_if_NULL_parsed_arguments_are_passed", should_return_false_for_has_directory_file_operands_if_NULL_parsed_arguments_are_passed);
         CU_add_test(suite, "should_return_false_for_has_directory_file_operands_if_it_does_not_have_any", should_return_false_for_has_directory_file_operands_if_it_does_not_have_any);
         CU_add_test(suite, "should_return_true_for_has_directory_file_operands_if_it_has_at_least_one", should_return_true_for_has_directory_file_operands_if_it_has_at_least_one);
-        CU_add_test(suite, "should_sort_the_file_operands_by_ascii_by_default", should_sort_the_file_operands_by_ascii_by_default);
+        CU_add_test(suite, "should_sort_the_non_directory_file_operands_by_ascii_by_default", should_sort_the_non_directory_file_operands_by_ascii_by_default);
+        CU_add_test(suite, "should_sort_the_directory_file_operands_by_ascii_by_default", should_sort_the_directory_file_operands_by_ascii_by_default);
     }
 }
