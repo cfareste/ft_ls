@@ -1,5 +1,4 @@
 #include <sys/stat.h>
-#include "libft.h"
 #include "mocks.h"
 #include "CUnit/CUnit.h"
 #include "CUnit/Basic.h"
@@ -71,7 +70,7 @@ static void should_return_NULL_file_operands_if_NULL_parsed_arguments_are_passed
 
 static void should_return_the_file_operands(void)
 {
-    const char *args[] = { "valid", "file", "operands", NULL };
+    const char *args[] = { "Valid", "file", "operands", NULL };
     const unsigned int args_types[] = { S_IFREG, S_IFREG, S_IFREG, 0 };
     guarantee_stat_will_populate_stats_of_N_file_types_for_paths(args, args_types);
     t_parsed_arguments *parsed_arguments = parse_arguments(3, args);
@@ -95,7 +94,7 @@ static void should_return_NULL_non_directory_file_operands_if_NULL_parsed_argume
 
 static void should_return_the_non_directory_file_operands(void)
 {
-    const char *args[] = { "socket", "symlink", "char_device", "reg_file", "pipe", "dir", "block_device", NULL };
+    const char *args[] = { "1_socket", "2_symlink", "3_char_device", "4_reg_file", "5_pipe", "6_dir", "7_block_device", NULL };
     const unsigned int args_types[] = { S_IFSOCK, S_IFLNK, S_IFCHR, S_IFREG, S_IFIFO, S_IFDIR, S_IFBLK, 0 };
     guarantee_stat_will_populate_stats_of_N_file_types_for_paths(args, args_types);
     t_parsed_arguments *parsed_arguments = parse_arguments(7, args);
@@ -206,6 +205,31 @@ static void should_return_true_for_has_directory_file_operands_if_it_has_at_leas
     parsed_arguments_destroy(&parsed_arguments);
 }
 
+static void should_sort_the_file_operands_by_ascii_by_default(void)
+{
+    const char *args[] = { "a", "2file", "_DIR", ".hiddir", "_file", "f", "dir", ".hidden_file", "FILE", NULL };
+    const unsigned int args_types[] = { S_IFREG, S_IFLNK, S_IFDIR, S_IFDIR, S_IFREG, S_IFCHR, S_IFDIR, S_IFREG, S_IFREG, 0 };
+    guarantee_stat_will_populate_stats_of_N_file_types_for_paths(args, args_types);
+    t_parsed_arguments *parsed_arguments = parse_arguments(9, args);
+
+    const char * const *non_directory_file_operands = parsed_arguments_get_non_directory_file_operands(parsed_arguments);
+    const char * const *directory_file_operands = parsed_arguments_get_directory_file_operands(parsed_arguments);
+
+    CU_ASSERT_STRING_EQUAL(non_directory_file_operands[0], args[7]);
+    CU_ASSERT_STRING_EQUAL(non_directory_file_operands[1], args[1]);
+    CU_ASSERT_STRING_EQUAL(non_directory_file_operands[2], args[8]);
+    CU_ASSERT_STRING_EQUAL(non_directory_file_operands[3], args[4]);
+    CU_ASSERT_STRING_EQUAL(non_directory_file_operands[4], args[0]);
+    CU_ASSERT_STRING_EQUAL(non_directory_file_operands[5], args[5]);
+    CU_ASSERT_STRING_EQUAL(directory_file_operands[0], args[3]);
+    CU_ASSERT_STRING_EQUAL(directory_file_operands[1], args[2]);
+    CU_ASSERT_STRING_EQUAL(directory_file_operands[2], args[6]);
+    CU_ASSERT_PTR_NULL(non_directory_file_operands[6]);
+    CU_ASSERT_PTR_NULL(directory_file_operands[3]);
+
+    parsed_arguments_destroy(&parsed_arguments);
+}
+
 void register_parsed_arguments_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, test_teardown);
@@ -230,5 +254,6 @@ void register_parsed_arguments_suite(void)
         CU_add_test(suite, "should_return_false_for_has_directory_file_operands_if_NULL_parsed_arguments_are_passed", should_return_false_for_has_directory_file_operands_if_NULL_parsed_arguments_are_passed);
         CU_add_test(suite, "should_return_false_for_has_directory_file_operands_if_it_does_not_have_any", should_return_false_for_has_directory_file_operands_if_it_does_not_have_any);
         CU_add_test(suite, "should_return_true_for_has_directory_file_operands_if_it_has_at_least_one", should_return_true_for_has_directory_file_operands_if_it_has_at_least_one);
+        CU_add_test(suite, "should_sort_the_file_operands_by_ascii_by_default", should_sort_the_file_operands_by_ascii_by_default);
     }
 }

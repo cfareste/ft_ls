@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include "file_entry.h"
+#include "sorter.h"
 #include "libft.h"
 
 #define DEFAULT_CAPACITY 8
@@ -15,6 +16,14 @@ struct s_file_entry_array
     unsigned int count;
     unsigned int max_capacity;
 };
+
+static int compare_by_entry_name(const void *first_entry, const void *second_entry)
+{
+    const char *first_entry_name = file_entry_get_name(first_entry);
+    const char *second_entry_name = file_entry_get_name(second_entry);
+
+    return ft_strcmp(first_entry_name, second_entry_name);
+}
 
 static void increase_entries_capacity(t_file_entry_array *array)
 {
@@ -89,6 +98,11 @@ unsigned int file_entry_array_get_length(const t_file_entry_array *file_entry_ar
         return 0;
 
     return file_entry_array->count;
+}
+
+void file_entry_array_sort(const t_file_entry_array *file_entry_array)
+{
+    sort_pointer_array((void **) file_entry_array->entries, compare_by_entry_name);
 }
 
 void file_entry_destroy(t_file_entry **file_entry)

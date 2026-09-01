@@ -225,6 +225,30 @@ static void should_push_correctly_an_specified_entry(void)
     CU_ASSERT_PTR_NULL(file_entry_array_get_at(sut, i));
 }
 
+static void should_sort_the_file_operands_by_entry_name(void)
+{
+    const char *entry_names[] = { "2file", ".hiddir", "_file", "dir", "FILE", NULL };
+    file_entry_array_push(sut, file_entry_create(entry_names[0]));
+    file_entry_array_push(sut, file_entry_create(entry_names[1]));
+    file_entry_array_push(sut, file_entry_create(entry_names[2]));
+    file_entry_array_push(sut, file_entry_create(entry_names[3]));
+    file_entry_array_push(sut, file_entry_create(entry_names[4]));
+
+    file_entry_array_sort(sut);
+    const t_file_entry *first_entry = file_entry_array_get_at(sut, 0);
+    const t_file_entry *second_entry = file_entry_array_get_at(sut, 1);
+    const t_file_entry *third_entry = file_entry_array_get_at(sut, 2);
+    const t_file_entry *fourth_entry = file_entry_array_get_at(sut, 3);
+    const t_file_entry *fifth_entry = file_entry_array_get_at(sut, 4);
+
+    CU_ASSERT_STRING_EQUAL(file_entry_get_name(first_entry), entry_names[1]);
+    CU_ASSERT_STRING_EQUAL(file_entry_get_name(second_entry), entry_names[0]);
+    CU_ASSERT_STRING_EQUAL(file_entry_get_name(third_entry), entry_names[4]);
+    CU_ASSERT_STRING_EQUAL(file_entry_get_name(fourth_entry), entry_names[2]);
+    CU_ASSERT_STRING_EQUAL(file_entry_get_name(fifth_entry), entry_names[3]);
+    CU_ASSERT_PTR_NULL(file_entry_array_get_at(sut, 5));
+}
+
 void register_file_entry_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, test_teardown);
@@ -254,5 +278,6 @@ void register_file_entry_suite(void)
         CU_add_test(suite, "should_not_fail_pushing_an_entry_to_a_NULL_array", should_not_fail_pushing_an_entry_to_a_NULL_array);
         CU_add_test(suite, "should_not_fail_pushing_a_NULL_entry_to_an_array", should_not_fail_pushing_a_NULL_entry_to_an_array);
         CU_add_test(suite, "should_push_correctly_an_specified_entry", should_push_correctly_an_specified_entry);
+        CU_add_test(suite, "should_sort_the_file_operands_by_ascii", should_sort_the_file_operands_by_entry_name);
     }
 }

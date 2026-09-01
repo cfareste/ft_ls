@@ -38,6 +38,8 @@ static void process_directory_file_operands(const t_parsed_arguments *parsed_arg
         const char *directory_header = should_print_directory_header ? directory_file_operands[i] : NULL;
         t_file_entry_array *file_entry_array = scan(directory_file_operands[i]);
 
+        file_entry_array_sort(file_entry_array);
+
         render_context_set_directory_header(render_context, directory_header);
         render(file_entry_array, render_context);
 

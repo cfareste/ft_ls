@@ -1,7 +1,14 @@
 TODO:
 1. Implementar LS-14 Default sorting output
-2. Terminar sorter (meter las funciones de sort dentro de cada módulo, y que estos llamen a sort)
-3. Si da tiempo, posibles refactors...
+2. Meter:
+   - Tests en el application suite
+   - Test file entry sort pasando null
+   - Tests parsed arguments?
+     - Separar en 2 tests
+   - Refactor para sort non y directory separados parsed args
+   - Arreglar E2E tests para que pueda ejecutar ls a solas (sin opciones ni operandos)
+   - Tests E2E
+
 
 
 TODO En algún momento:

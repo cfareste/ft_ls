@@ -66,7 +66,7 @@ static void should_successfully_print_the_contents_of_the_directory_specified_as
 {
     const char *arguments[] = { "dir", NULL };
     const char *dir_names[] = { arguments[0], NULL };
-    const char *file_names[] = { ".", "..", "file_from_dir_1", "subdir_1", "block_device", "char_device", NULL };
+    const char *file_names[] = { ".", "..", "block_device", "char_device", "file_from_dir_1", "subdir_1", NULL };
     const char **entry_names[] = { file_names, NULL };
     const char *expected_file_names[] = { file_names[2], file_names[3], file_names[4], file_names[5], NULL };
     guarantee_stat_will_populate_stats_of_a_directory_type_file(arguments[0]);
@@ -87,8 +87,8 @@ static void should_successfully_print_the_contents_of_the_directory_specified_as
 
 static void should_successfully_print_the_contents_of_multiple_non_directory_files(void)
 {
-    const char *arguments[] = { "file1", "cd1", "cd1", "block_device", NULL };
-    const unsigned int types[] = { S_IFREG, S_IFCHR, S_IFCHR, S_IFBLK, 0 };
+    const char *arguments[] = { "block_device", "cd1", "cd1", "file1", NULL };
+    const unsigned int types[] = { S_IFBLK, S_IFCHR, S_IFCHR, S_IFREG, 0 };
     guarantee_stat_will_populate_stats_of_N_file_types_for_paths(arguments, types);
     parsed_arguments = parse_arguments(4, arguments);
 
@@ -106,7 +106,7 @@ static void should_successfully_print_the_contents_of_multiple_non_directory_fil
 
 static void should_successfully_print_the_contents_of_multiple_directory_files(void)
 {
-    const char *arguments[] = { "dir3", "dir", "dir2", NULL };
+    const char *arguments[] = { "dir", "dir2", "dir3", NULL };
     const unsigned int types[] = { S_IFDIR, S_IFDIR, S_IFDIR, 0 };
     const char *first_dir_file_names[] = { ".", "file_dir_1", "..", NULL };
     const char *second_dir_file_names[] = { "file_dir_2", "..", ".", "symlink", NULL };
@@ -145,8 +145,8 @@ static void should_successfully_print_the_contents_of_the_mixed_types_specified_
     const char *arguments[] = { "dir", "file1", "file1", "symlink", "dir1", NULL };
     const unsigned int types[] = { S_IFDIR, S_IFREG, S_IFREG, S_IFLNK, S_IFDIR, 0 };
     const char *dir_names[] = { arguments[0], arguments[4], NULL };
-    const char *first_dir_file_names[] = { ".", "file_from_dir_1", "subdir_1", "block_device", "..", "char_device", NULL };
-    const char *second_dir_file_names[] = { "..", "file_from_dir_2", ".", "symlink", "file2", NULL };
+    const char *first_dir_file_names[] = { ".",  "block_device", "char_device", "file_from_dir_1", "..", "subdir_1", NULL };
+    const char *second_dir_file_names[] = { "..", "file2", ".", "file_from_dir_2", "symlink", NULL };
     const char *expected_first_dir_file_names[] = { first_dir_file_names[1], first_dir_file_names[2], first_dir_file_names[3], first_dir_file_names[5], NULL };
     const char *expected_second_dir_file_names[] = { second_dir_file_names[1], second_dir_file_names[3], second_dir_file_names[4], NULL };
     const char **entry_names[] = { first_dir_file_names, second_dir_file_names, NULL };
@@ -181,8 +181,8 @@ static void should_successfully_print_the_contents_of_the_mixed_types_specified_
 
 static void should_successfully_print_the_contents_of_the_explicitly_specified_hidden_non_directory_file_operands(void)
 {
-    const char *arguments[] = { ".file1", "symlink", ".char_device", NULL };
-    const unsigned int types[] = { S_IFREG, S_IFLNK, S_IFCHR, 0 };
+    const char *arguments[] = { ".char_device", ".file1", "symlink", NULL };
+    const unsigned int types[] = { S_IFCHR, S_IFREG, S_IFLNK, 0 };
     guarantee_stat_will_populate_stats_of_N_file_types_for_paths(arguments, types);
     parsed_arguments = parse_arguments(3, arguments);
 
@@ -199,12 +199,12 @@ static void should_successfully_print_the_contents_of_the_explicitly_specified_h
 
 static void should_successfully_print_the_contents_of_the_explicitly_specified_hidden_directory_file_operands(void)
 {
-    const char *arguments[] = { "dir1", ".dir2", ".dir", NULL };
+    const char *arguments[] = { ".dir", ".dir2", "dir1", NULL };
     const unsigned int types[] = { S_IFDIR, S_IFDIR , S_IFDIR, 0 };
     const char *dir_names[] = { arguments[0], arguments[1], arguments[2], NULL };
-    const char *first_dir_file_names[] = { ".", "file_from_dir_1", "..", "char_device", ".gitignore", NULL };
+    const char *first_dir_file_names[] = { ".", "char_device", "..", "file_from_dir_1", ".gitignore", NULL };
     const char *second_dir_file_names[] = { "..", "file_from_dir_2", ".", "symlink", ".idea", NULL };
-    const char *third_dir_file_names[] = { "file_from_dir_3", ".", "char_device", ".run", "..", "normal_file", NULL };
+    const char *third_dir_file_names[] = { "char_device", ".", "file_from_dir_3", ".run", "..", "normal_file", NULL };
     const char *expected_first_dir_file_names[] = { first_dir_file_names[1], first_dir_file_names[3], NULL };
     const char *expected_second_dir_file_names[] = { second_dir_file_names[1], second_dir_file_names[3], NULL };
     const char *expected_third_dir_file_names[] = { third_dir_file_names[0], third_dir_file_names[2], third_dir_file_names[5], NULL };
@@ -242,7 +242,7 @@ static void should_successfully_print_the_contents_of_the_explicitly_specified_h
     const char *arguments[] = { ".dir", ".dir1", ".file1", ".symlink", NULL };
     const unsigned int types[] = { S_IFDIR, S_IFDIR, S_IFREG, S_IFLNK, 0 };
     const char *dir_names[] = { arguments[0], arguments[1], NULL };
-    const char *first_dir_file_names[] = { ".run", ".", "file_from_dir_1", "..", "char_device", NULL };
+    const char *first_dir_file_names[] = { ".run", ".", "char_device", "..", "file_from_dir_1", NULL };
     const char *second_dir_file_names[] = { "..", ".gitignore", "file_from_dir_2", ".", "symlink", ".vscode", NULL };
     const char *expected_first_dir_file_names[] = { first_dir_file_names[2], first_dir_file_names[4], NULL };
     const char *expected_second_dir_file_names[] = { second_dir_file_names[2], second_dir_file_names[4], NULL };
@@ -308,7 +308,7 @@ static void should_successfully_not_print_anything_if_the_specified_directory_on
 
 static void should_successfully_only_print_dir_headers_if_the_specified_directories_are_empty(void)
 {
-    const char *arguments[] = { "dir1", ".dir", NULL };
+    const char *arguments[] = { ".dir", "dir1", NULL };
     const unsigned int types[] = { S_IFDIR, S_IFDIR, 0 };
     const char *dir_names[] = { arguments[0], arguments[1], NULL };
     const char *first_dir_file_names[] = { ".", "..", NULL };
