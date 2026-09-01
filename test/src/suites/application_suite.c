@@ -480,6 +480,36 @@ static void should_successfully_print_the_contents_of_the_specified_directory_so
     assert_application_execution_succeed(result);
 }
 
+static void should_successfully_print_the_specified_non_directory_file_operands_sorted(void)
+{
+    const char *arguments[] = { "a", "2file", "_file", "f", ".hidden_file", "FILE", NULL };
+    const unsigned int types[] = { S_IFREG, S_IFREG, S_IFREG, S_IFREG, S_IFREG, S_IFREG, 0 };
+    const char *expected_file_names[] = {
+        arguments[4],
+        arguments[1],
+        arguments[5],
+        arguments[2],
+        arguments[0],
+        arguments[3],
+        NULL
+    };
+    guarantee_stat_will_populate_stats_of_N_file_types_for_paths(arguments, types);
+    parsed_arguments = parse_arguments(6, arguments);
+
+    const int result = application_run(parsed_arguments);
+
+    CU_ASSERT(verify_that_the_str_that_has_been_printed_is(
+        "%s\n%s\n%s\n%s\n%s\n%s\n",
+        expected_file_names[0],
+        expected_file_names[1],
+        expected_file_names[2],
+        expected_file_names[3],
+        expected_file_names[4],
+        expected_file_names[5]
+    ));
+    assert_application_execution_succeed(result);
+}
+
 void register_application_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, test_teardown);
@@ -503,5 +533,6 @@ void register_application_suite(void)
         CU_add_test(suite, "should_successfully_only_print_dir_headers_with_non_directory_files_if_the_specified_directories_only_have_hidden_files", should_successfully_only_print_dir_headers_with_non_directory_files_if_the_specified_directories_only_have_hidden_files);
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_current_directory_sorted_if_no_file_operands_are_specified", should_successfully_print_the_contents_of_the_current_directory_sorted_if_no_file_operands_are_specified);
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_specified_directory_sorted", should_successfully_print_the_contents_of_the_specified_directory_sorted);
+        CU_add_test(suite, "should_successfully_print_the_specified_non_directory_file_operands_sorted", should_successfully_print_the_specified_non_directory_file_operands_sorted);
     }
 }
