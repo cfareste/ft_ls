@@ -23,7 +23,7 @@ static void open_directory_stream(const char *path)
     dir_stream_sut = directory_open(path);
 }
 
-static void assert_dir_stream_is_null()
+static void assert_dir_stream_is_null(void)
 {
     CU_ASSERT_PTR_NULL(dir_stream_sut);
 }

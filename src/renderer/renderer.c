@@ -16,7 +16,7 @@ static void print_directory_header(const t_render_context *context)
     ft_printf("%s:\n", context->directory_header);
 }
 
-t_render_context *render_context_create()
+t_render_context *render_context_create(void)
 {
     t_render_context *config = ft_safe_calloc(1, sizeof(t_render_context));
 
@@ -45,19 +45,19 @@ void render_context_destroy(t_render_context **context)
     *context = NULL;
 }
 
-void render(const t_file_entry_list *file_entry_list, t_render_context *context)
+void render(const t_file_entry_array *file_entry_array, t_render_context *context)
 {
-    if (context == NULL)
+    if (file_entry_array == NULL || context == NULL)
         return;
 
     if (context->directory_header != NULL)
         print_directory_header(context);
 
-    const t_file_entry_list *entry = file_entry_list;
-    while (entry != NULL)
+    const unsigned int count = file_entry_array_get_length(file_entry_array);
+    for (unsigned int i = 0; i < count; i++)
     {
-        ft_printf("%s\n", file_entry_list_get_name(entry));
-        entry = file_entry_list_get_next(entry);
+        const t_file_entry *file_entry = file_entry_array_get_at(file_entry_array, i);
+        ft_printf("%s\n", file_entry_get_name(file_entry));
     }
 
     context->is_first_render = 0;

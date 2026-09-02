@@ -15,6 +15,7 @@ TESTS_DIR="${SCRIPT_DIR}/e2e"
 TESTS_FILE="${TESTS_DIR}/tests.txt"
 DELIMITER="::"
 FT_CMD="../ft_ls"
+MODEL_LS_BIN="$(uname -s | grep -q 'Darwin' && printf '%s' 'gls' || printf '%s' 'ls')"
 
 trim() {
     local value="$1"
@@ -68,6 +69,12 @@ prepare_test_environment() {
     touch dir_only_hidden/.hidden1 dir_only_hidden/.fileee dir_only_hidden/.file2
     touch .hiddir/hidden1 .hiddir/.invis .hiddir/.invis2
     touch .hiddir2/hidden3 .hiddir2/hidden4 .hiddir2/.invis1
+
+    mkdir capacity/
+    mkdir capacity2/
+    touch "capacity/1" "capacity/2" "capacity/3" "capacity/4" "capacity/5" "capacity/6" "capacity/7" "capacity/8"
+    cp capacity/* capacity2
+    touch "capacity2/a" "capacity2/b" "capacity2/c" "capacity2/d" "capacity2/e" "capacity2/f" "capacity2/g" "capacity2/h"
 }
 
 remove_test_environment() {
@@ -87,9 +94,8 @@ parse_test_entry() {
     ft_cmd="$(trim "${line%%"${DELIMITER}"*}")"
     model_cmd="$(trim "${line#*"${DELIMITER}"}")"
 
-    if [[ -z "${model_cmd}" ]]; then
-        printf '%b[ERROR] Missing model command in test entry: %s%b\n' "${RED}" "$line" "${RESET}" >&2
-        return 1
+    if [[ "${model_cmd}" =~ ^(ls|gls)([[:space:]]+|$) ]]; then
+        model_cmd="$(trim "${model_cmd#${BASH_REMATCH[1]}}")"
     fi
 
     printf '%s\n%s\n' "${ft_cmd}" "${model_cmd}"
@@ -107,7 +113,8 @@ print_output_block() {
 
 run_single_test() {
     local ft_args="$1"
-    local model_cmd="$2"
+    local model_args="$2"
+    local model_cmd="${MODEL_LS_BIN} ${model_args}"
     local ft_cmd="${FT_CMD}"
     local ft_output="$(mktemp)"
     local model_output="$(mktemp)"

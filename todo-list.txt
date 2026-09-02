@@ -9,6 +9,9 @@ TODO En algún momento:
 - Usar un struct propio para los opendirs, stat, etc. (como t_dir_stream de antes)
 - Reflexionar si meter el should print header en render pasando parsed arguments. Si al hacer las options se necesita
   pasar parsed arguments al render, entonces calcularlo ahi
+- Revisar que todas las funciones tengan al menos 1 test que compruebe argumentos inválidos (run app no tiene)
+- Cuando haga LS-12, revisar que las funciones de ensure will fail dirent estén bien (conversación GPT Mac)
+- Posibles refactors de la suite de tests
 
 
 TODO Para mejorar siguientes proyectos:
@@ -69,3 +72,14 @@ QA LS-15 Filter hidden files (`ls -U file ... | cat`)
    - Mezcla de lo anterior y comprobar dir headers
 4. Parámetros ocultos (ficheros y directorios | .env .idea/)
 5. No memory leaks
+
+
+QA LS-14 Default sorting output
+1. Sin parámetros
+2. 1 parámetro (directorio)
+3. Múltiples parámetros
+   - Archivos
+   - Directorios
+     - Que se ordene nombres y contenidos
+   - Mixto
+     - Que se ordenen ambos y por separado

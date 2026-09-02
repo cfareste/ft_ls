@@ -132,19 +132,19 @@ void guarantee_readdir_will_return_N_files_named(const char ***files_names)
     }
 }
 
-void guarantee_opendir_will_fail()
+void guarantee_opendir_will_fail(void)
 {
     reset_dirent_guarantees();
     will_opendir_fail = 1;
 }
 
-void guarantee_readdir_will_fail()
+void guarantee_readdir_will_fail(void)
 {
     reset_dirent_guarantees();
     will_readdir_fail = 1;
 }
 
-void reset_dirent_guarantees()
+void reset_dirent_guarantees(void)
 {
     will_opendir_fail = 0;
     will_readdir_fail = 0;

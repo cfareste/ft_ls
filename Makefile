@@ -23,7 +23,7 @@ TEST_DIR = test/
 
 #----COMPILER----#
 CC = cc
-CCFLAGS += -g -Wall -Werror -Wextra -fsanitize=address
+CCFLAGS += -g -Wall -Werror -Wextra -Wpedantic -fsanitize=address
 INCLUDES = -I$(INC)
 
 
@@ -47,9 +47,10 @@ vpath %.c	$(SRC):\
 			$(SRC)/parsed_arguments:\
 			$(SRC)/parsed_arguments/file_operands:\
 			$(SRC)/filesystem:\
-			$(SRC)/file_entry_list:\
+			$(SRC)/file_entry:\
 			$(SRC)/scanner:\
-			$(SRC)/renderer
+			$(SRC)/renderer:\
+			$(SRC)/sorter
 
 #----SHARED----#
 SRCS = ft_ls.c \
@@ -58,9 +59,10 @@ SRCS = ft_ls.c \
 		file_operands.c \
 		directory.c \
 		file_stats.c \
-		file_entry_list.c \
+		file_entry.c \
 		scanner.c \
-		renderer.c
+		renderer.c \
+		sorter.c
 
 OBJS = $(SRCS:%.c=$(BIN_DIR)%.o)
 DEPS = $(OBJS:%.o=%.d)

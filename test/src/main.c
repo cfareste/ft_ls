@@ -7,10 +7,11 @@ int	main(void)
 	if (CU_initialize_registry() != CUE_SUCCESS)
 		return 1;
 
-	register_file_entry_list_suite();
+	register_file_entry_suite();
 	register_directory_suite();
 	register_renderer_suite();
 	register_scanner_suite();
+	register_sorter_suite();
 	register_file_stats_suite();
 	register_parsed_arguments_suite();
 	register_application_suite();

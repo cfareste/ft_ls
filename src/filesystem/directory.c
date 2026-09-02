@@ -3,14 +3,9 @@
 #include "libft.h"
 #include "directory.h"
 
-static int is_valid_path(const char *path)
-{
-    return path != NULL && !ft_is_str_empty(path);
-}
-
 DIR *directory_open(const char *path)
 {
-    if (!is_valid_path(path))
+    if (!ft_is_valid_path(path))
         return NULL;
 
     return opendir(path);

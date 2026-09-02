@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include "parsed_arguments.h"
 #include "file_operands.h"
+#include "sorter.h"
 #include "libft.h"
 
 struct s_parsed_arguments
@@ -10,6 +11,11 @@ struct s_parsed_arguments
     char **non_directory_file_operands;
     char **directory_file_operands;
 };
+
+static int compare_by_name(const void *first_str, const void *second_str)
+{
+    return ft_strcmp(first_str, second_str);
+}
 
 t_parsed_arguments *parse_arguments(const int num_of_arguments, const char **arguments)
 {
@@ -21,6 +27,8 @@ t_parsed_arguments *parse_arguments(const int num_of_arguments, const char **arg
     parsed_arguments->file_operand_types = file_operands_get_types(parsed_arguments->file_operands);
     parsed_arguments->non_directory_file_operands = file_operands_get_non_directory(parsed_arguments->file_operands, parsed_arguments->file_operand_types);
     parsed_arguments->directory_file_operands = file_operands_get_directory(parsed_arguments->file_operands, parsed_arguments->file_operand_types);
+    sort_pointer_array((void **) parsed_arguments->non_directory_file_operands, compare_by_name);
+    sort_pointer_array((void **) parsed_arguments->directory_file_operands, compare_by_name);
 
     return parsed_arguments;
 }
