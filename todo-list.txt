@@ -11,6 +11,7 @@ TODO En algún momento:
   pasar parsed arguments al render, entonces calcularlo ahi
 - Revisar que todas las funciones tengan al menos 1 test que compruebe argumentos inválidos (run app no tiene)
 - Cuando haga LS-12, revisar que las funciones de ensure will fail dirent estén bien (conversación GPT Mac)
+- Posibles refactors de la suite de tests
 
 
 TODO Para mejorar siguientes proyectos:
