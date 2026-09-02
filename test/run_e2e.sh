@@ -69,6 +69,9 @@ prepare_test_environment() {
     touch dir_only_hidden/.hidden1 dir_only_hidden/.fileee dir_only_hidden/.file2
     touch .hiddir/hidden1 .hiddir/.invis .hiddir/.invis2
     touch .hiddir2/hidden3 .hiddir2/hidden4 .hiddir2/.invis1
+
+    mkdir capacity/
+    touch "capacity/1" "capacity/2" "capacity/3" "capacity/4" "capacity/5" "capacity/6" "capacity/7" "capacity/8"
 }
 
 remove_test_environment() {

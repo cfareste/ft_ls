@@ -254,6 +254,15 @@ static void should_sort_the_file_operands_by_entry_name(void)
     CU_ASSERT_PTR_NULL(file_entry_array_get_at(sut, 5));
 }
 
+static void should_sort_(void)
+{
+    for (unsigned int i = 0; i < 8; i++)
+    {
+        file_entry_array_push(sut, file_entry_create("entry"));
+    }
+
+    file_entry_array_sort(sut);
+}
 void register_file_entry_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, test_teardown);
@@ -285,5 +294,6 @@ void register_file_entry_suite(void)
         CU_add_test(suite, "should_push_correctly_an_specified_entry", should_push_correctly_an_specified_entry);
         CU_add_test(suite, "should_not_fail_when_sorting_a_NULL_file_entry_array", should_not_fail_when_sorting_a_NULL_file_entry_array);
         CU_add_test(suite, "should_sort_the_file_operands_by_ascii", should_sort_the_file_operands_by_entry_name);
+        CU_add_test(suite, "should_sort_correctly_before_the_current_capacity", should_sort_correctly_before_the_current_capacity);
     }
 }

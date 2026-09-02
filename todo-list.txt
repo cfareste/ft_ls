@@ -1,9 +1,6 @@
 TODO:
 1. Implementar LS-14 Default sorting output
-2. Meter:
-   - Tests en el application suite
-   - Tests E2E
-3. Revisar:
+2. Revisar:
    - Que los cambios hechos hasta el momento estén bien, tengan sentido y estén cubiertos
    - Posibles refactors que me he dejado por ahí (test suites, etc.)
 
@@ -16,6 +13,7 @@ TODO En algún momento:
 - Usar un struct propio para los opendirs, stat, etc. (como t_dir_stream de antes)
 - Reflexionar si meter el should print header en render pasando parsed arguments. Si al hacer las options se necesita
   pasar parsed arguments al render, entonces calcularlo ahi
+- Mirar como no acoplarme al max capacity actual y aún así cubrir con tests el caso de que haga sort de max capacity entries
 
 
 TODO Para mejorar siguientes proyectos:

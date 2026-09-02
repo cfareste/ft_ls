@@ -25,3 +25,4 @@ dir_only_hidden dir_only_hidden/                           ::       dir_only_hid
 empty .hidden                                              ::       empty .hidden
 .hidden dir_only_hidden/                                   ::       .hidden dir_only_hidden/
 .hidden firstDir file dir_only_hidden/ .hiddir empty       ::       .hidden firstDir file dir_only_hidden/ .hiddir empty
+capacity/                                                  ::       capacity/

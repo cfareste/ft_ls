@@ -31,7 +31,9 @@ static void increase_entries_capacity(t_file_entry_array *array)
     const unsigned int new_capacity = array->max_capacity * 2;
 
     array->max_capacity = new_capacity;
-    array->entries = ft_safe_realloc(array->entries, old_capacity * sizeof(t_file_entry *), new_capacity * sizeof(t_file_entry *));
+    array->entries = ft_safe_realloc(array->entries,
+                                    (old_capacity * sizeof(t_file_entry *)) + 1,
+                                    (new_capacity * sizeof(t_file_entry *)) + 1);
 }
 
 t_file_entry *file_entry_create(const char *file_name)
@@ -49,7 +51,7 @@ t_file_entry_array *file_entry_array_create(void)
 {
     t_file_entry_array *file_entry_array = ft_safe_calloc(1, sizeof(t_file_entry_array));
 
-    file_entry_array->entries = ft_safe_calloc(DEFAULT_CAPACITY, sizeof(t_file_entry *));
+    file_entry_array->entries = ft_safe_calloc(DEFAULT_CAPACITY + 1, sizeof(t_file_entry *));
     file_entry_array->count = 0;
     file_entry_array->max_capacity = DEFAULT_CAPACITY;
 
