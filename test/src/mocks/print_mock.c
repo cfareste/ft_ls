@@ -3,13 +3,13 @@
 #include <unistd.h>
 #include "libft.h"
 
-#define PRINT_BUFFER_SIZE 1024
+#define PRINT_BUFFER_SIZE 2048
 
 static char printing_buffer[PRINT_BUFFER_SIZE] = { '\0' };
 
 int printf_mock(const char *str, ...)
 {
-    char temp_buffer[1024];
+    char temp_buffer[PRINT_BUFFER_SIZE];
     va_list args;
 
     va_start(args, str);
