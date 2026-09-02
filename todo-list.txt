@@ -9,6 +9,8 @@ TODO En algún momento:
 - Usar un struct propio para los opendirs, stat, etc. (como t_dir_stream de antes)
 - Reflexionar si meter el should print header en render pasando parsed arguments. Si al hacer las options se necesita
   pasar parsed arguments al render, entonces calcularlo ahi
+- Revisar que todas las funciones tengan al menos 1 test que compruebe argumentos inválidos (run app no tiene)
+- Cuando haga LS-12, revisar que las funciones de ensure will fail dirent estén bien (conversación GPT Mac)
 
 
 TODO Para mejorar siguientes proyectos:

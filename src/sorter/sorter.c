@@ -10,7 +10,7 @@ void sort_pointer_array(void **array, const t_comparator_fn compare_fn)
     {
         for (unsigned int j = i + 1; array[j] != NULL; j++)
         {
-            if (compare_fn(array[i], array[j]) < 0)
+            if (compare_fn(array[i], array[j]) <= 0)
                 continue ;
 
             void *tmp = array[i];
