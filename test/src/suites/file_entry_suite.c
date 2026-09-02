@@ -254,7 +254,7 @@ static void should_sort_the_file_operands_by_entry_name(void)
     CU_ASSERT_PTR_NULL(file_entry_array_get_at(sut, 5));
 }
 
-static void should_sort_correctly_before_the_current_capacity(void)
+static void should_manage_correctly_the_max_capacity(void)
 {
     for (unsigned int i = 0; i < 8; i++)
     {
@@ -294,6 +294,6 @@ void register_file_entry_suite(void)
         CU_add_test(suite, "should_push_correctly_an_specified_entry", should_push_correctly_an_specified_entry);
         CU_add_test(suite, "should_not_fail_when_sorting_a_NULL_file_entry_array", should_not_fail_when_sorting_a_NULL_file_entry_array);
         CU_add_test(suite, "should_sort_the_file_operands_by_ascii", should_sort_the_file_operands_by_entry_name);
-        CU_add_test(suite, "should_sort_correctly_before_the_current_capacity", should_sort_correctly_before_the_current_capacity);
+        CU_add_test(suite, "should_manage_correctly_the_max_capacity", should_manage_correctly_the_max_capacity);
     }
 }
