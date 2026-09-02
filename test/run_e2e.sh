@@ -71,7 +71,10 @@ prepare_test_environment() {
     touch .hiddir2/hidden3 .hiddir2/hidden4 .hiddir2/.invis1
 
     mkdir capacity/
+    mkdir capacity2/
     touch "capacity/1" "capacity/2" "capacity/3" "capacity/4" "capacity/5" "capacity/6" "capacity/7" "capacity/8"
+    cp capacity/* capacity2
+    touch "capacity2/a" "capacity2/b" "capacity2/c" "capacity2/d" "capacity2/e" "capacity2/f" "capacity2/g" "capacity2/h"
 }
 
 remove_test_environment() {

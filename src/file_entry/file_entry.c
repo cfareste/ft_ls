@@ -32,8 +32,8 @@ static void increase_entries_capacity(t_file_entry_array *array)
 
     array->max_capacity = new_capacity;
     array->entries = ft_safe_realloc(array->entries,
-                                    (old_capacity * sizeof(t_file_entry *)) + 1,
-                                    (new_capacity * sizeof(t_file_entry *)) + 1);
+                                    (old_capacity + 1) * sizeof(t_file_entry *),
+                                    (new_capacity + 1) * sizeof(t_file_entry *));
 }
 
 t_file_entry *file_entry_create(const char *file_name)
