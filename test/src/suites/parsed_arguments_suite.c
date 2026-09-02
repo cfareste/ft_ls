@@ -26,6 +26,20 @@ static void should_be_created_correctly(void)
     CU_ASSERT_PTR_NOT_NULL(sut);
 }
 
+static void should_be_created_with_default_values_if_arguments_are_NULL(void)
+{
+    const char *null_args[] = { NULL };
+    guarantee_stat_will_populate_stats_of_a_directory_type_file(".");
+
+    t_parsed_arguments *parsed_arguments = parse_arguments(1, null_args);
+    const char * const *file_operands = parsed_arguments_get_file_operands(parsed_arguments);
+
+    CU_ASSERT_PTR_NOT_NULL(parsed_arguments);
+    CU_ASSERT_STRING_EQUAL(file_operands[0], ".");
+
+    parsed_arguments_destroy(&parsed_arguments);
+}
+
 static void should_be_destroyed_correctly(void)
 {
     parsed_arguments_destroy(&sut);
@@ -250,6 +264,7 @@ void register_parsed_arguments_suite(void)
     if (suite != NULL)
     {
         CU_add_test(suite, "should_be_created_correctly", should_be_created_correctly);
+        CU_add_test(suite, "should_be_created_with_default_values_if_arguments_are_NULL", should_be_created_with_default_values_if_arguments_are_NULL);
         CU_add_test(suite, "should_be_destroyed_correctly", should_be_destroyed_correctly);
         CU_add_test(suite, "should_not_fail_to_destroy_when_a_null_pointer_is_passed", should_not_fail_to_destroy_when_a_null_pointer_is_passed);
         CU_add_test(suite, "should_not_fail_to_destroy_if_its_already_null", should_not_fail_to_destroy_if_its_already_null);

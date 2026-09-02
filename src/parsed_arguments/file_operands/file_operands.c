@@ -59,7 +59,7 @@ static unsigned int get_num_of_directory_file_operands(const unsigned int *file_
 
 char **file_operands_get(const int num_of_arguments, const char **arguments)
 {
-    if (num_of_arguments == 0)
+    if (num_of_arguments == 0 || *arguments == NULL)
         return get_default_file_operands();
 
     return get_file_operands_from_arguments(num_of_arguments, arguments);
