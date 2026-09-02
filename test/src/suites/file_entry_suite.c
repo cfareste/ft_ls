@@ -254,7 +254,7 @@ static void should_sort_the_file_operands_by_entry_name(void)
     CU_ASSERT_PTR_NULL(file_entry_array_get_at(sut, 5));
 }
 
-static void should_sort_(void)
+static void should_sort_correctly_before_the_current_capacity(void)
 {
     for (unsigned int i = 0; i < 8; i++)
     {
