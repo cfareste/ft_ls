@@ -81,6 +81,7 @@ ROOT_SRCS = application.c \
 			sorter.c
 
 SRCS = main.c \
+		vfs_mock.c \
 		directory_mock.c \
 		print_mock.c \
 		stat_mock.c \

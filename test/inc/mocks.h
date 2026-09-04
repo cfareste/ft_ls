@@ -1,5 +1,20 @@
 #pragma once
 
+#include <sys/stat.h>
+
+typedef struct s_vfs_mock_entry
+{
+    const char *path;
+    mode_t mode;
+    const char * const *dir_entries;
+} t_vfs_mock_entry;
+
+extern const t_vfs_mock_entry *g_vfs_mock_entries;
+
+void vfs_mock_setup(const t_vfs_mock_entry *entries);
+const t_vfs_mock_entry *find_node(const char *path);
+void vfs_mock_reset(void);
+
 void ensure_opendir_will_open_N_dirs_named(const char **dirs_names);
 void guarantee_readdir_will_return_N_files_named(const char ***files_names);
 

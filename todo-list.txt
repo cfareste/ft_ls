@@ -1,7 +1,7 @@
 TODO:
 1. Implementar LS-13 Support for multiple types of files
-2. Investigar porque no puedo debuggear desde proyecto ft_ls los tests
-3. Mockear VFS
+2. Mockear VFS
+3. Posibles refactors de la suite de tests
 4. Refactor e implementar mi propio enum para los tipos de ficheros y otro para los booleanos del renderer
 5. Usar un struct propio para los opendirs, stat, etc. (como t_dir_stream de antes)
 
@@ -13,7 +13,6 @@ TODO En algún momento:
   pasar parsed arguments al render, entonces calcularlo ahi
 - Revisar que todas las funciones tengan al menos 1 test que compruebe argumentos inválidos (run app no tiene)
 - Cuando haga LS-12, revisar que las funciones de ensure will fail dirent estén bien (conversación GPT Mac)
-- Posibles refactors de la suite de tests
 
 
 TODO Para mejorar siguientes proyectos:
