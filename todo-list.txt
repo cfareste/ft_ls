@@ -1,12 +1,14 @@
 TODO:
+1. Implementar LS-13 Support for multiple types of files
+2. Investigar porque no puedo debuggear desde proyecto ft_ls los tests
+3. Mockear VFS
+4. Refactor e implementar mi propio enum para los tipos de ficheros y otro para los booleanos del renderer
+5. Usar un struct propio para los opendirs, stat, etc. (como t_dir_stream de antes)
 
 
 TODO En algún momento:
 - Investigar si los tests están acoplados a la implementacion interna de las cosas
-- Investigar porque no puedo debugar desde proyecto ft_ls los tests
 - Refactor renderer, donde render llama a render_strategy o lo que sea basado en options
-- Refactor e implementar mi propio enum para los tipos de ficheros y otro para los booleanos del renderer
-- Usar un struct propio para los opendirs, stat, etc. (como t_dir_stream de antes)
 - Reflexionar si meter el should print header en render pasando parsed arguments. Si al hacer las options se necesita
   pasar parsed arguments al render, entonces calcularlo ahi
 - Revisar que todas las funciones tengan al menos 1 test que compruebe argumentos inválidos (run app no tiene)
