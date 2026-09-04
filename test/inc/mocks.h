@@ -2,6 +2,10 @@
 
 #include <sys/stat.h>
 
+#define MOCK_FILE(p) { (p), S_IFREG | 0644, NULL, NULL }
+#define MOCK_DIR(p, ...) { (p), S_IFDIR | 0755, (const char *[]){ __VA_ARGS__, NULL }, NULL }
+#define MOCK_SYMLINK(p, target) { (p), S_IFLNK | 0777, NULL, (target) }
+
 typedef struct s_vfs_mock_entry
 {
     const char *path;
