@@ -6,7 +6,7 @@ typedef struct s_vfs_mock_entry
 {
     const char *path;
     mode_t mode;
-    const char * const *dir_entries;
+    const char * const *entries;
 } t_vfs_mock_entry;
 
 extern const t_vfs_mock_entry *g_vfs_mock_entries;

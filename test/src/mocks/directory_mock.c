@@ -90,9 +90,9 @@ struct dirent *mock_readdir(DIR *dirp)
 {
     t_mock_dir *stream = (t_mock_dir *)dirp;
 
-    if (stream != NULL && stream->dir_entry != NULL && stream->dir_entry->dir_entries != NULL)
+    if (stream != NULL && stream->dir_entry != NULL && stream->dir_entry->entries != NULL)
     {
-        const char *next_entry_name = stream->dir_entry->dir_entries[stream->next_index];
+        const char *next_entry_name = stream->dir_entry->entries[stream->next_index];
         if (next_entry_name == NULL)
             return NULL;
 
