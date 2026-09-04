@@ -9,8 +9,6 @@ typedef struct s_vfs_mock_entry
     const char * const *entries;
 } t_vfs_mock_entry;
 
-extern const t_vfs_mock_entry *g_vfs_mock_entries;
-
 void vfs_mock_setup(const t_vfs_mock_entry *entries);
 const t_vfs_mock_entry *find_node(const char *path);
 void vfs_mock_reset(void);
