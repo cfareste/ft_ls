@@ -23,10 +23,10 @@ int stat_mock(const char *restrict pathname, struct stat *restrict statbuf)
     {
         ft_bzero(statbuf, sizeof(struct stat));
         statbuf->st_mode = entry->mode;
-        return (0);
+        return 0;
     }
 
-    //return (-1);
+    //return -1;
 
     for (unsigned int i = 0; next_paths[i] != NULL; i++)
     {
