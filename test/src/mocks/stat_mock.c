@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 #include "libft.h"
+#include "mocks.h"
 
 static char *next_paths[256] = { NULL };
 static unsigned int next_types[256] = { 0 };
@@ -17,6 +18,16 @@ static void free_stat_guarantees(void)
 
 int stat_mock(const char *restrict pathname, struct stat *restrict statbuf)
 {
+    const t_vfs_mock_entry *entry = find_node(pathname);
+    if (entry != NULL)
+    {
+        ft_bzero(statbuf, sizeof(struct stat));
+        statbuf->st_mode = entry->mode;
+        return (0);
+    }
+
+    //return (-1);
+
     for (unsigned int i = 0; next_paths[i] != NULL; i++)
     {
         if (ft_strcmp(pathname, next_paths[i]) == EQUAL_STRINGS)
