@@ -10,7 +10,7 @@ typedef struct s_vfs_mock_entry
 } t_vfs_mock_entry;
 
 void vfs_mock_setup(const t_vfs_mock_entry *entries);
-const t_vfs_mock_entry *find_node(const char *path);
+const t_vfs_mock_entry *find_vfs_entry(const char *path);
 void vfs_mock_reset(void);
 
 void ensure_opendir_will_open_N_dirs_named(const char **dirs_names);

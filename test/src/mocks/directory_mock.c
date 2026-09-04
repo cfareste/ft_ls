@@ -64,7 +64,7 @@ static char *get_next_file_entry_name(const t_mock_dir *dir)
 
 DIR *mock_opendir(const char *path)
 {
-    const t_vfs_mock_entry *dir_entry = find_node(path);
+    const t_vfs_mock_entry *dir_entry = find_vfs_entry(path);
 
     if (dir_entry != NULL && S_ISDIR(dir_entry->mode))
     {

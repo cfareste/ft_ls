@@ -9,7 +9,7 @@ void vfs_mock_setup(const t_vfs_mock_entry *entries)
     vfs_mock_entries = entries;
 }
 
-const t_vfs_mock_entry *find_node(const char *path)
+const t_vfs_mock_entry *find_vfs_entry(const char *path)
 {
     if (vfs_mock_entries == NULL || path == NULL)
         return NULL;

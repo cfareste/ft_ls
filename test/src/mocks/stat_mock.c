@@ -18,7 +18,7 @@ static void free_stat_guarantees(void)
 
 int stat_mock(const char *restrict pathname, struct stat *restrict statbuf)
 {
-    const t_vfs_mock_entry *entry = find_node(pathname);
+    const t_vfs_mock_entry *entry = find_vfs_entry(pathname);
     if (entry != NULL)
     {
         ft_bzero(statbuf, sizeof(struct stat));
