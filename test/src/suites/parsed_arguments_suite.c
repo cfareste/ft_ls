@@ -11,24 +11,39 @@ static t_parsed_arguments *sut;
 static void test_setup(void)
 {
     vfs_mock_reset();
-    const char *valid_args[] = { NULL };
-    guarantee_stat_will_populate_stats_of_a_directory_type_file(".");
-    sut = parse_arguments(0, valid_args);
 }
 
 static void test_teardown(void)
 {
-    reset_stat_guarantees();
     parsed_arguments_destroy(&sut);
 }
 
 static void should_be_created_correctly(void)
 {
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", "..", "."),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *valid_args[] = { NULL };
+
+    sut = parse_arguments(0, valid_args);
+
     CU_ASSERT_PTR_NOT_NULL(sut);
 }
 
 static void should_be_destroyed_correctly(void)
 {
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", "..", "."),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *valid_args[] = { NULL };
+    sut = parse_arguments(0, valid_args);
+
     parsed_arguments_destroy(&sut);
 
     CU_ASSERT_PTR_NULL(sut);
@@ -41,8 +56,9 @@ static void should_not_fail_to_destroy_when_a_null_pointer_is_passed(void)
 
 static void should_not_fail_to_destroy_if_its_already_null(void)
 {
-    parsed_arguments_destroy(&sut);
-    parsed_arguments_destroy(&sut);
+    t_parsed_arguments *invalid = NULL;
+
+    parsed_arguments_destroy(&invalid);
 }
 
 static void should_return_NULL_if_num_of_arguments_is_negative(void)
