@@ -10,6 +10,7 @@ static t_parsed_arguments *sut;
 
 static void test_setup(void)
 {
+    vfs_mock_reset();
     const char *valid_args[] = { NULL };
     guarantee_stat_will_populate_stats_of_a_directory_type_file(".");
     sut = parse_arguments(0, valid_args);

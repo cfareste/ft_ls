@@ -25,7 +25,7 @@ static void assert_file_stats_retrieving_succeed(const int result)
 
 static void assert_file_type_is(const unsigned int type)
 {
-    CU_ASSERT_EQUAL(file_stats.st_mode, type);
+    CU_ASSERT_EQUAL(file_stats.st_mode & S_IFMT, type);
 }
 
 static void should_return_an_error_when_retrieving_the_stats_from_a_NULL_path(void)
@@ -51,10 +51,13 @@ static void should_return_an_error_when_populating_the_stats_to_a_NULL_stat_stru
 
 static void should_populate_successfully_the_file_stats_when_passed_a_valid_regular_file_path(void)
 {
-    const char *file_path = "valid";
-    guarantee_stat_will_populate_stats_of_a_regular_type_file(file_path);
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("valid_file"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
 
-    const int result = file_stats_get(file_path, &file_stats);
+    const int result = file_stats_get("valid_file", &file_stats);
 
     assert_file_stats_retrieving_succeed(result);
     assert_file_type_is(S_IFREG);
@@ -62,10 +65,13 @@ static void should_populate_successfully_the_file_stats_when_passed_a_valid_regu
 
 static void should_populate_successfully_the_file_stats_when_passed_a_valid_directory_path(void)
 {
-    const char *dir_path = "valid_dir";
-    guarantee_stat_will_populate_stats_of_a_directory_type_file(dir_path);
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("valid_dir", ".", ".."),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
 
-    const int result = file_stats_get(dir_path, &file_stats);
+    const int result = file_stats_get("valid_dir", &file_stats);
 
     assert_file_stats_retrieving_succeed(result);
     assert_file_type_is(S_IFDIR);
