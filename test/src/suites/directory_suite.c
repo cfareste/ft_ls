@@ -11,7 +11,6 @@ static DIR *dir_stream_sut;
 static void test_setup(void)
 {
     vfs_mock_reset();
-    reset_dirent_guarantees();
 }
 
 static void test_teardown(void)
