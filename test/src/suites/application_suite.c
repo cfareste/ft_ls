@@ -35,7 +35,7 @@ static void should_successfully_print_the_contents_of_the_current_directory_one_
         MOCK_DIR("./subdir1", ".", ".."),
         MOCK_SYMLINK("./symlink", "file1"),
         MOCK_FILE("./zz"),
-        { .path = NULL, .mode = 0, .entries = NULL, .target = NULL }
+        MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
 
@@ -58,7 +58,7 @@ static void should_successfully_print_the_file_name_if_a_regular_file_operand_is
 {
     const t_vfs_mock_entry vfs[] = {
         MOCK_FILE("../../ft_ls/test/./frameworks/../regular_file"),
-        { .path = NULL, .mode = 0, .entries = NULL, .target = NULL }
+        MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
 
@@ -80,7 +80,7 @@ static void should_successfully_print_the_contents_of_the_directory_specified_as
         MOCK_CHAR_DEVICE("dir/char_device"),
         MOCK_FILE("dir/file_from_dir_1"),
         MOCK_DIR("dir/subdir_1", ".", ".."),
-        { .path = NULL, .mode = 0, .entries = NULL, .target = NULL }
+        MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
 
@@ -105,7 +105,7 @@ static void should_successfully_print_the_contents_of_multiple_non_directory_fil
         MOCK_BLOCK_DEVICE("block_device"),
         MOCK_CHAR_DEVICE("cd1"),
         MOCK_FILE("file1"),
-        { .path = NULL, .mode = 0, .entries = NULL, .target = NULL }
+        MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
 
@@ -134,7 +134,7 @@ static void should_successfully_print_the_contents_of_multiple_directory_files(v
         MOCK_FILE("dir2/file_dir_2"),
         MOCK_SYMLINK("dir2/symlink", "dir2/file_dir_2"),
         MOCK_FILE("dir3/file_dir_3"),
-        { .path = NULL, .mode = 0, .entries = NULL, .target = NULL }
+        MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
 
@@ -178,7 +178,7 @@ static void should_successfully_print_the_contents_of_the_mixed_types_specified_
         MOCK_FILE("dir1/file2"),
         MOCK_FILE("dir1/file_from_dir_2"),
         MOCK_SYMLINK("dir1/symlink", "dir1/file_from_dir_2"),
-        { .path = NULL, .mode = 0, .entries = NULL, .target = NULL }
+        MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
 
@@ -217,7 +217,7 @@ static void should_successfully_print_the_contents_of_the_explicitly_specified_h
         MOCK_CHAR_DEVICE(".char_device"),
         MOCK_FILE(".file1"),
         MOCK_SYMLINK("symlink", ".file1"),
-        { .path = NULL, .mode = 0, .entries = NULL, .target = NULL }
+        MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
 
@@ -251,7 +251,7 @@ static void should_successfully_print_the_contents_of_the_explicitly_specified_h
         MOCK_FILE("dir1/file_from_dir_3"),
         MOCK_FILE("dir1/normal_file"),
         MOCK_DIR("dir1/.run", ".", ".."),
-        { .path = NULL, .mode = 0, .entries = NULL, .target = NULL }
+        MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
 
@@ -298,7 +298,7 @@ static void should_successfully_print_the_contents_of_the_explicitly_specified_h
         MOCK_FILE(".dir1/.gitignore"),
         MOCK_FILE(".dir1/file_from_dir_2"),
         MOCK_SYMLINK(".dir1/symlink", ".dir1/file_from_dir_2"),
-        { .path = NULL, .mode = 0, .entries = NULL, .target = NULL }
+        MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
 
@@ -331,7 +331,7 @@ static void should_successfully_not_print_anything_if_the_specified_directory_is
 {
     const t_vfs_mock_entry vfs[] = {
         MOCK_DIR("dir", ".", ".."),
-        { .path = NULL, .mode = 0, .entries = NULL, .target = NULL }
+        MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
 
@@ -351,7 +351,7 @@ static void should_successfully_not_print_anything_if_the_specified_directory_on
         MOCK_FILE(".dir/.gitignore"),
         MOCK_DIR(".dir/.idea", ".", ".."),
         MOCK_DIR(".dir/.run", ".", ".."),
-        { .path = NULL, .mode = 0, .entries = NULL, .target = NULL }
+        MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
 
@@ -369,7 +369,7 @@ static void should_successfully_only_print_dir_headers_if_the_specified_director
     const t_vfs_mock_entry vfs[] = {
         MOCK_DIR(".dir", ".", ".."),
         MOCK_DIR("dir1", "..", "."),
-        { .path = NULL, .mode = 0, .entries = NULL, .target = NULL }
+        MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
 
@@ -395,7 +395,7 @@ static void should_successfully_only_print_dir_headers_if_the_specified_director
         MOCK_FILE(".dir1/.gitignore"),
         MOCK_DIR(".dir1/.idea", ".", ".."),
         MOCK_DIR("dir/.run", ".", ".."),
-        { .path = NULL, .mode = 0, .entries = NULL, .target = NULL }
+        MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
 
@@ -420,7 +420,7 @@ static void should_successfully_only_print_dir_headers_with_non_directory_files_
         MOCK_FILE("file"),
         MOCK_DIR(".dir1", ".", ".."),
         MOCK_DIR("dir", ".", ".."),
-        { .path = NULL, .mode = 0, .entries = NULL, .target = NULL }
+        MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
 
@@ -451,7 +451,7 @@ static void should_successfully_only_print_dir_headers_with_non_directory_files_
         MOCK_FILE("dir/.gitignore"),
         MOCK_DIR("dir/.idea", ".", ".."),
         MOCK_DIR("dir1/.run", ".", ".."),
-        { .path = NULL, .mode = 0, .entries = NULL, .target = NULL }
+        MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
 
@@ -485,7 +485,7 @@ static void should_successfully_print_the_contents_of_the_current_directory_sort
         MOCK_DIR("./dir", ".", ".."),
         MOCK_FILE("./.hidden_file"),
         MOCK_FILE("./FILE"),
-        { .path = NULL, .mode = 0, .entries = NULL, .target = NULL }
+        MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
 
@@ -521,7 +521,7 @@ static void should_successfully_print_the_contents_of_the_specified_directory_so
         MOCK_DIR("dir/dir", ".", ".."),
         MOCK_FILE("dir/.hidden_file"),
         MOCK_FILE("dir/FILE"),
-        { .path = NULL, .mode = 0, .entries = NULL, .target = NULL }
+        MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
 
@@ -553,7 +553,7 @@ static void should_successfully_print_the_specified_non_directory_file_operands_
         MOCK_FILE("f"),
         MOCK_FILE(".hidden_file"),
         MOCK_FILE("FILE"),
-        { .path = NULL, .mode = 0, .entries = NULL, .target = NULL }
+        MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
 
@@ -589,7 +589,7 @@ static void should_successfully_print_the_specified_directory_file_operands_and_
         MOCK_SYMLINK("_dir/symlink", "_dir/FILE"),
         MOCK_FILE("DIR/2FILE"),
         MOCK_FILE("DIR/file3"),
-        { .path = NULL, .mode = 0, .entries = NULL, .target = NULL }
+        MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
 
@@ -643,7 +643,7 @@ static void should_successfully_print_the_specified_mixed_types_file_operands_an
         MOCK_SYMLINK(".hiddir/symlink", ".hiddir/FILE"),
         MOCK_FILE("dir/2FILE"),
         MOCK_FILE("dir/file3"),
-        { .path = NULL, .mode = 0, .entries = NULL, .target = NULL }
+        MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
 
