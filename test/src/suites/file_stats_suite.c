@@ -10,7 +10,6 @@ static struct stat file_stats;
 static void test_setup(void)
 {
     vfs_mock_reset();
-    reset_stat_guarantees();
 }
 
 static void assert_file_stats_retrieving_failed(const int result)
