@@ -1,6 +1,7 @@
 TODO:
 1. Implementar LS-13 Support for multiple types of files
 2. Mockear VFS
+    - MOCK_NULL_TERMINATOR
 3. Posibles refactors de la suite de tests
 4. Refactor e implementar mi propio enum para los tipos de ficheros y otro para los booleanos del renderer
 5. Usar un struct propio para los opendirs, stat, etc. (como t_dir_stream de antes)

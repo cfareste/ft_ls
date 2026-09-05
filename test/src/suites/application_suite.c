@@ -14,6 +14,7 @@ static void test_setup(void)
     reset_dirent_guarantees();
     reset_stat_guarantees();
     reset_printing_buffer();
+    vfs_mock_reset();
 }
 
 static void test_teardown(void)
@@ -28,14 +29,18 @@ static void assert_application_execution_succeed(const int result)
 
 static void should_successfully_print_the_contents_of_the_current_directory_one_per_line_if_no_file_operands_are_specified(void)
 {
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", ".", "..", "file1", "subdir1", "symlink", "zz"),
+        MOCK_FILE("./file1"),
+        MOCK_DIR("./subdir1", ".", ".."),
+        MOCK_SYMLINK("./symlink", "file1"),
+        MOCK_FILE("./zz"),
+        { .path = NULL, .mode = 0, .entries = NULL, .target = NULL }
+    };
+    vfs_mock_setup(vfs);
+
     const char *arguments[] = { NULL };
-    const char *dir_names[] = { ".", NULL };
-    const char *file_names[] = { ".", "..", "file1", "subdir1", "symlink", "zz", NULL };
-    const char **entry_names[] = { file_names, NULL };
-    const char *expected_file_names[] = { file_names[2], file_names[3], file_names[4], file_names[5], NULL };
-    guarantee_stat_will_populate_stats_of_a_directory_type_file(".");
-    ensure_opendir_will_open_N_dirs_named(dir_names);
-    guarantee_readdir_will_return_N_files_named(entry_names);
+    const char *expected_file_names[] = { "file1", "subdir1", "symlink", "zz" };
     parsed_arguments = parse_arguments(0, arguments);
 
     const int result = application_run(parsed_arguments);
@@ -51,9 +56,14 @@ static void should_successfully_print_the_contents_of_the_current_directory_one_
 
 static void should_successfully_print_the_file_name_if_a_regular_file_operand_is_specified(void)
 {
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("../../ft_ls/test/./frameworks/../regular_file"),
+        { .path = NULL, .mode = 0, .entries = NULL, .target = NULL }
+    };
+    vfs_mock_setup(vfs);
+
     const char *file_name = "../../ft_ls/test/./frameworks/../regular_file";
     const char *arguments[] = { file_name, NULL };
-    guarantee_stat_will_populate_stats_of_a_regular_type_file(file_name);
     parsed_arguments = parse_arguments(1, arguments);
 
     const int result = application_run(parsed_arguments);
@@ -64,14 +74,18 @@ static void should_successfully_print_the_file_name_if_a_regular_file_operand_is
 
 static void should_successfully_print_the_contents_of_the_directory_specified_as_an_operand(void)
 {
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("dir", ".", "..", "block_device", "char_device", "file_from_dir_1", "subdir_1"),
+        MOCK_BLOCK_DEVICE("dir/block_device"),
+        MOCK_CHAR_DEVICE("dir/char_device"),
+        MOCK_FILE("dir/file_from_dir_1"),
+        MOCK_DIR("dir/subdir_1", ".", ".."),
+        { .path = NULL, .mode = 0, .entries = NULL, .target = NULL }
+    };
+    vfs_mock_setup(vfs);
+
     const char *arguments[] = { "dir", NULL };
-    const char *dir_names[] = { arguments[0], NULL };
-    const char *file_names[] = { ".", "..", "block_device", "char_device", "file_from_dir_1", "subdir_1", NULL };
-    const char **entry_names[] = { file_names, NULL };
-    const char *expected_file_names[] = { file_names[2], file_names[3], file_names[4], file_names[5], NULL };
-    guarantee_stat_will_populate_stats_of_a_directory_type_file(arguments[0]);
-    ensure_opendir_will_open_N_dirs_named(dir_names);
-    guarantee_readdir_will_return_N_files_named(entry_names);
+    const char *expected_file_names[] = { "block_device", "char_device", "file_from_dir_1", "subdir_1" };
     parsed_arguments = parse_arguments(1, arguments);
 
     const int result = application_run(parsed_arguments);
@@ -87,9 +101,15 @@ static void should_successfully_print_the_contents_of_the_directory_specified_as
 
 static void should_successfully_print_the_contents_of_multiple_non_directory_files(void)
 {
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_BLOCK_DEVICE("block_device"),
+        MOCK_CHAR_DEVICE("cd1"),
+        MOCK_FILE("file1"),
+        { .path = NULL, .mode = 0, .entries = NULL, .target = NULL }
+    };
+    vfs_mock_setup(vfs);
+
     const char *arguments[] = { "block_device", "cd1", "cd1", "file1", NULL };
-    const unsigned int types[] = { S_IFBLK, S_IFCHR, S_IFCHR, S_IFREG, 0 };
-    guarantee_stat_will_populate_stats_of_N_file_types_for_paths(arguments, types);
     parsed_arguments = parse_arguments(4, arguments);
 
     const int result = application_run(parsed_arguments);
@@ -106,18 +126,22 @@ static void should_successfully_print_the_contents_of_multiple_non_directory_fil
 
 static void should_successfully_print_the_contents_of_multiple_directory_files(void)
 {
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("dir", ".", "file_dir_1", ".."),
+        MOCK_DIR("dir2", "file_dir_2", "..", ".", "symlink"),
+        MOCK_DIR("dir3", "..", ".", "file_dir_3"),
+        MOCK_FILE("dir/file_dir_1"),
+        MOCK_FILE("dir2/file_dir_2"),
+        MOCK_SYMLINK("dir2/symlink", "dir2/file_dir_2"),
+        MOCK_FILE("dir3/file_dir_3"),
+        { .path = NULL, .mode = 0, .entries = NULL, .target = NULL }
+    };
+    vfs_mock_setup(vfs);
+
     const char *arguments[] = { "dir", "dir2", "dir3", NULL };
-    const unsigned int types[] = { S_IFDIR, S_IFDIR, S_IFDIR, 0 };
-    const char *first_dir_file_names[] = { ".", "file_dir_1", "..", NULL };
-    const char *second_dir_file_names[] = { "file_dir_2", "..", ".", "symlink", NULL };
-    const char *third_dir_file_names[] = { "..", ".", "file_dir_3", NULL };
-    const char *expected_first_dir_file_names[] = { first_dir_file_names[1], NULL };
-    const char *expected_second_dir_file_names[] = { second_dir_file_names[0], second_dir_file_names[3], NULL };
-    const char *expected_third_dir_file_names[] = { third_dir_file_names[2], NULL };
-    const char **entry_names[] = { first_dir_file_names, second_dir_file_names, third_dir_file_names, NULL };
-    guarantee_stat_will_populate_stats_of_N_file_types_for_paths(arguments, types);
-    ensure_opendir_will_open_N_dirs_named(arguments);
-    guarantee_readdir_will_return_N_files_named(entry_names);
+    const char *expected_first_dir_file_name = "file_dir_1";
+    const char *expected_second_dir_file_names[] = { "file_dir_2", "symlink" };
+    const char *expected_third_dir_file_name = "file_dir_3";
     parsed_arguments = parse_arguments(3, arguments);
 
     const int result = application_run(parsed_arguments);
@@ -130,29 +154,37 @@ static void should_successfully_print_the_contents_of_multiple_directory_files(v
         "\n%s:\n"
         "%s\n",
         arguments[0],
-        expected_first_dir_file_names[0],
+        expected_first_dir_file_name,
         arguments[1],
         expected_second_dir_file_names[0],
         expected_second_dir_file_names[1],
         arguments[2],
-        expected_third_dir_file_names[0]
+        expected_third_dir_file_name
     ));
     assert_application_execution_succeed(result);
 }
 
 static void should_successfully_print_the_contents_of_the_mixed_types_specified_operands(void)
 {
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("file1"),
+        MOCK_SYMLINK("symlink", "file1"),
+        MOCK_DIR("dir", ".", "block_device", "char_device", "file_from_dir_1", "..", "subdir_1"),
+        MOCK_BLOCK_DEVICE("dir/block_device"),
+        MOCK_CHAR_DEVICE("dir/char_device"),
+        MOCK_FILE("dir/file_from_dir_1"),
+        MOCK_DIR("dir/subdir_1", ".", ".."),
+        MOCK_DIR("dir1", "..", "file2", ".", "file_from_dir_2", "symlink"),
+        MOCK_FILE("dir1/file2"),
+        MOCK_FILE("dir1/file_from_dir_2"),
+        MOCK_SYMLINK("dir1/symlink", "dir1/file_from_dir_2"),
+        { .path = NULL, .mode = 0, .entries = NULL, .target = NULL }
+    };
+    vfs_mock_setup(vfs);
+
     const char *arguments[] = { "dir", "file1", "file1", "symlink", "dir1", NULL };
-    const unsigned int types[] = { S_IFDIR, S_IFREG, S_IFREG, S_IFLNK, S_IFDIR, 0 };
-    const char *dir_names[] = { arguments[0], arguments[4], NULL };
-    const char *first_dir_file_names[] = { ".",  "block_device", "char_device", "file_from_dir_1", "..", "subdir_1", NULL };
-    const char *second_dir_file_names[] = { "..", "file2", ".", "file_from_dir_2", "symlink", NULL };
-    const char *expected_first_dir_file_names[] = { first_dir_file_names[1], first_dir_file_names[2], first_dir_file_names[3], first_dir_file_names[5], NULL };
-    const char *expected_second_dir_file_names[] = { second_dir_file_names[1], second_dir_file_names[3], second_dir_file_names[4], NULL };
-    const char **entry_names[] = { first_dir_file_names, second_dir_file_names, NULL };
-    guarantee_stat_will_populate_stats_of_N_file_types_for_paths(arguments, types);
-    ensure_opendir_will_open_N_dirs_named(dir_names);
-    guarantee_readdir_will_return_N_files_named(entry_names);
+    const char *expected_first_dir_file_names[] = { "block_device", "char_device", "file_from_dir_1", "subdir_1" };
+    const char *expected_second_dir_file_names[] = { "file2", "file_from_dir_2", "symlink" };
     parsed_arguments = parse_arguments(5, arguments);
 
     const int result = application_run(parsed_arguments);
@@ -166,12 +198,12 @@ static void should_successfully_print_the_contents_of_the_mixed_types_specified_
         arguments[1],
         arguments[2],
         arguments[3],
-        dir_names[0],
+        arguments[0],
         expected_first_dir_file_names[0],
         expected_first_dir_file_names[1],
         expected_first_dir_file_names[2],
         expected_first_dir_file_names[3],
-        dir_names[1],
+        arguments[4],
         expected_second_dir_file_names[0],
         expected_second_dir_file_names[1],
         expected_second_dir_file_names[2]
@@ -181,9 +213,15 @@ static void should_successfully_print_the_contents_of_the_mixed_types_specified_
 
 static void should_successfully_print_the_contents_of_the_explicitly_specified_hidden_non_directory_file_operands(void)
 {
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_CHAR_DEVICE(".char_device"),
+        MOCK_FILE(".file1"),
+        MOCK_SYMLINK("symlink", ".file1"),
+        { .path = NULL, .mode = 0, .entries = NULL, .target = NULL }
+    };
+    vfs_mock_setup(vfs);
+
     const char *arguments[] = { ".char_device", ".file1", "symlink", NULL };
-    const unsigned int types[] = { S_IFCHR, S_IFREG, S_IFLNK, 0 };
-    guarantee_stat_will_populate_stats_of_N_file_types_for_paths(arguments, types);
     parsed_arguments = parse_arguments(3, arguments);
 
     const int result = application_run(parsed_arguments);
@@ -199,19 +237,28 @@ static void should_successfully_print_the_contents_of_the_explicitly_specified_h
 
 static void should_successfully_print_the_contents_of_the_explicitly_specified_hidden_directory_file_operands(void)
 {
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".dir", ".", "char_device", "..", "file_from_dir_1", ".gitignore"),
+        MOCK_DIR(".dir2", "..", "file_from_dir_2", ".", "symlink", ".idea"),
+        MOCK_DIR("dir1", "char_device", ".", "file_from_dir_3", ".run", "..", "normal_file"),
+        MOCK_CHAR_DEVICE(".dir/char_device"),
+        MOCK_FILE(".dir/file_from_dir_1"),
+        MOCK_FILE(".dir/.gitignore"),
+        MOCK_FILE(".dir2/file_from_dir_2"),
+        MOCK_SYMLINK(".dir2/symlink", "dir2/file_from_dir_2"),
+        MOCK_DIR(".dir2/.idea", ".", ".."),
+        MOCK_CHAR_DEVICE("dir1/char_device"),
+        MOCK_FILE("dir1/file_from_dir_3"),
+        MOCK_FILE("dir1/normal_file"),
+        MOCK_DIR("dir1/.run", ".", ".."),
+        { .path = NULL, .mode = 0, .entries = NULL, .target = NULL }
+    };
+    vfs_mock_setup(vfs);
+
     const char *arguments[] = { ".dir", ".dir2", "dir1", NULL };
-    const unsigned int types[] = { S_IFDIR, S_IFDIR , S_IFDIR, 0 };
-    const char *dir_names[] = { arguments[0], arguments[1], arguments[2], NULL };
-    const char *first_dir_file_names[] = { ".", "char_device", "..", "file_from_dir_1", ".gitignore", NULL };
-    const char *second_dir_file_names[] = { "..", "file_from_dir_2", ".", "symlink", ".idea", NULL };
-    const char *third_dir_file_names[] = { "char_device", ".", "file_from_dir_3", ".run", "..", "normal_file", NULL };
-    const char *expected_first_dir_file_names[] = { first_dir_file_names[1], first_dir_file_names[3], NULL };
-    const char *expected_second_dir_file_names[] = { second_dir_file_names[1], second_dir_file_names[3], NULL };
-    const char *expected_third_dir_file_names[] = { third_dir_file_names[0], third_dir_file_names[2], third_dir_file_names[5], NULL };
-    const char **entry_names[] = { first_dir_file_names, second_dir_file_names, third_dir_file_names, NULL };
-    guarantee_stat_will_populate_stats_of_N_file_types_for_paths(arguments, types);
-    ensure_opendir_will_open_N_dirs_named(dir_names);
-    guarantee_readdir_will_return_N_files_named(entry_names);
+    const char *expected_first_dir_file_names[] = { "char_device", "file_from_dir_1" };
+    const char *expected_second_dir_file_names[] = { "file_from_dir_2", "symlink" };
+    const char *expected_third_dir_file_names[] = { "char_device", "file_from_dir_3", "normal_file" };
     parsed_arguments = parse_arguments(3, arguments);
 
     const int result = application_run(parsed_arguments);
@@ -223,13 +270,13 @@ static void should_successfully_print_the_contents_of_the_explicitly_specified_h
         "%s\n%s\n"
         "\n%s:\n"
         "%s\n%s\n%s\n",
-        dir_names[0],
+        arguments[0],
         expected_first_dir_file_names[0],
         expected_first_dir_file_names[1],
-        dir_names[1],
+        arguments[1],
         expected_second_dir_file_names[0],
         expected_second_dir_file_names[1],
-        dir_names[2],
+        arguments[2],
         expected_third_dir_file_names[0],
         expected_third_dir_file_names[1],
         expected_third_dir_file_names[2]
@@ -239,17 +286,25 @@ static void should_successfully_print_the_contents_of_the_explicitly_specified_h
 
 static void should_successfully_print_the_contents_of_the_explicitly_specified_hidden_mixed_file_operands(void)
 {
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE(".file1"),
+        MOCK_SYMLINK(".symlink", "file1"),
+        MOCK_DIR(".dir", ".run", ".", "char_device", "..", "file_from_dir_1"),
+        MOCK_DIR(".dir1", "..", ".gitignore", "file_from_dir_2", ".", "symlink", ".vscode"),
+        MOCK_DIR(".dir/.run", "..", "."),
+        MOCK_CHAR_DEVICE(".dir/char_device"),
+        MOCK_FILE(".dir/file_from_dir_1"),
+        MOCK_DIR(".dir1/.vscode", "..", "."),
+        MOCK_FILE(".dir1/.gitignore"),
+        MOCK_FILE(".dir1/file_from_dir_2"),
+        MOCK_SYMLINK(".dir1/symlink", ".dir1/file_from_dir_2"),
+        { .path = NULL, .mode = 0, .entries = NULL, .target = NULL }
+    };
+    vfs_mock_setup(vfs);
+
     const char *arguments[] = { ".dir", ".dir1", ".file1", ".symlink", NULL };
-    const unsigned int types[] = { S_IFDIR, S_IFDIR, S_IFREG, S_IFLNK, 0 };
-    const char *dir_names[] = { arguments[0], arguments[1], NULL };
-    const char *first_dir_file_names[] = { ".run", ".", "char_device", "..", "file_from_dir_1", NULL };
-    const char *second_dir_file_names[] = { "..", ".gitignore", "file_from_dir_2", ".", "symlink", ".vscode", NULL };
-    const char *expected_first_dir_file_names[] = { first_dir_file_names[2], first_dir_file_names[4], NULL };
-    const char *expected_second_dir_file_names[] = { second_dir_file_names[2], second_dir_file_names[4], NULL };
-    const char **entry_names[] = { first_dir_file_names, second_dir_file_names, NULL };
-    guarantee_stat_will_populate_stats_of_N_file_types_for_paths(arguments, types);
-    ensure_opendir_will_open_N_dirs_named(dir_names);
-    guarantee_readdir_will_return_N_files_named(entry_names);
+    const char *expected_first_dir_file_names[] = { "char_device", "file_from_dir_1" };
+    const char *expected_second_dir_file_names[] = { "file_from_dir_2", "symlink" };
     parsed_arguments = parse_arguments(5, arguments);
 
     const int result = application_run(parsed_arguments);
@@ -262,10 +317,10 @@ static void should_successfully_print_the_contents_of_the_explicitly_specified_h
         "%s\n%s\n",
         arguments[2],
         arguments[3],
-        dir_names[0],
+        arguments[0],
         expected_first_dir_file_names[0],
         expected_first_dir_file_names[1],
-        dir_names[1],
+        arguments[1],
         expected_second_dir_file_names[0],
         expected_second_dir_file_names[1]
     ));
@@ -274,13 +329,13 @@ static void should_successfully_print_the_contents_of_the_explicitly_specified_h
 
 static void should_successfully_not_print_anything_if_the_specified_directory_is_empty(void)
 {
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("dir", ".", ".."),
+        { .path = NULL, .mode = 0, .entries = NULL, .target = NULL }
+    };
+    vfs_mock_setup(vfs);
+
     const char *arguments[] = { "dir", NULL };
-    const char *dir_names[] = { arguments[0], NULL };
-    const char *first_dir_file_names[] = { ".", "..", NULL };
-    const char **entry_names[] = { first_dir_file_names, NULL };
-    guarantee_stat_will_populate_stats_of_a_directory_type_file(dir_names[0]);
-    ensure_opendir_will_open_N_dirs_named(dir_names);
-    guarantee_readdir_will_return_N_files_named(entry_names);
     parsed_arguments = parse_arguments(1, arguments);
 
     const int result = application_run(parsed_arguments);
@@ -291,13 +346,16 @@ static void should_successfully_not_print_anything_if_the_specified_directory_is
 
 static void should_successfully_not_print_anything_if_the_specified_directory_only_has_hidden_files(void)
 {
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".dir", ".", ".gitignore", "..", ".idea/", ".run/"),
+        MOCK_FILE(".dir/.gitignore"),
+        MOCK_DIR(".dir/.idea", ".", ".."),
+        MOCK_DIR(".dir/.run", ".", ".."),
+        { .path = NULL, .mode = 0, .entries = NULL, .target = NULL }
+    };
+    vfs_mock_setup(vfs);
+
     const char *arguments[] = { ".dir", NULL };
-    const char *dir_names[] = { arguments[0], NULL };
-    const char *first_dir_file_names[] = { ".", ".gitignore", "..", ".idea/", ".run/", NULL };
-    const char **entry_names[] = { first_dir_file_names, NULL };
-    guarantee_stat_will_populate_stats_of_a_directory_type_file(dir_names[0]);
-    ensure_opendir_will_open_N_dirs_named(dir_names);
-    guarantee_readdir_will_return_N_files_named(entry_names);
     parsed_arguments = parse_arguments(1, arguments);
 
     const int result = application_run(parsed_arguments);
@@ -308,15 +366,14 @@ static void should_successfully_not_print_anything_if_the_specified_directory_on
 
 static void should_successfully_only_print_dir_headers_if_the_specified_directories_are_empty(void)
 {
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".dir", ".", ".."),
+        MOCK_DIR("dir1", "..", "."),
+        { .path = NULL, .mode = 0, .entries = NULL, .target = NULL }
+    };
+    vfs_mock_setup(vfs);
+
     const char *arguments[] = { ".dir", "dir1", NULL };
-    const unsigned int types[] = { S_IFDIR, S_IFDIR, 0 };
-    const char *dir_names[] = { arguments[0], arguments[1], NULL };
-    const char *first_dir_file_names[] = { ".", "..", NULL };
-    const char *second_dir_file_names[] = { "..", ".", NULL };
-    const char **entry_names[] = { first_dir_file_names, second_dir_file_names, NULL };
-    guarantee_stat_will_populate_stats_of_N_file_types_for_paths(arguments, types);
-    ensure_opendir_will_open_N_dirs_named(dir_names);
-    guarantee_readdir_will_return_N_files_named(entry_names);
     parsed_arguments = parse_arguments(2, arguments);
 
     const int result = application_run(parsed_arguments);
@@ -324,23 +381,25 @@ static void should_successfully_only_print_dir_headers_if_the_specified_director
     CU_ASSERT(verify_that_the_str_that_has_been_printed_is(
         "%s:\n"
         "\n%s:\n",
-        dir_names[0],
-        dir_names[1]
+        arguments[0],
+        arguments[1]
     ));
     assert_application_execution_succeed(result);
 }
 
 static void should_successfully_only_print_dir_headers_if_the_specified_directories_only_have_hidden_files(void)
 {
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".dir1", "..", ".gitignore", ".idea", "."),
+        MOCK_DIR("dir", ".", ".run", ".."),
+        MOCK_FILE(".dir1/.gitignore"),
+        MOCK_DIR(".dir1/.idea", ".", ".."),
+        MOCK_DIR("dir/.run", ".", ".."),
+        { .path = NULL, .mode = 0, .entries = NULL, .target = NULL }
+    };
+    vfs_mock_setup(vfs);
+
     const char *arguments[] = { ".dir1", "dir", NULL };
-    const unsigned int types[] = { S_IFDIR, S_IFDIR, 0 };
-    const char *dir_names[] = { arguments[0], arguments[1], NULL };
-    const char *first_dir_file_names[] = { "..", ".gitignore", ".idea", ".", NULL };
-    const char *second_dir_file_names[] = { ".", ".run", "..", NULL };
-    const char **entry_names[] = { first_dir_file_names, second_dir_file_names, NULL };
-    guarantee_stat_will_populate_stats_of_N_file_types_for_paths(arguments, types);
-    ensure_opendir_will_open_N_dirs_named(dir_names);
-    guarantee_readdir_will_return_N_files_named(entry_names);
     parsed_arguments = parse_arguments(2, arguments);
 
     const int result = application_run(parsed_arguments);
@@ -348,23 +407,24 @@ static void should_successfully_only_print_dir_headers_if_the_specified_director
     CU_ASSERT(verify_that_the_str_that_has_been_printed_is(
         "%s:\n"
         "\n%s:\n",
-        dir_names[0],
-        dir_names[1]
+        arguments[0],
+        arguments[1]
     ));
     assert_application_execution_succeed(result);
 }
 
 static void should_successfully_only_print_dir_headers_with_non_directory_files_if_the_specified_directories_are_empty(void)
 {
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE(".hidden"),
+        MOCK_FILE("file"),
+        MOCK_DIR(".dir1", ".", ".."),
+        MOCK_DIR("dir", ".", ".."),
+        { .path = NULL, .mode = 0, .entries = NULL, .target = NULL }
+    };
+    vfs_mock_setup(vfs);
+
     const char *arguments[] = { ".hidden", ".dir1", "dir", "file", NULL };
-    const unsigned int types[] = { S_IFREG, S_IFDIR, S_IFDIR, S_IFREG, 0 };
-    const char *dir_names[] = { arguments[1], arguments[2], NULL };
-    const char *first_dir_file_names[] = { "..", ".", NULL };
-    const char *second_dir_file_names[] = { ".", "..", NULL };
-    const char **entry_names[] = { first_dir_file_names, second_dir_file_names, NULL };
-    guarantee_stat_will_populate_stats_of_N_file_types_for_paths(arguments, types);
-    ensure_opendir_will_open_N_dirs_named(dir_names);
-    guarantee_readdir_will_return_N_files_named(entry_names);
     parsed_arguments = parse_arguments(4, arguments);
 
     const int result = application_run(parsed_arguments);
@@ -375,23 +435,27 @@ static void should_successfully_only_print_dir_headers_with_non_directory_files_
         "\n%s:\n",
         arguments[0],
         arguments[3],
-        dir_names[0],
-        dir_names[1]
+        arguments[1],
+        arguments[2]
     ));
     assert_application_execution_succeed(result);
 }
 
 static void should_successfully_only_print_dir_headers_with_non_directory_files_if_the_specified_directories_only_have_hidden_files(void)
 {
-    const char *arguments[] = { "dir", ".hidden", "dir", "file", NULL };
-    const unsigned int types[] = { S_IFDIR, S_IFREG, S_IFDIR, S_IFREG, 0 };
-    const char *dir_names[] = { arguments[0], arguments[2], NULL };
-    const char *first_dir_file_names[] = { "..", ".gitignore", ".idea", ".", NULL };
-    const char *second_dir_file_names[] = { ".", ".run", "..", NULL };
-    const char **entry_names[] = { first_dir_file_names, second_dir_file_names, NULL };
-    guarantee_stat_will_populate_stats_of_N_file_types_for_paths(arguments, types);
-    ensure_opendir_will_open_N_dirs_named(dir_names);
-    guarantee_readdir_will_return_N_files_named(entry_names);
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE(".hidden"),
+        MOCK_FILE("file"),
+        MOCK_DIR("dir", "..", ".gitignore", ".idea", "."),
+        MOCK_DIR("dir1", ".", ".run", ".."),
+        MOCK_FILE("dir/.gitignore"),
+        MOCK_DIR("dir/.idea", ".", ".."),
+        MOCK_DIR("dir1/.run", ".", ".."),
+        { .path = NULL, .mode = 0, .entries = NULL, .target = NULL }
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "dir", ".hidden", "dir1", "file", NULL };
     parsed_arguments = parse_arguments(4, arguments);
 
     const int result = application_run(parsed_arguments);
@@ -402,31 +466,31 @@ static void should_successfully_only_print_dir_headers_with_non_directory_files_
         "\n%s:\n",
         arguments[1],
         arguments[3],
-        dir_names[0],
-        dir_names[1]
+        arguments[0],
+        arguments[2]
     ));
     assert_application_execution_succeed(result);
 }
 
 static void should_successfully_print_the_contents_of_the_current_directory_sorted_if_no_file_operands_are_specified(void)
 {
-    const char *arguments[] = { NULL };
-    const char *dir_names[] = { ".", NULL };
-    const char *file_names[] = { "a", "2file", "_DIR", ".hiddir", "_file", "f", "dir", ".hidden_file", "FILE", NULL };
-    const char **entry_names[] = { file_names, NULL };
-    const char *expected_file_names[] = {
-        file_names[1],
-        file_names[8],
-        file_names[2],
-        file_names[4],
-        file_names[0],
-        file_names[6],
-        file_names[5],
-        NULL
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", "a", "2file", "..", "_DIR", ".hiddir", "_file", "f", "dir", ".hidden_file", ".", "FILE"),
+        MOCK_FILE("./a"),
+        MOCK_FILE("./2file"),
+        MOCK_DIR("./_DIR", ".", ".."),
+        MOCK_DIR("./.hiddir", ".", ".."),
+        MOCK_FILE("./_file"),
+        MOCK_FILE("./f"),
+        MOCK_DIR("./dir", ".", ".."),
+        MOCK_FILE("./.hidden_file"),
+        MOCK_FILE("./FILE"),
+        { .path = NULL, .mode = 0, .entries = NULL, .target = NULL }
     };
-    guarantee_stat_will_populate_stats_of_a_directory_type_file(".");
-    ensure_opendir_will_open_N_dirs_named(dir_names);
-    guarantee_readdir_will_return_N_files_named(entry_names);
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { NULL };
+    const char *expected_file_names[] = { "2file", "FILE", "_DIR", "_file", "a", "dir", "f" };
     parsed_arguments = parse_arguments(0, arguments);
 
     const int result = application_run(parsed_arguments);
@@ -446,23 +510,23 @@ static void should_successfully_print_the_contents_of_the_current_directory_sort
 
 static void should_successfully_print_the_contents_of_the_specified_directory_sorted(void)
 {
-    const char *arguments[] = { "dir", NULL };
-    const char *dir_names[] = { arguments[0], NULL };
-    const char *file_names[] = { "a", "2file", "_DIR", ".hiddir", "_file", "f", "dir", ".hidden_file", "FILE", NULL };
-    const char **entry_names[] = { file_names, NULL };
-    const char *expected_file_names[] = {
-        file_names[1],
-        file_names[8],
-        file_names[2],
-        file_names[4],
-        file_names[0],
-        file_names[6],
-        file_names[5],
-        NULL
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("dir", "a", "2file", "..", "_DIR", ".hiddir", "_file", "f", "dir", ".hidden_file", ".", "FILE"),
+        MOCK_FILE("dir/a"),
+        MOCK_FILE("dir/2file"),
+        MOCK_DIR("dir/_DIR", ".", ".."),
+        MOCK_DIR("dir/.hiddir", ".", ".."),
+        MOCK_FILE("dir/_file"),
+        MOCK_FILE("dir/f"),
+        MOCK_DIR("dir/dir", ".", ".."),
+        MOCK_FILE("dir/.hidden_file"),
+        MOCK_FILE("dir/FILE"),
+        { .path = NULL, .mode = 0, .entries = NULL, .target = NULL }
     };
-    guarantee_stat_will_populate_stats_of_a_directory_type_file(dir_names[0]);
-    ensure_opendir_will_open_N_dirs_named(dir_names);
-    guarantee_readdir_will_return_N_files_named(entry_names);
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "dir", NULL };
+    const char *expected_file_names[] = { "2file", "FILE", "_DIR", "_file", "a", "dir", "f" };
     parsed_arguments = parse_arguments(1, arguments);
 
     const int result = application_run(parsed_arguments);
@@ -482,18 +546,19 @@ static void should_successfully_print_the_contents_of_the_specified_directory_so
 
 static void should_successfully_print_the_specified_non_directory_file_operands_sorted(void)
 {
-    const char *arguments[] = { "a", "2file", "_file", "f", ".hidden_file", "FILE", NULL };
-    const unsigned int types[] = { S_IFREG, S_IFREG, S_IFREG, S_IFREG, S_IFREG, S_IFREG, 0 };
-    const char *expected_file_names[] = {
-        arguments[4],
-        arguments[1],
-        arguments[5],
-        arguments[2],
-        arguments[0],
-        arguments[3],
-        NULL
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("a"),
+        MOCK_FILE("2file"),
+        MOCK_FILE("_file"),
+        MOCK_FILE("f"),
+        MOCK_FILE(".hidden_file"),
+        MOCK_FILE("FILE"),
+        { .path = NULL, .mode = 0, .entries = NULL, .target = NULL }
     };
-    guarantee_stat_will_populate_stats_of_N_file_types_for_paths(arguments, types);
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "a", "2file", "_file", "f", ".hidden_file", "FILE", NULL };
+    const char *expected_file_names[] = { ".hidden_file", "2file", "FILE", "_file", "a", "f" };
     parsed_arguments = parse_arguments(6, arguments);
 
     const int result = application_run(parsed_arguments);
@@ -512,19 +577,26 @@ static void should_successfully_print_the_specified_non_directory_file_operands_
 
 static void should_successfully_print_the_specified_directory_file_operands_and_their_contents_sorted(void)
 {
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("dir", "~file", ".", "file1", "..", "-file"),
+        MOCK_DIR("_dir", "file2", "..", "FILE", ".", "symlink"),
+        MOCK_DIR("DIR", "..", "2FILE", ".", "file3"),
+        MOCK_FILE("dir/~file"),
+        MOCK_FILE("dir/file1"),
+        MOCK_FILE("dir/-file"),
+        MOCK_FILE("_dir/file2"),
+        MOCK_FILE("_dir/FILE"),
+        MOCK_SYMLINK("_dir/symlink", "_dir/FILE"),
+        MOCK_FILE("DIR/2FILE"),
+        MOCK_FILE("DIR/file3"),
+        { .path = NULL, .mode = 0, .entries = NULL, .target = NULL }
+    };
+    vfs_mock_setup(vfs);
+
     const char *arguments[] = { "dir", "_dir", "DIR", NULL };
-    const unsigned int types[] = { S_IFDIR, S_IFDIR, S_IFDIR, 0 };
-    const char *first_dir_file_names[] = { "~file", ".", "file1", "..", "-file", NULL };
-    const char *second_dir_file_names[] = { "file2", "..", "FILE", ".", "symlink", NULL };
-    const char *third_dir_file_names[] = { "..", "2FILE", ".", "file3", NULL };
-    const char *expected_first_dir_file_names[] = { first_dir_file_names[4], first_dir_file_names[2], first_dir_file_names[0], NULL };
-    const char *expected_second_dir_file_names[] = { second_dir_file_names[2], second_dir_file_names[0], second_dir_file_names[4], NULL };
-    const char *expected_third_dir_file_names[] = { third_dir_file_names[1], third_dir_file_names[3], NULL };
-    const char **entry_names[] = { first_dir_file_names, second_dir_file_names, third_dir_file_names, NULL };
-    guarantee_stat_will_populate_stats_of_N_file_types_for_paths(arguments, types);
-    ensure_opendir_will_open_N_dirs_named(arguments);
-    guarantee_readdir_will_return_N_files_named(entry_names);
-    guarantee_stat_will_populate_stats_of_N_file_types_for_paths(arguments, types);
+    const char *expected_first_dir_file_names[] = { "-file", "file1", "~file" };
+    const char *expected_second_dir_file_names[] = { "FILE", "file2", "symlink" };
+    const char *expected_third_dir_file_names[] = { "2FILE", "file3" };
     parsed_arguments = parse_arguments(3, arguments);
 
     const int result = application_run(parsed_arguments);
@@ -553,19 +625,33 @@ static void should_successfully_print_the_specified_directory_file_operands_and_
 
 static void should_successfully_print_the_specified_mixed_types_file_operands_and_their_contents_sorted(void)
 {
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("a"),
+        MOCK_FILE("2file"),
+        MOCK_FILE("_file"),
+        MOCK_FILE("f"),
+        MOCK_FILE(".hidden_file"),
+        MOCK_FILE("FILE"),
+        MOCK_DIR("_DIR", "~file", ".", "file1", "..", "-file"),
+        MOCK_DIR(".hiddir", "file2", "..", "FILE", ".", "symlink"),
+        MOCK_DIR("dir", "..", "2FILE", ".", "file3"),
+        MOCK_FILE("_DIR/~file"),
+        MOCK_FILE("_DIR/file1"),
+        MOCK_FILE("_DIR/-file"),
+        MOCK_FILE(".hiddir/file2"),
+        MOCK_FILE(".hiddir/FILE"),
+        MOCK_SYMLINK(".hiddir/symlink", ".hiddir/FILE"),
+        MOCK_FILE("dir/2FILE"),
+        MOCK_FILE("dir/file3"),
+        { .path = NULL, .mode = 0, .entries = NULL, .target = NULL }
+    };
+    vfs_mock_setup(vfs);
+
     const char *arguments[] = { "a", "2file", "_DIR", ".hiddir", "_file", "f", "dir", ".hidden_file", "FILE", NULL };
-    const char *dir_names[] = { arguments[2], arguments[3], arguments[6], NULL };
-    const unsigned int types[] = { S_IFREG, S_IFREG, S_IFDIR, S_IFDIR, S_IFREG, S_IFREG, S_IFDIR, S_IFREG, S_IFREG, 0 };
-    const char *first_dir_file_names[] = { "~file", ".", "file1", "..", "-file", NULL };
-    const char *second_dir_file_names[] = { "file2", "..", "FILE", ".", "symlink", NULL };
-    const char *third_dir_file_names[] = { "..", "2FILE", ".", "file3", NULL };
-    const char *expected_first_dir_file_names[] = { first_dir_file_names[4], first_dir_file_names[2], first_dir_file_names[0], NULL };
-    const char *expected_second_dir_file_names[] = { second_dir_file_names[2], second_dir_file_names[0], second_dir_file_names[4], NULL };
-    const char *expected_third_dir_file_names[] = { third_dir_file_names[1], third_dir_file_names[3], NULL };
-    const char **entry_names[] = { first_dir_file_names, second_dir_file_names, third_dir_file_names, NULL };
-    guarantee_stat_will_populate_stats_of_N_file_types_for_paths(arguments, types);
-    ensure_opendir_will_open_N_dirs_named(dir_names);
-    guarantee_readdir_will_return_N_files_named(entry_names);
+    const char *expected_non_dir_file_names[] = { ".hidden_file", "2file", "FILE", "_file", "a", "f" };
+    const char *expected_first_dir_file_names[] = { "-file", "file1", "~file" };
+    const char *expected_second_dir_file_names[] = { "FILE", "file2", "symlink" };
+    const char *expected_third_dir_file_names[] = { "2FILE", "file3" };
     parsed_arguments = parse_arguments(9, arguments);
 
     const int result = application_run(parsed_arguments);
@@ -578,21 +664,21 @@ static void should_successfully_print_the_specified_mixed_types_file_operands_an
         "%s\n%s\n%s\n"
         "\n%s:\n"
         "%s\n%s\n",
-        arguments[7],
-        arguments[1],
-        arguments[8],
-        arguments[4],
-        arguments[0],
-        arguments[5],
-        dir_names[1],
+        expected_non_dir_file_names[0],
+        expected_non_dir_file_names[1],
+        expected_non_dir_file_names[2],
+        expected_non_dir_file_names[3],
+        expected_non_dir_file_names[4],
+        expected_non_dir_file_names[5],
+        arguments[3],
         expected_second_dir_file_names[0],
         expected_second_dir_file_names[1],
         expected_second_dir_file_names[2],
-        dir_names[0],
+        arguments[2],
         expected_first_dir_file_names[0],
         expected_first_dir_file_names[1],
         expected_first_dir_file_names[2],
-        dir_names[2],
+        arguments[6],
         expected_third_dir_file_names[0],
         expected_third_dir_file_names[1]
     ));
