@@ -14,42 +14,35 @@ DIR *mock_opendir(const char *path)
 {
     const t_vfs_mock_entry *dir_entry = find_vfs_entry(path);
 
-    if (dir_entry != NULL && S_ISDIR(dir_entry->mode))
-    {
-        t_mock_dir *dir = ft_safe_calloc(1, sizeof(t_mock_dir));
-        dir->dir_entry = dir_entry;
-        dir->next_index = 0;
-        return (DIR *) dir;
-    }
+    if (dir_entry == NULL || !S_ISDIR(dir_entry->mode))
+        return NULL;
 
-    return NULL;
+    t_mock_dir *dir = ft_safe_calloc(1, sizeof(t_mock_dir));
+    dir->dir_entry = dir_entry;
+    dir->next_index = 0;
+    return (DIR *) dir;
 }
 
 struct dirent *mock_readdir(DIR *dirp)
 {
     t_mock_dir *stream = (t_mock_dir *)dirp;
 
-    if (stream != NULL && stream->dir_entry != NULL && stream->dir_entry->entries != NULL)
-    {
-        const char *next_entry_name = stream->dir_entry->entries[stream->next_index];
-        if (next_entry_name == NULL)
-            return NULL;
+    if (stream == NULL || stream->dir_entry == NULL || stream->dir_entry->entries == NULL)
+        return NULL;
 
-        ft_bzero(&stream->entry, sizeof(struct dirent));
-        ft_strlcpy(stream->entry.d_name, next_entry_name, sizeof(stream->entry.d_name));
-        stream->next_index++;
+    const char *next_entry_name = stream->dir_entry->entries[stream->next_index];
+    if (next_entry_name == NULL)
+        return NULL;
 
-        return &stream->entry;
-    }
+    ft_bzero(&stream->entry, sizeof(struct dirent));
+    ft_strlcpy(stream->entry.d_name, next_entry_name, sizeof(stream->entry.d_name));
+    stream->next_index++;
 
-    return NULL;
+    return &stream->entry;
 }
 
 int mock_closedir(DIR *dirp)
 {
-    t_mock_dir *dir = (t_mock_dir *) dirp;
-
-    free(dir);
-
+    free(dirp);
     return 0;
 }

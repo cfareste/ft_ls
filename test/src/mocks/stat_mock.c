@@ -5,12 +5,10 @@
 int stat_mock(const char *restrict pathname, struct stat *restrict statbuf)
 {
     const t_vfs_mock_entry *entry = find_vfs_entry(pathname);
-    if (entry != NULL)
-    {
-        ft_bzero(statbuf, sizeof(struct stat));
-        statbuf->st_mode = entry->mode;
-        return 0;
-    }
+    if (entry == NULL)
+        return -1;
 
-    return -1;
+    ft_bzero(statbuf, sizeof(struct stat));
+    statbuf->st_mode = entry->mode;
+    return 0;
 }

@@ -1,18 +1,16 @@
 TODO:
 1. Implementar LS-13 Support for multiple types of files
 2. Mockear VFS
-   - Borrar funciones de mockeo antiguas y última revisión del refactor
-3. Posibles refactors de la suite de tests
-4. Refactor e implementar mi propio enum para los tipos de ficheros y otro para los booleanos del renderer
-5. Usar un struct propio para los opendirs, stat, etc. (como t_dir_stream de antes)
+3. Refactor e implementar mi propio enum para los tipos de ficheros y otro para los booleanos del renderer
+4. Usar un struct propio para los opendirs, stat, etc. (como t_dir_stream de antes)
+5. Revisar que todas las funciones tengan al menos 1 test que compruebe argumentos inválidos (run app no tiene)
 
 
 TODO En algún momento:
-- Investigar si los tests están acoplados a la implementacion interna de las cosas
+- Investigar si los tests están acoplados a la implementación interna de las cosas
 - Refactor renderer, donde render llama a render_strategy o lo que sea basado en options
 - Reflexionar si meter el should print header en render pasando parsed arguments. Si al hacer las options se necesita
   pasar parsed arguments al render, entonces calcularlo ahi
-- Revisar que todas las funciones tengan al menos 1 test que compruebe argumentos inválidos (run app no tiene)
 - Cuando haga LS-12, revisar que las funciones de ensure will fail dirent estén bien (conversación GPT Mac)
 
 
