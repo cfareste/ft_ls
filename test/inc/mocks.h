@@ -7,7 +7,7 @@
 #define MOCK_SYMLINK(p, target) { (p), S_IFLNK | 0777, NULL, (target) }
 #define MOCK_BLOCK_DEVICE(p) { (p), S_IFBLK | 0660, NULL, NULL }
 #define MOCK_CHAR_DEVICE(p) { (p), S_IFCHR | 0660, NULL, NULL }
-#define MOCK_SOCKET(p) { (p), S_ISSOCK | 0777, NULL, NULL }
+#define MOCK_SOCKET(p) { (p), S_IFSOCK | 0777, NULL, NULL }
 #define MOCK_FIFO(p) { (p), S_IFIFO | 0664, NULL, NULL }
 #define MOCK_NULL_TERMINATOR() { NULL, 0, NULL, NULL }
 
