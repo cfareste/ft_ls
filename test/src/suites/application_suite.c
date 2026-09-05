@@ -11,8 +11,6 @@ static t_parsed_arguments *parsed_arguments = NULL;
 
 static void test_setup(void)
 {
-    reset_dirent_guarantees();
-    reset_stat_guarantees();
     reset_printing_buffer();
     vfs_mock_reset();
 }
