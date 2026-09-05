@@ -11,11 +11,7 @@ static t_file_entry_array *sut;
 
 static void test_setup(void)
 {
-    const char *dir_names[] = { CURRENT_DIRECTORY_PATH, NULL };
     vfs_mock_reset();
-    reset_dirent_guarantees();
-    reset_stat_guarantees();
-    ensure_opendir_will_open_N_dirs_named(dir_names);
 }
 
 static void test_teardown(void)
