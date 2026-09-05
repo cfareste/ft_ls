@@ -45,7 +45,8 @@ static void should_return_NULL_when_opening_an_empty_path(void)
 static void should_return_a_directory_stream_when_opening_a_valid_path(void)
 {
     const t_vfs_mock_entry vfs[] = {
-        MOCK_DIR(VALID_DIRECTORY_PATH, ".", "..")
+        MOCK_DIR(VALID_DIRECTORY_PATH, ".", ".."),
+        MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
 
@@ -57,7 +58,8 @@ static void should_return_a_directory_stream_when_opening_a_valid_path(void)
 static void should_return_NULL_when_reading_an_entry_from_a_null_directory(void)
 {
     const t_vfs_mock_entry vfs[] = {
-        MOCK_DIR(VALID_DIRECTORY_PATH, ".", "..")
+        MOCK_DIR(VALID_DIRECTORY_PATH, ".", ".."),
+        MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
 
@@ -72,7 +74,8 @@ static void should_return_an_entry_when_reading_from_a_valid_directory(void)
 {
     const t_vfs_mock_entry vfs[] = {
         MOCK_DIR(VALID_DIRECTORY_PATH, "file", ".", ".."),
-        MOCK_FILE(VALID_DIRECTORY_PATH "/file")
+        MOCK_FILE(VALID_DIRECTORY_PATH "/file"),
+        MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
 
@@ -95,7 +98,8 @@ static void should_return_minus_one_when_closing_a_null_directory(void)
 static void should_return_zero_when_closing_a_valid_directory(void)
 {
     const t_vfs_mock_entry vfs[] = {
-        MOCK_DIR(VALID_DIRECTORY_PATH, ".", "..")
+        MOCK_DIR(VALID_DIRECTORY_PATH, ".", ".."),
+        MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
 
