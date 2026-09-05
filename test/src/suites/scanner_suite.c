@@ -74,58 +74,74 @@ static void should_return_NULL_if_an_empty_path_is_specified(void)
 
 static void should_return_one_entry_if_the_current_directory_has_one_file(void)
 {
-    const char *file_names[] = { "file", NULL };
-    const char **entry_names[] = { file_names, NULL };
-    guarantee_stat_will_populate_stats_of_a_directory_type_file(CURRENT_DIRECTORY_PATH);
-    guarantee_readdir_will_return_N_files_named(entry_names);
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(CURRENT_DIRECTORY_PATH, ".", "..", "file"),
+        MOCK_FILE("./file"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
 
     scan_directory(CURRENT_DIRECTORY_PATH);
     const t_file_entry *file_entry = file_entry_array_get_at(sut, 0);
 
     assert_file_entry_array_length_is(1);
-    assert_file_entry_name_is(file_entry, file_names[0]);
+    assert_file_entry_name_is(file_entry, "file");
 }
 
 static void should_return_multiple_entries_if_the_current_directory_has_more_than_one_file(void)
 {
-    const char *files_names[] = { "multiple", "multiple2", "multiple3", NULL };
-    const char **entry_names[] = { files_names, NULL };
-    guarantee_stat_will_populate_stats_of_a_directory_type_file(CURRENT_DIRECTORY_PATH);
-    guarantee_readdir_will_return_N_files_named(entry_names);
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(CURRENT_DIRECTORY_PATH, ".", "..", "multiple", "multiple2", "multiple3"),
+        MOCK_FILE("./multiple"),
+        MOCK_FILE("./multiple2"),
+        MOCK_FILE("./multiple3"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *expected_files_names[] = { "multiple", "multiple2", "multiple3", NULL };
 
     scan_directory(CURRENT_DIRECTORY_PATH);
 
     assert_file_entry_array_length_is(3);
-    assert_file_entry_array_names_are(files_names);
+    assert_file_entry_array_names_are(expected_files_names);
 }
 
 static void should_return_an_array_of_entries_if_one_non_empty_directory_path_is_specified(void)
 {
-    const char *dir_names[] = { "valid_dir", NULL };
-    const char *files_names[] = { "file", "subdir", "file2", "subdir2", NULL };
-    const char **entry_names[] = { files_names, NULL };
-    guarantee_stat_will_populate_stats_of_a_directory_type_file(dir_names[0]);
-    ensure_opendir_will_open_N_dirs_named(dir_names);
-    guarantee_readdir_will_return_N_files_named(entry_names);
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("valid_dir", ".", "..", "file", "subdir", "file2", "subdir2"),
+        MOCK_FILE("valid_dir/file"),
+        MOCK_DIR("valid_dir/subdir", ".", ".."),
+        MOCK_FILE("valid_dir/file2"),
+        MOCK_DIR("valid_dir/subdir2", ".", ".."),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
 
-    scan_directory(dir_names[0]);
+    const char *expected_files_names[] = { "file", "subdir", "file2", "subdir2", NULL };
+
+    scan_directory("valid_dir");
 
     assert_file_entry_array_length_is(4);
-    assert_file_entry_array_names_are(files_names);
+    assert_file_entry_array_names_are(expected_files_names);
 }
 
 static void should_return_an_array_of_entries_without_hidden_files_if_a_directory_with_hidden_files_is_specified(void)
 {
-    const char *valid_dir = "dir";
-    const char *dir_names[] = { valid_dir, NULL };
-    const char *files_names[] = { ".", "subdir", "..", "subdir2", "file", ".gitignore", NULL };
-    const char **entry_names[] = { files_names, NULL };
-    const char *expected_file_names[] = { files_names[1], files_names[3], files_names[4], NULL };
-    guarantee_stat_will_populate_stats_of_a_directory_type_file(valid_dir);
-    ensure_opendir_will_open_N_dirs_named(dir_names);
-    guarantee_readdir_will_return_N_files_named(entry_names);
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("dir", ".", "subdir", "..", "subdir2", "file", ".gitignore"),
+        MOCK_FILE("dir/file"),
+        MOCK_FILE("dir/.gitignore"),
+        MOCK_DIR("dir/subdir", ".", ".."),
+        MOCK_DIR("dir/subdir2", ".", ".."),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
 
-    scan_directory(valid_dir);
+    const char *expected_file_names[] = { "subdir", "subdir2", "file", NULL };
+
+    scan_directory("dir");
 
     assert_file_entry_array_length_is(3);
     assert_file_entry_array_names_are(expected_file_names);
@@ -133,16 +149,17 @@ static void should_return_an_array_of_entries_without_hidden_files_if_a_director
 
 static void should_return_an_array_of_entries_if_a_hidden_directory_is_specified(void)
 {
-    const char *hidden_dir = ".dir";
-    const char *dir_names[] = { hidden_dir, NULL };
-    const char *files_names[] = { ".", "file", "..", "subdir1", NULL };
-    const char **entry_names[] = { files_names, NULL };
-    const char *expected_file_names[] = { files_names[1], files_names[3], NULL };
-    guarantee_stat_will_populate_stats_of_a_directory_type_file(hidden_dir);
-    ensure_opendir_will_open_N_dirs_named(dir_names);
-    guarantee_readdir_will_return_N_files_named(entry_names);
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".dir", ".", "file", "..", "subdir1"),
+        MOCK_FILE(".dir/file"),
+        MOCK_DIR(".dir/subdir1", ".", ".."),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
 
-    scan_directory(hidden_dir);
+    const char *expected_file_names[] = { "file", "subdir1", NULL };
+
+    scan_directory(".dir");
 
     assert_file_entry_array_length_is(2);
     assert_file_entry_array_names_are(expected_file_names);
@@ -150,12 +167,11 @@ static void should_return_an_array_of_entries_if_a_hidden_directory_is_specified
 
 static void should_return_an_empty_array_if_the_specified_directory_is_empty(void)
 {
-    const char *dir_names[] = { CURRENT_DIRECTORY_PATH, NULL };
-    const char *files_names[] = { ".", "..", NULL };
-    const char **entry_names[] = { files_names, NULL };
-    guarantee_stat_will_populate_stats_of_a_directory_type_file(CURRENT_DIRECTORY_PATH);
-    ensure_opendir_will_open_N_dirs_named(dir_names);
-    guarantee_readdir_will_return_N_files_named(entry_names);
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(CURRENT_DIRECTORY_PATH, ".", ".."),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
 
     scan_directory(CURRENT_DIRECTORY_PATH);
 
@@ -164,12 +180,14 @@ static void should_return_an_empty_array_if_the_specified_directory_is_empty(voi
 
 static void should_return_an_empty_array_if_the_specified_directory_only_contains_hidden_files(void)
 {
-    const char *dir_names[] = { "dir", NULL };
-    const char *files_names[] = { ".gitignore", ".", ".idea/", "..", ".run", NULL };
-    const char **entry_names[] = { files_names, NULL };
-    guarantee_stat_will_populate_stats_of_a_directory_type_file("dir");
-    ensure_opendir_will_open_N_dirs_named(dir_names);
-    guarantee_readdir_will_return_N_files_named(entry_names);
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("dir", ".gitignore", ".", ".idea/", "..", ".run"),
+        MOCK_FILE("dir/.gitignore"),
+        MOCK_DIR("dir/.idea", "..", "."),
+        MOCK_DIR("dir/.run", ".", ".."),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
 
     scan_directory("dir");
 

@@ -9,6 +9,7 @@ static struct stat file_stats;
 
 static void test_setup(void)
 {
+    vfs_mock_reset();
     reset_stat_guarantees();
 }
 
