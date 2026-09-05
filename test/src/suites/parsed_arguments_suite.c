@@ -216,7 +216,6 @@ static void should_return_false_for_multiple_file_operands_if_has_less_than_two(
     vfs_mock_setup(vfs);
 
     const char *args[] = { NULL };
-    guarantee_stat_will_populate_stats_of_a_directory_type_file(".");
     t_parsed_arguments *parsed_arguments = parse_arguments(0, args);
 
     const int has_multiple_file_operands = parsed_arguments_has_multiple_file_operands(parsed_arguments);

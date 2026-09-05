@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <unistd.h>
+#include "mocks.h"
 #include "libft.h"
 
 #define PRINT_BUFFER_SIZE 2048
