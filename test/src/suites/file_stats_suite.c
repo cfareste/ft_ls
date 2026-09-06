@@ -83,6 +83,13 @@ static void should_not_fail_to_destroy_file_stats_if_a_NULL_file_stats_is_passed
     file_stats_destroy(&invalid_stats);
 }
 
+static void should_return_unknown_file_type_when_a_NULL_file_stats_are_specified(void)
+{
+    const t_file_type invalid = file_stats_get_file_type(NULL);
+
+    CU_ASSERT_EQUAL(invalid, UNKNOWN_FILE_TYPE);
+}
+
 static void should_return_the_file_type_of_the_specified_file_stats(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -183,6 +190,7 @@ void register_file_stats_suite(void)
         CU_add_test(suite, "should_destroy_file_stats_correctly", should_destroy_file_stats_correctly);
         CU_add_test(suite, "should_not_fail_to_destroy_file_stats_if_a_NULL_pointer_is_passed", should_not_fail_to_destroy_file_stats_if_a_NULL_pointer_is_passed);
         CU_add_test(suite, "should_not_fail_to_destroy_file_stats_if_a_NULL_file_stats_is_passed", should_not_fail_to_destroy_file_stats_if_a_NULL_file_stats_is_passed);
+        CU_add_test(suite, "should_return_unknown_file_type_when_a_NULL_file_stats_are_specified", should_return_unknown_file_type_when_a_NULL_file_stats_are_specified);
         CU_add_test(suite, "should_return_the_file_type_of_the_specified_file_stats", should_return_the_file_type_of_the_specified_file_stats);
         CU_add_test(suite, "should_return_an_error_when_retrieving_the_stats_from_a_NULL_path", should_return_an_error_when_retrieving_the_stats_from_a_NULL_path);
         CU_add_test(suite, "should_return_an_error_when_retrieving_the_stats_from_an_empty_path", should_return_an_error_when_retrieving_the_stats_from_an_empty_path);

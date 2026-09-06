@@ -53,6 +53,9 @@ t_file_stats *file_stats_create(const char *file_path)
 
 t_file_type file_stats_get_file_type(const t_file_stats *file_stats)
 {
+    if (file_stats == NULL)
+        return UNKNOWN_FILE_TYPE;
+
     return file_stats->type;
 }
 
