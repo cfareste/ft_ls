@@ -76,6 +76,13 @@ static void should_not_fail_to_destroy_file_stats_if_a_NULL_pointer_is_passed(vo
     file_stats_destroy(NULL);
 }
 
+static void should_not_fail_to_destroy_file_stats_if_a_NULL_file_stats_is_passed(void)
+{
+    t_file_stats *invalid_stats = NULL;
+
+    file_stats_destroy(&invalid_stats);
+}
+
 static void should_return_an_error_when_retrieving_the_stats_from_a_NULL_path(void)
 {
     const int result = file_stats_get(NULL, &file_stats);
@@ -136,6 +143,7 @@ void register_file_stats_suite(void)
         CU_add_test(suite, "should_return_NULL_when_creating_file_stats_with_a_NULL_path", should_return_NULL_when_creating_file_stats_with_a_NULL_path);
         CU_add_test(suite, "should_destroy_file_stats_correctly", should_destroy_file_stats_correctly);
         CU_add_test(suite, "should_not_fail_to_destroy_file_stats_if_a_NULL_pointer_is_passed", should_not_fail_to_destroy_file_stats_if_a_NULL_pointer_is_passed);
+        CU_add_test(suite, "should_not_fail_to_destroy_file_stats_if_a_NULL_file_stats_is_passed", should_not_fail_to_destroy_file_stats_if_a_NULL_file_stats_is_passed);
         CU_add_test(suite, "should_return_an_error_when_retrieving_the_stats_from_a_NULL_path", should_return_an_error_when_retrieving_the_stats_from_a_NULL_path);
         CU_add_test(suite, "should_return_an_error_when_retrieving_the_stats_from_an_empty_path", should_return_an_error_when_retrieving_the_stats_from_an_empty_path);
         CU_add_test(suite, "should_return_an_error_when_populating_the_stats_to_a_NULL_stat_struct", should_return_an_error_when_populating_the_stats_to_a_NULL_stat_struct);
