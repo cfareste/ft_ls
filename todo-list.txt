@@ -1,7 +1,10 @@
 TODO:
 1. Implementar LS-13 Support for multiple types of files
-2. Refactor e implementar mi propio enum para los tipos de ficheros y otro para los booleanos del renderer
-3. Usar un struct propio para los opendirs, stat, etc. (como t_dir_stream de antes)
+2. Refactor e implementar mi propio enum para los tipos de ficheros y struct del stat
+   - Sustituir función file_stats_get para que devuelva el struct
+   - Meter función destroy del struct
+   - Meter función para devolver el tipo de dato directamente
+3. Usar un struct propio para los opendirs, readdir, etc. (como t_dir_stream de antes)
 4. Revisar que todas las funciones tengan al menos 1 test que compruebe argumentos inválidos (run app no tiene)
 
 
