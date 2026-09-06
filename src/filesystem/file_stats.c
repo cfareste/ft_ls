@@ -25,6 +25,9 @@ t_file_stats *file_stats_create(const char *file_path)
 
 void file_stats_destroy(t_file_stats **file_stats)
 {
+    if (file_stats == NULL)
+        return ;
+
     free(*file_stats);
     *file_stats = NULL;
 }
