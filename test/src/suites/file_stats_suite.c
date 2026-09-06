@@ -42,6 +42,13 @@ static void should_create_file_stats_correctly(void)
     file_stats_destroy(&stats);
 }
 
+static void should_return_NULL_when_creating_file_stats_with_a_NULL_path(void)
+{
+    const t_file_stats *stats = file_stats_create(NULL);
+
+    CU_ASSERT_PTR_NULL(stats);
+}
+
 static void should_return_an_error_when_retrieving_the_stats_from_a_NULL_path(void)
 {
     const int result = file_stats_get(NULL, &file_stats);
@@ -98,6 +105,7 @@ void register_file_stats_suite(void)
     if (suite != NULL)
     {
         CU_add_test(suite, "should_create_file_stats_correctly", should_create_file_stats_correctly);
+        CU_add_test(suite, "should_return_NULL_when_creating_file_stats_with_a_NULL_path", should_return_NULL_when_creating_file_stats_with_a_NULL_path);
         CU_add_test(suite, "should_return_an_error_when_retrieving_the_stats_from_a_NULL_path", should_return_an_error_when_retrieving_the_stats_from_a_NULL_path);
         CU_add_test(suite, "should_return_an_error_when_retrieving_the_stats_from_an_empty_path", should_return_an_error_when_retrieving_the_stats_from_an_empty_path);
         CU_add_test(suite, "should_return_an_error_when_populating_the_stats_to_a_NULL_stat_struct", should_return_an_error_when_populating_the_stats_to_a_NULL_stat_struct);
