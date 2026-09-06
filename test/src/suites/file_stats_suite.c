@@ -83,6 +83,45 @@ static void should_not_fail_to_destroy_file_stats_if_a_NULL_file_stats_is_passed
     file_stats_destroy(&invalid_stats);
 }
 
+static void should_return_the_file_type_of_the_specified_file_stats(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("reg_file"),
+        MOCK_DIR("dir", ".", ".."),
+        MOCK_CHAR_DEVICE("char_device"),
+        MOCK_BLOCK_DEVICE("block_device"),
+        MOCK_FIFO("pipe"),
+        MOCK_SYMLINK("symlink", "dir"),
+        MOCK_SOCKET("socket"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    t_file_stats *reg_file_stats = file_stats_create("reg_file");
+    t_file_stats *dir_stats = file_stats_create("dir");
+    t_file_stats *chardevice_stats = file_stats_create("char_device");
+    t_file_stats *blockdevice_stats = file_stats_create("block_device");
+    t_file_stats *fifo_stats = file_stats_create("pipe");
+    t_file_stats *symlink_stats = file_stats_create("symlink");
+    t_file_stats *socket_stats = file_stats_create("socket");
+
+    CU_ASSERT_EQUAL(file_stats_get_file_type(reg_file_stats), REGULAR_TYPE);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(dir_stats), DIRECTORY_TYPE);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(chardevice_stats), CHARDEVICE_TYPE);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(blockdevice_stats), BLOCKDEVICE_TYPE);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(fifo_stats), FIFO_TYPE);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(symlink_stats), SYMLINK_TYPE);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(socket_stats), SOCKET_TYPE);
+
+    file_stats_destroy(&reg_file_stats);
+    file_stats_destroy(&dir_stats);
+    file_stats_destroy(&chardevice_stats);
+    file_stats_destroy(&blockdevice_stats);
+    file_stats_destroy(&fifo_stats);
+    file_stats_destroy(&symlink_stats);
+    file_stats_destroy(&socket_stats);
+}
+
 static void should_return_an_error_when_retrieving_the_stats_from_a_NULL_path(void)
 {
     const int result = file_stats_get(NULL, &file_stats);
@@ -144,6 +183,7 @@ void register_file_stats_suite(void)
         CU_add_test(suite, "should_destroy_file_stats_correctly", should_destroy_file_stats_correctly);
         CU_add_test(suite, "should_not_fail_to_destroy_file_stats_if_a_NULL_pointer_is_passed", should_not_fail_to_destroy_file_stats_if_a_NULL_pointer_is_passed);
         CU_add_test(suite, "should_not_fail_to_destroy_file_stats_if_a_NULL_file_stats_is_passed", should_not_fail_to_destroy_file_stats_if_a_NULL_file_stats_is_passed);
+        CU_add_test(suite, "should_return_the_file_type_of_the_specified_file_stats", should_return_the_file_type_of_the_specified_file_stats);
         CU_add_test(suite, "should_return_an_error_when_retrieving_the_stats_from_a_NULL_path", should_return_an_error_when_retrieving_the_stats_from_a_NULL_path);
         CU_add_test(suite, "should_return_an_error_when_retrieving_the_stats_from_an_empty_path", should_return_an_error_when_retrieving_the_stats_from_an_empty_path);
         CU_add_test(suite, "should_return_an_error_when_populating_the_stats_to_a_NULL_stat_struct", should_return_an_error_when_populating_the_stats_to_a_NULL_stat_struct);
