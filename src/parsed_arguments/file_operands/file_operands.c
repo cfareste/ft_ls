@@ -72,7 +72,7 @@ t_file_type *file_operands_get_types(char **file_operands)
 
     for (unsigned int i = 0; i < num_of_operands; i++)
     {
-        t_file_stats *file_operand_stats = file_stats_create(file_operands[i]);
+        t_file_stats *file_operand_stats = file_stats_get(file_operands[i]);
 
         file_operands_types[i] = file_stats_get_file_type(file_operand_stats);
 

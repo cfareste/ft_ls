@@ -18,7 +18,7 @@ static void should_create_file_stats_correctly(void)
     };
     vfs_mock_setup(vfs);
 
-    t_file_stats *stats = file_stats_create("valid_file");
+    t_file_stats *stats = file_stats_get("valid_file");
 
     CU_ASSERT_PTR_NOT_NULL(stats);
 
@@ -27,14 +27,14 @@ static void should_create_file_stats_correctly(void)
 
 static void should_return_NULL_when_creating_file_stats_with_a_NULL_path(void)
 {
-    const t_file_stats *stats = file_stats_create(NULL);
+    const t_file_stats *stats = file_stats_get(NULL);
 
     CU_ASSERT_PTR_NULL(stats);
 }
 
 static void should_return_NULL_when_creating_file_stats_with_an_empty_path(void)
 {
-    const t_file_stats *stats = file_stats_create("");
+    const t_file_stats *stats = file_stats_get("");
 
     CU_ASSERT_PTR_NULL(stats);
 }
@@ -47,7 +47,7 @@ static void should_destroy_file_stats_correctly(void)
     };
     vfs_mock_setup(vfs);
 
-    t_file_stats *stats = file_stats_create("valid_file");
+    t_file_stats *stats = file_stats_get("valid_file");
 
     file_stats_destroy(&stats);
 
@@ -87,13 +87,13 @@ static void should_return_the_file_type_of_the_specified_file_stats(void)
     };
     vfs_mock_setup(vfs);
 
-    t_file_stats *reg_file_stats = file_stats_create("reg_file");
-    t_file_stats *dir_stats = file_stats_create("dir");
-    t_file_stats *chardevice_stats = file_stats_create("char_device");
-    t_file_stats *blockdevice_stats = file_stats_create("block_device");
-    t_file_stats *fifo_stats = file_stats_create("pipe");
-    t_file_stats *symlink_stats = file_stats_create("symlink");
-    t_file_stats *socket_stats = file_stats_create("socket");
+    t_file_stats *reg_file_stats = file_stats_get("reg_file");
+    t_file_stats *dir_stats = file_stats_get("dir");
+    t_file_stats *chardevice_stats = file_stats_get("char_device");
+    t_file_stats *blockdevice_stats = file_stats_get("block_device");
+    t_file_stats *fifo_stats = file_stats_get("pipe");
+    t_file_stats *symlink_stats = file_stats_get("symlink");
+    t_file_stats *socket_stats = file_stats_get("socket");
 
     CU_ASSERT_EQUAL(file_stats_get_file_type(reg_file_stats), REGULAR_FILE_TYPE);
     CU_ASSERT_EQUAL(file_stats_get_file_type(dir_stats), DIRECTORY_FILE_TYPE);

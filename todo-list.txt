@@ -72,7 +72,7 @@ QA LS-15 Filter hidden files (`ls -U file ... | cat`)
 5. No memory leaks
 
 
-QA LS-14 Default sorting output
+QA LS-14 Default sorting output (`ls file ... | cat`)
 1. Sin parámetros
 2. 1 parámetro (directorio)
 3. Múltiples parámetros

@@ -30,7 +30,7 @@ static t_file_type get_file_type(const mode_t mode)
     return file_type;
 }
 
-t_file_stats *file_stats_create(const char *file_path)
+t_file_stats *file_stats_get(const char *file_path)
 {
     if (!ft_is_valid_path(file_path))
         return NULL;
