@@ -1,6 +1,11 @@
 TODO:
 1. Implementar LS-13 Support for multiple types of files
 2. Usar un struct propio para los opendirs, readdir, etc. (como t_dir_stream de antes)
+   - Hash referencia: 9653a882
+   - Crear dir_entry_create donde devuelve el struct + tests
+   - Sustituir función dir_entry_create por la actual
+   - Borrar actual
+   - Add tests for DIR * and struct dirent * nulls?
 3. Revisar que todas las funciones tengan al menos 1 test que compruebe argumentos inválidos (run app no tiene)
 
 
