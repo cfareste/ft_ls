@@ -6,7 +6,7 @@
 #define SUITE_NAME "directory"
 #define VALID_DIRECTORY_PATH "valid"
 
-static DIR *dir_stream_sut;
+static t_dir_stream *dir_stream_sut;
 
 static void test_setup(void)
 {

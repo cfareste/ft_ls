@@ -14,7 +14,7 @@ t_file_entry_array *scan(const char *path)
     if (!ft_is_valid_path(path))
         return NULL;
 
-    DIR *dir_stream = directory_open(path);
+    t_dir_stream *dir_stream = directory_open(path);
 
     t_file_entry_array *file_entry_array = file_entry_array_create();
     const struct dirent *dir_entry = directory_get_next_entry(dir_stream);
