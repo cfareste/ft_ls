@@ -3,6 +3,16 @@
 #include "libft.h"
 #include "directory.h"
 
+struct s_dir_stream
+{
+    DIR *dir;
+};
+
+struct s_dir_entry
+{
+    struct dirent *entry;
+};
+
 DIR *directory_open(const char *path)
 {
     if (!ft_is_valid_path(path))
