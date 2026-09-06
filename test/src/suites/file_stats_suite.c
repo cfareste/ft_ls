@@ -27,6 +27,21 @@ static void assert_file_type_is(const unsigned int type)
     CU_ASSERT_EQUAL(file_stats.st_mode & S_IFMT, type);
 }
 
+static void should_create_file_stats_correctly(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("valid_file"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    t_file_stats *stats = file_stats_create("valid_file");
+
+    CU_ASSERT_PTR_NOT_NULL(stats);
+
+    file_stats_destroy(&stats);
+}
+
 static void should_return_an_error_when_retrieving_the_stats_from_a_NULL_path(void)
 {
     const int result = file_stats_get(NULL, &file_stats);
@@ -82,6 +97,7 @@ void register_file_stats_suite(void)
 
     if (suite != NULL)
     {
+        CU_add_test(suite, "should_create_file_stats_correctly", should_create_file_stats_correctly);
         CU_add_test(suite, "should_return_an_error_when_retrieving_the_stats_from_a_NULL_path", should_return_an_error_when_retrieving_the_stats_from_a_NULL_path);
         CU_add_test(suite, "should_return_an_error_when_retrieving_the_stats_from_an_empty_path", should_return_an_error_when_retrieving_the_stats_from_an_empty_path);
         CU_add_test(suite, "should_return_an_error_when_populating_the_stats_to_a_NULL_stat_struct", should_return_an_error_when_populating_the_stats_to_a_NULL_stat_struct);

@@ -20,3 +20,5 @@ typedef enum e_file_type
 typedef struct s_file_stats t_file_stats;
 
 int file_stats_get(const char *file_path, struct stat *stats);
+t_file_stats *file_stats_create(const char *file_path);
+void file_stats_destroy(t_file_stats **file_stats);
