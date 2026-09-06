@@ -1,7 +1,6 @@
-#include <sys/stat.h>
-#include "mocks.h"
 #include "CUnit/CUnit.h"
 #include "CUnit/Basic.h"
+#include "mocks.h"
 #include "parsed_arguments.h"
 
 #define SUITE_NAME "parsed_arguments"
