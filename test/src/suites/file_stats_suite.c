@@ -105,13 +105,13 @@ static void should_return_the_file_type_of_the_specified_file_stats(void)
     t_file_stats *symlink_stats = file_stats_create("symlink");
     t_file_stats *socket_stats = file_stats_create("socket");
 
-    CU_ASSERT_EQUAL(file_stats_get_file_type(reg_file_stats), REGULAR_TYPE);
-    CU_ASSERT_EQUAL(file_stats_get_file_type(dir_stats), DIRECTORY_TYPE);
-    CU_ASSERT_EQUAL(file_stats_get_file_type(chardevice_stats), CHARDEVICE_TYPE);
-    CU_ASSERT_EQUAL(file_stats_get_file_type(blockdevice_stats), BLOCKDEVICE_TYPE);
-    CU_ASSERT_EQUAL(file_stats_get_file_type(fifo_stats), FIFO_TYPE);
-    CU_ASSERT_EQUAL(file_stats_get_file_type(symlink_stats), SYMLINK_TYPE);
-    CU_ASSERT_EQUAL(file_stats_get_file_type(socket_stats), SOCKET_TYPE);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(reg_file_stats), REGULAR_FILE_TYPE);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(dir_stats), DIRECTORY_FILE_TYPE);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(chardevice_stats), CHARDEVICE_FILE_TYPE);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(blockdevice_stats), BLOCKDEVICE_FILE_TYPE);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(fifo_stats), FIFO_FILE_TYPE);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(symlink_stats), SYMLINK_FILE_TYPE);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(socket_stats), SOCKET_FILE_TYPE);
 
     file_stats_destroy(&reg_file_stats);
     file_stats_destroy(&dir_stats);
