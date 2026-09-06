@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <sys/stat.h>
 #include "libft.h"
 #include "file_stats.h"
 
@@ -29,22 +30,13 @@ static t_file_type get_file_type(const mode_t mode)
     return file_type;
 }
 
-int file_stats_get(const char *file_path, struct stat *stats)
-{
-    if (!ft_is_valid_path(file_path) || stats == NULL)
-        return FILE_STATS_COULD_NOT_RETRIEVE_STATS;
-
-    return stat(file_path, stats);
-}
-
 t_file_stats *file_stats_create(const char *file_path)
 {
     if (!ft_is_valid_path(file_path))
         return NULL;
 
     struct stat stats;
-    file_stats_get(file_path, &stats);
-
+    stat(file_path, &stats);
     t_file_stats *file_stats = ft_safe_calloc(1, sizeof(t_file_stats));
     file_stats->type = get_file_type(stats.st_mode);
 
