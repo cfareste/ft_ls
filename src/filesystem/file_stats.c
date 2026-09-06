@@ -17,7 +17,7 @@ int file_stats_get(const char *file_path, struct stat *stats)
 
 t_file_stats *file_stats_create(const char *file_path)
 {
-    if (file_path == NULL)
+    if (!ft_is_valid_path(file_path))
         return NULL;
 
     return ft_safe_calloc(1, sizeof(t_file_stats));
