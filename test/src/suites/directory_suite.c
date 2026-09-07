@@ -81,9 +81,11 @@ static void should_return_the_next_entry_when_reading_from_a_valid_directory(voi
 
     open_directory_stream(".");
 
-    const char *first_entry_name = directory_get_entry_name(directory_get_next(dir_stream_sut));
+    t_dir_entry *dir_entry = directory_get_next(dir_stream_sut);
 
-    CU_ASSERT_STRING_EQUAL(first_entry_name, "file");
+    CU_ASSERT_STRING_EQUAL(directory_get_entry_name(dir_entry), "file");
+
+    directory_entry_destroy(&dir_entry);
 }
 
 static void should_return_an_entry_when_reading_from_a_valid_directory(void)

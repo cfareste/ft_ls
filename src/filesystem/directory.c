@@ -45,6 +45,12 @@ struct dirent *directory_get_next_entry(t_dir_stream *stream)
     return readdir(stream->dir);
 }
 
+void directory_entry_destroy(t_dir_entry **dir_entry)
+{
+    free(*dir_entry);
+    *dir_entry = NULL;
+}
+
 int directory_close(t_dir_stream **dir_stream)
 {
     if (dir_stream == NULL || *dir_stream == NULL)
