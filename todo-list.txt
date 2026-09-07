@@ -1,7 +1,4 @@
 TODO:
-1. Implementar LS-13 Support for multiple types of files
-2. QA LS-13
-   - Crear los tests en la suite adecuada + application suite + e2e
 
 
 TODO En algún momento:
