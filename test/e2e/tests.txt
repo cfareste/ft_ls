@@ -4,28 +4,29 @@
 # Remember: Columns without tty: -C | Colors without tty: --colors
 #
 
-                                                           ::
-.                                                          ::       .
-Makefile                                                   ::       Makefile
-src                                                        ::       src
-../../../ft_ls/./test/testdir                              ::       ../../../ft_ls/./test/testdir
-../../../ft_ls/./test/testdir/file                         ::       ../../../ft_ls/./test/testdir/file
-/tmp/tempfile                                              ::       /tmp/tempfile
-/tmp/tempdir/                                              ::       /tmp/tempdir/
-Makefile file Makefile file2                               ::       Makefile file Makefile file2
-inc/ src firstDir src                                      ::       inc/ src firstDir src
-file2 firstDir secondDir file                              ::       file2 firstDir secondDir file
-.hidden2 .hidden                                           ::       .hidden2 .hidden
-.hiddir2 .hiddir                                           ::       .hiddir2 .hiddir
-.hidden2 .hiddir .hiddir2 .hidden                          ::       .hidden2 .hiddir .hiddir2 .hidden
-empty                                                      ::       empty
-dir_only_hidden                                            ::       dir_only_hidden
-empty empty/                                               ::       empty empty/
-dir_only_hidden dir_only_hidden/                           ::       dir_only_hidden dir_only_hidden/
-empty .hidden                                              ::       empty .hidden
-.hidden dir_only_hidden/                                   ::       .hidden dir_only_hidden/
-.hidden firstDir file dir_only_hidden/ .hiddir empty       ::       .hidden firstDir file dir_only_hidden/ .hiddir empty
-capacity/ capacity2/                                       ::       capacity/ capacity2/
-linkfile                                                   ::       linkfile
-linkdir                                                    ::       linkdir
-linkdir/                                                   ::       linkdir/
+                                                                                ::
+.                                                                               ::       .
+Makefile                                                                        ::       Makefile
+src                                                                             ::       src
+../../../ft_ls/./test/testdir                                                   ::       ../../../ft_ls/./test/testdir
+../../../ft_ls/./test/testdir/file                                              ::       ../../../ft_ls/./test/testdir/file
+/tmp/tempfile                                                                   ::       /tmp/tempfile
+/tmp/tempdir/                                                                   ::       /tmp/tempdir/
+Makefile file Makefile file2                                                    ::       Makefile file Makefile file2
+inc/ src firstDir src                                                           ::       inc/ src firstDir src
+file2 firstDir secondDir file                                                   ::       file2 firstDir secondDir file
+.hidden2 .hidden                                                                ::       .hidden2 .hidden
+.hiddir2 .hiddir                                                                ::       .hiddir2 .hiddir
+.hidden2 .hiddir .hiddir2 .hidden                                               ::       .hidden2 .hiddir .hiddir2 .hidden
+empty                                                                           ::       empty
+dir_only_hidden                                                                 ::       dir_only_hidden
+empty empty/                                                                    ::       empty empty/
+dir_only_hidden dir_only_hidden/                                                ::       dir_only_hidden dir_only_hidden/
+empty .hidden                                                                   ::       empty .hidden
+.hidden dir_only_hidden/                                                        ::       .hidden dir_only_hidden/
+.hidden firstDir file dir_only_hidden/ .hiddir empty                            ::       .hidden firstDir file dir_only_hidden/ .hiddir empty
+capacity/ capacity2/                                                            ::       capacity/ capacity2/
+linkfile                                                                        ::       linkfile
+linkdir                                                                         ::       linkdir
+linkdir/                                                                        ::       linkdir/
+file src linklink linkdir linkfile /dev/sda /dev/null fifo my_socket.sock       ::       file src linklink linkdir linkfile /dev/sda /dev/null fifo my_socket.sock

@@ -79,6 +79,7 @@ prepare_test_environment() {
     # Different file types
     ln -s file linkfile
     ln -s firstDir linkdir
+    ln -s linkdir linklink
     mkfifo fifo
 }
 
