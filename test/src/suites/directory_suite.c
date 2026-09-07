@@ -80,6 +80,23 @@ static void should_return_the_next_entry_when_reading_from_a_valid_directory(voi
     directory_entry_destroy(&dir_entry);
 }
 
+static void should_destroy_a_valid_dir_entry_correctly(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", "file", ".", ".."),
+        MOCK_FILE("./file"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    open_directory_stream(".");
+    t_dir_entry *dir_entry = directory_get_next(dir_stream_sut);
+
+    directory_entry_destroy(&dir_entry);
+
+    CU_ASSERT_PTR_NULL(dir_entry);
+}
+
 static void should_return_NULL_for_the_entry_name_if_a_NULL_entry_is_specified(void)
 {
     const char *invalid_name = directory_get_entry_name(NULL);
@@ -177,6 +194,7 @@ void register_directory_suite(void)
         CU_add_test(suite, "should_return_a_directory_stream_when_opening_a_valid_path", should_return_a_directory_stream_when_opening_a_valid_path);
         CU_add_test(suite, "should_return_NULL_for_next_entry_if_a_NULL_dir_stream_is_specified", should_return_NULL_for_next_entry_if_a_NULL_dir_stream_is_specified);
         CU_add_test(suite, "should_return_the_next_entry_when_reading_from_a_valid_directory", should_return_the_next_entry_when_reading_from_a_valid_directory);
+        CU_add_test(suite, "should_destroy_a_valid_dir_entry_correctly", should_destroy_a_valid_dir_entry_correctly);
         CU_add_test(suite, "should_return_NULL_for_the_entry_name_if_a_NULL_entry_is_specified", should_return_NULL_for_the_entry_name_if_a_NULL_entry_is_specified);
         CU_add_test(suite, "should_return_the_dir_entry_name", should_return_the_dir_entry_name);
         CU_add_test(suite, "should_return_NULL_when_reading_an_entry_from_a_null_directory", should_return_NULL_when_reading_an_entry_from_a_null_directory);
