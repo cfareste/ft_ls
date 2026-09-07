@@ -120,7 +120,7 @@ static void should_print_the_name_of_every_entry_with_a_file_entry_array_of_vari
     render_context_destroy(&context);
 }
 
-static void should_not_print_a_dir_header_if_specified_in_the_context(void)
+static void should_not_print_a_dir_header_if_a_NULL_header_is_specified_in_the_context(void)
 {
     const char *expected_file_name[] = { "file", "file2", "file3" };
     t_render_context *context = render_context_create();
@@ -240,7 +240,7 @@ void register_renderer_suite(void)
         CU_add_test(suite, "should_not_print_anything_if_the_context_is_null", should_not_print_anything_if_the_context_is_null);
         CU_add_test(suite, "should_print_the_name_of_the_entry_with_a_file_entry_array_of_one_element", should_print_the_name_of_the_entry_with_a_file_entry_array_of_one_element);
         CU_add_test(suite, "should_print_the_name_of_every_entry_with_a_file_entry_array_of_various_elements_separated_by_new_lines", should_print_the_name_of_every_entry_with_a_file_entry_array_of_various_elements_separated_by_new_lines);
-        CU_add_test(suite, "should_not_print_a_dir_header_if_specified_in_the_context", should_not_print_a_dir_header_if_specified_in_the_context);
+        CU_add_test(suite, "should_not_print_a_dir_header_if_a_NULL_header_is_specified_in_the_context", should_not_print_a_dir_header_if_a_NULL_header_is_specified_in_the_context);
         CU_add_test(suite, "should_not_print_a_leading_dir_header_newline_if_its_the_first_render", should_not_print_a_leading_dir_header_newline_if_its_the_first_render);
         CU_add_test(suite, "should_print_a_leading_dir_header_newline_if_its_not_first_render", should_print_a_leading_dir_header_newline_if_its_not_first_render);
         // CU_add_test(suite, "should_print_the_name_of_every_entry_with_a_file_entry_array_of_various_elements_separated_by_two_spaces", should_print_the_name_of_every_entry_with_a_file_entry_array_of_various_elements_separated_by_two_spaces);
