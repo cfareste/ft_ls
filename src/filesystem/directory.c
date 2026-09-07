@@ -24,8 +24,7 @@ t_dir_stream *directory_open(const char *path)
     return dir_stream;
 }
 
-//TODO: rename to directory_get_next_entry
-t_dir_entry *directory_get_next(const t_dir_stream *dir_stream)
+t_dir_entry *directory_get_next_entry(const t_dir_stream *dir_stream)
 {
     if (dir_stream == NULL)
         return NULL;

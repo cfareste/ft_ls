@@ -57,7 +57,7 @@ static void should_return_a_directory_stream_when_opening_a_valid_path(void)
 
 static void should_return_NULL_for_next_entry_if_a_NULL_dir_stream_is_specified(void)
 {
-    const t_dir_entry *dir_entry = directory_get_next(NULL);
+    const t_dir_entry *dir_entry = directory_get_next_entry(NULL);
 
     CU_ASSERT_PTR_NULL(dir_entry);
 }
@@ -73,7 +73,7 @@ static void should_return_the_next_entry_when_reading_from_a_valid_directory(voi
 
     open_directory_stream(".");
 
-    t_dir_entry *dir_entry = directory_get_next(dir_stream_sut);
+    t_dir_entry *dir_entry = directory_get_next_entry(dir_stream_sut);
 
     CU_ASSERT_STRING_EQUAL(directory_get_entry_name(dir_entry), "file");
 
@@ -102,7 +102,7 @@ static void should_destroy_a_valid_dir_entry_correctly(void)
     vfs_mock_setup(vfs);
 
     open_directory_stream(".");
-    t_dir_entry *dir_entry = directory_get_next(dir_stream_sut);
+    t_dir_entry *dir_entry = directory_get_next_entry(dir_stream_sut);
 
     directory_destroy_entry(&dir_entry);
 
@@ -125,7 +125,7 @@ static void should_return_the_dir_entry_name(void)
     vfs_mock_setup(vfs);
 
     open_directory_stream(".");
-    t_dir_entry *dir_entry = directory_get_next(dir_stream_sut);
+    t_dir_entry *dir_entry = directory_get_next_entry(dir_stream_sut);
 
     CU_ASSERT_STRING_EQUAL(directory_get_entry_name(dir_entry), "valid file");
 
@@ -146,7 +146,7 @@ static void should_return_false_for_is_entry_empty_if_the_dir_entry_is_not_empty
     vfs_mock_setup(vfs);
 
     open_directory_stream(".");
-    t_dir_entry *first_entry = directory_get_next(dir_stream_sut);
+    t_dir_entry *first_entry = directory_get_next_entry(dir_stream_sut);
 
     CU_ASSERT_FALSE(directory_is_entry_empty(first_entry));
 
@@ -162,10 +162,10 @@ static void should_return_true_for_is_entry_empty_if_the_dir_entry_is_empty(void
     vfs_mock_setup(vfs);
 
     open_directory_stream(".");
-    t_dir_entry *first_entry = directory_get_next(dir_stream_sut);
+    t_dir_entry *first_entry = directory_get_next_entry(dir_stream_sut);
     directory_destroy_entry(&first_entry);
 
-    t_dir_entry *second_entry = directory_get_next(dir_stream_sut);
+    t_dir_entry *second_entry = directory_get_next_entry(dir_stream_sut);
 
     CU_ASSERT_TRUE(directory_is_entry_empty(second_entry));
 
