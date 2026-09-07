@@ -170,46 +170,51 @@ static void should_successfully_print_the_contents_of_multiple_directory_files(v
 static void should_successfully_print_the_contents_of_the_mixed_types_specified_operands(void)
 {
     const t_vfs_mock_entry vfs[] = {
-        MOCK_FILE("file1"),
-        MOCK_SYMLINK("symlink", "file1"),
-        MOCK_DIR("dir", ".", "block_device", "char_device", "file_from_dir_1", "..", "subdir_1"),
-        MOCK_BLOCK_DEVICE("dir/block_device"),
-        MOCK_CHAR_DEVICE("dir/char_device"),
-        MOCK_FILE("dir/file_from_dir_1"),
-        MOCK_DIR("dir/subdir_1", ".", ".."),
-        MOCK_DIR("dir1", "..", "file2", ".", "file_from_dir_2", "symlink"),
-        MOCK_FILE("dir1/file2"),
-        MOCK_FILE("dir1/file_from_dir_2"),
-        MOCK_SYMLINK("dir1/symlink", "dir1/file_from_dir_2"),
+        MOCK_FILE("file"),
+        MOCK_DIR("dir", ".", "..", "file", "dir2"),
+        MOCK_SYMLINK("linkdir", "dir"),
+        MOCK_SYMLINK("linklink", "linkdir"),
+        MOCK_SYMLINK("linkfile", "file"),
+        MOCK_BLOCK_DEVICE("block_device"),
+        MOCK_CHAR_DEVICE("char_device"),
+        MOCK_FIFO("fifo"),
+        MOCK_SOCKET("socket"),
+        MOCK_FILE("dir/file"),
+        MOCK_DIR("dir/dir2", ".", ".."),
         MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
 
-    const char *arguments[] = { "dir", "file1", "file1", "symlink", "dir1", NULL };
-    const char *expected_first_dir_file_names[] = { "block_device", "char_device", "file_from_dir_1", "subdir_1" };
-    const char *expected_second_dir_file_names[] = { "file2", "file_from_dir_2", "symlink" };
-    parsed_arguments = parse_arguments(5, arguments);
+    const char *arguments[] = { "file", "dir", "linklink", "linkdir", "linkfile", "block_device", "char_device", "fifo", "socket", NULL };
+    const char *expected_file_names[] = { "block_device", "char_device", "fifo", "file", "linkfile", "socket" };
+    const char *expected_dir_file_names[] = { "dir2", "file" };
+    parsed_arguments = parse_arguments(9, arguments);
 
     const int result = application_run(parsed_arguments);
 
     CU_ASSERT(verify_that_the_str_that_has_been_printed_is(
-        "%s\n%s\n%s\n"
+        "%s\n%s\n%s\n%s\n%s\n%s\n"
         "\n%s:\n"
-        "%s\n%s\n%s\n%s\n"
+        "%s\n%s\n"
         "\n%s:\n"
-        "%s\n%s\n%s\n",
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n%s\n",
+        expected_file_names[0],
+        expected_file_names[1],
+        expected_file_names[2],
+        expected_file_names[3],
+        expected_file_names[4],
+        expected_file_names[5],
         arguments[1],
-        arguments[2],
+        expected_dir_file_names[0],
+        expected_dir_file_names[1],
         arguments[3],
-        arguments[0],
-        expected_first_dir_file_names[0],
-        expected_first_dir_file_names[1],
-        expected_first_dir_file_names[2],
-        expected_first_dir_file_names[3],
-        arguments[4],
-        expected_second_dir_file_names[0],
-        expected_second_dir_file_names[1],
-        expected_second_dir_file_names[2]
+        expected_dir_file_names[0],
+        expected_dir_file_names[1],
+        arguments[2],
+        expected_dir_file_names[0],
+        expected_dir_file_names[1]
     ));
     assert_application_execution_succeed(result);
 }

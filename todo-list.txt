@@ -98,4 +98,6 @@ QA LS-13 Support for multiple types of files
    - Symlink directorio con barra al final (linkdir/) -> E2E only
 3. Múltiples parámetros
    - Mezclar combinaciones anteriores (symlink archivo / directorio, archivo normal...)
+   - Asegurarse que los dir headers están bien
+   - Si es un symlink -> directorio, el dir header es el nombre del link
 4. No memory leaks
