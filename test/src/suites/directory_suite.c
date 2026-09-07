@@ -77,19 +77,19 @@ static void should_return_the_next_entry_when_reading_from_a_valid_directory(voi
 
     CU_ASSERT_STRING_EQUAL(directory_get_entry_name(dir_entry), "file");
 
-    directory_entry_destroy(&dir_entry);
+    directory_destroy_entry(&dir_entry);
 }
 
 static void should_not_fail_to_destroy_a_null_pointer_dir_entry(void)
 {
-    directory_entry_destroy(NULL);
+    directory_destroy_entry(NULL);
 }
 
 static void should_not_fail_to_destroy_a_null_dir_entry(void)
 {
     t_dir_entry *dir_entry = NULL;
 
-    directory_entry_destroy(&dir_entry);
+    directory_destroy_entry(&dir_entry);
 }
 
 static void should_destroy_a_valid_dir_entry_correctly(void)
@@ -104,7 +104,7 @@ static void should_destroy_a_valid_dir_entry_correctly(void)
     open_directory_stream(".");
     t_dir_entry *dir_entry = directory_get_next(dir_stream_sut);
 
-    directory_entry_destroy(&dir_entry);
+    directory_destroy_entry(&dir_entry);
 
     CU_ASSERT_PTR_NULL(dir_entry);
 }
@@ -129,7 +129,7 @@ static void should_return_the_dir_entry_name(void)
 
     CU_ASSERT_STRING_EQUAL(directory_get_entry_name(dir_entry), "valid file");
 
-    directory_entry_destroy(&dir_entry);
+    directory_destroy_entry(&dir_entry);
 }
 
 static void should_return_NULL_when_reading_an_entry_from_a_null_directory(void)
