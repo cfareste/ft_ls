@@ -51,14 +51,6 @@ int directory_is_entry_empty(const t_dir_entry *dir_entry)
     return dir_entry->entry == NULL;
 }
 
-struct dirent *directory_get_next_entry(t_dir_stream *stream)
-{
-    if (stream == NULL)
-        return NULL;
-
-    return readdir(stream->dir);
-}
-
 void directory_destroy_entry(t_dir_entry **dir_entry)
 {
     if (dir_entry == NULL || *dir_entry == NULL)
