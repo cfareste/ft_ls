@@ -136,11 +136,18 @@ static void should_return_an_entry_when_reading_from_a_valid_directory(void)
     CU_ASSERT_STRING_EQUAL(entry->d_name, file_name);
 }
 
-static void should_return_minus_one_when_closing_a_null_directory(void)
+static void should_return_minus_one_when_closing_a_null_pointer(void)
 {
     const int actual = directory_close(NULL);
 
     CU_ASSERT_EQUAL(actual, -1);
+}
+
+static void should_return_minus_one_when_closing_a_null_directory(void)
+{
+    t_dir_stream *dir_stream = NULL;
+
+    CU_ASSERT_EQUAL(directory_close(&dir_stream), -1);
 }
 
 static void should_return_zero_when_closing_a_valid_directory(void)
@@ -174,6 +181,7 @@ void register_directory_suite(void)
         CU_add_test(suite, "should_return_the_dir_entry_name", should_return_the_dir_entry_name);
         CU_add_test(suite, "should_return_NULL_when_reading_an_entry_from_a_null_directory", should_return_NULL_when_reading_an_entry_from_a_null_directory);
         CU_add_test(suite, "should_return_an_entry_when_reading_from_a_valid_directory", should_return_an_entry_when_reading_from_a_valid_directory);
+        CU_add_test(suite, "should_return_minus_one_when_closing_a_null_pointer", should_return_minus_one_when_closing_a_null_pointer);
         CU_add_test(suite, "should_return_minus_one_when_closing_a_null_directory", should_return_minus_one_when_closing_a_null_directory);
         CU_add_test(suite, "should_return_zero_when_closing_a_valid_directory", should_return_zero_when_closing_a_valid_directory);
     }
