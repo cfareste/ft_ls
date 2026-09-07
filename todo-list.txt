@@ -2,16 +2,13 @@ TODO:
 
 
 TODO En algún momento:
-- Investigar si los tests están acoplados a la implementacion interna de las cosas
-- Investigar porque no puedo debugar desde proyecto ft_ls los tests
+- Investigar si los tests están acoplados a la implementación interna de las cosas
 - Refactor renderer, donde render llama a render_strategy o lo que sea basado en options
-- Refactor e implementar mi propio enum para los tipos de ficheros y otro para los booleanos del renderer
-- Usar un struct propio para los opendirs, stat, etc. (como t_dir_stream de antes)
 - Reflexionar si meter el should print header en render pasando parsed arguments. Si al hacer las options se necesita
   pasar parsed arguments al render, entonces calcularlo ahi
-- Revisar que todas las funciones tengan al menos 1 test que compruebe argumentos inválidos (run app no tiene)
 - Cuando haga LS-12, revisar que las funciones de ensure will fail dirent estén bien (conversación GPT Mac)
-- Posibles refactors de la suite de tests
+- Añadir tests para DIR * and struct dirent * nulls?
+- Añadir valgrind a los tests E2E
 
 
 TODO Para mejorar siguientes proyectos:
@@ -74,7 +71,7 @@ QA LS-15 Filter hidden files (`ls -U file ... | cat`)
 5. No memory leaks
 
 
-QA LS-14 Default sorting output
+QA LS-14 Default sorting output (`ls file ... | cat`)
 1. Sin parámetros
 2. 1 parámetro (directorio)
 3. Múltiples parámetros
@@ -83,3 +80,21 @@ QA LS-14 Default sorting output
      - Que se ordene nombres y contenidos
    - Mixto
      - Que se ordenen ambos y por separado
+5. No memory leaks
+
+
+QA LS-13 Support for multiple types of files
+- Disclaimer: Al listar contenido de un directorio, se escribe el nombre de los ficheros contenidos, incluso
+              si es un symlink (no del target)
+1. Sin parámetros
+2. 1 parámetro
+   - Archivo cualquiera
+   - Symlink archivo cualquiera
+   - Directorio
+   - Symlink directorio
+   - Symlink directorio con barra al final (linkdir/) -> E2E only
+3. Múltiples parámetros
+   - Mezclar combinaciones anteriores (symlink archivo / directorio, archivo normal...)
+   - Asegurarse que los dir headers están bien
+   - Si es un symlink -> directorio, el dir header es el nombre del link
+4. No memory leaks

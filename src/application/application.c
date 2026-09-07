@@ -49,6 +49,9 @@ static void process_directory_file_operands(const t_parsed_arguments *parsed_arg
 
 int application_run(const t_parsed_arguments *parsed_arguments)
 {
+    if (parsed_arguments == NULL)
+        return FT_LS_APPLICATION_MAJOR_ERROR;
+
     t_render_context *render_context = render_context_create();
 
     process_non_directory_file_operands(parsed_arguments, render_context);

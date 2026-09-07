@@ -5,69 +5,111 @@
 
 #define SUITE_NAME "file_stats"
 
-static struct stat file_stats;
-
 static void test_setup(void)
 {
-    reset_stat_guarantees();
+    vfs_mock_reset();
 }
 
-static void assert_file_stats_retrieving_failed(const int result)
+static void should_create_file_stats_correctly(void)
 {
-    CU_ASSERT_EQUAL(result, FILE_STATS_COULD_NOT_RETRIEVE_STATS);
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("valid_file"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    t_file_stats *stats = file_stats_get("valid_file");
+
+    CU_ASSERT_PTR_NOT_NULL(stats);
+
+    file_stats_destroy(&stats);
 }
 
-static void assert_file_stats_retrieving_succeed(const int result)
+static void should_return_NULL_when_creating_file_stats_with_a_NULL_path(void)
 {
-    CU_ASSERT_EQUAL(result, FILE_STATS_SUCCESS);
+    const t_file_stats *stats = file_stats_get(NULL);
+
+    CU_ASSERT_PTR_NULL(stats);
 }
 
-static void assert_file_type_is(const unsigned int type)
+static void should_return_NULL_when_creating_file_stats_with_an_empty_path(void)
 {
-    CU_ASSERT_EQUAL(file_stats.st_mode, type);
+    const t_file_stats *stats = file_stats_get("");
+
+    CU_ASSERT_PTR_NULL(stats);
 }
 
-static void should_return_an_error_when_retrieving_the_stats_from_a_NULL_path(void)
+static void should_destroy_file_stats_correctly(void)
 {
-    const int result = file_stats_get(NULL, &file_stats);
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("valid_file"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
 
-    assert_file_stats_retrieving_failed(result);
+    t_file_stats *stats = file_stats_get("valid_file");
+
+    file_stats_destroy(&stats);
+
+    CU_ASSERT_PTR_NULL(stats);
 }
 
-static void should_return_an_error_when_retrieving_the_stats_from_an_empty_path(void)
+static void should_not_fail_to_destroy_file_stats_if_a_NULL_pointer_is_passed(void)
 {
-    const int result = file_stats_get("", &file_stats);
-
-    assert_file_stats_retrieving_failed(result);
+    file_stats_destroy(NULL);
 }
 
-static void should_return_an_error_when_populating_the_stats_to_a_NULL_stat_struct(void)
+static void should_not_fail_to_destroy_file_stats_if_a_NULL_file_stats_is_passed(void)
 {
-    const int result = file_stats_get("valid", NULL);
+    t_file_stats *invalid_stats = NULL;
 
-    assert_file_stats_retrieving_failed(result);
+    file_stats_destroy(&invalid_stats);
 }
 
-static void should_populate_successfully_the_file_stats_when_passed_a_valid_regular_file_path(void)
+static void should_return_unknown_file_type_when_a_NULL_file_stats_are_specified(void)
 {
-    const char *file_path = "valid";
-    guarantee_stat_will_populate_stats_of_a_regular_type_file(file_path);
+    const t_file_type invalid = file_stats_get_file_type(NULL);
 
-    const int result = file_stats_get(file_path, &file_stats);
-
-    assert_file_stats_retrieving_succeed(result);
-    assert_file_type_is(S_IFREG);
+    CU_ASSERT_EQUAL(invalid, UNKNOWN_FILE_TYPE);
 }
 
-static void should_populate_successfully_the_file_stats_when_passed_a_valid_directory_path(void)
+static void should_return_the_file_type_of_the_specified_file_stats(void)
 {
-    const char *dir_path = "valid_dir";
-    guarantee_stat_will_populate_stats_of_a_directory_type_file(dir_path);
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("reg_file"),
+        MOCK_DIR("dir", ".", ".."),
+        MOCK_CHAR_DEVICE("char_device"),
+        MOCK_BLOCK_DEVICE("block_device"),
+        MOCK_FIFO("pipe"),
+        MOCK_SYMLINK("symlink", "dir"),
+        MOCK_SOCKET("socket"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
 
-    const int result = file_stats_get(dir_path, &file_stats);
+    t_file_stats *reg_file_stats = file_stats_get("reg_file");
+    t_file_stats *dir_stats = file_stats_get("dir");
+    t_file_stats *chardevice_stats = file_stats_get("char_device");
+    t_file_stats *blockdevice_stats = file_stats_get("block_device");
+    t_file_stats *fifo_stats = file_stats_get("pipe");
+    t_file_stats *symlink_stats = file_stats_get("symlink");
+    t_file_stats *socket_stats = file_stats_get("socket");
 
-    assert_file_stats_retrieving_succeed(result);
-    assert_file_type_is(S_IFDIR);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(reg_file_stats), REGULAR_FILE_TYPE);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(dir_stats), DIRECTORY_FILE_TYPE);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(chardevice_stats), CHARDEVICE_FILE_TYPE);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(blockdevice_stats), BLOCKDEVICE_FILE_TYPE);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(fifo_stats), FIFO_FILE_TYPE);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(symlink_stats), DIRECTORY_FILE_TYPE);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(socket_stats), SOCKET_FILE_TYPE);
+
+    file_stats_destroy(&reg_file_stats);
+    file_stats_destroy(&dir_stats);
+    file_stats_destroy(&chardevice_stats);
+    file_stats_destroy(&blockdevice_stats);
+    file_stats_destroy(&fifo_stats);
+    file_stats_destroy(&symlink_stats);
+    file_stats_destroy(&socket_stats);
 }
 
 void register_file_stats_suite(void)
@@ -76,10 +118,13 @@ void register_file_stats_suite(void)
 
     if (suite != NULL)
     {
-        CU_add_test(suite, "should_return_an_error_when_retrieving_the_stats_from_a_NULL_path", should_return_an_error_when_retrieving_the_stats_from_a_NULL_path);
-        CU_add_test(suite, "should_return_an_error_when_retrieving_the_stats_from_an_empty_path", should_return_an_error_when_retrieving_the_stats_from_an_empty_path);
-        CU_add_test(suite, "should_return_an_error_when_populating_the_stats_to_a_NULL_stat_struct", should_return_an_error_when_populating_the_stats_to_a_NULL_stat_struct);
-        CU_add_test(suite, "should_populate_successfully_the_file_stats_when_passed_a_valid_regular_file_path", should_populate_successfully_the_file_stats_when_passed_a_valid_regular_file_path);
-        CU_add_test(suite, "should_populate_successfully_the_file_stats_when_passed_a_valid_directory_path", should_populate_successfully_the_file_stats_when_passed_a_valid_directory_path);
+        CU_add_test(suite, "should_create_file_stats_correctly", should_create_file_stats_correctly);
+        CU_add_test(suite, "should_return_NULL_when_creating_file_stats_with_an_empty_path", should_return_NULL_when_creating_file_stats_with_an_empty_path);
+        CU_add_test(suite, "should_return_NULL_when_creating_file_stats_with_a_NULL_path", should_return_NULL_when_creating_file_stats_with_a_NULL_path);
+        CU_add_test(suite, "should_destroy_file_stats_correctly", should_destroy_file_stats_correctly);
+        CU_add_test(suite, "should_not_fail_to_destroy_file_stats_if_a_NULL_pointer_is_passed", should_not_fail_to_destroy_file_stats_if_a_NULL_pointer_is_passed);
+        CU_add_test(suite, "should_not_fail_to_destroy_file_stats_if_a_NULL_file_stats_is_passed", should_not_fail_to_destroy_file_stats_if_a_NULL_file_stats_is_passed);
+        CU_add_test(suite, "should_return_unknown_file_type_when_a_NULL_file_stats_are_specified", should_return_unknown_file_type_when_a_NULL_file_stats_are_specified);
+        CU_add_test(suite, "should_return_the_file_type_of_the_specified_file_stats", should_return_the_file_type_of_the_specified_file_stats);
     }
 }

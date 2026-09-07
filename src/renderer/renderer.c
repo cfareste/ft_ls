@@ -28,7 +28,7 @@ t_render_context *render_context_create(void)
 
 void render_context_set_directory_header(t_render_context *context, const char *directory_header)
 {
-    if (context == NULL || directory_header == NULL)
+    if (context == NULL || !ft_is_valid_path(directory_header))
         return;
 
     free(context->directory_header);

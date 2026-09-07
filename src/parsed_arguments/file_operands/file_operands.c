@@ -27,13 +27,13 @@ static char **get_file_operands_from_arguments(const int num_of_arguments, const
     return file_operands;
 }
 
-static unsigned int get_num_of_non_directory_file_operands(const unsigned int *file_operand_types)
+static unsigned int get_num_of_non_directory_file_operands(const t_file_type *file_operand_types)
 {
     unsigned int num_of_non_directory_file_operands = 0;
 
     for (unsigned int i = 0; file_operand_types[i] != 0; i++)
     {
-        if (!S_ISDIR(file_operand_types[i]))
+        if (file_operand_types[i] != DIRECTORY_FILE_TYPE)
         {
             num_of_non_directory_file_operands++;
         }
@@ -42,13 +42,13 @@ static unsigned int get_num_of_non_directory_file_operands(const unsigned int *f
     return num_of_non_directory_file_operands;
 }
 
-static unsigned int get_num_of_directory_file_operands(const unsigned int *file_operand_types)
+static unsigned int get_num_of_directory_file_operands(const t_file_type *file_operand_types)
 {
     unsigned int num_of_directory_file_operands = 0;
 
     for (unsigned int i = 0; file_operand_types[i] != 0; i++)
     {
-        if (S_ISDIR(file_operand_types[i]))
+        if (file_operand_types[i] == DIRECTORY_FILE_TYPE)
         {
             num_of_directory_file_operands++;
         }
@@ -65,23 +65,24 @@ char **file_operands_get(const int num_of_arguments, const char **arguments)
     return get_file_operands_from_arguments(num_of_arguments, arguments);
 }
 
-unsigned int *file_operands_get_types(char **file_operands)
+t_file_type *file_operands_get_types(char **file_operands)
 {
     const unsigned int num_of_operands = ft_str_matrix_length(file_operands);
-    unsigned int *file_operands_types = ft_safe_calloc(num_of_operands + 1, sizeof(int));
-    struct stat file_stats;
+    t_file_type *file_operands_types = ft_safe_calloc(num_of_operands + 1, sizeof(t_file_type));
 
     for (unsigned int i = 0; i < num_of_operands; i++)
     {
-        file_stats_get(file_operands[i], &file_stats);
+        t_file_stats *file_operand_stats = file_stats_get(file_operands[i]);
 
-        file_operands_types[i] = file_stats.st_mode & S_IFMT;
+        file_operands_types[i] = file_stats_get_file_type(file_operand_stats);
+
+        file_stats_destroy(&file_operand_stats);
     }
 
     return file_operands_types;
 }
 
-char **file_operands_get_non_directory(char **file_operands, const unsigned int *file_operands_types)
+char **file_operands_get_non_directory(char **file_operands, const t_file_type *file_operands_types)
 {
     const unsigned int num_of_non_directory_file_operands = get_num_of_non_directory_file_operands(file_operands_types);
     char **non_directory_file_operands = ft_safe_calloc(num_of_non_directory_file_operands + 1, sizeof(char *));
@@ -89,7 +90,7 @@ char **file_operands_get_non_directory(char **file_operands, const unsigned int 
     int j = 0;
     for (int i = 0; file_operands[i] != NULL; i++)
     {
-        if (!S_ISDIR(file_operands_types[i]))
+        if (file_operands_types[i] != DIRECTORY_FILE_TYPE)
         {
             non_directory_file_operands[j] = ft_safe_strdup(file_operands[i]);
             j++;
@@ -99,7 +100,7 @@ char **file_operands_get_non_directory(char **file_operands, const unsigned int 
     return non_directory_file_operands;
 }
 
-char **file_operands_get_directory(char **file_operands, const unsigned int *file_operand_types)
+char **file_operands_get_directory(char **file_operands, const t_file_type *file_operand_types)
 {
     const unsigned int num_of_directory_file_operands = get_num_of_directory_file_operands(file_operand_types);
     char **directory_file_operands = ft_safe_calloc(num_of_directory_file_operands + 1, sizeof(char *));
@@ -107,7 +108,7 @@ char **file_operands_get_directory(char **file_operands, const unsigned int *fil
     int j = 0;
     for (int i = 0; file_operands[i] != NULL; i++)
     {
-        if (S_ISDIR(file_operand_types[i]))
+        if (file_operand_types[i] == DIRECTORY_FILE_TYPE)
         {
             directory_file_operands[j] = ft_safe_strdup(file_operands[i]);
             j++;

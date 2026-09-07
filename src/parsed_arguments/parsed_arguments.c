@@ -7,7 +7,7 @@
 struct s_parsed_arguments
 {
     char **file_operands;
-    unsigned int *file_operand_types;
+    t_file_type *file_operand_types;
     char **non_directory_file_operands;
     char **directory_file_operands;
 };
