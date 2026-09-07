@@ -28,3 +28,4 @@ empty .hidden                                              ::       empty .hidde
 capacity/ capacity2/                                       ::       capacity/ capacity2/
 linkfile                                                   ::       linkfile
 linkdir                                                    ::       linkdir
+linkdir/                                                   ::       linkdir/
