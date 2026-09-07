@@ -157,8 +157,12 @@ run: all
 
 e2e:
 	@echo "$(CYAN)Running $(WHITE_BOLD)E2E tests$(CYAN)...$(RESET)\n"
-	@cp ../ft_ls .
-	@./run_e2e.sh
+	@rm -rf ./testdir
+	@mkdir -p ./testdir
+	@(cd ./testdir && nc -lkU my_socket.sock > /dev/null) & socket_pid=$$!; \
+		cp ../ft_ls .; \
+		./run_e2e.sh ; \
+		kill $$socket_pid 2>/dev/null || true; rm -f ./testdir/my_socket.sock
 	@rm -rf ./ft_ls
 
 .PHONY: all \

@@ -41,40 +41,45 @@ print_summary() {
 }
 
 prepare_test_environment() {
+    # Misc. directories
     mkdir -p firstDir secondDir empty
 
+    # Directories with misc. content
     cp -rf ../inc ./inc
     cp -rf ../src ./src
     cp -rf ../Makefile ./Makefile
 
+    # Files with special quoting
     touch src/.hidden
     touch "'my" "'my file'" '"file"' file "file'" file2 "my file" ".hidden" ".env"
     touch my-pdf.pdf myfiñe nwl test@pdf $'tab\tfile' a "file " " "
     touch firstDir/file firstDir/file2 secondDir/file3 secondDir/file4
 
-    ln -s firstDir link_to_firstDir
-    printf 'hello' > file
-    printf 'world' > file2
-    printf 'sample' > a
-    printf 'data' > nwl
-
+    # Temporary files to test absolute paths
     touch "/tmp/tempfile"
     mkdir -p "/tmp/tempdir"
     touch "/tmp/tempdir/file1"
     touch "/tmp/tempdir/file2"
     touch "/tmp/tempdir/file3"
 
+    # Hidden files
     touch .hidden .hidden2
     mkdir dir_only_hidden .hiddir .hiddir2
     touch dir_only_hidden/.hidden1 dir_only_hidden/.fileee dir_only_hidden/.file2
     touch .hiddir/hidden1 .hiddir/.invis .hiddir/.invis2
     touch .hiddir2/hidden3 .hiddir2/hidden4 .hiddir2/.invis1
 
+    # Capacity tests
     mkdir capacity/
     mkdir capacity2/
     touch "capacity/1" "capacity/2" "capacity/3" "capacity/4" "capacity/5" "capacity/6" "capacity/7" "capacity/8"
     cp capacity/* capacity2
     touch "capacity2/a" "capacity2/b" "capacity2/c" "capacity2/d" "capacity2/e" "capacity2/f" "capacity2/g" "capacity2/h"
+
+    # Different file types
+    ln -s file linkfile
+    ln -s firstDir linkdir
+    mkfifo fifo
 }
 
 remove_test_environment() {
@@ -171,7 +176,6 @@ main() {
     export LANG=C
     export LC_ALL=C
 
-    rm -rf "${SCRIPT_DIR}/testdir"
     mkdir -p "${SCRIPT_DIR}/testdir"
     cd "${SCRIPT_DIR}/testdir" || exit 1
     prepare_test_environment
