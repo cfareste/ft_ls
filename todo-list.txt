@@ -1,8 +1,6 @@
 TODO:
 1. Implementar LS-13 Support for multiple types of files
-2. Usar un struct propio para los opendirs, readdir, etc. (como t_dir_stream de antes)
-   - Add tests for DIR * and struct dirent * nulls?
-3. Revisar que todas las funciones tengan al menos 1 test que compruebe argumentos inválidos (run app no tiene)
+2. Revisar que todas las funciones tengan al menos 1 test que compruebe argumentos inválidos (run app no tiene)
 
 
 TODO En algún momento:
@@ -11,6 +9,7 @@ TODO En algún momento:
 - Reflexionar si meter el should print header en render pasando parsed arguments. Si al hacer las options se necesita
   pasar parsed arguments al render, entonces calcularlo ahi
 - Cuando haga LS-12, revisar que las funciones de ensure will fail dirent estén bien (conversación GPT Mac)
+- Añadir tests para DIR * and struct dirent * nulls?
 
 
 TODO Para mejorar siguientes proyectos:
