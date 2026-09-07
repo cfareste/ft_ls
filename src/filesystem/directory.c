@@ -45,8 +45,7 @@ const char *directory_get_entry_name(const t_dir_entry *dir_entry)
 
 int directory_is_entry_empty(const t_dir_entry *dir_entry)
 {
-    (void) dir_entry;
-    return 1;
+    return dir_entry->entry == NULL;
 }
 
 struct dirent *directory_get_next_entry(t_dir_stream *stream)
