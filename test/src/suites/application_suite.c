@@ -722,6 +722,28 @@ static void should_successfully_print_the_contents_of_the_current_directory_with
     ));
     assert_application_execution_succeed(result);
 }
+
+static void should_successfully_print_the_name_of_the_specified_symlink_pointing_to_a_non_directory_file(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("file"),
+        MOCK_SYMLINK("linkfile", "file"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "linkfile", NULL };
+    const char *expected_file_names[] = { "linkfile" };
+    parsed_arguments = parse_arguments(1, arguments);
+
+    const int result = application_run(parsed_arguments);
+
+    CU_ASSERT(verify_that_the_str_that_has_been_printed_is("%s\n",
+        expected_file_names[0]
+    ));
+    assert_application_execution_succeed(result);
+}
+
 void register_application_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, test_teardown);
@@ -750,5 +772,6 @@ void register_application_suite(void)
         CU_add_test(suite, "should_successfully_print_the_specified_directory_file_operands_and_their_contents_sorted", should_successfully_print_the_specified_directory_file_operands_and_their_contents_sorted);
         CU_add_test(suite, "should_successfully_print_the_specified_mixed_types_file_operands_and_their_contents_sorted", should_successfully_print_the_specified_mixed_types_file_operands_and_their_contents_sorted);
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_current_directory_without_following_symlinks", should_successfully_print_the_contents_of_the_current_directory_without_following_symlinks);
+        CU_add_test(suite, "should_successfully_print_the_name_of_the_specified_symlink_pointing_to_a_non_directory_file", should_successfully_print_the_name_of_the_specified_symlink_pointing_to_a_non_directory_file);
     }
 }
