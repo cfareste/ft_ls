@@ -14,7 +14,17 @@ DIR *mock_opendir(const char *path)
 {
     const t_vfs_mock_entry *dir_entry = find_vfs_entry(path);
 
-    if (dir_entry == NULL || !S_ISDIR(dir_entry->mode))
+    if (dir_entry == NULL)
+        return NULL;
+
+    while (S_ISLNK(dir_entry->mode))
+    {
+        dir_entry = find_vfs_entry(dir_entry->target);
+        if (dir_entry == NULL)
+            return NULL;
+    }
+
+    if (!S_ISDIR(dir_entry->mode))
         return NULL;
 
     t_mock_dir *dir = ft_safe_calloc(1, sizeof(t_mock_dir));

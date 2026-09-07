@@ -291,7 +291,7 @@ static void should_successfully_print_the_contents_of_the_explicitly_specified_h
 {
     const t_vfs_mock_entry vfs[] = {
         MOCK_FILE(".file1"),
-        MOCK_SYMLINK(".symlink", "file1"),
+        MOCK_SYMLINK(".symlink", ".file1"),
         MOCK_DIR(".dir", ".run", ".", "char_device", "..", "file_from_dir_1"),
         MOCK_DIR(".dir1", "..", ".gitignore", "file_from_dir_2", ".", "symlink", ".vscode"),
         MOCK_DIR(".dir/.run", "..", "."),
@@ -308,7 +308,7 @@ static void should_successfully_print_the_contents_of_the_explicitly_specified_h
     const char *arguments[] = { ".dir", ".dir1", ".file1", ".symlink", NULL };
     const char *expected_first_dir_file_names[] = { "char_device", "file_from_dir_1" };
     const char *expected_second_dir_file_names[] = { "file_from_dir_2", "symlink" };
-    parsed_arguments = parse_arguments(5, arguments);
+    parsed_arguments = parse_arguments(4, arguments);
 
     const int result = application_run(parsed_arguments);
 
@@ -744,6 +744,34 @@ static void should_successfully_print_the_name_of_the_specified_symlink_pointing
     assert_application_execution_succeed(result);
 }
 
+static void should_successfully_print_the_contents_of_the_directory_pointed_by_the_specified_symlink(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("dir", ".", "..", "block_device", "char_device", "file", "subdir"),
+        MOCK_SYMLINK("linkdir", "dir"),
+        MOCK_BLOCK_DEVICE("dir/block_device"),
+        MOCK_CHAR_DEVICE("dir/char_device"),
+        MOCK_FILE("dir/file"),
+        MOCK_DIR("dir/subdir", ".", ".."),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "linkdir", NULL };
+    const char *expected_file_names[] = { "block_device", "char_device", "file", "subdir" };
+    parsed_arguments = parse_arguments(1, arguments);
+
+    const int result = application_run(parsed_arguments);
+
+    CU_ASSERT(verify_that_the_str_that_has_been_printed_is("%s\n%s\n%s\n%s\n",
+        expected_file_names[0],
+        expected_file_names[1],
+        expected_file_names[2],
+        expected_file_names[3]
+    ));
+    assert_application_execution_succeed(result);
+}
+
 void register_application_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, test_teardown);
@@ -773,5 +801,6 @@ void register_application_suite(void)
         CU_add_test(suite, "should_successfully_print_the_specified_mixed_types_file_operands_and_their_contents_sorted", should_successfully_print_the_specified_mixed_types_file_operands_and_their_contents_sorted);
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_current_directory_without_following_symlinks", should_successfully_print_the_contents_of_the_current_directory_without_following_symlinks);
         CU_add_test(suite, "should_successfully_print_the_name_of_the_specified_symlink_pointing_to_a_non_directory_file", should_successfully_print_the_name_of_the_specified_symlink_pointing_to_a_non_directory_file);
+        CU_add_test(suite, "should_successfully_print_the_contents_of_the_directory_pointed_by_the_specified_symlink", should_successfully_print_the_contents_of_the_directory_pointed_by_the_specified_symlink);
     }
 }

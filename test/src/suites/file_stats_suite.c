@@ -100,7 +100,7 @@ static void should_return_the_file_type_of_the_specified_file_stats(void)
     CU_ASSERT_EQUAL(file_stats_get_file_type(chardevice_stats), CHARDEVICE_FILE_TYPE);
     CU_ASSERT_EQUAL(file_stats_get_file_type(blockdevice_stats), BLOCKDEVICE_FILE_TYPE);
     CU_ASSERT_EQUAL(file_stats_get_file_type(fifo_stats), FIFO_FILE_TYPE);
-    CU_ASSERT_EQUAL(file_stats_get_file_type(symlink_stats), SYMLINK_FILE_TYPE);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(symlink_stats), DIRECTORY_FILE_TYPE);
     CU_ASSERT_EQUAL(file_stats_get_file_type(socket_stats), SOCKET_FILE_TYPE);
 
     file_stats_destroy(&reg_file_stats);
