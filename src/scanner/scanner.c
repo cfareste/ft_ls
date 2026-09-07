@@ -31,6 +31,8 @@ t_file_entry_array *scan(const char *path)
         dir_entry = directory_get_next(dir_stream);
     }
 
+    directory_destroy_entry(&dir_entry);
     directory_close(&dir_stream);
+
     return file_entry_array;
 }
