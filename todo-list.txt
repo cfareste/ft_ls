@@ -1,6 +1,8 @@
 TODO:
 1. Implementar LS-13 Support for multiple types of files
-2. Revisar que todas las funciones tengan al menos 1 test que compruebe argumentos inválidos (run app no tiene)
+2. QA LS-13
+   - Buscar casos de tests
+   - Crear los tests en la suite adecuada + application suite + e2e
 
 
 TODO En algún momento:
