@@ -26,3 +26,4 @@ empty .hidden                                              ::       empty .hidde
 .hidden dir_only_hidden/                                   ::       .hidden dir_only_hidden/
 .hidden firstDir file dir_only_hidden/ .hiddir empty       ::       .hidden firstDir file dir_only_hidden/ .hiddir empty
 capacity/ capacity2/                                       ::       capacity/ capacity2/
+linkfile                                                   ::       linkfile
