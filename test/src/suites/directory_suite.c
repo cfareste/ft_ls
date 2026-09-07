@@ -85,6 +85,13 @@ static void should_not_fail_to_destroy_a_null_pointer_dir_entry(void)
     directory_entry_destroy(NULL);
 }
 
+static void should_not_fail_to_destroy_a_null_dir_entry(void)
+{
+    t_dir_entry *dir_entry = NULL;
+
+    directory_entry_destroy(&dir_entry);
+}
+
 static void should_destroy_a_valid_dir_entry_correctly(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -200,6 +207,7 @@ void register_directory_suite(void)
         CU_add_test(suite, "should_return_NULL_for_next_entry_if_a_NULL_dir_stream_is_specified", should_return_NULL_for_next_entry_if_a_NULL_dir_stream_is_specified);
         CU_add_test(suite, "should_return_the_next_entry_when_reading_from_a_valid_directory", should_return_the_next_entry_when_reading_from_a_valid_directory);
         CU_add_test(suite, "should_not_fail_to_destroy_a_null_pointer_dir_entry", should_not_fail_to_destroy_a_null_pointer_dir_entry);
+        CU_add_test(suite, "should_not_fail_to_destroy_a_null_dir_entry", should_not_fail_to_destroy_a_null_dir_entry);
         CU_add_test(suite, "should_destroy_a_valid_dir_entry_correctly", should_destroy_a_valid_dir_entry_correctly);
         CU_add_test(suite, "should_return_NULL_for_the_entry_name_if_a_NULL_entry_is_specified", should_return_NULL_for_the_entry_name_if_a_NULL_entry_is_specified);
         CU_add_test(suite, "should_return_the_dir_entry_name", should_return_the_dir_entry_name);

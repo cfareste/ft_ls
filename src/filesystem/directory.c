@@ -53,7 +53,7 @@ struct dirent *directory_get_next_entry(t_dir_stream *stream)
 
 void directory_entry_destroy(t_dir_entry **dir_entry)
 {
-    if (dir_entry == NULL)
+    if (dir_entry == NULL || *dir_entry == NULL)
         return ;
 
     free(*dir_entry);
