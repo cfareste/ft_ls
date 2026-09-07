@@ -27,6 +27,9 @@ t_dir_stream *directory_open(const char *path)
 //TODO: rename to directory_get_next_entry
 t_dir_entry *directory_get_next(const t_dir_stream *dir_stream)
 {
+    if (dir_stream == NULL)
+        return NULL;
+
     t_dir_entry *dir_entry = ft_safe_calloc(1, sizeof(t_dir_entry));
     dir_entry->entry = readdir(dir_stream->dir);
     return dir_entry;
