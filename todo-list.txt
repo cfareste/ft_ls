@@ -1,7 +1,6 @@
 TODO:
 1. Implementar LS-13 Support for multiple types of files
 2. QA LS-13
-   - Buscar casos de tests
    - Crear los tests en la suite adecuada + application suite + e2e
 
 
@@ -12,6 +11,7 @@ TODO En algún momento:
   pasar parsed arguments al render, entonces calcularlo ahi
 - Cuando haga LS-12, revisar que las funciones de ensure will fail dirent estén bien (conversación GPT Mac)
 - Añadir tests para DIR * and struct dirent * nulls?
+- Añadir valgrind a los tests E2E
 
 
 TODO Para mejorar siguientes proyectos:
@@ -83,3 +83,19 @@ QA LS-14 Default sorting output (`ls file ... | cat`)
      - Que se ordene nombres y contenidos
    - Mixto
      - Que se ordenen ambos y por separado
+5. No memory leaks
+
+
+QA LS-13 Support for multiple types of files
+- Disclaimer: Al listar contenido de un directorio, se escribe el nombre de los ficheros contenidos, incluso
+              si es un symlink (no del target)
+1. Sin parámetros
+2. 1 parámetro
+   - Archivo cualquiera
+   - Symlink archivo cualquiera
+   - Directorio
+   - Symlink directorio
+   - Symlink directorio con barra al final (linkdir/) -> E2E only
+3. Múltiples parámetros
+   - Mezclar combinaciones anteriores (symlink archivo / directorio, archivo normal...)
+4. No memory leaks

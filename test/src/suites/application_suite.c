@@ -688,6 +688,40 @@ static void should_successfully_print_the_specified_mixed_types_file_operands_an
     assert_application_execution_succeed(result);
 }
 
+static void should_successfully_print_the_contents_of_the_current_directory_without_following_symlinks(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", ".", "..", "1_file", "2_subdir", "3_linkfile", "4_linkdir", "5_chardevice", "6_blockdevice", "7_fifo", "8_socket"),
+        MOCK_FILE("./1_file"),
+        MOCK_DIR("./2_subdir", ".", ".."),
+        MOCK_SYMLINK("./3_linkfile", "1_file"),
+        MOCK_SYMLINK("./4_linkdir", "2_subdir"),
+        MOCK_CHAR_DEVICE("./5_chardevice"),
+        MOCK_BLOCK_DEVICE("./6_blockdevice"),
+        MOCK_FIFO("./7_fifo"),
+        MOCK_SOCKET("./8_socket"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { NULL };
+    const char *expected_file_names[] = { "1_file", "2_subdir", "3_linkfile", "4_linkdir", "5_chardevice", "6_blockdevice", "7_fifo", "8_socket" };
+    parsed_arguments = parse_arguments(0, arguments);
+
+    const int result = application_run(parsed_arguments);
+
+    CU_ASSERT(verify_that_the_str_that_has_been_printed_is("%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n",
+        expected_file_names[0],
+        expected_file_names[1],
+        expected_file_names[2],
+        expected_file_names[3],
+        expected_file_names[4],
+        expected_file_names[5],
+        expected_file_names[6],
+        expected_file_names[7]
+    ));
+    assert_application_execution_succeed(result);
+}
 void register_application_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, test_teardown);
@@ -715,5 +749,6 @@ void register_application_suite(void)
         CU_add_test(suite, "should_successfully_print_the_specified_non_directory_file_operands_sorted", should_successfully_print_the_specified_non_directory_file_operands_sorted);
         CU_add_test(suite, "should_successfully_print_the_specified_directory_file_operands_and_their_contents_sorted", should_successfully_print_the_specified_directory_file_operands_and_their_contents_sorted);
         CU_add_test(suite, "should_successfully_print_the_specified_mixed_types_file_operands_and_their_contents_sorted", should_successfully_print_the_specified_mixed_types_file_operands_and_their_contents_sorted);
+        CU_add_test(suite, "should_successfully_print_the_contents_of_the_current_directory_without_following_symlinks", should_successfully_print_the_contents_of_the_current_directory_without_following_symlinks);
     }
 }
