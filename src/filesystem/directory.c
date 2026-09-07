@@ -37,6 +37,9 @@ t_dir_entry *directory_get_next(const t_dir_stream *dir_stream)
 
 const char *directory_get_entry_name(const t_dir_entry *dir_entry)
 {
+    if (dir_entry == NULL)
+        return NULL;
+
     return dir_entry->entry->d_name;
 }
 
