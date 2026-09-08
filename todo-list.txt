@@ -1,4 +1,16 @@
 TODO:
+1. Implementar LS-12 Manage invalid operations
+2. Permitir diferentes tipos de errores en los mocks, jugando con permisos, mensajes escritos en stderr y demás
+3. Reflexionar si añadir tests para DIR * and struct dirent * nulls
+4. Añadir valgrind a los tests E2E
+5. Mensaje de error de opendir
+6. Mensaje de error de readdir
+7. Mensaje de error de closedir
+8. Mensaje de error de stat
+9. Estado de error de scan (opendir + readdir + closedir) en caso de ser file operand
+10. Estado de error de scan (opendir + readdir + closedir) en caso de NO ser file operand
+11. Estado de error de parsed args (stat) en caso de ser file operand
+12. Estado de error de parsed args (stat) en caso de NO ser file operand
 
 
 TODO En algún momento:
@@ -6,9 +18,7 @@ TODO En algún momento:
 - Refactor renderer, donde render llama a render_strategy o lo que sea basado en options
 - Reflexionar si meter el should print header en render pasando parsed arguments. Si al hacer las options se necesita
   pasar parsed arguments al render, entonces calcularlo ahi
-- Cuando haga LS-12, revisar que las funciones de ensure will fail dirent estén bien (conversación GPT Mac)
-- Añadir tests para DIR * and struct dirent * nulls?
-- Añadir valgrind a los tests E2E
+- Para manejar errores de cualquier tipo, mirar la conversación de: https://chatgpt.com/c/6a711028-5c44-83eb-a7a4-e50ff2877990
 
 
 TODO Para mejorar siguientes proyectos:
