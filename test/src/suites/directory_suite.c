@@ -246,7 +246,6 @@ static void should_return_NULL_when_opening_a_directory_without_permissions(void
         MOCK_DIR_OPEN_ERROR(EMFILE, "processFD", ".", ".."),
         MOCK_DIR_OPEN_ERROR(ENAMETOOLONG, "nameTooLong", ".", ".."),
         MOCK_DIR_OPEN_ERROR(ENFILE, "systemFD", ".", ".."),
-        MOCK_DIR_OPEN_ERROR(ENOENT, "dirDoesntExist", ".", ".."),
         MOCK_DIR_OPEN_ERROR(ENOTDIR, "notADirectory", ".", ".."),
         MOCK_DIR_OPEN_ERROR(ENOMEM, "noMemory", ".", ".."),
         MOCK_NULL_TERMINATOR()

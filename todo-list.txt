@@ -3,7 +3,6 @@ TODO:
 2. Permitir diferentes tipos de errores en los mocks, jugando con permisos, mensajes escritos en stderr y demás
 3. Reflexionar si añadir tests para DIR * and struct dirent * nulls
 4. Añadir valgrind a los tests E2E
-5. Mensaje de error de opendir
 6. Mensaje de error de readdir
 7. Mensaje de error de closedir
 8. Mensaje de error de stat
