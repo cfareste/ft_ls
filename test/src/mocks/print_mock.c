@@ -36,14 +36,13 @@ int verify_that_the_str_that_has_been_printed_is(const char *str, ...)
 
     if (!strings_are_equal)
     {
-        ft_fprintf(STDERR_FILENO,
+        fprintf(stderr,
             "FAILED:\n"
-            "-----\n"
-            "expected:\n"
+            "\nExpected:\n"
             "-----\n"
             "%s"
             "-----\n"
-            "actual:\n"
+            "\nActual:\n"
             "-----\n"
             "%s"
             "-----\n", expected, printing_buffer);
