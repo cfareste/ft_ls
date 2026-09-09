@@ -1,4 +1,5 @@
 #include <dirent.h>
+#include <errno.h>
 #include <stdlib.h>
 #include "libft.h"
 #include "mocks.h"
@@ -16,6 +17,12 @@ DIR *mock_opendir(const char *path)
 
     if (dir_entry == NULL)
         return NULL;
+
+    if (dir_entry->errors.opendir_errno != 0)
+    {
+        errno = dir_entry->errors.opendir_errno;
+        return NULL;
+    }
 
     while (S_ISLNK(dir_entry->mode))
     {
