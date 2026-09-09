@@ -4,9 +4,10 @@
 #include "mocks.h"
 #include "libft.h"
 
+#define BUFFER_COUNT 256
 #define PRINT_BUFFER_SIZE 2048
 
-static char printing_buffer[PRINT_BUFFER_SIZE] = { '\0' };
+static char printing_buffer[BUFFER_COUNT][PRINT_BUFFER_SIZE];
 
 int printf_mock(const char *str, ...)
 {
@@ -17,8 +18,8 @@ int printf_mock(const char *str, ...)
     const int written_length = vsnprintf(temp_buffer, PRINT_BUFFER_SIZE, str, args);
     va_end(args);
 
-    const int printing_buffer_length = (int) ft_strlen(printing_buffer);
-    ft_strlcat(printing_buffer, temp_buffer, printing_buffer_length + written_length + 1);
+    const int printing_buffer_length = (int) ft_strlen(printing_buffer[STDOUT_FILENO]);
+    ft_strlcat(printing_buffer[STDOUT_FILENO], temp_buffer, printing_buffer_length + written_length + 1);
 
     return printing_buffer_length + written_length;
 }
@@ -32,7 +33,7 @@ int verify_that_the_str_that_has_been_printed_is(const char *str, ...)
     vsnprintf(expected, PRINT_BUFFER_SIZE, str, args);
     va_end(args);
 
-    const int strings_are_equal = ft_are_string_equals(printing_buffer, expected);
+    const int strings_are_equal = ft_are_string_equals(printing_buffer[STDOUT_FILENO], expected);
 
     if (!strings_are_equal)
     {
@@ -45,12 +46,18 @@ int verify_that_the_str_that_has_been_printed_is(const char *str, ...)
             "\nActual:\n"
             "-----\n"
             "%s"
-            "-----\n", expected, printing_buffer);
+            "-----\n", expected, printing_buffer[STDOUT_FILENO]);
     }
     return strings_are_equal;
 }
 
 void reset_printing_buffer(void)
 {
-    printing_buffer[0] = '\0';
+    for (unsigned int i = 0; i < BUFFER_COUNT; i++)
+    {
+        for (unsigned int j = 0; j < PRINT_BUFFER_SIZE; j++)
+        {
+            printing_buffer[i][j] = '\0';
+        }
+    }
 }
