@@ -31,4 +31,5 @@ const t_vfs_mock_entry *find_vfs_entry(const char *path);
 void vfs_mock_reset(void);
 
 int verify_that_the_str_that_has_been_printed_is(const char *str, ...);
+int verify_that_the_error_that_has_been_printed_is(const char *str, ...);
 void reset_printing_buffer(void);

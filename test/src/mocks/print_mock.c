@@ -66,6 +66,33 @@ int verify_that_the_str_that_has_been_printed_is(const char *str, ...)
     return strings_are_equal;
 }
 
+int verify_that_the_error_that_has_been_printed_is(const char *str, ...)
+{
+    char expected[PRINT_BUFFER_SIZE];
+    va_list args;
+
+    va_start(args, str);
+    vsnprintf(expected, PRINT_BUFFER_SIZE, str, args);
+    va_end(args);
+
+    const int strings_are_equal = ft_are_string_equals(printing_buffer[STDERR_FILENO], expected);
+
+    if (!strings_are_equal)
+    {
+        fprintf(stderr,
+            "FAILED:\n"
+            "\nExpected:\n"
+            "-----\n"
+            "%s"
+            "-----\n"
+            "\nActual:\n"
+            "-----\n"
+            "%s"
+            "-----\n", expected, printing_buffer[STDERR_FILENO]);
+    }
+    return strings_are_equal;
+}
+
 void reset_printing_buffer(void)
 {
     for (unsigned int i = 0; i < BUFFER_COUNT; i++)
