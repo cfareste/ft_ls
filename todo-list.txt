@@ -11,8 +11,6 @@ TODO:
 10. Estado de error de scan (opendir + readdir + closedir) en caso de NO ser file operand
 11. Estado de error de parsed args (stat) en caso de ser file operand
 12. Estado de error de parsed args (stat) en caso de NO ser file operand
-13. Meter hidden files en el dir entry (tell dont ask) y revisar para más posibles TDA
-14. Refactor enums file type
 
 
 TODO En algún momento:

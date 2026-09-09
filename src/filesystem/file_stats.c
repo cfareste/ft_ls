@@ -10,22 +10,22 @@ struct s_file_stats
 
 static t_file_type get_file_type(const mode_t mode)
 {
-    t_file_type file_type = UNKNOWN_FILE_TYPE;
+    t_file_type file_type = FILE_TYPE_UNKNOWN;
 
     if (S_ISREG(mode))
-        file_type = REGULAR_FILE_TYPE;
+        file_type = FILE_TYPE_REGULAR;
     if (S_ISDIR(mode))
-        file_type = DIRECTORY_FILE_TYPE;
+        file_type = FILE_TYPE_DIRECTORY;
     if (S_ISCHR(mode))
-        file_type = CHARDEVICE_FILE_TYPE;
+        file_type = FILE_TYPE_CHARDEVICE;
     if (S_ISBLK(mode))
-        file_type = BLOCKDEVICE_FILE_TYPE;
+        file_type = FILE_TYPE_BLOCKDEVICE;
     if (S_ISFIFO(mode))
-        file_type = FIFO_FILE_TYPE;
+        file_type = FILE_TYPE_FIFO;
     if (S_ISLNK(mode))
-        file_type = SYMLINK_FILE_TYPE;
+        file_type = FILE_TYPE_SYMLINK;
     if (S_ISSOCK(mode))
-        file_type = SOCKET_FILE_TYPE;
+        file_type = FILE_TYPE_SOCKET;
 
     return file_type;
 }
@@ -46,7 +46,7 @@ t_file_stats *file_stats_get(const char *file_path)
 t_file_type file_stats_get_file_type(const t_file_stats *file_stats)
 {
     if (file_stats == NULL)
-        return UNKNOWN_FILE_TYPE;
+        return FILE_TYPE_UNKNOWN;
 
     return file_stats->type;
 }

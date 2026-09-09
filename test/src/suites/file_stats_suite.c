@@ -70,7 +70,7 @@ static void should_return_unknown_file_type_when_a_NULL_file_stats_are_specified
 {
     const t_file_type invalid = file_stats_get_file_type(NULL);
 
-    CU_ASSERT_EQUAL(invalid, UNKNOWN_FILE_TYPE);
+    CU_ASSERT_EQUAL(invalid, FILE_TYPE_UNKNOWN);
 }
 
 static void should_return_the_file_type_of_the_specified_file_stats(void)
@@ -95,13 +95,13 @@ static void should_return_the_file_type_of_the_specified_file_stats(void)
     t_file_stats *symlink_stats = file_stats_get("symlink");
     t_file_stats *socket_stats = file_stats_get("socket");
 
-    CU_ASSERT_EQUAL(file_stats_get_file_type(reg_file_stats), REGULAR_FILE_TYPE);
-    CU_ASSERT_EQUAL(file_stats_get_file_type(dir_stats), DIRECTORY_FILE_TYPE);
-    CU_ASSERT_EQUAL(file_stats_get_file_type(chardevice_stats), CHARDEVICE_FILE_TYPE);
-    CU_ASSERT_EQUAL(file_stats_get_file_type(blockdevice_stats), BLOCKDEVICE_FILE_TYPE);
-    CU_ASSERT_EQUAL(file_stats_get_file_type(fifo_stats), FIFO_FILE_TYPE);
-    CU_ASSERT_EQUAL(file_stats_get_file_type(symlink_stats), DIRECTORY_FILE_TYPE);
-    CU_ASSERT_EQUAL(file_stats_get_file_type(socket_stats), SOCKET_FILE_TYPE);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(reg_file_stats), FILE_TYPE_REGULAR);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(dir_stats), FILE_TYPE_DIRECTORY);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(chardevice_stats), FILE_TYPE_CHARDEVICE);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(blockdevice_stats), FILE_TYPE_BLOCKDEVICE);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(fifo_stats), FILE_TYPE_FIFO);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(symlink_stats), FILE_TYPE_DIRECTORY);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(socket_stats), FILE_TYPE_SOCKET);
 
     file_stats_destroy(&reg_file_stats);
     file_stats_destroy(&dir_stats);
