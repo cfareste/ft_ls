@@ -162,9 +162,12 @@ e2e:
 	@rm -rf ./testdir
 	@mkdir -p ./testdir
 	@(cd ./testdir && nc -lkU my_socket.sock > /dev/null) & socket_pid=$$!; \
-		cp ../ft_ls .; \
-		./run_e2e.sh ; \
-		kill $$socket_pid 2>/dev/null || true; rm -f ./testdir/my_socket.sock
+	   cp ../ft_ls .; \
+	   ./run_e2e.sh; \
+	   e2e_status=$$?; \
+	   kill $$socket_pid 2>/dev/null || true; \
+	   rm -f ./testdir/my_socket.sock; \
+	   exit $$e2e_status
 	@rm -rf ./ft_ls
 
 .PHONY: all \
