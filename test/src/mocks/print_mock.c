@@ -24,6 +24,21 @@ int printf_mock(const char *str, ...)
     return printing_buffer_length + written_length;
 }
 
+int fprintf_mock(const int fd, const char *str, ...)
+{
+    char temp_buffer[PRINT_BUFFER_SIZE];
+    va_list args;
+
+    va_start(args, str);
+    const int written_length = vsnprintf(temp_buffer, PRINT_BUFFER_SIZE, str, args);
+    va_end(args);
+
+    const int printing_buffer_length = (int) ft_strlen(printing_buffer[fd]);
+    ft_strlcat(printing_buffer[fd], temp_buffer, printing_buffer_length + written_length + 1);
+
+    return printing_buffer_length + written_length;
+}
+
 int verify_that_the_str_that_has_been_printed_is(const char *str, ...)
 {
     char expected[PRINT_BUFFER_SIZE];
