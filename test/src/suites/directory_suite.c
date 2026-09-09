@@ -239,7 +239,7 @@ static void should_return_zero_when_closing_a_valid_directory(void)
     CU_ASSERT_EQUAL(result, 0);
 }
 
-static void should_return_NULL_when_opening_a_directory_without_permissions(void)
+static void should_return_NULL_when_an_error_opening_a_directory_occurs(void)
 {
     const t_vfs_mock_entry vfs[] = {
         MOCK_DIR_OPEN_ERROR(EACCES, "noPerm", ".", ".."),
@@ -297,6 +297,6 @@ void register_directory_suite(void)
         CU_add_test(suite, "should_return_minus_one_when_closing_a_null_pointer", should_return_minus_one_when_closing_a_null_pointer);
         CU_add_test(suite, "should_return_minus_one_when_closing_a_null_directory", should_return_minus_one_when_closing_a_null_directory);
         CU_add_test(suite, "should_return_zero_when_closing_a_valid_directory", should_return_zero_when_closing_a_valid_directory);
-        CU_add_test(suite, "should_return_NULL_when_opening_a_directory_without_permissions", should_return_NULL_when_opening_a_directory_without_permissions);
+        CU_add_test(suite, "should_return_NULL_when_an_error_opening_a_directory_occurs", should_return_NULL_when_an_error_opening_a_directory_occurs);
     }
 }
