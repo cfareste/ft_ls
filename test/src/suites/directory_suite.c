@@ -282,12 +282,31 @@ static void should_return_NULL_when_an_error_reading_a_directory_occurs(void)
     vfs_mock_setup(vfs);
 
     open_directory_stream("failingDir");
+
     const t_dir_entry *dir_entry = directory_get_next_entry(dir_stream_sut);
 
     CU_ASSERT(verify_that_the_error_that_has_been_printed_is(
         "ft_ls: reading directory '%s': Bad file descriptor\n",
         "failingDir"));
     CU_ASSERT_PTR_NULL(dir_entry);
+}
+
+static void should_return_negative_value_when_an_error_closing_a_directory_occurs(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR_CLOSE_ERROR("failingDir", ".", ".."),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    open_directory_stream("failingDir");
+
+    const int result = directory_close(&dir_stream_sut);
+
+    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(
+        "ft_ls: closing directory '%s': Bad file descriptor\n",
+        "failingDir"));
+    CU_ASSERT_EQUAL(result, -1);
 }
 
 void register_directory_suite(void)
@@ -317,5 +336,6 @@ void register_directory_suite(void)
         CU_add_test(suite, "should_return_zero_when_closing_a_valid_directory", should_return_zero_when_closing_a_valid_directory);
         CU_add_test(suite, "should_return_NULL_when_an_error_opening_a_directory_occurs", should_return_NULL_when_an_error_opening_a_directory_occurs);
         CU_add_test(suite, "should_return_NULL_when_an_error_reading_a_directory_occurs", should_return_NULL_when_an_error_reading_a_directory_occurs);
+        CU_add_test(suite, "should_return_negative_value_when_an_error_closing_a_directory_occurs", should_return_negative_value_when_an_error_closing_a_directory_occurs);
     }
 }

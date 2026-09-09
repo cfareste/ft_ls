@@ -13,6 +13,7 @@
 
 #define MOCK_DIR_OPEN_ERROR(err, p, ...) { (p), S_IFDIR | 0755, (const char *[]){ __VA_ARGS__, NULL }, NULL, { 0, err, 0, 0 } }
 #define MOCK_DIR_READ_ERROR(p, ...) { (p), S_IFDIR | 0755, (const char *[]){ __VA_ARGS__, NULL }, NULL, { 0, 0, EBADF, 0 } }
+#define MOCK_DIR_CLOSE_ERROR(p, ...) { (p), S_IFDIR | 0755, (const char *[]){ __VA_ARGS__, NULL }, NULL, { 0, 0, 0, EBADF } }
 
 typedef struct s_vfs_mock_entry
 {

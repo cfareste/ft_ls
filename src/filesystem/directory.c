@@ -94,6 +94,12 @@ int directory_close(t_dir_stream **dir_stream)
         return -1;
 
     const int result = closedir((*dir_stream)->dir);
+
+    if (result != 0)
+    {
+        ft_fprintf(STDERR_FILENO, "ft_ls: closing directory '%s': %s\n", (*dir_stream)->dir_name, strerror(errno));
+    }
+
     free((*dir_stream)->dir_name);
     free(*dir_stream);
     *dir_stream = NULL;

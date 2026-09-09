@@ -10,6 +10,7 @@ TODO:
 10. Estado de error de scan (opendir + readdir + closedir) en caso de NO ser file operand
 11. Estado de error de parsed args (stat) en caso de ser file operand
 12. Estado de error de parsed args (stat) en caso de NO ser file operand
+13. Que pasa si hago close / read de un DIR * NULL (en principio está protegido)
 
 
 TODO En algún momento:
