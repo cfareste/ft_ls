@@ -9,6 +9,7 @@
 struct s_dir_stream
 {
     DIR *dir;
+    char *dir_name;
 };
 
 struct s_dir_entry
@@ -31,6 +32,7 @@ t_dir_stream *directory_open(const char *path)
 
     t_dir_stream *dir_stream = ft_safe_calloc(1, sizeof(t_dir_stream));
     dir_stream->dir = dir;
+    dir_stream->dir_name = ft_safe_strdup(path);
 
     return dir_stream;
 }
@@ -40,8 +42,16 @@ t_dir_entry *directory_get_next_entry(const t_dir_stream *dir_stream)
     if (dir_stream == NULL)
         return NULL;
 
+    struct dirent *entry = readdir(dir_stream->dir);
+
+    if (entry == NULL)
+    {
+        ft_fprintf(STDERR_FILENO, "ft_ls: reading directory '%s': %s\n", dir_stream->dir_name, strerror(errno));
+        return NULL;
+    }
+
     t_dir_entry *dir_entry = ft_safe_calloc(1, sizeof(t_dir_entry));
-    dir_entry->entry = readdir(dir_stream->dir);
+    dir_entry->entry = entry;
     return dir_entry;
 }
 
@@ -84,6 +94,7 @@ int directory_close(t_dir_stream **dir_stream)
         return -1;
 
     const int result = closedir((*dir_stream)->dir);
+    free((*dir_stream)->dir_name);
     free(*dir_stream);
     *dir_stream = NULL;
 

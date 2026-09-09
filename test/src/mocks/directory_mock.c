@@ -50,6 +50,12 @@ struct dirent *mock_readdir(DIR *dirp)
     if (stream == NULL || stream->dir_entry == NULL || stream->dir_entry->entries == NULL)
         return NULL;
 
+    if (stream->dir_entry->errors.readdir_errno != 0)
+    {
+        errno = stream->dir_entry->errors.readdir_errno;
+        return NULL;
+    }
+
     const char *next_entry_name = stream->dir_entry->entries[stream->next_index];
     if (next_entry_name == NULL)
         return NULL;
