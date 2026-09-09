@@ -1,3 +1,4 @@
+#include <errno.h>
 #include <stddef.h>
 #include "libft.h"
 #include "mocks.h"
@@ -25,5 +26,6 @@ const t_vfs_mock_entry *find_vfs_entry(const char *path)
 
 void vfs_mock_reset(void)
 {
+    errno = 0;
     vfs_mock_entries = NULL;
 }

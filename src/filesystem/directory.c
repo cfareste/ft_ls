@@ -1,5 +1,8 @@
 #include <dirent.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <errno.h>
+#include <string.h>
 #include "libft.h"
 #include "directory.h"
 
@@ -18,8 +21,16 @@ t_dir_stream *directory_open(const char *path)
     if (!ft_is_valid_path(path))
         return NULL;
 
+    DIR *dir = opendir(path);
+
+    if (dir == NULL)
+    {
+        ft_fprintf(STDERR_FILENO, "ft_ls: cannot open directory '%s': %s\n", path, strerror(errno));
+        return NULL;
+    }
+
     t_dir_stream *dir_stream = ft_safe_calloc(1, sizeof(t_dir_stream));
-    dir_stream->dir = opendir(path);
+    dir_stream->dir = dir;
 
     return dir_stream;
 }

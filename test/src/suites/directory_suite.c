@@ -239,6 +239,40 @@ static void should_return_zero_when_closing_a_valid_directory(void)
     CU_ASSERT_EQUAL(result, 0);
 }
 
+static void should_return_NULL_when_opening_a_directory_without_permissions(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR_OPEN_ERROR(EACCES, "noPerm", ".", ".."),
+        MOCK_DIR_OPEN_ERROR(EMFILE, "processFD", ".", ".."),
+        MOCK_DIR_OPEN_ERROR(ENAMETOOLONG, "nameTooLong", ".", ".."),
+        MOCK_DIR_OPEN_ERROR(ENFILE, "systemFD", ".", ".."),
+        MOCK_DIR_OPEN_ERROR(ENOENT, "dirDoesntExist", ".", ".."),
+        MOCK_DIR_OPEN_ERROR(ENOTDIR, "notADirectory", ".", ".."),
+        MOCK_DIR_OPEN_ERROR(ENOMEM, "noMemory", ".", ".."),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    open_directory_stream("noPerm");
+    open_directory_stream("processFD");
+    open_directory_stream("nameTooLong");
+    open_directory_stream("systemFD");
+    open_directory_stream("dirDoesntExist");
+    open_directory_stream("notADirectory");
+    open_directory_stream("noMemory");
+
+    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(
+        "ft_ls: cannot open directory '%s': Permission denied\n"
+        "ft_ls: cannot open directory '%s': Too many open files\n"
+        "ft_ls: cannot open directory '%s': File name too long\n"
+        "ft_ls: cannot open directory '%s': Too many open files in system\n"
+        "ft_ls: cannot open directory '%s': No such file or directory\n"
+        "ft_ls: cannot open directory '%s': Not a directory\n"
+        "ft_ls: cannot open directory '%s': Cannot allocate memory\n",
+        "noPerm", "processFD", "nameTooLong", "systemFD", "dirDoesntExist", "notADirectory", "noMemory"));
+    assert_dir_stream_is_null();
+}
+
 void register_directory_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, test_teardown);
@@ -264,5 +298,6 @@ void register_directory_suite(void)
         CU_add_test(suite, "should_return_minus_one_when_closing_a_null_pointer", should_return_minus_one_when_closing_a_null_pointer);
         CU_add_test(suite, "should_return_minus_one_when_closing_a_null_directory", should_return_minus_one_when_closing_a_null_directory);
         CU_add_test(suite, "should_return_zero_when_closing_a_valid_directory", should_return_zero_when_closing_a_valid_directory);
+        CU_add_test(suite, "should_return_NULL_when_opening_a_directory_without_permissions", should_return_NULL_when_opening_a_directory_without_permissions);
     }
 }
