@@ -140,7 +140,7 @@ static void should_return_true_for_is_entry_empty_if_the_dir_entry_is_NULL(void)
 static void should_return_false_for_is_entry_empty_if_the_dir_entry_is_not_empty(void)
 {
     const t_vfs_mock_entry vfs[] = {
-        MOCK_DIR(".", ".."),
+        MOCK_DIR(".", "file", ".", ".."),
         MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
@@ -170,6 +170,22 @@ static void should_return_true_for_is_entry_empty_if_the_dir_entry_is_empty(void
     CU_ASSERT_TRUE(directory_is_entry_empty(second_entry));
 
     directory_destroy_entry(&second_entry);
+}
+
+static void should_return_true_for_is_hidden_file_entry_if_the_entry_points_to_a_hidden_file(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", ".hidden_file", ".", ".."),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    open_directory_stream(".");
+    t_dir_entry *first_entry = directory_get_next_entry(dir_stream_sut);
+
+    CU_ASSERT_TRUE(directory_is_entry_hidden_file(first_entry));
+
+    directory_destroy_entry(&first_entry);
 }
 
 static void should_return_minus_one_when_closing_a_null_pointer(void)
@@ -221,6 +237,7 @@ void register_directory_suite(void)
         CU_add_test(suite, "should_return_true_for_is_entry_empty_if_the_dir_entry_is_NULL", should_return_true_for_is_entry_empty_if_the_dir_entry_is_NULL);
         CU_add_test(suite, "should_return_false_for_is_entry_empty_if_the_dir_entry_is_not_empty", should_return_false_for_is_entry_empty_if_the_dir_entry_is_not_empty);
         CU_add_test(suite, "should_return_true_for_is_entry_empty_if_the_dir_entry_is_empty", should_return_true_for_is_entry_empty_if_the_dir_entry_is_empty);
+        CU_add_test(suite, "should_return_true_for_is_hidden_file_entry_if_the_entry_points_to_a_hidden_file", should_return_true_for_is_hidden_file_entry_if_the_entry_points_to_a_hidden_file);
         CU_add_test(suite, "should_return_minus_one_when_closing_a_null_pointer", should_return_minus_one_when_closing_a_null_pointer);
         CU_add_test(suite, "should_return_minus_one_when_closing_a_null_directory", should_return_minus_one_when_closing_a_null_directory);
         CU_add_test(suite, "should_return_zero_when_closing_a_valid_directory", should_return_zero_when_closing_a_valid_directory);

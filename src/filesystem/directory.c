@@ -50,6 +50,12 @@ int directory_is_entry_empty(const t_dir_entry *dir_entry)
     return dir_entry->entry == NULL;
 }
 
+int directory_is_entry_hidden_file(const t_dir_entry *dir_entry)
+{
+    (void) dir_entry;
+    return 1;
+}
+
 void directory_destroy_entry(t_dir_entry **dir_entry)
 {
     if (dir_entry == NULL || *dir_entry == NULL)
