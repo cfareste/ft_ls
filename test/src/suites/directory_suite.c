@@ -233,10 +233,10 @@ static void should_return_zero_when_closing_a_valid_directory(void)
 
     open_directory_stream(VALID_DIRECTORY_PATH);
 
-    const int actual = directory_close(&dir_stream_sut);
+    const int result = directory_close(&dir_stream_sut);
 
     assert_dir_stream_is_null();
-    CU_ASSERT_EQUAL(actual, 0);
+    CU_ASSERT_EQUAL(result, 0);
 }
 
 void register_directory_suite(void)
