@@ -52,6 +52,9 @@ int directory_is_entry_empty(const t_dir_entry *dir_entry)
 
 int directory_is_entry_hidden_file(const t_dir_entry *dir_entry)
 {
+    if (dir_entry == NULL)
+        return 0;
+
     return dir_entry->entry->d_name[0] == '.';
 }
 
