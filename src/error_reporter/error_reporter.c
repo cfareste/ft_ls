@@ -13,3 +13,8 @@ void report_error(const char *message)
 
     ft_fprintf(STDERR_FILENO, "%s\n", strerror(errno));
 }
+
+void report_opening_directory_error(const char *directory_path)
+{
+    (void) directory_path;
+}
