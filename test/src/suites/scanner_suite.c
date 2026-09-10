@@ -59,7 +59,7 @@ static void should_return_NULL_if_a_NULL_path_is_specified(void)
 {
     scan_directory(NULL);
 
-    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(""));
+    CU_ASSERT(verify_that_no_error_was_printed());
     assert_file_entry_array_is_null();
 }
 
@@ -67,7 +67,7 @@ static void should_return_NULL_if_an_empty_path_is_specified(void)
 {
     scan_directory("");
 
-    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(""));
+    CU_ASSERT(verify_that_no_error_was_printed());
     assert_file_entry_array_is_null();
 }
 
@@ -83,7 +83,7 @@ static void should_return_one_entry_if_the_current_directory_has_one_file(void)
     scan_directory(CURRENT_DIRECTORY_PATH);
     const t_file_entry *file_entry = file_entry_array_get_at(sut, 0);
 
-    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(""));
+    CU_ASSERT(verify_that_no_error_was_printed());
     assert_file_entry_array_length_is(1);
     assert_file_entry_name_is(file_entry, "file");
 }
@@ -103,7 +103,7 @@ static void should_return_multiple_entries_if_the_current_directory_has_more_tha
 
     scan_directory(CURRENT_DIRECTORY_PATH);
 
-    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(""));
+    CU_ASSERT(verify_that_no_error_was_printed());
     assert_file_entry_array_length_is(3);
     assert_file_entry_array_names_are(expected_files_names);
 }
@@ -124,7 +124,7 @@ static void should_return_an_array_of_entries_if_one_non_empty_directory_path_is
 
     scan_directory("valid_dir");
 
-    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(""));
+    CU_ASSERT(verify_that_no_error_was_printed());
     assert_file_entry_array_length_is(4);
     assert_file_entry_array_names_are(expected_files_names);
 }
@@ -145,7 +145,7 @@ static void should_return_an_array_of_entries_without_hidden_files_if_a_director
 
     scan_directory("dir");
 
-    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(""));
+    CU_ASSERT(verify_that_no_error_was_printed());
     assert_file_entry_array_length_is(3);
     assert_file_entry_array_names_are(expected_file_names);
 }
@@ -164,7 +164,7 @@ static void should_return_an_array_of_entries_if_a_hidden_directory_is_specified
 
     scan_directory(".dir");
 
-    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(""));
+    CU_ASSERT(verify_that_no_error_was_printed());
     assert_file_entry_array_length_is(2);
     assert_file_entry_array_names_are(expected_file_names);
 }
@@ -179,7 +179,7 @@ static void should_return_an_empty_array_if_the_specified_directory_is_empty(voi
 
     scan_directory(CURRENT_DIRECTORY_PATH);
 
-    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(""));
+    CU_ASSERT(verify_that_no_error_was_printed());
     assert_file_entry_array_length_is(0);
 }
 
@@ -196,7 +196,7 @@ static void should_return_an_empty_array_if_the_specified_directory_only_contain
 
     scan_directory("dir");
 
-    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(""));
+    CU_ASSERT(verify_that_no_error_was_printed());
     assert_file_entry_array_length_is(0);
 }
 

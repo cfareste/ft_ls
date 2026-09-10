@@ -85,6 +85,11 @@ int verify_that_the_error_that_has_been_printed_is(const char *str, ...)
     return strings_are_equal;
 }
 
+int verify_that_no_error_was_printed(void)
+{
+    return verify_that_the_error_that_has_been_printed_is("");
+}
+
 void reset_printing_buffer(void)
 {
     for (unsigned int i = 0; i < BUFFER_COUNT; i++)
