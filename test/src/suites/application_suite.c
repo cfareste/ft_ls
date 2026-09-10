@@ -49,7 +49,7 @@ static void should_successfully_print_the_contents_of_the_current_directory_one_
 
     const int result = application_run(parsed_arguments);
 
-    CU_ASSERT(verify_that_the_str_that_has_been_printed_is("%s\n%s\n%s\n%s\n",
+    CU_ASSERT(verify_that_the_output_printed_is("%s\n%s\n%s\n%s\n",
         expected_file_names[0],
         expected_file_names[1],
         expected_file_names[2],
@@ -73,7 +73,7 @@ static void should_successfully_print_the_file_name_if_a_regular_file_operand_is
 
     const int result = application_run(parsed_arguments);
 
-    CU_ASSERT(verify_that_the_str_that_has_been_printed_is("%s\n", file_name));
+    CU_ASSERT(verify_that_the_output_printed_is("%s\n", file_name));
     CU_ASSERT(verify_that_no_error_was_printed());
     assert_application_execution_succeed(result);
 }
@@ -96,7 +96,7 @@ static void should_successfully_print_the_contents_of_the_directory_specified_as
 
     const int result = application_run(parsed_arguments);
 
-    CU_ASSERT(verify_that_the_str_that_has_been_printed_is("%s\n%s\n%s\n%s\n",
+    CU_ASSERT(verify_that_the_output_printed_is("%s\n%s\n%s\n%s\n",
         expected_file_names[0],
         expected_file_names[1],
         expected_file_names[2],
@@ -121,7 +121,7 @@ static void should_successfully_print_the_contents_of_multiple_non_directory_fil
 
     const int result = application_run(parsed_arguments);
 
-    CU_ASSERT(verify_that_the_str_that_has_been_printed_is(
+    CU_ASSERT(verify_that_the_output_printed_is(
         "%s\n%s\n%s\n%s\n",
         arguments[0],
         arguments[1],
@@ -154,7 +154,7 @@ static void should_successfully_print_the_contents_of_multiple_directory_files(v
 
     const int result = application_run(parsed_arguments);
 
-    CU_ASSERT(verify_that_the_str_that_has_been_printed_is(
+    CU_ASSERT(verify_that_the_output_printed_is(
         "%s:\n"
         "%s\n"
         "\n%s:\n"
@@ -198,7 +198,7 @@ static void should_successfully_print_the_contents_of_the_mixed_types_specified_
 
     const int result = application_run(parsed_arguments);
 
-    CU_ASSERT(verify_that_the_str_that_has_been_printed_is(
+    CU_ASSERT(verify_that_the_output_printed_is(
         "%s\n%s\n%s\n%s\n%s\n%s\n"
         "\n%s:\n"
         "%s\n%s\n"
@@ -241,7 +241,7 @@ static void should_successfully_print_the_contents_of_the_explicitly_specified_h
 
     const int result = application_run(parsed_arguments);
 
-    CU_ASSERT(verify_that_the_str_that_has_been_printed_is(
+    CU_ASSERT(verify_that_the_output_printed_is(
         "%s\n%s\n%s\n",
         arguments[0],
         arguments[1],
@@ -279,7 +279,7 @@ static void should_successfully_print_the_contents_of_the_explicitly_specified_h
 
     const int result = application_run(parsed_arguments);
 
-    CU_ASSERT(verify_that_the_str_that_has_been_printed_is(
+    CU_ASSERT(verify_that_the_output_printed_is(
         "%s:\n"
         "%s\n%s\n"
         "\n%s:\n"
@@ -326,7 +326,7 @@ static void should_successfully_print_the_contents_of_the_explicitly_specified_h
 
     const int result = application_run(parsed_arguments);
 
-    CU_ASSERT(verify_that_the_str_that_has_been_printed_is(
+    CU_ASSERT(verify_that_the_output_printed_is(
         "%s\n%s\n"
         "\n%s:\n"
         "%s\n%s\n"
@@ -398,7 +398,7 @@ static void should_successfully_only_print_dir_headers_if_the_specified_director
 
     const int result = application_run(parsed_arguments);
 
-    CU_ASSERT(verify_that_the_str_that_has_been_printed_is(
+    CU_ASSERT(verify_that_the_output_printed_is(
         "%s:\n"
         "\n%s:\n",
         arguments[0],
@@ -425,7 +425,7 @@ static void should_successfully_only_print_dir_headers_if_the_specified_director
 
     const int result = application_run(parsed_arguments);
 
-    CU_ASSERT(verify_that_the_str_that_has_been_printed_is(
+    CU_ASSERT(verify_that_the_output_printed_is(
         "%s:\n"
         "\n%s:\n",
         arguments[0],
@@ -451,7 +451,7 @@ static void should_successfully_only_print_dir_headers_with_non_directory_files_
 
     const int result = application_run(parsed_arguments);
 
-    CU_ASSERT(verify_that_the_str_that_has_been_printed_is(
+    CU_ASSERT(verify_that_the_output_printed_is(
         "%s\n%s\n"
         "\n%s:\n"
         "\n%s:\n",
@@ -483,7 +483,7 @@ static void should_successfully_only_print_dir_headers_with_non_directory_files_
 
     const int result = application_run(parsed_arguments);
 
-    CU_ASSERT(verify_that_the_str_that_has_been_printed_is(
+    CU_ASSERT(verify_that_the_output_printed_is(
         "%s\n%s\n"
         "\n%s:\n"
         "\n%s:\n",
@@ -519,7 +519,7 @@ static void should_successfully_print_the_contents_of_the_current_directory_sort
 
     const int result = application_run(parsed_arguments);
 
-    CU_ASSERT(verify_that_the_str_that_has_been_printed_is(
+    CU_ASSERT(verify_that_the_output_printed_is(
         "%s\n%s\n%s\n%s\n%s\n%s\n%s\n",
         expected_file_names[0],
         expected_file_names[1],
@@ -556,7 +556,7 @@ static void should_successfully_print_the_contents_of_the_specified_directory_so
 
     const int result = application_run(parsed_arguments);
 
-    CU_ASSERT(verify_that_the_str_that_has_been_printed_is(
+    CU_ASSERT(verify_that_the_output_printed_is(
         "%s\n%s\n%s\n%s\n%s\n%s\n%s\n",
         expected_file_names[0],
         expected_file_names[1],
@@ -589,7 +589,7 @@ static void should_successfully_print_the_specified_non_directory_file_operands_
 
     const int result = application_run(parsed_arguments);
 
-    CU_ASSERT(verify_that_the_str_that_has_been_printed_is(
+    CU_ASSERT(verify_that_the_output_printed_is(
         "%s\n%s\n%s\n%s\n%s\n%s\n",
         expected_file_names[0],
         expected_file_names[1],
@@ -628,7 +628,7 @@ static void should_successfully_print_the_specified_directory_file_operands_and_
 
     const int result = application_run(parsed_arguments);
 
-    CU_ASSERT(verify_that_the_str_that_has_been_printed_is(
+    CU_ASSERT(verify_that_the_output_printed_is(
         "%s:\n"
         "%s\n%s\n"
         "\n%s:\n"
@@ -684,7 +684,7 @@ static void should_successfully_print_the_specified_mixed_types_file_operands_an
 
     const int result = application_run(parsed_arguments);
 
-    CU_ASSERT(verify_that_the_str_that_has_been_printed_is(
+    CU_ASSERT(verify_that_the_output_printed_is(
         "%s\n%s\n%s\n%s\n%s\n%s\n"
         "\n%s:\n"
         "%s\n%s\n%s\n"
@@ -736,7 +736,7 @@ static void should_successfully_print_the_contents_of_the_current_directory_with
 
     const int result = application_run(parsed_arguments);
 
-    CU_ASSERT(verify_that_the_str_that_has_been_printed_is("%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n",
+    CU_ASSERT(verify_that_the_output_printed_is("%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n",
         expected_file_names[0],
         expected_file_names[1],
         expected_file_names[2],
@@ -765,7 +765,7 @@ static void should_successfully_print_the_name_of_the_specified_symlink_pointing
 
     const int result = application_run(parsed_arguments);
 
-    CU_ASSERT(verify_that_the_str_that_has_been_printed_is("%s\n",
+    CU_ASSERT(verify_that_the_output_printed_is("%s\n",
         expected_file_names[0]
     ));
     CU_ASSERT(verify_that_no_error_was_printed());
@@ -791,7 +791,7 @@ static void should_successfully_print_the_contents_of_the_directory_pointed_by_t
 
     const int result = application_run(parsed_arguments);
 
-    CU_ASSERT(verify_that_the_str_that_has_been_printed_is("%s\n%s\n%s\n%s\n",
+    CU_ASSERT(verify_that_the_output_printed_is("%s\n%s\n%s\n%s\n",
         expected_file_names[0],
         expected_file_names[1],
         expected_file_names[2],

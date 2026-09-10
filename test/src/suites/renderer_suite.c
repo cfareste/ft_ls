@@ -88,7 +88,7 @@ static void should_print_the_name_of_the_entry_with_a_file_entry_array_of_one_el
 
     render(file_entry_array, context);
 
-    CU_ASSERT(verify_that_the_str_that_has_been_printed_is("%s\n", expected_file_name));
+    CU_ASSERT(verify_that_the_output_printed_is("%s\n", expected_file_name));
 
     file_entry_array_destroy(&file_entry_array);
     render_context_destroy(&context);
@@ -107,7 +107,7 @@ static void should_print_the_name_of_every_entry_with_a_file_entry_array_of_vari
 
     render(file_entry_array, context);
 
-    CU_ASSERT(verify_that_the_str_that_has_been_printed_is(
+    CU_ASSERT(verify_that_the_output_printed_is(
         "%s\n%s\n%s\n%s\n%s\n",
         expected_file_name[0],
         expected_file_name[1],
@@ -132,7 +132,7 @@ static void should_not_print_a_dir_header_if_a_NULL_header_is_specified_in_the_c
 
     render(file_entry_array, context);
 
-    CU_ASSERT(verify_that_the_str_that_has_been_printed_is(
+    CU_ASSERT(verify_that_the_output_printed_is(
         "%s\n%s\n%s\n",
         expected_file_name[0],
         expected_file_name[1],
@@ -155,7 +155,7 @@ static void should_not_print_a_dir_header_if_an_empty_header_is_specified_in_the
 
     render(file_entry_array, context);
 
-    CU_ASSERT(verify_that_the_str_that_has_been_printed_is(
+    CU_ASSERT(verify_that_the_output_printed_is(
         "%s\n%s\n%s\n",
         expected_file_name[0],
         expected_file_name[1],
@@ -179,7 +179,7 @@ static void should_not_print_a_leading_dir_header_newline_if_its_the_first_rende
 
     render(file_entry_array, context);
 
-    CU_ASSERT(verify_that_the_str_that_has_been_printed_is(
+    CU_ASSERT(verify_that_the_output_printed_is(
         "%s:\n%s\n%s\n%s\n",
         dir_header,
         expected_file_name[0],
@@ -204,7 +204,7 @@ static void should_print_a_leading_dir_header_newline_if_its_not_first_render(vo
     render(file_entry_array, context);
     render(file_entry_array, context);
 
-    CU_ASSERT(verify_that_the_str_that_has_been_printed_is(
+    CU_ASSERT(verify_that_the_output_printed_is(
         "%s:\n"
         "%s\n%s\n"
         "\n%s:\n"
@@ -235,7 +235,7 @@ static void should_print_a_leading_dir_header_newline_if_its_not_first_render(vo
 
     render(file_entry_array);
 
-    verify_that_the_str_that_has_been_printed_is(
+    verify_that_the_output_printed_is(
         "%s  %s  %s  %s  %s\n",
         expected_file_name[0],
         expected_file_name[1],

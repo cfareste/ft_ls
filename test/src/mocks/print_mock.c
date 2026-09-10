@@ -51,7 +51,7 @@ int fprintf_mock(const int fd, const char *str, ...)
     return printing_buffer_length + written_length;
 }
 
-int verify_that_the_str_that_has_been_printed_is(const char *str, ...)
+int verify_that_the_output_printed_is(const char *str, ...)
 {
     char expected[PRINT_BUFFER_SIZE];
     va_list args;
@@ -87,7 +87,7 @@ int verify_that_the_error_that_has_been_printed_is(const char *str, ...)
 
 int verify_that_no_output_was_printed(void)
 {
-    return verify_that_the_str_that_has_been_printed_is("");
+    return verify_that_the_output_printed_is("");
 }
 
 int verify_that_no_error_was_printed(void)
