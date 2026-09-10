@@ -85,6 +85,11 @@ int verify_that_the_error_that_has_been_printed_is(const char *str, ...)
     return strings_are_equal;
 }
 
+int verify_that_no_output_was_printed(void)
+{
+    return verify_that_the_str_that_has_been_printed_is("");
+}
+
 int verify_that_no_error_was_printed(void)
 {
     return verify_that_the_error_that_has_been_printed_is("");

@@ -27,7 +27,7 @@ static void assert_application_execution_succeed(const int result)
 static void should_return_a_major_error_when_passing_a_NULL_parsed_argument(void)
 {
     CU_ASSERT_EQUAL(application_run(parsed_arguments), FT_LS_APPLICATION_MAJOR_ERROR);
-    CU_ASSERT(verify_that_the_str_that_has_been_printed_is(""));
+    CU_ASSERT(verify_that_no_output_was_printed());
     CU_ASSERT(verify_that_no_error_was_printed());
 }
 
@@ -358,7 +358,7 @@ static void should_successfully_not_print_anything_if_the_specified_directory_is
 
     const int result = application_run(parsed_arguments);
 
-    CU_ASSERT(verify_that_the_str_that_has_been_printed_is(""));
+    CU_ASSERT(verify_that_no_output_was_printed());
     CU_ASSERT(verify_that_no_error_was_printed());
     assert_application_execution_succeed(result);
 }
@@ -379,7 +379,7 @@ static void should_successfully_not_print_anything_if_the_specified_directory_on
 
     const int result = application_run(parsed_arguments);
 
-    CU_ASSERT(verify_that_the_str_that_has_been_printed_is(""));
+    CU_ASSERT(verify_that_no_output_was_printed());
     CU_ASSERT(verify_that_no_error_was_printed());
     assert_application_execution_succeed(result);
 }

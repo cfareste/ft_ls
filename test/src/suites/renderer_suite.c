@@ -60,7 +60,7 @@ static void should_not_print_anything_if_the_file_entry_array_is_null(void)
 
     render(NULL, context);
 
-    CU_ASSERT(verify_that_the_str_that_has_been_printed_is(""));
+    CU_ASSERT(verify_that_no_output_was_printed());
 
     render_context_destroy(&context);
 }
@@ -73,7 +73,7 @@ static void should_not_print_anything_if_the_context_is_null(void)
 
     render(file_entry_array, NULL);
 
-    CU_ASSERT(verify_that_the_str_that_has_been_printed_is(""));
+    CU_ASSERT(verify_that_no_output_was_printed());
 
     file_entry_array_destroy(&file_entry_array);
 }
