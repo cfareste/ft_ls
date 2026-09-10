@@ -6,6 +6,10 @@
 
 void report_error(const char *message)
 {
-    (void) message;
-    ft_fprintf(STDERR_FILENO, "ft_ls: %s\n", strerror(errno));
+    ft_fprintf(STDERR_FILENO, "ft_ls: ");
+
+    if (!ft_is_str_empty(message))
+        ft_fprintf(STDERR_FILENO, "%s: ", message);
+
+    ft_fprintf(STDERR_FILENO, "%s\n", strerror(errno));
 }
