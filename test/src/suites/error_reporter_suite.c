@@ -5,6 +5,12 @@
 
 #define SUITE_NAME "error_reporter"
 
+static void test_setup(void)
+{
+    errno = 0;
+    reset_printing_buffer();
+}
+
 static void should_only_print_the_application_prefix_and_system_error_if_a_NULL_message_is_specified(void)
 {
     errno = ENOTDIR;
@@ -16,8 +22,6 @@ static void should_only_print_the_application_prefix_and_system_error_if_a_NULL_
 
 static void should_only_print_the_application_prefix_and_system_error_if_an_empty_message_is_specified(void)
 {
-    reset_printing_buffer();
-
     errno = ENOENT;
 
     report_error(NULL);
@@ -27,7 +31,7 @@ static void should_only_print_the_application_prefix_and_system_error_if_an_empt
 
 void register_error_reporter_suite(void)
 {
-    const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, NULL, NULL);
+    const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, NULL);
 
     if (suite != NULL)
     {
