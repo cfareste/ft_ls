@@ -17,5 +17,5 @@ void report_error(const char *message)
 void report_opening_directory_error(const char *directory_path)
 {
     (void) directory_path;
-    ft_fprintf(STDERR_FILENO, "ft_ls: cannot open directory\n");
+    ft_fprintf(STDERR_FILENO, "ft_ls: cannot open directory: %s\n", strerror(errno));
 }

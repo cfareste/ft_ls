@@ -41,16 +41,20 @@ static void should_print_the_application_prefix_followed_by_the_specified_messag
 
 static void should_only_print_the_open_directory_error_if_a_NULL_directory_path_is_specified(void)
 {
+    errno = ENOTDIR;
+
     report_opening_directory_error(NULL);
 
-    CU_ASSERT(verify_that_the_error_printed_is("ft_ls: cannot open directory\n"));
+    CU_ASSERT(verify_that_the_error_printed_is("ft_ls: cannot open directory: %s\n", strerror(errno)));
 }
 
 static void should_only_print_the_open_directory_error_if_an_empty_directory_path_is_specified(void)
 {
+    errno = ENOENT;
+
     report_opening_directory_error("");
 
-    CU_ASSERT(verify_that_the_error_printed_is("ft_ls: cannot open directory\n"));
+    CU_ASSERT(verify_that_the_error_printed_is("ft_ls: cannot open directory: %s\n", strerror(errno)));
 }
 
 void register_error_reporter_suite(void)
