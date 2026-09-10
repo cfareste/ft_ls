@@ -33,6 +33,7 @@ static void should_return_NULL_when_opening_a_NULL_path(void)
 {
     open_directory_stream(NULL);
 
+    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(""));
     assert_dir_stream_is_null();
 }
 
@@ -40,6 +41,7 @@ static void should_return_NULL_when_opening_an_empty_path(void)
 {
     open_directory_stream("");
 
+    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(""));
     assert_dir_stream_is_null();
 }
 
@@ -53,6 +55,7 @@ static void should_return_a_directory_stream_when_opening_a_valid_path(void)
 
     open_directory_stream(VALID_DIRECTORY_PATH);
 
+    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(""));
     CU_ASSERT_PTR_NOT_NULL(dir_stream_sut);
 }
 
@@ -60,6 +63,7 @@ static void should_return_NULL_for_next_entry_if_a_NULL_dir_stream_is_specified(
 {
     const t_dir_entry *dir_entry = directory_get_next_entry(NULL);
 
+    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(""));
     CU_ASSERT_PTR_NULL(dir_entry);
 }
 
@@ -76,6 +80,7 @@ static void should_return_the_next_entry_when_reading_from_a_valid_directory(voi
 
     t_dir_entry *dir_entry = directory_get_next_entry(dir_stream_sut);
 
+    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(""));
     CU_ASSERT_STRING_EQUAL(directory_get_entry_name(dir_entry), "file");
 
     directory_destroy_entry(&dir_entry);
@@ -84,11 +89,15 @@ static void should_return_the_next_entry_when_reading_from_a_valid_directory(voi
 static void should_not_fail_to_destroy_a_null_pointer_dir_entry(void)
 {
     directory_destroy_entry(NULL);
+
+    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(""));
 }
 
 static void should_not_fail_to_destroy_a_null_dir_entry(void)
 {
     t_dir_entry *dir_entry = NULL;
+
+    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(""));
 
     directory_destroy_entry(&dir_entry);
 }
@@ -107,6 +116,7 @@ static void should_destroy_a_valid_dir_entry_correctly(void)
 
     directory_destroy_entry(&dir_entry);
 
+    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(""));
     CU_ASSERT_PTR_NULL(dir_entry);
 }
 
@@ -115,6 +125,7 @@ static void should_return_NULL_for_the_entry_name_if_a_NULL_entry_is_specified(v
     const char *invalid_name = directory_get_entry_name(NULL);
 
     CU_ASSERT_PTR_NULL(invalid_name);
+    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(""));
 }
 
 static void should_return_the_dir_entry_name(void)
@@ -128,6 +139,7 @@ static void should_return_the_dir_entry_name(void)
     open_directory_stream(".");
     t_dir_entry *dir_entry = directory_get_next_entry(dir_stream_sut);
 
+    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(""));
     CU_ASSERT_STRING_EQUAL(directory_get_entry_name(dir_entry), "valid file");
 
     directory_destroy_entry(&dir_entry);
@@ -136,6 +148,7 @@ static void should_return_the_dir_entry_name(void)
 static void should_return_true_for_is_entry_empty_if_the_dir_entry_is_NULL(void)
 {
     CU_ASSERT_TRUE(directory_is_entry_empty(NULL));
+    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(""));
 }
 
 static void should_return_false_for_is_entry_empty_if_the_dir_entry_is_not_empty(void)
@@ -150,6 +163,7 @@ static void should_return_false_for_is_entry_empty_if_the_dir_entry_is_not_empty
     t_dir_entry *first_entry = directory_get_next_entry(dir_stream_sut);
 
     CU_ASSERT_FALSE(directory_is_entry_empty(first_entry));
+    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(""));
 
     directory_destroy_entry(&first_entry);
 }
@@ -169,6 +183,7 @@ static void should_return_true_for_is_entry_empty_if_the_dir_entry_is_empty(void
     t_dir_entry *second_entry = directory_get_next_entry(dir_stream_sut);
 
     CU_ASSERT_TRUE(directory_is_entry_empty(second_entry));
+    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(""));
 
     directory_destroy_entry(&second_entry);
 }
@@ -176,6 +191,7 @@ static void should_return_true_for_is_entry_empty_if_the_dir_entry_is_empty(void
 static void should_return_false_for_is_hidden_file_entry_if_the_dir_entry_is_NULL(void)
 {
     CU_ASSERT_FALSE(directory_is_entry_hidden_file(NULL));
+    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(""));
 }
 
 static void should_return_false_for_is_hidden_file_entry_if_the_entry_points_to_a_non_hidden_file(void)
@@ -190,6 +206,7 @@ static void should_return_false_for_is_hidden_file_entry_if_the_entry_points_to_
     t_dir_entry *first_entry = directory_get_next_entry(dir_stream_sut);
 
     CU_ASSERT_FALSE(directory_is_entry_hidden_file(first_entry));
+    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(""));
 
     directory_destroy_entry(&first_entry);
 }
@@ -206,6 +223,7 @@ static void should_return_true_for_is_hidden_file_entry_if_the_entry_points_to_a
     t_dir_entry *first_entry = directory_get_next_entry(dir_stream_sut);
 
     CU_ASSERT_TRUE(directory_is_entry_hidden_file(first_entry));
+    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(""));
 
     directory_destroy_entry(&first_entry);
 }
@@ -215,6 +233,7 @@ static void should_return_minus_one_when_closing_a_null_pointer(void)
     const int actual = directory_close(NULL);
 
     CU_ASSERT_EQUAL(actual, -1);
+    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(""));
 }
 
 static void should_return_minus_one_when_closing_a_null_directory(void)
@@ -222,6 +241,7 @@ static void should_return_minus_one_when_closing_a_null_directory(void)
     t_dir_stream *dir_stream = NULL;
 
     CU_ASSERT_EQUAL(directory_close(&dir_stream), -1);
+    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(""));
 }
 
 static void should_return_zero_when_closing_a_valid_directory(void)
@@ -238,6 +258,7 @@ static void should_return_zero_when_closing_a_valid_directory(void)
 
     assert_dir_stream_is_null();
     CU_ASSERT_EQUAL(result, 0);
+    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(""));
 }
 
 static void should_return_NULL_when_an_error_opening_a_directory_occurs(void)

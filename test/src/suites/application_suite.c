@@ -28,6 +28,7 @@ static void should_return_a_major_error_when_passing_a_NULL_parsed_argument(void
 {
     CU_ASSERT_EQUAL(application_run(parsed_arguments), FT_LS_APPLICATION_MAJOR_ERROR);
     CU_ASSERT(verify_that_the_str_that_has_been_printed_is(""));
+    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(""));
 }
 
 static void should_successfully_print_the_contents_of_the_current_directory_one_per_line_if_no_file_operands_are_specified(void)
@@ -54,6 +55,7 @@ static void should_successfully_print_the_contents_of_the_current_directory_one_
         expected_file_names[2],
         expected_file_names[3]
     ));
+    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(""));
     assert_application_execution_succeed(result);
 }
 
@@ -72,6 +74,7 @@ static void should_successfully_print_the_file_name_if_a_regular_file_operand_is
     const int result = application_run(parsed_arguments);
 
     CU_ASSERT(verify_that_the_str_that_has_been_printed_is("%s\n", file_name));
+    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(""));
     assert_application_execution_succeed(result);
 }
 
@@ -99,6 +102,7 @@ static void should_successfully_print_the_contents_of_the_directory_specified_as
         expected_file_names[2],
         expected_file_names[3]
     ));
+    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(""));
     assert_application_execution_succeed(result);
 }
 
@@ -124,6 +128,7 @@ static void should_successfully_print_the_contents_of_multiple_non_directory_fil
         arguments[2],
         arguments[3]
     ));
+    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(""));
     assert_application_execution_succeed(result);
 }
 
@@ -164,6 +169,7 @@ static void should_successfully_print_the_contents_of_multiple_directory_files(v
         arguments[2],
         expected_third_dir_file_name
     ));
+    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(""));
     assert_application_execution_succeed(result);
 }
 
@@ -216,6 +222,7 @@ static void should_successfully_print_the_contents_of_the_mixed_types_specified_
         expected_dir_file_names[0],
         expected_dir_file_names[1]
     ));
+    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(""));
     assert_application_execution_succeed(result);
 }
 
@@ -240,6 +247,7 @@ static void should_successfully_print_the_contents_of_the_explicitly_specified_h
         arguments[1],
         arguments[2]
     ));
+    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(""));
     assert_application_execution_succeed(result);
 }
 
@@ -289,6 +297,7 @@ static void should_successfully_print_the_contents_of_the_explicitly_specified_h
         expected_third_dir_file_names[1],
         expected_third_dir_file_names[2]
     ));
+    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(""));
     assert_application_execution_succeed(result);
 }
 
@@ -332,6 +341,7 @@ static void should_successfully_print_the_contents_of_the_explicitly_specified_h
         expected_second_dir_file_names[0],
         expected_second_dir_file_names[1]
     ));
+    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(""));
     assert_application_execution_succeed(result);
 }
 
@@ -349,6 +359,7 @@ static void should_successfully_not_print_anything_if_the_specified_directory_is
     const int result = application_run(parsed_arguments);
 
     CU_ASSERT(verify_that_the_str_that_has_been_printed_is(""));
+    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(""));
     assert_application_execution_succeed(result);
 }
 
@@ -369,6 +380,7 @@ static void should_successfully_not_print_anything_if_the_specified_directory_on
     const int result = application_run(parsed_arguments);
 
     CU_ASSERT(verify_that_the_str_that_has_been_printed_is(""));
+    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(""));
     assert_application_execution_succeed(result);
 }
 
@@ -392,6 +404,7 @@ static void should_successfully_only_print_dir_headers_if_the_specified_director
         arguments[0],
         arguments[1]
     ));
+    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(""));
     assert_application_execution_succeed(result);
 }
 
@@ -418,6 +431,7 @@ static void should_successfully_only_print_dir_headers_if_the_specified_director
         arguments[0],
         arguments[1]
     ));
+    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(""));
     assert_application_execution_succeed(result);
 }
 
@@ -446,6 +460,7 @@ static void should_successfully_only_print_dir_headers_with_non_directory_files_
         arguments[1],
         arguments[2]
     ));
+    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(""));
     assert_application_execution_succeed(result);
 }
 
@@ -477,6 +492,7 @@ static void should_successfully_only_print_dir_headers_with_non_directory_files_
         arguments[0],
         arguments[2]
     ));
+    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(""));
     assert_application_execution_succeed(result);
 }
 
@@ -513,6 +529,7 @@ static void should_successfully_print_the_contents_of_the_current_directory_sort
         expected_file_names[5],
         expected_file_names[6]
     ));
+    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(""));
     assert_application_execution_succeed(result);
 }
 
@@ -549,6 +566,7 @@ static void should_successfully_print_the_contents_of_the_specified_directory_so
         expected_file_names[5],
         expected_file_names[6]
     ));
+    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(""));
     assert_application_execution_succeed(result);
 }
 
@@ -580,6 +598,7 @@ static void should_successfully_print_the_specified_non_directory_file_operands_
         expected_file_names[4],
         expected_file_names[5]
     ));
+    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(""));
     assert_application_execution_succeed(result);
 }
 
@@ -628,6 +647,7 @@ static void should_successfully_print_the_specified_directory_file_operands_and_
         expected_first_dir_file_names[1],
         expected_first_dir_file_names[2]
     ));
+    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(""));
     assert_application_execution_succeed(result);
 }
 
@@ -690,6 +710,7 @@ static void should_successfully_print_the_specified_mixed_types_file_operands_an
         expected_third_dir_file_names[0],
         expected_third_dir_file_names[1]
     ));
+    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(""));
     assert_application_execution_succeed(result);
 }
 
@@ -725,6 +746,7 @@ static void should_successfully_print_the_contents_of_the_current_directory_with
         expected_file_names[6],
         expected_file_names[7]
     ));
+    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(""));
     assert_application_execution_succeed(result);
 }
 
@@ -746,6 +768,7 @@ static void should_successfully_print_the_name_of_the_specified_symlink_pointing
     CU_ASSERT(verify_that_the_str_that_has_been_printed_is("%s\n",
         expected_file_names[0]
     ));
+    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(""));
     assert_application_execution_succeed(result);
 }
 
@@ -774,6 +797,7 @@ static void should_successfully_print_the_contents_of_the_directory_pointed_by_t
         expected_file_names[2],
         expected_file_names[3]
     ));
+    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(""));
     assert_application_execution_succeed(result);
 }
 

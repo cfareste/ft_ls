@@ -42,9 +42,10 @@ t_dir_entry *directory_get_next_entry(const t_dir_stream *dir_stream)
     if (dir_stream == NULL)
         return NULL;
 
+    errno = 0;
     struct dirent *entry = readdir(dir_stream->dir);
 
-    if (entry == NULL)
+    if (entry == NULL && errno != 0)
     {
         ft_fprintf(STDERR_FILENO, "ft_ls: reading directory '%s': %s\n", dir_stream->dir_name, strerror(errno));
         return NULL;
