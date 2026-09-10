@@ -16,6 +16,10 @@ void report_opening_directory_error(const char *directory_path)
 
 void report_reading_directory_error(const char *directory_path)
 {
-    (void) directory_path;
-    ft_fprintf(STDERR_FILENO, "ft_ls: reading directory: %s\n", strerror(errno));
+    ft_fprintf(STDERR_FILENO, "ft_ls: reading directory");
+
+    if (!ft_is_str_empty(directory_path))
+        ft_fprintf(STDERR_FILENO, " '%s'", directory_path);
+
+    ft_fprintf(STDERR_FILENO, ": %s\n", strerror(errno));
 }

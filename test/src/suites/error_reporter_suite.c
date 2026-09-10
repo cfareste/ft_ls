@@ -59,6 +59,16 @@ static void should_only_print_the_read_directory_error_if_an_empty_directory_pat
     CU_ASSERT(verify_that_the_error_printed_is( "%s: %s\n", READ_DIRECTORY_ERROR_PREFIX, strerror(errno)));
 }
 
+static void should_print_the_read_directory_error_with_the_specified_directory_path(void)
+{
+    errno = EBADF;
+    const char *directory_path = "./path/to/directory";
+
+    report_reading_directory_error(directory_path);
+
+    CU_ASSERT(verify_that_the_error_printed_is("%s '%s': %s\n", READ_DIRECTORY_ERROR_PREFIX, directory_path, strerror(errno)));
+}
+
 void register_error_reporter_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, NULL);
@@ -70,5 +80,6 @@ void register_error_reporter_suite(void)
         CU_add_test(suite, "should_print_the_open_directory_error_with_the_specified_directory_path", should_print_the_open_directory_error_with_the_specified_directory_path);
         CU_add_test(suite, "should_only_print_the_read_directory_error_if_a_NULL_directory_path_is_specified", should_only_print_the_read_directory_error_if_a_NULL_directory_path_is_specified);
         CU_add_test(suite, "should_only_print_the_read_directory_error_if_an_empty_directory_path_is_specified", should_only_print_the_read_directory_error_if_an_empty_directory_path_is_specified);
+        CU_add_test(suite, "should_print_the_read_directory_error_with_the_specified_directory_path", should_print_the_read_directory_error_with_the_specified_directory_path);
     }
 }
