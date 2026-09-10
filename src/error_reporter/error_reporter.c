@@ -4,13 +4,14 @@
 #include "error_reporter.h"
 #include "libft.h"
 
-#define OPENING_DIRECTORY_ERROR "ft_ls: cannot open directory"
-#define READING_DIRECTORY_ERROR "ft_ls: reading directory"
-#define CLOSING_DIRECTORY_ERROR "ft_ls: closing directory"
+#define APPLICATION_PREFIX "ft_ls"
+#define OPENING_DIRECTORY_ERROR "cannot open directory"
+#define READING_DIRECTORY_ERROR "reading directory"
+#define CLOSING_DIRECTORY_ERROR "closing directory"
 
 static void report_error(const char *error_message, const char *file_path)
 {
-    ft_fprintf(STDERR_FILENO, "%s", error_message);
+    ft_fprintf(STDERR_FILENO, "%s: %s", APPLICATION_PREFIX, error_message);
 
     if (!ft_is_str_empty(file_path))
         ft_fprintf(STDERR_FILENO, " '%s'", file_path);
