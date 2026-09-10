@@ -1,10 +1,9 @@
 #include <dirent.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <errno.h>
-#include <string.h>
 #include "libft.h"
 #include "directory.h"
+#include "error_reporter.h"
 
 struct s_dir_stream
 {
@@ -23,10 +22,9 @@ t_dir_stream *directory_open(const char *path)
         return NULL;
 
     DIR *dir = opendir(path);
-
     if (dir == NULL)
     {
-        ft_fprintf(STDERR_FILENO, "ft_ls: cannot open directory '%s': %s\n", path, strerror(errno));
+        report_opening_directory_error(path);
         return NULL;
     }
 
@@ -44,10 +42,9 @@ t_dir_entry *directory_get_next_entry(const t_dir_stream *dir_stream)
 
     errno = 0;
     struct dirent *entry = readdir(dir_stream->dir);
-
     if (entry == NULL && errno != 0)
     {
-        ft_fprintf(STDERR_FILENO, "ft_ls: reading directory '%s': %s\n", dir_stream->dir_name, strerror(errno));
+        report_reading_directory_error(dir_stream->dir_name);
         return NULL;
     }
 
@@ -97,9 +94,7 @@ int directory_close(t_dir_stream **dir_stream)
     const int result = closedir((*dir_stream)->dir);
 
     if (result != 0)
-    {
-        ft_fprintf(STDERR_FILENO, "ft_ls: closing directory '%s': %s\n", (*dir_stream)->dir_name, strerror(errno));
-    }
+        report_closing_directory_error((* dir_stream)->dir_name);
 
     free((*dir_stream)->dir_name);
     free(*dir_stream);
