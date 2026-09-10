@@ -23,3 +23,9 @@ void report_reading_directory_error(const char *directory_path)
 
     ft_fprintf(STDERR_FILENO, ": %s\n", strerror(errno));
 }
+
+void report_closing_directory_error(const char *directory_path)
+{
+    (void) directory_path;
+    ft_fprintf(STDERR_FILENO, "ft_ls: closing directory: %s\n", strerror(errno));
+}
