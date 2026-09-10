@@ -20,7 +20,7 @@ static void should_only_print_the_open_directory_error_if_a_NULL_directory_path_
 
     report_opening_directory_error(NULL);
 
-    CU_ASSERT(verify_that_the_error_printed_is( "%s: %s\n", OPEN_DIRECTORY_ERROR_PREFIX, strerror(errno)));
+    CU_ASSERT(verify_that_the_error_printed_is("%s: %s\n", OPEN_DIRECTORY_ERROR_PREFIX, strerror(errno)));
 }
 
 static void should_only_print_the_open_directory_error_if_an_empty_directory_path_is_specified(void)
@@ -29,7 +29,7 @@ static void should_only_print_the_open_directory_error_if_an_empty_directory_pat
 
     report_opening_directory_error("");
 
-    CU_ASSERT(verify_that_the_error_printed_is( "%s: %s\n", OPEN_DIRECTORY_ERROR_PREFIX, strerror(errno)));
+    CU_ASSERT(verify_that_the_error_printed_is("%s: %s\n", OPEN_DIRECTORY_ERROR_PREFIX, strerror(errno)));
 }
 
 static void should_print_the_open_directory_error_with_the_specified_directory_path(void)
@@ -48,7 +48,7 @@ static void should_only_print_the_read_directory_error_if_a_NULL_directory_path_
 
     report_reading_directory_error(NULL);
 
-    CU_ASSERT(verify_that_the_error_printed_is( "%s: %s\n", READ_DIRECTORY_ERROR_PREFIX, strerror(errno)));
+    CU_ASSERT(verify_that_the_error_printed_is("%s: %s\n", READ_DIRECTORY_ERROR_PREFIX, strerror(errno)));
 }
 
 static void should_only_print_the_read_directory_error_if_an_empty_directory_path_is_specified(void)
@@ -57,7 +57,7 @@ static void should_only_print_the_read_directory_error_if_an_empty_directory_pat
 
     report_reading_directory_error("");
 
-    CU_ASSERT(verify_that_the_error_printed_is( "%s: %s\n", READ_DIRECTORY_ERROR_PREFIX, strerror(errno)));
+    CU_ASSERT(verify_that_the_error_printed_is("%s: %s\n", READ_DIRECTORY_ERROR_PREFIX, strerror(errno)));
 }
 
 static void should_print_the_read_directory_error_with_the_specified_directory_path(void)
@@ -76,7 +76,7 @@ static void should_only_print_the_close_directory_error_if_a_NULL_directory_path
 
     report_closing_directory_error(NULL);
 
-    CU_ASSERT(verify_that_the_error_printed_is( "%s: %s\n", CLOSE_DIRECTORY_ERROR_PREFIX, strerror(errno)));
+    CU_ASSERT(verify_that_the_error_printed_is("%s: %s\n", CLOSE_DIRECTORY_ERROR_PREFIX, strerror(errno)));
 }
 
 static void should_only_print_the_close_directory_error_if_an_empty_directory_path_is_specified(void)
@@ -85,7 +85,17 @@ static void should_only_print_the_close_directory_error_if_an_empty_directory_pa
 
     report_closing_directory_error("");
 
-    CU_ASSERT(verify_that_the_error_printed_is( "%s: %s\n", CLOSE_DIRECTORY_ERROR_PREFIX, strerror(errno)));
+    CU_ASSERT(verify_that_the_error_printed_is("%s: %s\n", CLOSE_DIRECTORY_ERROR_PREFIX, strerror(errno)));
+}
+
+static void should_print_the_close_directory_error_with_the_specified_directory_path(void)
+{
+    errno = EBADF;
+    const char *directory_path = "./path/to/directory";
+
+    report_closing_directory_error(directory_path);
+
+    CU_ASSERT(verify_that_the_error_printed_is("%s '%s': %s\n", CLOSE_DIRECTORY_ERROR_PREFIX, directory_path, strerror(errno)));
 }
 
 void register_error_reporter_suite(void)
@@ -102,5 +112,6 @@ void register_error_reporter_suite(void)
         CU_add_test(suite, "should_print_the_read_directory_error_with_the_specified_directory_path", should_print_the_read_directory_error_with_the_specified_directory_path);
         CU_add_test(suite, "should_only_print_the_close_directory_error_if_a_NULL_directory_path_is_specified", should_only_print_the_close_directory_error_if_a_NULL_directory_path_is_specified);
         CU_add_test(suite, "should_only_print_the_close_directory_error_if_an_empty_directory_path_is_specified", should_only_print_the_close_directory_error_if_an_empty_directory_path_is_specified);
+        CU_add_test(suite, "should_print_the_close_directory_error_with_the_specified_directory_path", should_print_the_close_directory_error_with_the_specified_directory_path);
     }
 }
