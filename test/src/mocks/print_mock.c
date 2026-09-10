@@ -68,7 +68,7 @@ int verify_that_the_output_printed_is(const char *str, ...)
     return strings_are_equal;
 }
 
-int verify_that_the_error_that_has_been_printed_is(const char *str, ...)
+int verify_that_the_error_printed_is(const char *str, ...)
 {
     char expected[PRINT_BUFFER_SIZE];
     va_list args;
@@ -92,7 +92,7 @@ int verify_that_no_output_was_printed(void)
 
 int verify_that_no_error_was_printed(void)
 {
-    return verify_that_the_error_that_has_been_printed_is("");
+    return verify_that_the_error_printed_is("");
 }
 
 void reset_printing_buffer(void)

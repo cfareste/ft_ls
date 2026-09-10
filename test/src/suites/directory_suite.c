@@ -282,7 +282,7 @@ static void should_return_NULL_when_an_error_opening_a_directory_occurs(void)
     open_directory_stream("notADirectory");
     open_directory_stream("noMemory");
 
-    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(
+    CU_ASSERT(verify_that_the_error_printed_is(
         "ft_ls: cannot open directory '%s': Permission denied\n"
         "ft_ls: cannot open directory '%s': Too many open files\n"
         "ft_ls: cannot open directory '%s': File name too long\n"
@@ -306,7 +306,7 @@ static void should_return_NULL_when_an_error_reading_a_directory_occurs(void)
 
     const t_dir_entry *dir_entry = directory_get_next_entry(dir_stream_sut);
 
-    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(
+    CU_ASSERT(verify_that_the_error_printed_is(
         "ft_ls: reading directory '%s': Bad file descriptor\n",
         "failingDir"));
     CU_ASSERT_PTR_NULL(dir_entry);
@@ -324,7 +324,7 @@ static void should_return_negative_value_when_an_error_closing_a_directory_occur
 
     const int result = directory_close(&dir_stream_sut);
 
-    CU_ASSERT(verify_that_the_error_that_has_been_printed_is(
+    CU_ASSERT(verify_that_the_error_printed_is(
         "ft_ls: closing directory '%s': Bad file descriptor\n",
         "failingDir"));
     CU_ASSERT_EQUAL(result, -1);
