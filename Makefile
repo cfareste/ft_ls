@@ -50,7 +50,8 @@ vpath %.c	$(SRC):\
 			$(SRC)/file_entry:\
 			$(SRC)/scanner:\
 			$(SRC)/renderer:\
-			$(SRC)/sorter
+			$(SRC)/sorter:\
+			$(SRC)/error_reporter
 
 #----SHARED----#
 SRCS = ft_ls.c \
@@ -62,7 +63,8 @@ SRCS = ft_ls.c \
 		file_entry.c \
 		scanner.c \
 		renderer.c \
-		sorter.c
+		sorter.c \
+		error_reporter.c
 
 OBJS = $(SRCS:%.c=$(BIN_DIR)%.o)
 DEPS = $(OBJS:%.o=%.d)
