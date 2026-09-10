@@ -4,6 +4,7 @@
 #include "mocks.h"
 
 #define SUITE_NAME "error_reporter"
+#define OPEN_DIRECTORY_ERROR_PREFIX "ft_ls: cannot open directory"
 
 static void test_setup(void)
 {
@@ -17,7 +18,7 @@ static void should_only_print_the_open_directory_error_if_a_NULL_directory_path_
 
     report_opening_directory_error(NULL);
 
-    CU_ASSERT(verify_that_the_error_printed_is("ft_ls: cannot open directory: %s\n", strerror(errno)));
+    CU_ASSERT(verify_that_the_error_printed_is( "%s: %s\n", OPEN_DIRECTORY_ERROR_PREFIX, strerror(errno)));
 }
 
 static void should_only_print_the_open_directory_error_if_an_empty_directory_path_is_specified(void)
@@ -26,7 +27,7 @@ static void should_only_print_the_open_directory_error_if_an_empty_directory_pat
 
     report_opening_directory_error("");
 
-    CU_ASSERT(verify_that_the_error_printed_is("ft_ls: cannot open directory: %s\n", strerror(errno)));
+    CU_ASSERT(verify_that_the_error_printed_is( "%s: %s\n", OPEN_DIRECTORY_ERROR_PREFIX, strerror(errno)));
 }
 
 static void should_print_the_open_directory_error_with_the_specified_directory_path(void)
@@ -36,7 +37,7 @@ static void should_print_the_open_directory_error_with_the_specified_directory_p
 
     report_opening_directory_error(directory_path);
 
-    CU_ASSERT(verify_that_the_error_printed_is("ft_ls: cannot open directory '%s': %s\n", directory_path, strerror(errno)));
+    CU_ASSERT(verify_that_the_error_printed_is("%s '%s': %s\n", OPEN_DIRECTORY_ERROR_PREFIX, directory_path, strerror(errno)));
 }
 
 void register_error_reporter_suite(void)
