@@ -24,7 +24,7 @@ static void should_only_print_the_application_prefix_and_system_error_if_an_empt
 {
     errno = ENOENT;
 
-    report_error(NULL);
+    report_error("");
 
     CU_ASSERT(verify_that_the_error_printed_is("ft_ls: %s\n", strerror(errno)));
 }
