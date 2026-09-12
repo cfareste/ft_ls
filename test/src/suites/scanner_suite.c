@@ -254,6 +254,26 @@ static void should_return_an_array_with_the_elements_that_didnt_fail_if_fails_to
     assert_file_entry_array_names_are(expected_file_names);
 }
 
+static void should_return_a_valid_array_even_if_it_fails_to_close_a_directory(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR_CLOSE_ERROR("close_error", "valid", ".", "dir", "..", "entries"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *expected_file_names[] = { "valid", "dir", "entries", NULL };
+
+    scan_directory("close_error");
+
+    CU_ASSERT(verify_that_the_error_printed_is(
+        "ft_ls: closing directory '%s': %s\n",
+        "close_error", strerror(errno))
+    );
+    assert_file_entry_array_length_is(3);
+    assert_file_entry_array_names_are(expected_file_names);
+}
+
 void register_scanner_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, test_teardown);
@@ -272,5 +292,6 @@ void register_scanner_suite(void)
         CU_add_test(suite, "should_return_NULL_if_fails_to_open_a_directory", should_return_NULL_if_fails_to_open_a_directory);
         CU_add_test(suite, "should_return_an_empty_array_if_fails_to_read_the_first_entry_of_a_directory", should_return_an_empty_array_if_fails_to_read_the_first_entry_of_a_directory);
         CU_add_test(suite, "should_return_an_array_with_the_elements_that_didnt_fail_if_fails_to_read_a_middle_entry_of_a_directory", should_return_an_array_with_the_elements_that_didnt_fail_if_fails_to_read_a_middle_entry_of_a_directory);
+        CU_add_test(suite, "should_return_a_valid_array_even_if_it_fails_to_close_a_directory", should_return_a_valid_array_even_if_it_fails_to_close_a_directory);
     }
 }
