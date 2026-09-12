@@ -837,6 +837,25 @@ static void should_fail_with_a_major_error_and_not_print_anything_if_fails_to_re
     CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MAJOR_ERROR);
 }
 
+static void should_fail_with_a_major_error_and_only_print_the_non_failed_entries_if_fails_to_read_a_middle_entry_of_the_current_directory(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR_READ_ERROR(".", 3, ".", "..", "file1", "subdir1", "symlink", "zz"),
+        MOCK_FILE("./file1"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { NULL };
+    parsed_arguments = parse_arguments(0, arguments);
+
+    const int result = application_run(parsed_arguments);
+
+    CU_ASSERT(verify_that_the_output_printed_is("file1\n"));
+    CU_ASSERT(verify_that_the_error_printed_is("ft_ls: reading directory '%s': %s\n", ".", strerror(EBADF)));
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MAJOR_ERROR);
+}
+
 void register_application_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, test_teardown);
@@ -869,5 +888,6 @@ void register_application_suite(void)
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_directory_pointed_by_the_specified_symlink", should_successfully_print_the_contents_of_the_directory_pointed_by_the_specified_symlink);
         CU_add_test(suite, "should_fail_with_a_major_error_and_not_print_anything_if_fails_to_open_the_current_directory", should_fail_with_a_major_error_and_not_print_anything_if_fails_to_open_the_current_directory);
         CU_add_test(suite, "should_fail_with_a_major_error_and_not_print_anything_if_fails_to_read_the_first_entry_of_the_current_directory", should_fail_with_a_major_error_and_not_print_anything_if_fails_to_read_the_first_entry_of_the_current_directory);
+        CU_add_test(suite, "should_fail_with_a_major_error_and_only_print_the_non_failed_entries_if_fails_to_read_a_middle_entry_of_the_current_directory", should_fail_with_a_major_error_and_only_print_the_non_failed_entries_if_fails_to_read_a_middle_entry_of_the_current_directory);
     }
 }
