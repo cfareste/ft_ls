@@ -22,6 +22,9 @@ t_file_entry_array *scan(const char *path)
 
     t_dir_stream *dir_stream = directory_open(path);
 
+    if (dir_stream == NULL)
+        return NULL;
+
     t_file_entry_array *file_entry_array = file_entry_array_create();
     t_dir_entry *dir_entry = directory_get_next_entry(dir_stream);
     while (!directory_is_entry_empty(dir_entry))
