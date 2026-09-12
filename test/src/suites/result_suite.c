@@ -25,6 +25,6 @@ void register_result_suite(void)
 
     if (suite != NULL)
     {
-        CU_add_test(suite, "should_create_a_succeed_result", should_create_a_succeed_result);
+        CU_add_test(suite, "should_create_a_successful_result", should_create_a_successful_result);
     }
 }
