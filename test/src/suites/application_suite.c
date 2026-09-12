@@ -801,6 +801,28 @@ static void should_successfully_print_the_contents_of_the_directory_pointed_by_t
     assert_application_execution_succeed(result);
 }
 
+static void should_fail_with_a_major_error_and_not_print_anything_if_fails_to_open_the_current_directory(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR_OPEN_ERROR(EACCES, ".", ".", "..", "file1", "subdir1", "symlink", "zz"),
+        MOCK_FILE("./file1"),
+        MOCK_DIR("./subdir1", ".", ".."),
+        MOCK_SYMLINK("./symlink", "file1"),
+        MOCK_FILE("./zz"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { NULL };
+    parsed_arguments = parse_arguments(0, arguments);
+
+    const int result = application_run(parsed_arguments);
+
+    CU_ASSERT(verify_that_no_output_was_printed());
+    CU_ASSERT(verify_that_the_error_printed_is("ft_ls: cannot open directory '%s': %s\n", ".", strerror(EACCES)));
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MAJOR_ERROR);
+}
+
 void register_application_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, test_teardown);
@@ -831,5 +853,6 @@ void register_application_suite(void)
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_current_directory_without_following_symlinks", should_successfully_print_the_contents_of_the_current_directory_without_following_symlinks);
         CU_add_test(suite, "should_successfully_print_the_name_of_the_specified_symlink_pointing_to_a_non_directory_file", should_successfully_print_the_name_of_the_specified_symlink_pointing_to_a_non_directory_file);
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_directory_pointed_by_the_specified_symlink", should_successfully_print_the_contents_of_the_directory_pointed_by_the_specified_symlink);
+        CU_add_test(suite, "should_fail_with_a_major_error_and_not_print_anything_if_fails_to_open_the_current_directory", should_fail_with_a_major_error_and_not_print_anything_if_fails_to_open_the_current_directory);
     }
 }

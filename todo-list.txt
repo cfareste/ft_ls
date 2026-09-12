@@ -8,7 +8,6 @@ TODO:
 7. Tests parsed args y application stat
 8. Mirar posibles refactors que me haya dejado
 9. Revisar requerimientos y apuntarlos más claramente (comportamiento local con 1 fallo, comportamiento global, errores faltantes...)
-10. Tests scanner y application opendir + readdir + closedir
 11. Estado de error de scan (opendir + readdir + closedir) en caso de ser file operand
 12. Estado de error de scan (opendir + readdir + closedir) en caso de NO ser file operand
 
@@ -109,3 +108,23 @@ QA LS-13 Support for multiple types of files
    - Asegurarse que los dir headers están bien
    - Si es un symlink -> directorio, el dir header es el nombre del link
 4. No memory leaks
+
+
+QA LS-12 Manage invalid operations
+1. Opendir + readdir + closedir. Note: los parámetros que fallan son solo directorios
+   - Sin fallos (sin parámetros, 1 parámetro de cada tipo, múltiples parámetros)
+   - 1 Fallo:
+       * Sin parámetros (current dir): No se puede abrir, falla leer a la primera o a la mitad, no se cierra
+       * 1 parámetro: No se puede abrir, falla leer a la primera o mitad, no se cierra
+       * Mezcla de parámetros:
+           · 2 params: Mezclar entre parámetro que falla y que no (no_dir + dir y dir + dir)
+           · X params: Mezclar entre parámetro que falla y que no (X dirs, X non_dirs, 1 fallo)
+   - X Fallos:
+       * 2 params, 2 fallos: Mezclar entre no poder abrirse, fallos de lectura, fallos al cerrar
+       * X params, X fallos: Mezclar entre fallos y successes (X dirs, X non_dirs, N fallos)
+
+
+To test in stat:
+1. ls in a current directory without permissions:
+    - ls: cannot open directory '.': Permission denied
+    - ls: cannot access '..': Permission denied
