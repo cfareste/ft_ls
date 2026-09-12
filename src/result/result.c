@@ -30,6 +30,9 @@ t_result *result_create_failed(void)
 
 void *result_get_value(const t_result *result)
 {
+    if (result == NULL)
+        return NULL;
+
     return result->value;
 }
 
