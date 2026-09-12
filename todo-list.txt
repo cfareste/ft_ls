@@ -6,7 +6,7 @@ TODO:
 5. Estado de error de parsed args (stat) en caso de ser file operand
 6. Estado de error de parsed args (stat) en caso de NO ser file operand
 7. Tests parsed args y application stat
-8. Mirar posibles refactors que me haya dejado
+8. Mirar posibles refactors que me haya dejado (list_changed_files_in_branch)
 9. Revisar requerimientos y apuntarlos más claramente (comportamiento local con 1 fallo, comportamiento global, errores faltantes...)
 11. Estado de error de scan (opendir + readdir + closedir) en caso de ser file operand
 12. Estado de error de scan (opendir + readdir + closedir) en caso de NO ser file operand
