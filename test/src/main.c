@@ -15,6 +15,7 @@ int	main(void)
 	register_file_stats_suite();
 	register_parsed_arguments_suite();
 	register_error_reporter_suite();
+	register_result_suite();
 	register_application_suite();
 
 	CU_basic_set_mode(CU_BRM_VERBOSE);

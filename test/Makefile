@@ -68,7 +68,8 @@ vpath %.c	$(SRC):\
 			$(ROOT_SRC)/scanner:\
 			$(ROOT_SRC)/renderer:\
 			$(ROOT_SRC)/sorter:\
-			$(ROOT_SRC)/error_reporter
+			$(ROOT_SRC)/error_reporter:\
+			$(ROOT_SRC)/result
 
 
 
@@ -82,7 +83,8 @@ ROOT_SRCS = application.c \
 			scanner.c \
 			renderer.c \
 			sorter.c \
-			error_reporter.c
+			error_reporter.c \
+			result.c
 
 SRCS = main.c \
 		vfs_mock.c \
@@ -98,6 +100,7 @@ SRCS = main.c \
 		parsed_arguments_suite.c \
 		application_suite.c \
 		error_reporter_suite.c \
+		result_suite.c \
 		$(ROOT_SRCS)
 
 OBJS = $(SRCS:%.c=$(BIN_DIR)%.o)

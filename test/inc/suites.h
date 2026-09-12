@@ -9,4 +9,5 @@ void register_file_stats_suite(void);
 void register_sorter_suite(void);
 void register_parsed_arguments_suite(void);
 void register_error_reporter_suite(void);
+void register_result_suite(void);
 void register_application_suite(void);
