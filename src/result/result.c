@@ -18,11 +18,11 @@ t_result *result_create_successful(void *value)
     return result;
 }
 
-t_result *result_create_failed(void)
+t_result *result_create_failed(void *value)
 {
     t_result *result = ft_safe_calloc(1, sizeof(t_result));
 
-    result->value = NULL;
+    result->value = value;
     result->has_failed = 1;
 
     return result;

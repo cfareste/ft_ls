@@ -17,9 +17,9 @@ static void should_create_a_successful_result(void)
 
 static void should_create_a_failed_result(void)
 {
-    t_result *result = result_create_failed();
+    t_result *result = result_create_failed("value");
 
-    CU_ASSERT_PTR_NULL(result_get_value(result));
+    CU_ASSERT_STRING_EQUAL(result_get_value(result), "value");
     CU_ASSERT_EQUAL(result_has_failed(result), 1);
 
     result_destroy(&result);
@@ -79,7 +79,7 @@ static void should_return_false_for_has_failed_if_a_successful_result_is_passed(
 
 static void should_return_true_for_has_failed_if_a_failed_result_is_passed(void)
 {
-    t_result *result = result_create_failed();
+    t_result *result = result_create_failed(NULL);
 
     CU_ASSERT_PTR_NULL(result_get_value(result));
     CU_ASSERT_EQUAL(result_has_failed(result), 1);
