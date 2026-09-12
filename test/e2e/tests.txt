@@ -30,3 +30,4 @@ linkfile                                                                        
 linkdir                                                                         ::       linkdir
 linkdir/                                                                        ::       linkdir/
 file src linklink linkdir linkfile /dev/sda /dev/null fifo my_socket.sock       ::       file src linklink linkdir linkfile /dev/sda /dev/null fifo my_socket.sock
+nopermdir                                                                       ::       nopermdir
