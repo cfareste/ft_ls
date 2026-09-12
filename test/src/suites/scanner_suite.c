@@ -210,6 +210,10 @@ static void should_return_NULL_if_fails_to_open_a_directory(void)
 
     scan_directory("no_perm_dir");
 
+    CU_ASSERT(verify_that_the_error_printed_is(
+        "ft_ls: cannot open directory '%s': %s\n",
+        "no_perm_dir", strerror(errno))
+    );
     assert_file_entry_array_is_null();
 }
 
