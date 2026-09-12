@@ -35,12 +35,15 @@ void *result_get_value(const t_result *result)
 
 int result_has_failed(const t_result *result)
 {
+    if (result == NULL)
+        return 1;
+
     return result->has_failed;
 }
 
 int result_has_succeed(const t_result *result)
 {
-    return !result->has_failed;
+    return !result_has_failed(result);
 }
 
 void result_destroy(t_result **result)
