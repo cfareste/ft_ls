@@ -38,6 +38,11 @@ int result_has_failed(const t_result *result)
     return result->has_failed;
 }
 
+int result_has_succeed(const t_result *result)
+{
+    return !result->has_failed;
+}
+
 void result_destroy(t_result **result)
 {
     free(*result);
