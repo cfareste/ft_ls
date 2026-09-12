@@ -856,6 +856,34 @@ static void should_fail_with_a_major_error_and_only_print_the_non_failed_entries
     CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MAJOR_ERROR);
 }
 
+static void should_fail_with_a_major_error_print_the_contents_of_the_current_directory_if_fails_to_close_it(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR_CLOSE_ERROR(".", ".", "..", "file1", "subdir1", "symlink", "zz"),
+        MOCK_FILE("./file1"),
+        MOCK_DIR("./subdir1", ".", ".."),
+        MOCK_SYMLINK("./symlink", "file1"),
+        MOCK_FILE("./zz"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { NULL };
+    const char *expected_file_names[] = { "file1", "subdir1", "symlink", "zz" };
+    parsed_arguments = parse_arguments(0, arguments);
+
+    const int result = application_run(parsed_arguments);
+
+    CU_ASSERT(verify_that_the_output_printed_is("%s\n%s\n%s\n%s\n",
+        expected_file_names[0],
+        expected_file_names[1],
+        expected_file_names[2],
+        expected_file_names[3]
+    ));
+    CU_ASSERT(verify_that_the_error_printed_is("ft_ls: closing directory '%s': %s\n", ".", strerror(EBADF)));
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MAJOR_ERROR);
+}
+
 void register_application_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, test_teardown);
@@ -889,5 +917,6 @@ void register_application_suite(void)
         CU_add_test(suite, "should_fail_with_a_major_error_and_not_print_anything_if_fails_to_open_the_current_directory", should_fail_with_a_major_error_and_not_print_anything_if_fails_to_open_the_current_directory);
         CU_add_test(suite, "should_fail_with_a_major_error_and_not_print_anything_if_fails_to_read_the_first_entry_of_the_current_directory", should_fail_with_a_major_error_and_not_print_anything_if_fails_to_read_the_first_entry_of_the_current_directory);
         CU_add_test(suite, "should_fail_with_a_major_error_and_only_print_the_non_failed_entries_if_fails_to_read_a_middle_entry_of_the_current_directory", should_fail_with_a_major_error_and_only_print_the_non_failed_entries_if_fails_to_read_a_middle_entry_of_the_current_directory);
+        CU_add_test(suite, "should_fail_with_a_major_error_print_the_contents_of_the_current_directory_if_fails_to_close_it", should_fail_with_a_major_error_print_the_contents_of_the_current_directory_if_fails_to_close_it);
     }
 }
