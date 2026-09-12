@@ -39,6 +39,15 @@ static void should_return_NULL_for_value_if_a_NULL_result_is_passed(void)
     CU_ASSERT_PTR_NULL(result_get_value(NULL));
 }
 
+static void should_return_the_result_value_of_the_specified_result(void)
+{
+    t_result *result = result_create_successful("value");
+
+    CU_ASSERT_STRING_EQUAL(result_get_value(result), "value");
+
+    result_destroy(&result);
+}
+
 static void should_return_true_for_has_failed_if_a_NULL_result_is_passed(void)
 {
     CU_ASSERT_EQUAL(result_has_failed(NULL), 1);
@@ -77,6 +86,7 @@ void register_result_suite(void)
         CU_add_test(suite, "should_create_a_failed_result", should_create_a_failed_result);
         CU_add_test(suite, "should_destroy_a_result", should_destroy_a_result);
         CU_add_test(suite, "should_return_NULL_for_value_if_a_NULL_result_is_passed", should_return_NULL_for_value_if_a_NULL_result_is_passed);
+        CU_add_test(suite, "should_return_the_result_value_of_the_specified_result", should_return_the_result_value_of_the_specified_result);
         CU_add_test(suite, "should_return_true_for_has_failed_if_a_NULL_result_is_passed", should_return_true_for_has_failed_if_a_NULL_result_is_passed);
         CU_add_test(suite, "should_return_false_for_has_failed_if_a_successful_result_is_passed", should_return_false_for_has_failed_if_a_successful_result_is_passed);
         CU_add_test(suite, "should_return_true_for_has_failed_if_a_failed_result_is_passed", should_return_true_for_has_failed_if_a_failed_result_is_passed);
