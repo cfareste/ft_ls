@@ -52,9 +52,9 @@ struct dirent *mock_readdir(DIR *dirp)
     if (stream == NULL || stream->dir_entry == NULL || stream->dir_entry->entries == NULL)
         return NULL;
 
-    if (stream->dir_entry->errors.readdir_errno != 0)
+    if (stream->dir_entry->errors.readdir_error.code != 0 && stream->dir_entry->errors.readdir_error.entry_idx == stream->next_index)
     {
-        errno = stream->dir_entry->errors.readdir_errno;
+        errno = stream->dir_entry->errors.readdir_error.code;
         return NULL;
     }
 

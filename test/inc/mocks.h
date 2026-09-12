@@ -2,18 +2,18 @@
 
 #include <sys/stat.h>
 
-#define MOCK_FILE(p) { (p), S_IFREG | 0644, NULL, NULL, { 0, 0, 0, 0 } }
-#define MOCK_DIR(p, ...) { (p), S_IFDIR | 0755, (const char *[]){ __VA_ARGS__, NULL }, NULL, { 0, 0, 0, 0 } }
-#define MOCK_SYMLINK(p, target) { (p), S_IFLNK | 0777, NULL, (target), { 0, 0, 0, 0 } }
-#define MOCK_BLOCK_DEVICE(p) { (p), S_IFBLK | 0660, NULL, NULL, { 0, 0, 0, 0 } }
-#define MOCK_CHAR_DEVICE(p) { (p), S_IFCHR | 0660, NULL, NULL, { 0, 0, 0, 0 } }
-#define MOCK_SOCKET(p) { (p), S_IFSOCK | 0777, NULL, NULL, { 0, 0, 0, 0 } }
-#define MOCK_FIFO(p) { (p), S_IFIFO | 0664, NULL, NULL, { 0, 0, 0, 0 } }
-#define MOCK_NULL_TERMINATOR() { NULL, 0, NULL, NULL, { 0, 0, 0, 0 } }
+#define MOCK_FILE(p) { (p), S_IFREG | 0644, NULL, NULL, { 0, 0, { 0, 0 }, 0 } }
+#define MOCK_DIR(p, ...) { (p), S_IFDIR | 0755, (const char *[]){ __VA_ARGS__, NULL }, NULL, { 0, 0, { 0, 0 }, 0 } }
+#define MOCK_SYMLINK(p, target) { (p), S_IFLNK | 0777, NULL, (target), { 0, 0, { 0, 0 }, 0 } }
+#define MOCK_BLOCK_DEVICE(p) { (p), S_IFBLK | 0660, NULL, NULL, { 0, 0, { 0, 0 }, 0 } }
+#define MOCK_CHAR_DEVICE(p) { (p), S_IFCHR | 0660, NULL, NULL, { 0, 0, { 0, 0 }, 0 } }
+#define MOCK_SOCKET(p) { (p), S_IFSOCK | 0777, NULL, NULL, { 0, 0, { 0, 0 }, 0 } }
+#define MOCK_FIFO(p) { (p), S_IFIFO | 0664, NULL, NULL, { 0, 0, { 0, 0 }, 0 } }
+#define MOCK_NULL_TERMINATOR() { NULL, 0, NULL, NULL, { 0, 0, { 0, 0 }, 0 } }
 
-#define MOCK_DIR_OPEN_ERROR(err, p, ...) { (p), S_IFDIR | 0755, (const char *[]){ __VA_ARGS__, NULL }, NULL, { 0, err, 0, 0 } }
-#define MOCK_DIR_READ_ERROR(p, ...) { (p), S_IFDIR | 0755, (const char *[]){ __VA_ARGS__, NULL }, NULL, { 0, 0, EBADF, 0 } }
-#define MOCK_DIR_CLOSE_ERROR(p, ...) { (p), S_IFDIR | 0755, (const char *[]){ __VA_ARGS__, NULL }, NULL, { 0, 0, 0, EBADF } }
+#define MOCK_DIR_OPEN_ERROR(err, p, ...) { (p), S_IFDIR | 0755, (const char *[]){ __VA_ARGS__, NULL }, NULL, { 0, err, { 0, 0 }, 0 } }
+#define MOCK_DIR_READ_ERROR(p, entry_error_idx, ...) { (p), S_IFDIR | 0755, (const char *[]){ __VA_ARGS__, NULL }, NULL, { 0, 0, { entry_error_idx, EBADF } , 0 } }
+#define MOCK_DIR_CLOSE_ERROR(p, ...) { (p), S_IFDIR | 0755, (const char *[]){ __VA_ARGS__, NULL }, NULL, { 0, 0, { 0, 0 }, EBADF } }
 
 typedef struct s_vfs_mock_entry
 {
@@ -25,7 +25,11 @@ typedef struct s_vfs_mock_entry
     {
         int stat_errno;
         int opendir_errno;
-        int readdir_errno;
+        struct
+        {
+            unsigned int entry_idx;
+            int code;
+        } readdir_error;
         int closedir_errno;
     } errors;
 } t_vfs_mock_entry;

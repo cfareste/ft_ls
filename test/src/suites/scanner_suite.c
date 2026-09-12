@@ -217,15 +217,22 @@ static void should_return_NULL_if_fails_to_open_a_directory(void)
     assert_file_entry_array_is_null();
 }
 
-// static void should_return_NULL_if_fails_to_read_a_directory(void)
-// {
-//     guarantee_stat_will_populate_stats_of_a_directory_type_file(CURRENT_DIRECTORY_PATH);
-//     guarantee_readdir_will_fail();
-//
-//     scan_directory(CURRENT_DIRECTORY_PATH);
-//
-//     assert_file_entry_array_is_null();
-// }
+static void should_return_an_empty_array_if_fails_to_read_the_first_entry_of_a_directory(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR_READ_ERROR("read_dir", 0, ".", ".."),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    scan_directory("read_dir");
+
+    CU_ASSERT(verify_that_the_error_printed_is(
+        "ft_ls: reading directory '%s': %s\n",
+        "read_dir", strerror(errno))
+    );
+    assert_file_entry_array_length_is(0);
+}
 
 void register_scanner_suite(void)
 {
@@ -243,6 +250,6 @@ void register_scanner_suite(void)
         CU_add_test(suite, "should_return_an_empty_array_if_the_specified_directory_is_empty", should_return_an_empty_array_if_the_specified_directory_is_empty);
         CU_add_test(suite, "should_return_an_empty_array_if_the_specified_directory_only_contains_hidden_files", should_return_an_empty_array_if_the_specified_directory_only_contains_hidden_files);
         CU_add_test(suite, "should_return_NULL_if_fails_to_open_a_directory", should_return_NULL_if_fails_to_open_a_directory);
-        // CU_add_test(suite, "should_return_NULL_if_fails_to_read_a_directory", should_return_NULL_if_fails_to_read_a_directory);
+        CU_add_test(suite, "should_return_an_empty_array_if_fails_to_read_the_first_entry_of_a_directory", should_return_an_empty_array_if_fails_to_read_the_first_entry_of_a_directory);
     }
 }

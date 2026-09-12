@@ -297,7 +297,7 @@ static void should_return_NULL_when_an_error_opening_a_directory_occurs(void)
 static void should_return_NULL_when_an_error_reading_a_directory_occurs(void)
 {
     const t_vfs_mock_entry vfs[] = {
-        MOCK_DIR_READ_ERROR("failingDir", ".", ".."),
+        MOCK_DIR_READ_ERROR("failingDir", 0, ".", ".."),
         MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
