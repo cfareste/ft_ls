@@ -1,5 +1,5 @@
 #pragma once
 
-#include "file_entry.h"
+#include "result.h"
 
-t_file_entry_array *scan(const char *path);
+t_result *scan(const char *path);

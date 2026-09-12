@@ -37,9 +37,10 @@ static int process_directory_file_operands(const t_parsed_arguments *parsed_argu
     for (unsigned int i = 0; directory_file_operands[i] != NULL; i++)
     {
         const char *directory_header = should_print_directory_header ? directory_file_operands[i] : NULL;
-        t_file_entry_array *file_entry_array = scan(directory_file_operands[i]);
+        t_result *result = scan(directory_file_operands[i]);
+        t_file_entry_array *file_entry_array = result_get_value(result);
 
-        if (file_entry_array == NULL)
+        if (result_has_failed(result))
             error_code = FT_LS_APPLICATION_MAJOR_ERROR;
 
         file_entry_array_sort(file_entry_array);
@@ -47,6 +48,7 @@ static int process_directory_file_operands(const t_parsed_arguments *parsed_argu
         render_context_set_directory_header(render_context, directory_header);
         render(file_entry_array, render_context);
 
+        result_destroy(&result);
         file_entry_array_destroy(&file_entry_array);
     }
 
