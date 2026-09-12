@@ -51,7 +51,7 @@ int result_has_succeed(const t_result *result)
 
 void result_destroy(t_result **result)
 {
-    if (result == NULL)
+    if (result == NULL || *result == NULL)
         return ;
 
     free(*result);
