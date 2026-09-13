@@ -51,7 +51,10 @@ void render(const t_file_entry_array *file_entry_array, t_render_context *contex
         return;
 
     if (context->directory_header != NULL)
+    {
         print_directory_header(context);
+        context->is_first_render = 0;
+    }
 
     const unsigned int count = file_entry_array_get_length(file_entry_array);
     for (unsigned int i = 0; i < count; i++)
@@ -59,6 +62,4 @@ void render(const t_file_entry_array *file_entry_array, t_render_context *contex
         const t_file_entry *file_entry = file_entry_array_get_at(file_entry_array, i);
         ft_printf("%s\n", file_entry_get_name(file_entry));
     }
-
-    context->is_first_render = 0;
 }

@@ -2,6 +2,7 @@
 #include "application.h"
 #include "renderer.h"
 #include "error_codes.h"
+#include "libft.h"
 #include "scanner.h"
 
 static int check_if_should_print_directory_header(const t_parsed_arguments *parsed_arguments)
@@ -63,6 +64,8 @@ int application_run(const t_parsed_arguments *parsed_arguments)
     t_render_context *render_context = render_context_create();
 
     process_non_directory_file_operands(parsed_arguments, render_context);
+    if (parsed_arguments_get_non_directory_file_operands(parsed_arguments)[0] != NULL && parsed_arguments_get_directory_file_operands(parsed_arguments)[0] != NULL)
+        ft_printf("\n");
     const int error_code = process_directory_file_operands(parsed_arguments, render_context);
 
     render_context_destroy(&render_context);

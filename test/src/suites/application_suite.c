@@ -898,7 +898,7 @@ static void should_fail_with_a_major_error_and_print_only_the_non_directory_oper
 
     const int result = application_run(parsed_arguments);
 
-    CU_ASSERT(verify_that_the_output_printed_is("file\n"));
+    CU_ASSERT(verify_that_the_output_printed_is("file\n\n"));
     CU_ASSERT(verify_that_the_error_printed_is("ft_ls: cannot open directory '%s': %s\n", "dir", strerror(ENOTDIR)));
     CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MAJOR_ERROR);
 }
