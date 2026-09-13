@@ -2,7 +2,6 @@
 #include "application.h"
 #include "renderer.h"
 #include "error_codes.h"
-#include "libft.h"
 #include "scanner.h"
 
 static void process_non_directory_file_operands(const t_parsed_arguments *parsed_arguments, t_render_context *render_context)
@@ -54,8 +53,7 @@ int application_run(const t_parsed_arguments *parsed_arguments)
     t_render_context *render_context = render_context_create(parsed_arguments);
 
     process_non_directory_file_operands(parsed_arguments, render_context);
-    if (parsed_arguments_has_mixed_types_file_operands(parsed_arguments))
-        ft_printf("\n");
+    render_types_separator(render_context);
     const int error_code = process_directory_file_operands(parsed_arguments, render_context);
 
     render_context_destroy(&render_context);
