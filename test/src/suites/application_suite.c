@@ -928,6 +928,43 @@ static void should_fail_with_a_major_error_and_print_only_the_working_directory_
     CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MAJOR_ERROR);
 }
 
+static void should_fail_with_a_major_error_and_print_only_the_working_file_operands_if_fails_to_scan_a_directory_operand(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR_OPEN_ERROR(EACCES, "noPermDir", ".", "..", "file1", "subdir1", "symlink", "zz"),
+        MOCK_FILE("file"),
+        MOCK_FILE("zFile"),
+        MOCK_DIR("workingDir", ".", "..", "fileDir"),
+        MOCK_DIR("zWorkingDir", ".", "..", "zFileDir"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *expected_file_names[] = { "file", "zFile" };
+    const char *expected_first_dir_file_name = "fileDir";
+    const char *expected_second_dir_file_name = "zFileDir";
+    const char *arguments[] = { "noPermDir", "workingDir", "file", "zWorkingDir", "zFile", NULL };
+    parsed_arguments = parse_arguments(5, arguments);
+
+    const int result = application_run(parsed_arguments);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n"
+        "\n%s:\n"
+        "%s\n",
+        expected_file_names[0],
+        expected_file_names[1],
+        arguments[1],
+        expected_first_dir_file_name,
+        arguments[3],
+        expected_second_dir_file_name
+    ));
+    CU_ASSERT(verify_that_the_error_printed_is("ft_ls: cannot open directory '%s': %s\n", "noPermDir", strerror(EACCES)));
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MAJOR_ERROR);
+}
+
 void register_application_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, test_teardown);
@@ -964,5 +1001,6 @@ void register_application_suite(void)
         CU_add_test(suite, "should_fail_with_a_major_error_print_the_contents_of_the_directory_if_fails_to_close_it", should_fail_with_a_major_error_print_the_contents_of_the_directory_if_fails_to_close_it);
         CU_add_test(suite, "should_fail_with_a_major_error_and_print_only_the_non_directory_operand_if_fails_to_scan_the_directory_operand", should_fail_with_a_major_error_and_print_only_the_non_directory_operand_if_fails_to_scan_the_directory_operand);
         CU_add_test(suite, "should_fail_with_a_major_error_and_print_only_the_working_directory_operand_if_fails_to_scan_a_directory_operand", should_fail_with_a_major_error_and_print_only_the_working_directory_operand_if_fails_to_scan_a_directory_operand);
+        CU_add_test(suite, "should_fail_with_a_major_error_and_print_only_the_working_file_operands_if_fails_to_scan_a_directory_operand", should_fail_with_a_major_error_and_print_only_the_working_file_operands_if_fails_to_scan_a_directory_operand);
     }
 }
