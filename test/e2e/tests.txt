@@ -32,4 +32,5 @@ linkdir/                                                                        
 file src linklink linkdir linkfile /dev/sda /dev/null fifo my_socket.sock       ::       file src linklink linkdir linkfile /dev/sda /dev/null fifo my_socket.sock
 nopermdir                                                                       ::       nopermdir
 nopermdir Makefile                                                              ::       nopermdir Makefile
-nopermdir/ nopermdir                                                            ::       nopermdir/ nopermdir
+nopermdir/ .hiddir                                                              ::       nopermdir/ .hiddir
+nopermdir/ src                                                                  ::       nopermdir/ src

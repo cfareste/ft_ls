@@ -906,24 +906,25 @@ static void should_fail_with_a_major_error_and_print_only_the_non_directory_oper
 static void should_fail_with_a_major_error_and_print_only_the_working_directory_operand_if_fails_to_scan_a_directory_operand(void)
 {
     const t_vfs_mock_entry vfs[] = {
-        MOCK_DIR_OPEN_ERROR(EACCES, "dir", ".", "..", "file1", "subdir1", "symlink", "zz"),
-        MOCK_DIR_OPEN_ERROR(ENOTDIR, "zdir/", ".", "..", "file1", "subdir1", "symlink", "zz"),
+        MOCK_DIR_OPEN_ERROR(EACCES, "noPermDir", ".", "..", "file1", "subdir1", "symlink", "zz"),
+        MOCK_DIR("workingDir", ".", "..", "fileDir"),
         MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
 
-    const char *arguments[] = { "zdir/", "dir", NULL };
+    const char *expected_file_name = "fileDir";
+    const char *arguments[] = { "workingDir", "noPermDir", NULL };
     parsed_arguments = parse_arguments(2, arguments);
 
     const int result = application_run(parsed_arguments);
 
-    CU_ASSERT(verify_that_no_output_was_printed());
-    CU_ASSERT(verify_that_the_error_printed_is(
-        "ft_ls: cannot open directory '%s': %s\n"
-        "ft_ls: cannot open directory '%s': %s\n",
-        "dir", strerror(EACCES),
-        "zdir/", strerror(ENOTDIR))
-    );
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "%s:\n"
+        "%s\n",
+        arguments[0],
+        expected_file_name
+    ));
+    CU_ASSERT(verify_that_the_error_printed_is("ft_ls: cannot open directory '%s': %s\n", "noPermDir", strerror(EACCES)));
     CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MAJOR_ERROR);
 }
 
