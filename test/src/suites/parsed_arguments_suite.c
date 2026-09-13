@@ -365,6 +365,11 @@ static void should_sort_the_directory_file_operands_by_ascii_by_default(void)
     parsed_arguments_destroy(&parsed_arguments);
 }
 
+static void should_return_false_for_has_mixed_types_file_operands_if_it_null_parsed_arguments_are_specified(void)
+{
+    CU_ASSERT_EQUAL(parsed_arguments_has_mixed_types_file_operands(NULL), 0);
+}
+
 static void should_return_false_for_has_mixed_types_file_operands_if_it_does_not_have_at_least_one_non_dir_and_one_dir(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -430,6 +435,7 @@ void register_parsed_arguments_suite(void)
         CU_add_test(suite, "should_return_true_for_has_directory_file_operands_if_it_has_at_least_one", should_return_true_for_has_directory_file_operands_if_it_has_at_least_one);
         CU_add_test(suite, "should_sort_the_non_directory_file_operands_by_ascii_by_default", should_sort_the_non_directory_file_operands_by_ascii_by_default);
         CU_add_test(suite, "should_sort_the_directory_file_operands_by_ascii_by_default", should_sort_the_directory_file_operands_by_ascii_by_default);
+        CU_add_test(suite, "should_return_false_for_has_mixed_types_file_operands_if_it_null_parsed_arguments_are_specified", should_return_false_for_has_mixed_types_file_operands_if_it_null_parsed_arguments_are_specified);
         CU_add_test(suite, "should_return_false_for_has_mixed_types_file_operands_if_it_does_not_have_at_least_one_non_dir_and_one_dir", should_return_false_for_has_mixed_types_file_operands_if_it_does_not_have_at_least_one_non_dir_and_one_dir);
         CU_add_test(suite, "should_return_true_for_has_mixed_types_file_operands_if_it_does_have_at_least_one_non_dir_and_one_dir", should_return_true_for_has_mixed_types_file_operands_if_it_does_have_at_least_one_non_dir_and_one_dir);
     }

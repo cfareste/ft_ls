@@ -75,7 +75,9 @@ int parsed_arguments_has_directory_file_operands(const t_parsed_arguments *parse
 
 int parsed_arguments_has_mixed_types_file_operands(const t_parsed_arguments *parsed_arguments)
 {
-    (void) parsed_arguments;
+    if (parsed_arguments == NULL)
+        return 0;
+
     return parsed_arguments->non_directory_file_operands[0] != NULL && parsed_arguments->directory_file_operands[0] != NULL;
 }
 
