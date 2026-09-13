@@ -35,3 +35,4 @@ nopermdir Makefile                                                              
 nopermdir/ .hiddir                                                              ::       nopermdir/ .hiddir
 nopermdir/ src                                                                  ::       nopermdir/ src
 Makefile src .hidden .hiddir nopermdir                                          ::       Makefile src .hidden .hiddir nopermdir
+nopermdir/ nopermdir                                                            ::       nopermdir/ nopermdir
