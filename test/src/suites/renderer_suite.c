@@ -12,7 +12,7 @@ static void test_setup(void)
 
 static void should_create_a_context(void)
 {
-    t_render_context *context = render_context_create();
+    t_render_context *context = render_context_create(NULL);
 
     CU_ASSERT_PTR_NOT_NULL(context);
 
@@ -21,7 +21,7 @@ static void should_create_a_context(void)
 
 static void should_destroy_a_context(void)
 {
-    t_render_context *context = render_context_create();
+    t_render_context *context = render_context_create(NULL);
 
     render_context_destroy(&context);
 
@@ -47,7 +47,7 @@ static void should_not_fail_set_a_directory_header_when_passed_a_null_context(vo
 
 static void should_not_fail_set_a_null_directory_header(void)
 {
-    t_render_context *valid = render_context_create();
+    t_render_context *valid = render_context_create(NULL);
 
     render_context_set_directory_header(valid, NULL);
 
@@ -56,7 +56,7 @@ static void should_not_fail_set_a_null_directory_header(void)
 
 static void should_not_print_anything_if_the_file_entry_array_is_null(void)
 {
-    t_render_context *context = render_context_create();
+    t_render_context *context = render_context_create(NULL);
 
     render(NULL, context);
 
@@ -84,7 +84,7 @@ static void should_print_the_name_of_the_entry_with_a_file_entry_array_of_one_el
     t_file_entry_array *file_entry_array = file_entry_array_create();
     t_file_entry *file_entry = file_entry_create(expected_file_name);
     file_entry_array_push(file_entry_array, file_entry);
-    t_render_context *context = render_context_create();
+    t_render_context *context = render_context_create(NULL);
 
     render(file_entry_array, context);
 
@@ -96,7 +96,7 @@ static void should_print_the_name_of_the_entry_with_a_file_entry_array_of_one_el
 
 static void should_print_the_name_of_every_entry_with_a_file_entry_array_of_various_elements_separated_by_new_lines(void)
 {
-    t_render_context *context = render_context_create();
+    t_render_context *context = render_context_create(NULL);
     const char *expected_file_name[] = { "file", "file2", "file3", "file4", "file5" };
     t_file_entry_array *file_entry_array = file_entry_array_create();
     file_entry_array_push(file_entry_array, file_entry_create(expected_file_name[0]));
@@ -123,7 +123,7 @@ static void should_print_the_name_of_every_entry_with_a_file_entry_array_of_vari
 static void should_not_print_a_dir_header_if_a_NULL_header_is_specified_in_the_context(void)
 {
     const char *expected_file_name[] = { "file", "file2", "file3" };
-    t_render_context *context = render_context_create();
+    t_render_context *context = render_context_create(NULL);
     render_context_set_directory_header(context, NULL);
     t_file_entry_array *file_entry_array = file_entry_array_create();
     file_entry_array_push(file_entry_array, file_entry_create(expected_file_name[0]));
@@ -146,7 +146,7 @@ static void should_not_print_a_dir_header_if_a_NULL_header_is_specified_in_the_c
 static void should_not_print_a_dir_header_if_an_empty_header_is_specified_in_the_context(void)
 {
     const char *expected_file_name[] = { "file", "file2", "file3" };
-    t_render_context *context = render_context_create();
+    t_render_context *context = render_context_create(NULL);
     render_context_set_directory_header(context, "");
     t_file_entry_array *file_entry_array = file_entry_array_create();
     file_entry_array_push(file_entry_array, file_entry_create(expected_file_name[0]));
@@ -170,7 +170,7 @@ static void should_not_print_a_leading_dir_header_newline_if_its_the_first_rende
 {
     const char *expected_file_name[] = { "file", "file2", "file3" };
     const char *dir_header = "dir";
-    t_render_context *context = render_context_create();
+    t_render_context *context = render_context_create(NULL);
     render_context_set_directory_header(context, dir_header);
     t_file_entry_array *file_entry_array = file_entry_array_create();
     file_entry_array_push(file_entry_array, file_entry_create(expected_file_name[0]));
@@ -195,7 +195,7 @@ static void should_print_a_leading_dir_header_newline_if_its_not_first_render(vo
 {
     const char *expected_file_name[] = { "file", "file2" };
     const char *dir_header = "dir";
-    t_render_context *context = render_context_create();
+    t_render_context *context = render_context_create(NULL);
     render_context_set_directory_header(context, dir_header);
     t_file_entry_array *file_entry_array = file_entry_array_create();
     file_entry_array_push(file_entry_array, file_entry_create(expected_file_name[0]));

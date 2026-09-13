@@ -16,8 +16,9 @@ static void print_directory_header(const t_render_context *context)
     ft_printf("%s:\n", context->directory_header);
 }
 
-t_render_context *render_context_create(void)
+t_render_context *render_context_create(const t_parsed_arguments *parsed_arguments)
 {
+    (void) parsed_arguments;
     t_render_context *config = ft_safe_calloc(1, sizeof(t_render_context));
 
     config->directory_header = NULL;

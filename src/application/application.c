@@ -61,7 +61,7 @@ int application_run(const t_parsed_arguments *parsed_arguments)
     if (parsed_arguments == NULL)
         return FT_LS_APPLICATION_MAJOR_ERROR;
 
-    t_render_context *render_context = render_context_create();
+    t_render_context *render_context = render_context_create(parsed_arguments);
 
     process_non_directory_file_operands(parsed_arguments, render_context);
     if (parsed_arguments_has_mixed_types_file_operands(parsed_arguments))
