@@ -6,6 +6,7 @@ struct s_render_context
 {
     char *directory_header;
     int is_first_directory_render;
+    int should_print_types_separator;
     int should_print_directory_header;
 };
 
@@ -35,6 +36,7 @@ t_render_context *render_context_create(const t_parsed_arguments *parsed_argumen
     config->directory_header = NULL;
     config->is_first_directory_render = 1;
     config->should_print_directory_header = check_if_should_print_directory_header(parsed_arguments);
+    config->should_print_types_separator = parsed_arguments_has_mixed_types_file_operands(parsed_arguments);
 
     return config;
 }
@@ -77,8 +79,10 @@ void render(const t_file_entry_array *file_entry_array, t_render_context *contex
     }
 }
 
-void render_types_separator(t_render_context *context)
+void render_types_separator(const t_render_context *context)
 {
-    (void) context;
+    if (!context->should_print_types_separator)
+        return ;
+
     ft_printf("\n");
 }
