@@ -44,8 +44,8 @@ QA LS-8 Execution without parameters (`ls -aU | cat`)
 1. Directorio vacío - NO ACCESIBLE (siempre hay '.' y '..')
 2. Un solo fichero - NO ACCESIBLE (siempre hay '.' y '..')
 3. Múltiples ficheros
-4. Ficheros con nombres raros se ven bien
-5. No memory leaks
+4. No memory leaks
+No probado en E2E: Directorio vacío, 1 fichero
 
 
 QA LS-11 Execution with parameters (`ls -aU file ... | cat`)
@@ -79,6 +79,7 @@ QA LS-15 Filter hidden files (`ls -U file ... | cat`)
    - Mezcla de lo anterior y comprobar dir headers
 4. Parámetros ocultos (ficheros y directorios | .env .idea/)
 5. No memory leaks
+No probado en E2E: Current dir vacío / solo hidden
 
 
 QA LS-14 Default sorting output (`ls file ... | cat`)
@@ -111,7 +112,7 @@ QA LS-13 Support for multiple types of files
 
 
 QA LS-12 Manage invalid operations
-1. Opendir + readdir + closedir. Note: los parámetros que fallan son solo directorios
+1. Opendir + readdir + closedir | Note: los parámetros que fallan son solo directorios
    - Sin fallos (sin parámetros, 1 parámetro de cada tipo, múltiples parámetros)
    - 1 Fallo:
        * Sin parámetros (current dir): No se puede abrir, falla leer a la primera o a la mitad, no se cierra
@@ -122,9 +123,8 @@ QA LS-12 Manage invalid operations
    - X Fallos:
        * 2 params, 2 fallos: Mezclar entre no poder abrirse, fallos de lectura, fallos al cerrar
        * X params, X fallos: Mezclar entre fallos y successes (X dirs, X non_dirs, N fallos)
-
-
-To test in stat:
-1. ls in a current directory without permissions:
-    - ls: cannot open directory '.': Permission denied
-    - ls: cannot access '..': Permission denied
+2. To test in stat:
+    1. Execute ls in a current directory without permissions:
+        - ls: cannot open directory '.': Permission denied
+        - ls: cannot access '..': Permission denied
+No probado en E2E: Readdir y closedir errores
