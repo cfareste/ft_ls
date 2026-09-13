@@ -6,7 +6,16 @@ struct s_render_context
 {
     char *directory_header;
     int is_first_directory_render;
+    int should_print_directory_header;
 };
+
+static int check_if_should_print_directory_header(const t_parsed_arguments *parsed_arguments)
+{
+    const int has_multiple_file_operands = parsed_arguments_has_multiple_file_operands(parsed_arguments);
+    const int has_directory_file_operands = parsed_arguments_has_directory_file_operands(parsed_arguments);
+
+    return has_multiple_file_operands && has_directory_file_operands;
+}
 
 static void print_directory_header(const t_render_context *context)
 {
@@ -25,6 +34,7 @@ t_render_context *render_context_create(const t_parsed_arguments *parsed_argumen
 
     config->directory_header = NULL;
     config->is_first_directory_render = 1;
+    config->should_print_directory_header = check_if_should_print_directory_header(parsed_arguments);
 
     return config;
 }
@@ -53,7 +63,7 @@ void render(const t_file_entry_array *file_entry_array, t_render_context *contex
     if (file_entry_array == NULL || context == NULL)
         return;
 
-    if (context->directory_header != NULL)
+    if (context->should_print_directory_header && context->directory_header != NULL)
     {
         print_directory_header(context);
         context->is_first_directory_render = 0;

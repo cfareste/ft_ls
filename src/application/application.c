@@ -5,14 +5,6 @@
 #include "libft.h"
 #include "scanner.h"
 
-static int check_if_should_print_directory_header(const t_parsed_arguments *parsed_arguments)
-{
-    const int has_multiple_file_operands = parsed_arguments_has_multiple_file_operands(parsed_arguments);
-    const int has_directory_file_operands = parsed_arguments_has_directory_file_operands(parsed_arguments);
-
-    return has_multiple_file_operands && has_directory_file_operands;
-}
-
 static void process_non_directory_file_operands(const t_parsed_arguments *parsed_arguments, t_render_context *render_context)
 {
     const char * const *non_directory_file_operands = parsed_arguments_get_non_directory_file_operands(parsed_arguments);
@@ -33,11 +25,9 @@ static int process_directory_file_operands(const t_parsed_arguments *parsed_argu
 {
     int error_code = FT_LS_APPLICATION_SUCCESS;
     const char * const *directory_file_operands = parsed_arguments_get_directory_file_operands(parsed_arguments);
-    const int should_print_directory_header = check_if_should_print_directory_header(parsed_arguments);
 
     for (unsigned int i = 0; directory_file_operands[i] != NULL; i++)
     {
-        const char *directory_header = should_print_directory_header ? directory_file_operands[i] : NULL;
         t_result *result = scan(directory_file_operands[i]);
         t_file_entry_array *file_entry_array = result_get_value(result);
 
@@ -46,7 +36,7 @@ static int process_directory_file_operands(const t_parsed_arguments *parsed_argu
 
         file_entry_array_sort(file_entry_array);
 
-        render_context_set_directory_header(render_context, directory_header);
+        render_context_set_directory_header(render_context, directory_file_operands[i]);
         render(file_entry_array, render_context);
 
         result_destroy(&result);
