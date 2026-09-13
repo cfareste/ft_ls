@@ -127,4 +127,4 @@ QA LS-12 Manage invalid operations
     1. Execute ls in a current directory without permissions:
         - ls: cannot open directory '.': Permission denied
         - ls: cannot access '..': Permission denied
-No probado en E2E: Readdir y closedir errores
+No probado en E2E: Readdir y closedir errores (y algunos errores de opendir como EMFILE o ENOMEM)

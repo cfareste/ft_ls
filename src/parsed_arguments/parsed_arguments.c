@@ -73,6 +73,12 @@ int parsed_arguments_has_directory_file_operands(const t_parsed_arguments *parse
     return parsed_arguments->directory_file_operands[0] != NULL;
 }
 
+int parsed_arguments_has_mixed_types_file_operands(const t_parsed_arguments *parsed_arguments)
+{
+    (void) parsed_arguments;
+    return 0;
+}
+
 void parsed_arguments_destroy(t_parsed_arguments **parsed_arguments)
 {
     if (parsed_arguments == NULL || *parsed_arguments == NULL)
