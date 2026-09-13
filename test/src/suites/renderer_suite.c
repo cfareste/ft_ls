@@ -237,17 +237,16 @@ static void should_not_print_a_dir_header_if_an_empty_header_is_specified_in_the
 static void should_not_print_a_leading_dir_header_newline_if_its_the_first_render(void)
 {
     const t_vfs_mock_entry vfs[] = {
-        MOCK_FILE("file"),
-        MOCK_FILE("file2"),
-        MOCK_FILE("file3"),
+        MOCK_DIR("dir", ".", ".."),
+        MOCK_DIR("dir2", ".", ".."),
         MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
 
     const char *expected_file_name[] = { "file", "file2", "file3" };
     const char *dir_header = "dir";
-    const char *args[] = { "file", "file2", "file3", NULL };
-    t_parsed_arguments *parsed_args = parse_arguments(3, args);
+    const char *args[] = { "dir", "dir2", NULL };
+    t_parsed_arguments *parsed_args = parse_arguments(2, args);
     t_render_context *context = render_context_create(parsed_args);
     render_context_set_directory_header(context, dir_header);
     t_file_entry_array *file_entry_array = file_entry_array_create();
@@ -273,15 +272,15 @@ static void should_not_print_a_leading_dir_header_newline_if_its_the_first_rende
 static void should_print_a_leading_dir_header_newline_if_its_not_first_render(void)
 {
     const t_vfs_mock_entry vfs[] = {
-        MOCK_FILE("file"),
-        MOCK_FILE("file2"),
+        MOCK_DIR("dir", ".", ".."),
+        MOCK_DIR("dir2", ".", ".."),
         MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
 
     const char *expected_file_name[] = { "file", "file2" };
     const char *dir_header = "dir";
-    const char *args[] = { "file", "file2", NULL };
+    const char *args[] = { "dir", "dir2", NULL };
     t_parsed_arguments *parsed_args = parse_arguments(2, args);
     t_render_context *context = render_context_create(parsed_args);
     render_context_set_directory_header(context, dir_header);
