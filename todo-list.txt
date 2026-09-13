@@ -10,6 +10,7 @@ TODO:
 9. Revisar requerimientos y apuntarlos más claramente (comportamiento local con 1 fallo, comportamiento global, errores faltantes...)
 11. Estado de error de scan (opendir + readdir + closedir) en caso de ser file operand
 12. Estado de error de scan (opendir + readdir + closedir) en caso de NO ser file operand
+13. Refactor para llamar a render_dir_header en la application en vez de que sea implícito (orden correcto para los errores de readdir)
 
 
 TODO En algún momento:
