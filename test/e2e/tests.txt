@@ -36,3 +36,4 @@ nopermdir/ .hiddir                                                              
 nopermdir/ src                                                                  ::       nopermdir/ src
 Makefile src .hidden .hiddir nopermdir                                          ::       Makefile src .hidden .hiddir nopermdir
 nopermdir/ nopermdir                                                            ::       nopermdir/ nopermdir
+src Makefile nopermdir/ .hiddir empty nopermdir .hidden2 dir_only_hidden        ::       src Makefile nopermdir/ .hiddir empty nopermdir .hidden2 dir_only_hidden
