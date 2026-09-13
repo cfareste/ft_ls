@@ -64,7 +64,7 @@ int application_run(const t_parsed_arguments *parsed_arguments)
     t_render_context *render_context = render_context_create();
 
     process_non_directory_file_operands(parsed_arguments, render_context);
-    if (parsed_arguments_get_non_directory_file_operands(parsed_arguments)[0] != NULL && parsed_arguments_get_directory_file_operands(parsed_arguments)[0] != NULL)
+    if (parsed_arguments_has_mixed_types_file_operands(parsed_arguments))
         ft_printf("\n");
     const int error_code = process_directory_file_operands(parsed_arguments, render_context);
 
