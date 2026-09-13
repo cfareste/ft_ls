@@ -5,12 +5,12 @@
 struct s_render_context
 {
     char *directory_header;
-    int is_first_render;
+    int is_first_directory_render;
 };
 
 static void print_directory_header(const t_render_context *context)
 {
-    if (!context->is_first_render)
+    if (!context->is_first_directory_render)
         ft_printf("\n");
 
     ft_printf("%s:\n", context->directory_header);
@@ -21,7 +21,7 @@ t_render_context *render_context_create(void)
     t_render_context *config = ft_safe_calloc(1, sizeof(t_render_context));
 
     config->directory_header = NULL;
-    config->is_first_render = 1;
+    config->is_first_directory_render = 1;
 
     return config;
 }
@@ -53,7 +53,7 @@ void render(const t_file_entry_array *file_entry_array, t_render_context *contex
     if (context->directory_header != NULL)
     {
         print_directory_header(context);
-        context->is_first_render = 0;
+        context->is_first_directory_render = 0;
     }
 
     const unsigned int count = file_entry_array_get_length(file_entry_array);
