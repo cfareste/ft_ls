@@ -309,6 +309,27 @@ static void should_print_a_leading_dir_header_newline_if_its_not_first_render(vo
     render_context_destroy(&context);
 }
 
+static void should_print_the_types_separator_if_has_at_least_one_non_dir_and_one_dir(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("dir", ".", ".."),
+        MOCK_FILE("file"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *args[] = { "dir", "file", NULL };
+    t_parsed_arguments *parsed_args = parse_arguments(2, args);
+    t_render_context *context = render_context_create(parsed_args);
+
+    render_types_separator(context);
+
+    CU_ASSERT(verify_that_the_output_printed_is("\n"));
+
+    parsed_arguments_destroy(&parsed_args);
+    render_context_destroy(&context);
+}
+
 /*static void should_print_the_name_of_every_entry_with_a_file_entry_array_of_various_elements_separated_by_two_spaces(void)
 {
     const char *expected_file_name[] = { "file", "file2", "file3", "file4", "file5" };
@@ -356,6 +377,7 @@ void register_renderer_suite(void)
         CU_add_test(suite, "should_not_print_a_dir_header_if_an_empty_header_is_specified_in_the_context", should_not_print_a_dir_header_if_an_empty_header_is_specified_in_the_context);
         CU_add_test(suite, "should_not_print_a_leading_dir_header_newline_if_its_the_first_render", should_not_print_a_leading_dir_header_newline_if_its_the_first_render);
         CU_add_test(suite, "should_print_a_leading_dir_header_newline_if_its_not_first_render", should_print_a_leading_dir_header_newline_if_its_not_first_render);
+        CU_add_test(suite, "should_print_the_types_separator_if_has_at_least_one_non_dir_and_one_dir", should_print_the_types_separator_if_has_at_least_one_non_dir_and_one_dir);
         // CU_add_test(suite, "should_print_the_name_of_every_entry_with_a_file_entry_array_of_various_elements_separated_by_two_spaces", should_print_the_name_of_every_entry_with_a_file_entry_array_of_various_elements_separated_by_two_spaces);
     }
 }

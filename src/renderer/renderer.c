@@ -76,3 +76,9 @@ void render(const t_file_entry_array *file_entry_array, t_render_context *contex
         ft_printf("%s\n", file_entry_get_name(file_entry));
     }
 }
+
+void render_types_separator(t_render_context *context)
+{
+    (void) context;
+    ft_printf("\n");
+}
