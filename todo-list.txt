@@ -1,7 +1,10 @@
 TODO:
 1. Implementar LS-12 Manage invalid operations
 2. Añadir valgrind a los tests E2E
-3. Mensaje de error de stat
+3. Error de stat
+   - Mensaje de error y devolver NULL file stats
+   - Manejarlo en parsed arguments (saltarse ese file operand)
+   - Código de error
 4. Estado de error de parsed args (stat) en caso de ser file operand
 5. Estado de error de parsed args (stat) en caso de NO ser file operand
 6. Tests parsed args y application stat
@@ -38,8 +41,8 @@ TODO QA:
 
 
 QA LS-8 Execution without parameters (`ls -aU | cat`)
-1. Directorio vacío - NO ACCESIBLE (siempre hay '.' y '..')
-2. Un solo fichero - NO ACCESIBLE (siempre hay '.' y '..')
+1. Directorio vacío - No aplicable (siempre hay '.' y '..')
+2. Un solo fichero - No aplicable (siempre hay '.' y '..')
 3. Múltiples ficheros
 4. No memory leaks
 No probado en E2E: Directorio vacío, 1 fichero
@@ -120,8 +123,17 @@ QA LS-12 Manage invalid operations
    - X Fallos:
        * 2 params, 2 fallos: Mezclar entre no poder abrirse, fallos de lectura, fallos al cerrar
        * X params, X fallos: Mezclar entre fallos y successes (X dirs, X non_dirs, N fallos)
-2. To test in stat:
-    1. Execute ls in a current directory without permissions:
-        - ls: cannot open directory '.': Permission denied
-        - ls: cannot access '..': Permission denied
-No probado en E2E: Readdir y closedir errores (y algunos errores de opendir como EMFILE o ENOMEM)
+2. Stat
+   - Sin fallos (sin parámetros, 1 parámetro de cada tipo, múltiples parámetros)
+   - 1 Fallo:
+       * Sin parámetros (current dir): Prácticamente irreproducible (solo ENOMEM o EFAULT, ambos no aplicables)
+       * 1 parámetro: Sin permisos, inexistente, no directorio, etc.
+       * Mezcla de parámetros:
+           · 2 params: Mezclar entre parámetro que falla y que no (fallo + no_dir, fallo + dir)
+           · X params: Mezclar entre parámetro que falla y los que no (X dirs, X non dirs, 1 fallo)
+   - X Fallos:
+       * 2 params, 2 fallos: Mezclar tipos de fallos
+       * X params, X fallos: Mezclar entre fallos y successes (X dirs, X non_dirs, N fallos)
+No probado en E2E:
+   - Readdir y closedir errores
+   - Algunos errores de opendir y stat como EMFILE o ENOMEM
