@@ -65,16 +65,16 @@ void render(const t_file_entry_array *file_entry_array, const t_render_context *
     }
 }
 
+void render_directory(t_render_context *context, const char *directory_header, const t_file_entry_array *file_entry_array)
+{
+    render_directory_header(context, directory_header);
+    render(file_entry_array, context);
+}
+
 void render_types_separator(const t_render_context *context)
 {
     if (context == NULL || !context->should_print_types_separator)
         return ;
 
     ft_printf("\n");
-}
-
-void render_directory(t_render_context *context, const char *directory_header, const t_file_entry_array *file_entry_array)
-{
-    render_directory_header(context, directory_header);
-    render(file_entry_array, context);
 }
