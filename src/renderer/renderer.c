@@ -89,3 +89,10 @@ void render_directory_header(t_render_context *context)
     print_directory_header(context);
     context->is_first_directory_render = 0;
 }
+
+void render_directory(t_render_context *context, const char *directory_header, const t_file_entry_array *file_entry_array)
+{
+    render_context_set_directory_header(context, directory_header);
+    render_directory_header(context);
+    render(file_entry_array, context);
+}
