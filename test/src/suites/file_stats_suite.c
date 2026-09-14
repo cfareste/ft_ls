@@ -7,6 +7,7 @@
 
 static void test_setup(void)
 {
+    reset_printing_buffer();
     vfs_mock_reset();
 }
 
