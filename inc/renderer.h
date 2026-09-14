@@ -10,3 +10,4 @@ void render_context_set_directory_header(t_render_context *context, const char *
 void render_context_destroy(t_render_context **context);
 void render(const t_file_entry_array *file_entry_array, t_render_context *context);
 void render_types_separator(const t_render_context *context);
+void render_directory_header(const t_render_context *context);
