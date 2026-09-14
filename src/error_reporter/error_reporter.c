@@ -8,6 +8,7 @@
 #define OPENING_DIRECTORY_ERROR "cannot open directory"
 #define READING_DIRECTORY_ERROR "reading directory"
 #define CLOSING_DIRECTORY_ERROR "closing directory"
+#define ACCESSING_FILE_ERROR "cannot access"
 
 static void report_error(const char *error_message, const char *file_path)
 {
@@ -32,4 +33,9 @@ void report_reading_directory_error(const char *directory_path)
 void report_closing_directory_error(const char *directory_path)
 {
     report_error(CLOSING_DIRECTORY_ERROR, directory_path);
+}
+
+void report_access_file_error(const char *file_path)
+{
+    report_error(ACCESSING_FILE_ERROR, file_path);
 }

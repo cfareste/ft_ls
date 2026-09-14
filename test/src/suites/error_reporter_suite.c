@@ -7,6 +7,7 @@
 #define OPEN_DIRECTORY_ERROR_PREFIX "ft_ls: cannot open directory"
 #define READ_DIRECTORY_ERROR_PREFIX "ft_ls: reading directory"
 #define CLOSE_DIRECTORY_ERROR_PREFIX "ft_ls: closing directory"
+#define ACCESS_FILE_ERROR_PREFIX "ft_ls: cannot access"
 
 static void test_setup(void)
 {
@@ -98,6 +99,15 @@ static void should_print_the_close_directory_error_with_the_specified_directory_
     CU_ASSERT(verify_that_the_error_printed_is("%s '%s': %s\n", CLOSE_DIRECTORY_ERROR_PREFIX, directory_path, strerror(errno)));
 }
 
+static void should_only_print_the_access_file_error_if_a_NULL_file_path_is_specified(void)
+{
+    errno = ENOTDIR;
+
+    report_access_file_error(NULL);
+
+    CU_ASSERT(verify_that_the_error_printed_is("%s: %s\n", ACCESS_FILE_ERROR_PREFIX, strerror(errno)));
+}
+
 void register_error_reporter_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, NULL);
@@ -113,5 +123,6 @@ void register_error_reporter_suite(void)
         CU_add_test(suite, "should_only_print_the_close_directory_error_if_a_NULL_directory_path_is_specified", should_only_print_the_close_directory_error_if_a_NULL_directory_path_is_specified);
         CU_add_test(suite, "should_only_print_the_close_directory_error_if_an_empty_directory_path_is_specified", should_only_print_the_close_directory_error_if_an_empty_directory_path_is_specified);
         CU_add_test(suite, "should_print_the_close_directory_error_with_the_specified_directory_path", should_print_the_close_directory_error_with_the_specified_directory_path);
+        CU_add_test(suite, "should_only_print_the_access_file_error_if_a_NULL_file_path_is_specified", should_only_print_the_access_file_error_if_a_NULL_file_path_is_specified);
     }
 }
