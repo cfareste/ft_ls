@@ -2,7 +2,6 @@
 #include "CUnit/Basic.h"
 #include "mocks.h"
 #include "application.h"
-#include "error_codes.h"
 
 #define SUITE_NAME "application"
 

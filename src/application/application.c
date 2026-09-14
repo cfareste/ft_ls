@@ -1,7 +1,6 @@
 #include <stddef.h>
 #include "application.h"
 #include "renderer.h"
-#include "error_codes.h"
 #include "scanner.h"
 
 static t_file_entry_array *create_non_directory_entry_array(const char *non_directory_file_operand)
