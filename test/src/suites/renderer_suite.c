@@ -309,6 +309,13 @@ static void should_print_a_leading_dir_header_newline_if_its_not_first_render(vo
     render_context_destroy(&context);
 }
 
+static void should_not_print_the_types_separator_if_NULL_context_is_passed(void)
+{
+    render_types_separator(NULL);
+
+    CU_ASSERT(verify_that_no_output_was_printed());
+}
+
 static void should_print_the_types_separator_if_has_at_least_one_non_dir_and_one_dir(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -398,6 +405,7 @@ void register_renderer_suite(void)
         CU_add_test(suite, "should_not_print_a_dir_header_if_an_empty_header_is_specified_in_the_context", should_not_print_a_dir_header_if_an_empty_header_is_specified_in_the_context);
         CU_add_test(suite, "should_not_print_a_leading_dir_header_newline_if_its_the_first_render", should_not_print_a_leading_dir_header_newline_if_its_the_first_render);
         CU_add_test(suite, "should_print_a_leading_dir_header_newline_if_its_not_first_render", should_print_a_leading_dir_header_newline_if_its_not_first_render);
+        CU_add_test(suite, "should_not_print_the_types_separator_if_NULL_context_is_passed", should_not_print_the_types_separator_if_NULL_context_is_passed);
         CU_add_test(suite, "should_print_the_types_separator_if_has_at_least_one_non_dir_and_one_dir", should_print_the_types_separator_if_has_at_least_one_non_dir_and_one_dir);
         CU_add_test(suite, "should_not_print_the_types_separator_if_doesnt_have_at_least_one_non_dir_and_one_dir", should_not_print_the_types_separator_if_doesnt_have_at_least_one_non_dir_and_one_dir);
         // CU_add_test(suite, "should_print_the_name_of_every_entry_with_a_file_entry_array_of_various_elements_separated_by_two_spaces", should_print_the_name_of_every_entry_with_a_file_entry_array_of_various_elements_separated_by_two_spaces);

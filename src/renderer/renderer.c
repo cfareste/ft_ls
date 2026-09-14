@@ -81,7 +81,7 @@ void render(const t_file_entry_array *file_entry_array, t_render_context *contex
 
 void render_types_separator(const t_render_context *context)
 {
-    if (!context->should_print_types_separator)
+    if (context == NULL || !context->should_print_types_separator)
         return ;
 
     ft_printf("\n");
