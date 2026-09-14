@@ -21,6 +21,7 @@ static void should_create_file_stats_correctly(void)
     t_file_stats *stats = file_stats_get("valid_file");
 
     CU_ASSERT_PTR_NOT_NULL(stats);
+    CU_ASSERT(verify_that_no_error_was_printed());
 
     file_stats_destroy(&stats);
 }
@@ -30,6 +31,7 @@ static void should_return_NULL_when_creating_file_stats_with_a_NULL_path(void)
     const t_file_stats *stats = file_stats_get(NULL);
 
     CU_ASSERT_PTR_NULL(stats);
+    CU_ASSERT(verify_that_no_error_was_printed());
 }
 
 static void should_return_NULL_when_creating_file_stats_with_an_empty_path(void)
@@ -37,6 +39,7 @@ static void should_return_NULL_when_creating_file_stats_with_an_empty_path(void)
     const t_file_stats *stats = file_stats_get("");
 
     CU_ASSERT_PTR_NULL(stats);
+    CU_ASSERT(verify_that_no_error_was_printed());
 }
 
 static void should_destroy_file_stats_correctly(void)
@@ -52,11 +55,14 @@ static void should_destroy_file_stats_correctly(void)
     file_stats_destroy(&stats);
 
     CU_ASSERT_PTR_NULL(stats);
+    CU_ASSERT(verify_that_no_error_was_printed());
 }
 
 static void should_not_fail_to_destroy_file_stats_if_a_NULL_pointer_is_passed(void)
 {
     file_stats_destroy(NULL);
+
+    CU_ASSERT(verify_that_no_error_was_printed());
 }
 
 static void should_not_fail_to_destroy_file_stats_if_a_NULL_file_stats_is_passed(void)
@@ -64,6 +70,8 @@ static void should_not_fail_to_destroy_file_stats_if_a_NULL_file_stats_is_passed
     t_file_stats *invalid_stats = NULL;
 
     file_stats_destroy(&invalid_stats);
+
+    CU_ASSERT(verify_that_no_error_was_printed());
 }
 
 static void should_return_unknown_file_type_when_a_NULL_file_stats_are_specified(void)
@@ -71,6 +79,7 @@ static void should_return_unknown_file_type_when_a_NULL_file_stats_are_specified
     const t_file_type invalid = file_stats_get_file_type(NULL);
 
     CU_ASSERT_EQUAL(invalid, FILE_TYPE_UNKNOWN);
+    CU_ASSERT(verify_that_no_error_was_printed());
 }
 
 static void should_return_the_file_type_of_the_specified_file_stats(void)
@@ -102,6 +111,7 @@ static void should_return_the_file_type_of_the_specified_file_stats(void)
     CU_ASSERT_EQUAL(file_stats_get_file_type(fifo_stats), FILE_TYPE_FIFO);
     CU_ASSERT_EQUAL(file_stats_get_file_type(symlink_stats), FILE_TYPE_DIRECTORY);
     CU_ASSERT_EQUAL(file_stats_get_file_type(socket_stats), FILE_TYPE_SOCKET);
+    CU_ASSERT(verify_that_no_error_was_printed());
 
     file_stats_destroy(&reg_file_stats);
     file_stats_destroy(&dir_stats);
