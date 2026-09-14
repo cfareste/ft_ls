@@ -1,13 +1,12 @@
 TODO:
 1. Implementar LS-12 Manage invalid operations
-2. Que pasa si hago close / read de un DIR * NULL (en principio está protegido). No creo que sea necesario meter test
-3. Añadir valgrind a los tests E2E
-4. Mensaje de error de stat
-5. Estado de error de parsed args (stat) en caso de ser file operand
-6. Estado de error de parsed args (stat) en caso de NO ser file operand
-7. Tests parsed args y application stat
-8. Mirar posibles refactors que me haya dejado (list_changed_files_in_branch)
-9. Revisar requerimientos y apuntarlos más claramente (comportamiento local con 1 fallo, comportamiento global, errores faltantes...)
+2. Añadir valgrind a los tests E2E
+3. Mensaje de error de stat
+4. Estado de error de parsed args (stat) en caso de ser file operand
+5. Estado de error de parsed args (stat) en caso de NO ser file operand
+6. Tests parsed args y application stat
+7. Mirar posibles refactors que me haya dejado (list_changed_files_in_branch)
+8. Revisar requerimientos y apuntarlos más claramente (comportamiento local con 1 fallo, comportamiento global, errores faltantes...)
 
 
 TODO En algún momento:
