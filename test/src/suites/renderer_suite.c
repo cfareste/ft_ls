@@ -152,6 +152,17 @@ static void should_print_the_name_of_every_entry_with_a_file_entry_array_of_vari
     render_context_destroy(&context);
 }
 
+static void should_not_render_a_directory_if_a_NULL_context_is_provided(void)
+{
+    t_file_entry_array *file_entry_array = file_entry_array_create();
+
+    render_directory(NULL, "valid", file_entry_array);
+
+    CU_ASSERT(verify_that_no_output_was_printed());
+
+    file_entry_array_destroy(&file_entry_array);
+}
+
 static void should_not_print_a_leading_dir_header_newline_if_its_the_first_render(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -315,6 +326,7 @@ void register_renderer_suite(void)
         CU_add_test(suite, "should_not_print_anything_if_the_context_is_null", should_not_print_anything_if_the_context_is_null);
         CU_add_test(suite, "should_print_the_name_of_the_entry_with_a_file_entry_array_of_one_element", should_print_the_name_of_the_entry_with_a_file_entry_array_of_one_element);
         CU_add_test(suite, "should_print_the_name_of_every_entry_with_a_file_entry_array_of_various_elements_separated_by_new_lines", should_print_the_name_of_every_entry_with_a_file_entry_array_of_various_elements_separated_by_new_lines);
+        CU_add_test(suite, "should_not_render_a_directory_if_a_NULL_context_is_provided", should_not_render_a_directory_if_a_NULL_context_is_provided);
         CU_add_test(suite, "should_not_print_a_leading_dir_header_newline_if_its_the_first_render", should_not_print_a_leading_dir_header_newline_if_its_the_first_render);
         CU_add_test(suite, "should_print_a_leading_dir_header_newline_if_its_not_first_render", should_print_a_leading_dir_header_newline_if_its_not_first_render);
         CU_add_test(suite, "should_not_print_the_types_separator_if_NULL_context_is_passed", should_not_print_the_types_separator_if_NULL_context_is_passed);

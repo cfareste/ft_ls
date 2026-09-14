@@ -19,7 +19,7 @@ static int check_if_should_print_directory_header(const t_parsed_arguments *pars
 
 static void render_directory_header(t_render_context *context, const char *directory_header)
 {
-    if (context == NULL || !context->should_print_directory_header)
+    if (!context->should_print_directory_header)
         return ;
 
     if (!context->is_first_directory_render)
@@ -67,6 +67,9 @@ void render(const t_file_entry_array *file_entry_array, const t_render_context *
 
 void render_directory(t_render_context *context, const char *directory_header, const t_file_entry_array *file_entry_array)
 {
+    if (context == NULL)
+        return ;
+
     render_directory_header(context, directory_header);
     render(file_entry_array, context);
 }
