@@ -165,7 +165,16 @@ static void should_not_render_a_directory_if_a_NULL_context_is_provided(void)
 
 static void should_not_render_a_directory_if_a_NULL_directory_header_is_provided(void)
 {
-    t_render_context *context = render_context_create(parsed_arguments);
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("dir", ".", ".."),
+        MOCK_DIR("dir2", ".", ".."),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *args[] = { "dir", "dir2", NULL };
+    t_parsed_arguments *parsed_args = parse_arguments(2, args);
+    t_render_context *context = render_context_create(parsed_args);
     t_file_entry_array *file_entry_array = file_entry_array_create();
     file_entry_array_push(file_entry_array, file_entry_create("file"));
 
@@ -174,12 +183,22 @@ static void should_not_render_a_directory_if_a_NULL_directory_header_is_provided
     CU_ASSERT(verify_that_no_output_was_printed());
 
     file_entry_array_destroy(&file_entry_array);
+    parsed_arguments_destroy(&parsed_args);
     render_context_destroy(&context);
 }
 
 static void should_not_render_a_directory_if_an_empty_directory_header_is_provided(void)
 {
-    t_render_context *context = render_context_create(parsed_arguments);
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("dir", ".", ".."),
+        MOCK_DIR("dir2", ".", ".."),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *args[] = { "dir", "dir2", NULL };
+    t_parsed_arguments *parsed_args = parse_arguments(2, args);
+    t_render_context *context = render_context_create(parsed_args);
     t_file_entry_array *file_entry_array = file_entry_array_create();
     file_entry_array_push(file_entry_array, file_entry_create("file"));
 
@@ -188,6 +207,7 @@ static void should_not_render_a_directory_if_an_empty_directory_header_is_provid
     CU_ASSERT(verify_that_no_output_was_printed());
 
     file_entry_array_destroy(&file_entry_array);
+    parsed_arguments_destroy(&parsed_args);
     render_context_destroy(&context);
 }
 
