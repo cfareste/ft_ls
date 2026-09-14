@@ -35,8 +35,12 @@ static int process_directory_file_operands(const t_parsed_arguments *parsed_argu
 
         file_entry_array_sort(file_entry_array);
 
-        render_context_set_directory_header(render_context, directory_file_operands[i]);
-        render(file_entry_array, render_context);
+        if (file_entry_array != NULL)
+        {
+            render_context_set_directory_header(render_context, directory_file_operands[i]);
+            render_directory_header(render_context);
+            render(file_entry_array, render_context);
+        }
 
         result_destroy(&result);
         file_entry_array_destroy(&file_entry_array);

@@ -65,12 +65,6 @@ void render(const t_file_entry_array *file_entry_array, t_render_context *contex
     if (file_entry_array == NULL || context == NULL)
         return;
 
-    if (context->should_print_directory_header && context->directory_header != NULL)
-    {
-        print_directory_header(context);
-        context->is_first_directory_render = 0;
-    }
-
     const unsigned int count = file_entry_array_get_length(file_entry_array);
     for (unsigned int i = 0; i < count; i++)
     {
@@ -87,7 +81,11 @@ void render_types_separator(const t_render_context *context)
     ft_printf("\n");
 }
 
-void render_directory_header(const t_render_context *context)
+void render_directory_header(t_render_context *context)
 {
-    (void) context;
+    if (context != NULL && context->should_print_directory_header && context->directory_header != NULL)
+    {
+        print_directory_header(context);
+        context->is_first_directory_render = 0;
+    }
 }

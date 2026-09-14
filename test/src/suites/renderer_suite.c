@@ -239,6 +239,7 @@ static void should_not_print_a_leading_dir_header_newline_if_its_the_first_rende
     file_entry_array_push(file_entry_array, file_entry_create(expected_file_name[1]));
     file_entry_array_push(file_entry_array, file_entry_create(expected_file_name[2]));
 
+    render_directory_header(context);
     render(file_entry_array, context);
 
     CU_ASSERT(verify_that_the_output_printed_is(
@@ -273,7 +274,9 @@ static void should_print_a_leading_dir_header_newline_if_its_not_first_render(vo
     file_entry_array_push(file_entry_array, file_entry_create(expected_file_name[0]));
     file_entry_array_push(file_entry_array, file_entry_create(expected_file_name[1]));
 
+    render_directory_header(context);
     render(file_entry_array, context);
+    render_directory_header(context);
     render(file_entry_array, context);
 
     CU_ASSERT(verify_that_the_output_printed_is(
