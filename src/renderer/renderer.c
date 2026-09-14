@@ -4,7 +4,6 @@
 
 struct s_render_context
 {
-    char *directory_header;
     int is_first_directory_render;
     int should_print_types_separator;
     int should_print_directory_header;
@@ -33,7 +32,6 @@ t_render_context *render_context_create(const t_parsed_arguments *parsed_argumen
 
     t_render_context *context = ft_safe_calloc(1, sizeof(t_render_context));
 
-    context->directory_header = NULL;
     context->is_first_directory_render = 1;
     context->should_print_directory_header = check_if_should_print_directory_header(parsed_arguments);
     context->should_print_types_separator = parsed_arguments_has_mixed_types_file_operands(parsed_arguments);
@@ -46,7 +44,6 @@ void render_context_destroy(t_render_context **context)
     if (context == NULL || *context == NULL)
         return ;
 
-    free((*context)->directory_header);
     free(*context);
     *context = NULL;
 }
