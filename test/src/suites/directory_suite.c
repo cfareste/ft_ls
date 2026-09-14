@@ -290,7 +290,8 @@ static void should_return_NULL_when_an_error_opening_a_directory_occurs(void)
         "ft_ls: cannot open directory '%s': No such file or directory\n"
         "ft_ls: cannot open directory '%s': Not a directory\n"
         "ft_ls: cannot open directory '%s': Cannot allocate memory\n",
-        "noPerm", "processFD", "nameTooLong", "systemFD", "dirDoesntExist", "notADirectory", "noMemory"));
+        "noPerm", "processFD", "nameTooLong", "systemFD", "dirDoesntExist", "notADirectory", "noMemory"
+    ));
     assert_dir_stream_is_null();
 }
 
@@ -308,7 +309,8 @@ static void should_return_NULL_when_an_error_reading_a_directory_occurs(void)
 
     CU_ASSERT(verify_that_the_error_printed_is(
         "ft_ls: reading directory '%s': Bad file descriptor\n",
-        "failingDir"));
+        "failingDir"
+    ));
     CU_ASSERT_PTR_NULL(dir_entry);
 }
 
@@ -326,7 +328,8 @@ static void should_return_negative_value_when_an_error_closing_a_directory_occur
 
     CU_ASSERT(verify_that_the_error_printed_is(
         "ft_ls: closing directory '%s': Bad file descriptor\n",
-        "failingDir"));
+        "failingDir"
+    ));
     CU_ASSERT_EQUAL(result, -1);
 }
 
