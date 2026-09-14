@@ -2,6 +2,7 @@
 #include <sys/stat.h>
 #include "libft.h"
 #include "file_stats.h"
+#include "error_reporter.h"
 
 struct s_file_stats
 {
@@ -36,7 +37,12 @@ t_file_stats *file_stats_get(const char *file_path)
         return NULL;
 
     struct stat stats;
-    stat(file_path, &stats);
+    if (stat(file_path, &stats) == -1)
+    {
+        report_access_file_error(file_path);
+        return NULL;
+    }
+
     t_file_stats *file_stats = ft_safe_calloc(1, sizeof(t_file_stats));
     file_stats->type = get_file_type(stats.st_mode);
 
