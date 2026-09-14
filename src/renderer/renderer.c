@@ -17,12 +17,16 @@ static int check_if_should_print_directory_header(const t_parsed_arguments *pars
     return has_multiple_file_operands && has_directory_file_operands;
 }
 
-static void print_directory_header(const t_render_context *context, const char *directory_header)
+static void render_directory_header(t_render_context *context, const char *directory_header)
 {
+    if (context == NULL || !context->should_print_directory_header)
+        return ;
+
     if (!context->is_first_directory_render)
         ft_printf("\n");
-
     ft_printf("%s:\n", directory_header);
+
+    context->is_first_directory_render = 0;
 }
 
 t_render_context *render_context_create(const t_parsed_arguments *parsed_arguments)
@@ -67,15 +71,6 @@ void render_types_separator(const t_render_context *context)
         return ;
 
     ft_printf("\n");
-}
-
-static void render_directory_header(t_render_context *context, const char *directory_header)
-{
-    if (context == NULL || !context->should_print_directory_header || directory_header == NULL)
-        return ;
-
-    print_directory_header(context, directory_header);
-    context->is_first_directory_render = 0;
 }
 
 void render_directory(t_render_context *context, const char *directory_header, const t_file_entry_array *file_entry_array)
