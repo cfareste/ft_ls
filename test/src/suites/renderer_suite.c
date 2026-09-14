@@ -177,6 +177,20 @@ static void should_not_render_a_directory_if_a_NULL_directory_header_is_provided
     render_context_destroy(&context);
 }
 
+static void should_not_render_a_directory_if_an_empty_directory_header_is_provided(void)
+{
+    t_render_context *context = render_context_create(parsed_arguments);
+    t_file_entry_array *file_entry_array = file_entry_array_create();
+    file_entry_array_push(file_entry_array, file_entry_create("file"));
+
+    render_directory(context, "", file_entry_array);
+
+    CU_ASSERT(verify_that_no_output_was_printed());
+
+    file_entry_array_destroy(&file_entry_array);
+    render_context_destroy(&context);
+}
+
 static void should_not_print_a_leading_dir_header_newline_if_its_the_first_render(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -342,6 +356,7 @@ void register_renderer_suite(void)
         CU_add_test(suite, "should_print_the_name_of_every_entry_with_a_file_entry_array_of_various_elements_separated_by_new_lines", should_print_the_name_of_every_entry_with_a_file_entry_array_of_various_elements_separated_by_new_lines);
         CU_add_test(suite, "should_not_render_a_directory_if_a_NULL_context_is_provided", should_not_render_a_directory_if_a_NULL_context_is_provided);
         CU_add_test(suite, "should_not_render_a_directory_if_a_NULL_directory_header_is_provided", should_not_render_a_directory_if_a_NULL_directory_header_is_provided);
+        CU_add_test(suite, "should_not_render_a_directory_if_an_empty_directory_header_is_provided", should_not_render_a_directory_if_an_empty_directory_header_is_provided);
         CU_add_test(suite, "should_not_print_a_leading_dir_header_newline_if_its_the_first_render", should_not_print_a_leading_dir_header_newline_if_its_the_first_render);
         CU_add_test(suite, "should_print_a_leading_dir_header_newline_if_its_not_first_render", should_print_a_leading_dir_header_newline_if_its_not_first_render);
         CU_add_test(suite, "should_not_print_the_types_separator_if_NULL_context_is_passed", should_not_print_the_types_separator_if_NULL_context_is_passed);
