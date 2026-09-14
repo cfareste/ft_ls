@@ -41,15 +41,6 @@ t_render_context *render_context_create(const t_parsed_arguments *parsed_argumen
     return context;
 }
 
-void render_context_set_directory_header(t_render_context *context, const char *directory_header)
-{
-    if (context == NULL || !ft_is_valid_path(directory_header))
-        return;
-
-    free(context->directory_header);
-    context->directory_header = ft_safe_strdup(directory_header);
-}
-
 void render_context_destroy(t_render_context **context)
 {
     if (context == NULL || *context == NULL)
@@ -60,7 +51,7 @@ void render_context_destroy(t_render_context **context)
     *context = NULL;
 }
 
-void render(const t_file_entry_array *file_entry_array, t_render_context *context)
+void render(const t_file_entry_array *file_entry_array, const t_render_context *context)
 {
     if (file_entry_array == NULL || context == NULL)
         return;
