@@ -232,6 +232,38 @@ static void should_not_render_a_directory_if_a_NULL_file_entry_array_is_provided
     parsed_arguments_destroy(&parsed_args);
 }
 
+static void should_not_render_a_dir_header_if_its_not_needed(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("dir", ".", ".."),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *expected_file_name[] = { "file", "file2", "file3" };
+    const char *dir_header = "dir";
+    const char *args[] = { "dir", NULL };
+    t_parsed_arguments *parsed_args = parse_arguments(2, args);
+    t_render_context *context = render_context_create(parsed_args);
+    t_file_entry_array *file_entry_array = file_entry_array_create();
+    file_entry_array_push(file_entry_array, file_entry_create(expected_file_name[0]));
+    file_entry_array_push(file_entry_array, file_entry_create(expected_file_name[1]));
+    file_entry_array_push(file_entry_array, file_entry_create(expected_file_name[2]));
+
+    render_directory(context, dir_header, file_entry_array);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "%s\n%s\n%s\n",
+        expected_file_name[0],
+        expected_file_name[1],
+        expected_file_name[2]
+    ));
+
+    file_entry_array_destroy(&file_entry_array);
+    parsed_arguments_destroy(&parsed_args);
+    render_context_destroy(&context);
+}
+
 static void should_not_render_a_leading_dir_header_newline_if_its_the_first_render(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -399,6 +431,7 @@ void register_renderer_suite(void)
         CU_add_test(suite, "should_not_render_a_directory_if_a_NULL_directory_header_is_provided", should_not_render_a_directory_if_a_NULL_directory_header_is_provided);
         CU_add_test(suite, "should_not_render_a_directory_if_an_empty_directory_header_is_provided", should_not_render_a_directory_if_an_empty_directory_header_is_provided);
         CU_add_test(suite, "should_not_render_a_directory_if_a_NULL_file_entry_array_is_provided", should_not_render_a_directory_if_a_NULL_file_entry_array_is_provided);
+        CU_add_test(suite, "should_not_render_a_dir_header_if_its_not_needed", should_not_render_a_dir_header_if_its_not_needed);
         CU_add_test(suite, "should_not_render_a_leading_dir_header_newline_if_its_the_first_render", should_not_render_a_leading_dir_header_newline_if_its_the_first_render);
         CU_add_test(suite, "should_render_a_leading_dir_header_newline_if_its_not_first_render", should_render_a_leading_dir_header_newline_if_its_not_first_render);
         CU_add_test(suite, "should_not_render_the_types_separator_if_NULL_context_is_passed", should_not_render_the_types_separator_if_NULL_context_is_passed);
