@@ -2,7 +2,6 @@ TODO:
 1. Implementar LS-12 Manage invalid operations
 2. Añadir valgrind a los tests E2E
 3. Error de stat
-   - Mensaje de error y devolver NULL file stats
    - Manejarlo en parsed arguments (saltarse ese file operand)
    - Código de error
 4. Estado de error de parsed args (stat) en caso de ser file operand
@@ -15,8 +14,6 @@ TODO:
 TODO En algún momento:
 - Investigar si los tests están acoplados a la implementación interna de las cosas
 - Refactor renderer, donde render llama a render_strategy o lo que sea basado en options
-- Reflexionar si meter el should print header en render pasando parsed arguments. Si al hacer las options se necesita
-  pasar parsed arguments al render, entonces calcularlo ahi
 - Para manejar errores de cualquier tipo, mirar la conversación de: https://chatgpt.com/c/6a711028-5c44-83eb-a7a4-e50ff2877990
 
 

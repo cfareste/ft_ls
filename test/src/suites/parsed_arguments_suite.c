@@ -9,6 +9,7 @@ static t_parsed_arguments *sut;
 
 static void test_setup(void)
 {
+    reset_printing_buffer();
     vfs_mock_reset();
 }
 
@@ -30,6 +31,7 @@ static void should_be_created_correctly(void)
     sut = parse_arguments(0, valid_args);
 
     CU_ASSERT_PTR_NOT_NULL(sut);
+    CU_ASSERT(verify_that_no_error_was_printed());
 }
 
 static void should_be_destroyed_correctly(void)
@@ -46,11 +48,14 @@ static void should_be_destroyed_correctly(void)
     parsed_arguments_destroy(&sut);
 
     CU_ASSERT_PTR_NULL(sut);
+    CU_ASSERT(verify_that_no_error_was_printed());
 }
 
 static void should_not_fail_to_destroy_when_a_null_pointer_is_passed(void)
 {
     parsed_arguments_destroy(NULL);
+
+    CU_ASSERT(verify_that_no_error_was_printed());
 }
 
 static void should_not_fail_to_destroy_if_its_already_null(void)
@@ -58,6 +63,8 @@ static void should_not_fail_to_destroy_if_its_already_null(void)
     t_parsed_arguments *invalid = NULL;
 
     parsed_arguments_destroy(&invalid);
+
+    CU_ASSERT(verify_that_no_error_was_printed());
 }
 
 static void should_return_NULL_if_num_of_arguments_is_negative(void)
@@ -66,6 +73,7 @@ static void should_return_NULL_if_num_of_arguments_is_negative(void)
     t_parsed_arguments *parsed_arguments = parse_arguments(-1, args);
 
     CU_ASSERT_PTR_NULL(parsed_arguments);
+    CU_ASSERT(verify_that_no_error_was_printed());
 
     parsed_arguments_destroy(&parsed_arguments);
 }
@@ -75,6 +83,7 @@ static void should_return_NULL_if_arguments_are_NULL(void)
     t_parsed_arguments *parsed_arguments = parse_arguments(1, NULL);
 
     CU_ASSERT_PTR_NULL(parsed_arguments);
+    CU_ASSERT(verify_that_no_error_was_printed());
 
     parsed_arguments_destroy(&parsed_arguments);
 }
@@ -94,6 +103,7 @@ static void should_return_default_values_if_arguments_are_NULL(void)
 
     CU_ASSERT_PTR_NOT_NULL(parsed_arguments);
     CU_ASSERT_STRING_EQUAL(file_operands[0], ".");
+    CU_ASSERT(verify_that_no_error_was_printed());
 
     parsed_arguments_destroy(&parsed_arguments);
 }
@@ -103,6 +113,7 @@ static void should_return_NULL_file_operands_if_NULL_parsed_arguments_are_passed
     const char * const *file_operands = parsed_arguments_get_file_operands(NULL);
 
     CU_ASSERT_PTR_NULL(file_operands);
+    CU_ASSERT(verify_that_no_error_was_printed());
 }
 
 static void should_return_the_file_operands(void)
@@ -124,6 +135,7 @@ static void should_return_the_file_operands(void)
     CU_ASSERT_STRING_EQUAL(file_operands[1], args[1]);
     CU_ASSERT_STRING_EQUAL(file_operands[2], args[2]);
     CU_ASSERT_PTR_NULL(file_operands[3]);
+    CU_ASSERT(verify_that_no_error_was_printed());
 
     parsed_arguments_destroy(&parsed_arguments);
 }
@@ -133,6 +145,7 @@ static void should_return_NULL_non_directory_file_operands_if_NULL_parsed_argume
     const char * const *non_directory_file_operands = parsed_arguments_get_non_directory_file_operands(NULL);
 
     CU_ASSERT_PTR_NULL(non_directory_file_operands);
+    CU_ASSERT(verify_that_no_error_was_printed());
 }
 
 static void should_return_the_non_directory_file_operands(void)
@@ -161,6 +174,7 @@ static void should_return_the_non_directory_file_operands(void)
     CU_ASSERT_STRING_EQUAL(non_directory_file_operands[4], args[4]);
     CU_ASSERT_STRING_EQUAL(non_directory_file_operands[5], args[6]);
     CU_ASSERT_PTR_NULL(non_directory_file_operands[6]);
+    CU_ASSERT(verify_that_no_error_was_printed());
 
     parsed_arguments_destroy(&parsed_arguments);
 }
@@ -170,6 +184,7 @@ static void should_return_NULL_directory_file_operands_if_NULL_parsed_arguments_
     const char * const *directory_file_operands = parsed_arguments_get_directory_file_operands(NULL);
 
     CU_ASSERT_PTR_NULL(directory_file_operands);
+    CU_ASSERT(verify_that_no_error_was_printed());
 }
 
 static void should_return_the_directory_file_operands(void)
@@ -195,6 +210,7 @@ static void should_return_the_directory_file_operands(void)
     CU_ASSERT_STRING_EQUAL(directory_file_operands[0], args[2]);
     CU_ASSERT_STRING_EQUAL(directory_file_operands[1], args[6]);
     CU_ASSERT_PTR_NULL(directory_file_operands[2]);
+    CU_ASSERT(verify_that_no_error_was_printed());
 
     parsed_arguments_destroy(&parsed_arguments);
 }
@@ -204,6 +220,7 @@ static void should_return_false_for_multiple_file_operands_if_NULL_parsed_argume
     const int has_multiple_file_operands = parsed_arguments_has_multiple_file_operands(NULL);
 
     CU_ASSERT_EQUAL(has_multiple_file_operands, 0);
+    CU_ASSERT(verify_that_no_error_was_printed());
 }
 
 static void should_return_false_for_multiple_file_operands_if_has_less_than_two(void)
@@ -220,6 +237,7 @@ static void should_return_false_for_multiple_file_operands_if_has_less_than_two(
     const int has_multiple_file_operands = parsed_arguments_has_multiple_file_operands(parsed_arguments);
 
     CU_ASSERT_EQUAL(has_multiple_file_operands, 0);
+    CU_ASSERT(verify_that_no_error_was_printed());
 
     parsed_arguments_destroy(&parsed_arguments);
 }
@@ -239,6 +257,7 @@ static void should_return_true_for_multiple_file_operands_if_has_equal_or_more_t
     const int has_multiple_file_operands = parsed_arguments_has_multiple_file_operands(parsed_arguments);
 
     CU_ASSERT_EQUAL(has_multiple_file_operands, 1);
+    CU_ASSERT(verify_that_no_error_was_printed());
 
     parsed_arguments_destroy(&parsed_arguments);
 }
@@ -248,6 +267,7 @@ static void should_return_false_for_has_directory_file_operands_if_NULL_parsed_a
     const int has_directory_file_operands = parsed_arguments_has_directory_file_operands(NULL);
 
     CU_ASSERT_EQUAL(has_directory_file_operands, 0);
+    CU_ASSERT(verify_that_no_error_was_printed());
 }
 
 static void should_return_false_for_has_directory_file_operands_if_it_does_not_have_any(void)
@@ -266,6 +286,7 @@ static void should_return_false_for_has_directory_file_operands_if_it_does_not_h
     const int has_directory_file_operands = parsed_arguments_has_directory_file_operands(parsed_arguments);
 
     CU_ASSERT_EQUAL(has_directory_file_operands, 0);
+    CU_ASSERT(verify_that_no_error_was_printed());
 
     parsed_arguments_destroy(&parsed_arguments);
 }
@@ -284,6 +305,7 @@ static void should_return_true_for_has_directory_file_operands_if_it_has_at_leas
     const int has_directory_file_operands = parsed_arguments_has_directory_file_operands(parsed_arguments);
 
     CU_ASSERT_EQUAL(has_directory_file_operands, 1);
+    CU_ASSERT(verify_that_no_error_was_printed());
 
     parsed_arguments_destroy(&parsed_arguments);
 }
@@ -291,6 +313,7 @@ static void should_return_true_for_has_directory_file_operands_if_it_has_at_leas
 static void should_return_false_for_has_mixed_types_file_operands_if_it_null_parsed_arguments_are_specified(void)
 {
     CU_ASSERT_EQUAL(parsed_arguments_has_mixed_types_file_operands(NULL), 0);
+    CU_ASSERT(verify_that_no_error_was_printed());
 }
 
 static void should_return_false_for_has_mixed_types_file_operands_if_it_does_not_have_at_least_one_non_dir_and_one_dir(void)
@@ -308,6 +331,7 @@ static void should_return_false_for_has_mixed_types_file_operands_if_it_does_not
     const int has_mixed_types_file_operands = parsed_arguments_has_mixed_types_file_operands(parsed_arguments);
 
     CU_ASSERT_EQUAL(has_mixed_types_file_operands, 0);
+    CU_ASSERT(verify_that_no_error_was_printed());
 
     parsed_arguments_destroy(&parsed_arguments);
 }
@@ -327,6 +351,7 @@ static void should_return_true_for_has_mixed_types_file_operands_if_it_does_have
     const int has_mixed_types_file_operands = parsed_arguments_has_mixed_types_file_operands(parsed_arguments);
 
     CU_ASSERT_EQUAL(has_mixed_types_file_operands, 1);
+    CU_ASSERT(verify_that_no_error_was_printed());
 
     parsed_arguments_destroy(&parsed_arguments);
 }
@@ -367,6 +392,7 @@ static void should_sort_the_non_directory_file_operands_by_ascii_by_default(void
     CU_ASSERT_STRING_EQUAL(non_directory_file_operands[4], args[0]);
     CU_ASSERT_STRING_EQUAL(non_directory_file_operands[5], args[5]);
     CU_ASSERT_PTR_NULL(non_directory_file_operands[6]);
+    CU_ASSERT(verify_that_no_error_was_printed());
 
     parsed_arguments_destroy(&parsed_arguments);
 }
@@ -404,6 +430,7 @@ static void should_sort_the_directory_file_operands_by_ascii_by_default(void)
     CU_ASSERT_STRING_EQUAL(directory_file_operands[1], args[2]);
     CU_ASSERT_STRING_EQUAL(directory_file_operands[2], args[6]);
     CU_ASSERT_PTR_NULL(directory_file_operands[3]);
+    CU_ASSERT(verify_that_no_error_was_printed());
 
     parsed_arguments_destroy(&parsed_arguments);
 }
