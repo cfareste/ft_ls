@@ -21,7 +21,7 @@ static void process_non_directory_file_operands(const t_parsed_arguments *parsed
     {
         t_file_entry_array *file_entry_array = create_non_directory_entry_array(non_directory_file_operands[i]);
 
-        render_entries(file_entry_array, render_context);
+        render_entries(render_context, file_entry_array);
 
         file_entry_array_destroy(&file_entry_array);
     }

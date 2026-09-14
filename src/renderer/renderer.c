@@ -52,7 +52,7 @@ void render_context_destroy(t_render_context **context)
     *context = NULL;
 }
 
-void render_entries(const t_file_entry_array *file_entry_array, const t_render_context *context)
+void render_entries(const t_render_context *context, const t_file_entry_array *file_entry_array)
 {
     if (file_entry_array == NULL || context == NULL)
         return;
@@ -71,7 +71,7 @@ void render_directory(t_render_context *context, const char *directory_header, c
         return ;
 
     render_directory_header(context, directory_header);
-    render_entries(file_entry_array, context);
+    render_entries(context, file_entry_array);
 }
 
 void render_types_separator(const t_render_context *context)

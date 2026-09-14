@@ -64,28 +64,28 @@ static void should_not_fail_to_destroy_a_context_when_an_already_null_context_is
     render_context_destroy(&invalid);
 }
 
-static void should_not_render_anything_if_the_file_entry_array_is_null(void)
-{
-    t_render_context *context = render_context_create(parsed_arguments);
-
-    render_entries(NULL, context);
-
-    CU_ASSERT(verify_that_no_output_was_printed());
-
-    render_context_destroy(&context);
-}
-
 static void should_not_render_anything_if_the_context_is_null(void)
 {
     t_file_entry_array *file_entry_array = file_entry_array_create();
     t_file_entry *file_entry = file_entry_create("valid");
     file_entry_array_push(file_entry_array, file_entry);
 
-    render_entries(file_entry_array, NULL);
+    render_entries(NULL, file_entry_array);
 
     CU_ASSERT(verify_that_no_output_was_printed());
 
     file_entry_array_destroy(&file_entry_array);
+}
+
+static void should_not_render_anything_if_the_file_entry_array_is_null(void)
+{
+    t_render_context *context = render_context_create(parsed_arguments);
+
+    render_entries(context, NULL);
+
+    CU_ASSERT(verify_that_no_output_was_printed());
+
+    render_context_destroy(&context);
 }
 
 static void should_render_the_name_of_the_entry_with_a_file_entry_array_of_one_element(void)
@@ -104,7 +104,7 @@ static void should_render_the_name_of_the_entry_with_a_file_entry_array_of_one_e
     file_entry_array_push(file_entry_array, file_entry);
     t_render_context *context = render_context_create(parsed_args);
 
-    render_entries(file_entry_array, context);
+    render_entries(context, file_entry_array);
 
     CU_ASSERT(verify_that_the_output_printed_is("%s\n", expected_file_name));
 
@@ -136,7 +136,7 @@ static void should_render_the_name_of_every_entry_with_a_file_entry_array_of_var
     file_entry_array_push(file_entry_array, file_entry_create(expected_file_name[3]));
     file_entry_array_push(file_entry_array, file_entry_create(expected_file_name[4]));
 
-    render_entries(file_entry_array, context);
+    render_entries(context, file_entry_array);
 
     CU_ASSERT(verify_that_the_output_printed_is(
         "%s\n%s\n%s\n%s\n%s\n",
@@ -391,8 +391,8 @@ void register_renderer_suite(void)
         CU_add_test(suite, "should_destroy_a_context", should_destroy_a_context);
         CU_add_test(suite, "should_not_fail_to_destroy_a_context_when_a_null_pointer_is_passed", should_not_fail_to_destroy_a_context_when_a_null_pointer_is_passed);
         CU_add_test(suite, "should_not_fail_to_destroy_a_context_when_an_already_null_context_is_passed", should_not_fail_to_destroy_a_context_when_an_already_null_context_is_passed);
-        CU_add_test(suite, "should_not_render_anything_if_the_file_entry_array_is_null", should_not_render_anything_if_the_file_entry_array_is_null);
         CU_add_test(suite, "should_not_render_anything_if_the_context_is_null", should_not_render_anything_if_the_context_is_null);
+        CU_add_test(suite, "should_not_render_anything_if_the_file_entry_array_is_null", should_not_render_anything_if_the_file_entry_array_is_null);
         CU_add_test(suite, "should_render_the_name_of_the_entry_with_a_file_entry_array_of_one_element", should_render_the_name_of_the_entry_with_a_file_entry_array_of_one_element);
         CU_add_test(suite, "should_render_the_name_of_every_entry_with_a_file_entry_array_of_various_elements_separated_by_new_lines", should_render_the_name_of_every_entry_with_a_file_entry_array_of_various_elements_separated_by_new_lines);
         CU_add_test(suite, "should_not_render_a_directory_if_a_NULL_context_is_provided", should_not_render_a_directory_if_a_NULL_context_is_provided);
