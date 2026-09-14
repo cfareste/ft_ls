@@ -83,9 +83,9 @@ void render_types_separator(const t_render_context *context)
 
 void render_directory_header(t_render_context *context)
 {
-    if (context != NULL && context->should_print_directory_header && context->directory_header != NULL)
-    {
-        print_directory_header(context);
-        context->is_first_directory_render = 0;
-    }
+    if (context == NULL || !context->should_print_directory_header || context->directory_header == NULL)
+        return ;
+
+    print_directory_header(context);
+    context->is_first_directory_render = 0;
 }
