@@ -64,7 +64,7 @@ static void should_not_fail_to_destroy_a_context_when_an_already_null_context_is
     render_context_destroy(&invalid);
 }
 
-static void should_not_print_anything_if_the_file_entry_array_is_null(void)
+static void should_not_render_anything_if_the_file_entry_array_is_null(void)
 {
     t_render_context *context = render_context_create(parsed_arguments);
 
@@ -75,7 +75,7 @@ static void should_not_print_anything_if_the_file_entry_array_is_null(void)
     render_context_destroy(&context);
 }
 
-static void should_not_print_anything_if_the_context_is_null(void)
+static void should_not_render_anything_if_the_context_is_null(void)
 {
     t_file_entry_array *file_entry_array = file_entry_array_create();
     t_file_entry *file_entry = file_entry_create("valid");
@@ -88,7 +88,7 @@ static void should_not_print_anything_if_the_context_is_null(void)
     file_entry_array_destroy(&file_entry_array);
 }
 
-static void should_print_the_name_of_the_entry_with_a_file_entry_array_of_one_element(void)
+static void should_render_the_name_of_the_entry_with_a_file_entry_array_of_one_element(void)
 {
     const t_vfs_mock_entry vfs[] = {
         MOCK_FILE("file"),
@@ -113,7 +113,7 @@ static void should_print_the_name_of_the_entry_with_a_file_entry_array_of_one_el
     render_context_destroy(&context);
 }
 
-static void should_print_the_name_of_every_entry_with_a_file_entry_array_of_various_elements_separated_by_new_lines(void)
+static void should_render_the_name_of_every_entry_with_a_file_entry_array_of_various_elements_separated_by_new_lines(void)
 {
     const t_vfs_mock_entry vfs[] = {
         MOCK_FILE("file"),
@@ -193,16 +193,26 @@ static void should_not_render_a_directory_if_an_empty_directory_header_is_provid
 
 static void should_not_render_a_directory_if_a_NULL_file_entry_array_is_provided(void)
 {
-    t_render_context *context = render_context_create(parsed_arguments);
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("dir", ".", ".."),
+        MOCK_DIR("dir2", ".", ".."),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *args[] = { "dir", "dir2", NULL };
+    t_parsed_arguments *parsed_args = parse_arguments(2, args);
+    t_render_context *context = render_context_create(parsed_args);
 
     render_directory(context, "valid", NULL);
 
     CU_ASSERT(verify_that_no_output_was_printed());
 
     render_context_destroy(&context);
+    parsed_arguments_destroy(&parsed_args);
 }
 
-static void should_not_print_a_leading_dir_header_newline_if_its_the_first_render(void)
+static void should_not_render_a_leading_dir_header_newline_if_its_the_first_render(void)
 {
     const t_vfs_mock_entry vfs[] = {
         MOCK_DIR("dir", ".", ".."),
@@ -236,7 +246,7 @@ static void should_not_print_a_leading_dir_header_newline_if_its_the_first_rende
     render_context_destroy(&context);
 }
 
-static void should_print_a_leading_dir_header_newline_if_its_not_first_render(void)
+static void should_render_a_leading_dir_header_newline_if_its_not_first_render(void)
 {
     const t_vfs_mock_entry vfs[] = {
         MOCK_DIR("dir", ".", ".."),
@@ -275,14 +285,14 @@ static void should_print_a_leading_dir_header_newline_if_its_not_first_render(vo
     render_context_destroy(&context);
 }
 
-static void should_not_print_the_types_separator_if_NULL_context_is_passed(void)
+static void should_not_render_the_types_separator_if_NULL_context_is_passed(void)
 {
     render_types_separator(NULL);
 
     CU_ASSERT(verify_that_no_output_was_printed());
 }
 
-static void should_print_the_types_separator_if_has_at_least_one_non_dir_and_one_dir(void)
+static void should_render_the_types_separator_if_has_at_least_one_non_dir_and_one_dir(void)
 {
     const t_vfs_mock_entry vfs[] = {
         MOCK_DIR("dir", ".", ".."),
@@ -303,7 +313,7 @@ static void should_print_the_types_separator_if_has_at_least_one_non_dir_and_one
     render_context_destroy(&context);
 }
 
-static void should_not_print_the_types_separator_if_doesnt_have_at_least_one_non_dir_and_one_dir(void)
+static void should_not_render_the_types_separator_if_doesnt_have_at_least_one_non_dir_and_one_dir(void)
 {
     const t_vfs_mock_entry vfs[] = {
         MOCK_FILE("file"),
@@ -324,7 +334,7 @@ static void should_not_print_the_types_separator_if_doesnt_have_at_least_one_non
     render_context_destroy(&context);
 }
 
-/*static void should_print_the_name_of_every_entry_with_a_file_entry_array_of_various_elements_separated_by_two_spaces(void)
+/*static void should_render_the_name_of_every_entry_with_a_file_entry_array_of_various_elements_separated_by_two_spaces(void)
 {
     const char *expected_file_name[] = { "file", "file2", "file3", "file4", "file5" };
     t_file_entry_array *file_entry_array = file_entry_array_create(expected_file_name[0]);
@@ -361,19 +371,19 @@ void register_renderer_suite(void)
         CU_add_test(suite, "should_destroy_a_context", should_destroy_a_context);
         CU_add_test(suite, "should_not_fail_to_destroy_a_context_when_a_null_pointer_is_passed", should_not_fail_to_destroy_a_context_when_a_null_pointer_is_passed);
         CU_add_test(suite, "should_not_fail_to_destroy_a_context_when_an_already_null_context_is_passed", should_not_fail_to_destroy_a_context_when_an_already_null_context_is_passed);
-        CU_add_test(suite, "should_not_print_anything_if_the_file_entry_array_is_null", should_not_print_anything_if_the_file_entry_array_is_null);
-        CU_add_test(suite, "should_not_print_anything_if_the_context_is_null", should_not_print_anything_if_the_context_is_null);
-        CU_add_test(suite, "should_print_the_name_of_the_entry_with_a_file_entry_array_of_one_element", should_print_the_name_of_the_entry_with_a_file_entry_array_of_one_element);
-        CU_add_test(suite, "should_print_the_name_of_every_entry_with_a_file_entry_array_of_various_elements_separated_by_new_lines", should_print_the_name_of_every_entry_with_a_file_entry_array_of_various_elements_separated_by_new_lines);
+        CU_add_test(suite, "should_not_render_anything_if_the_file_entry_array_is_null", should_not_render_anything_if_the_file_entry_array_is_null);
+        CU_add_test(suite, "should_not_render_anything_if_the_context_is_null", should_not_render_anything_if_the_context_is_null);
+        CU_add_test(suite, "should_render_the_name_of_the_entry_with_a_file_entry_array_of_one_element", should_render_the_name_of_the_entry_with_a_file_entry_array_of_one_element);
+        CU_add_test(suite, "should_render_the_name_of_every_entry_with_a_file_entry_array_of_various_elements_separated_by_new_lines", should_render_the_name_of_every_entry_with_a_file_entry_array_of_various_elements_separated_by_new_lines);
         CU_add_test(suite, "should_not_render_a_directory_if_a_NULL_context_is_provided", should_not_render_a_directory_if_a_NULL_context_is_provided);
         CU_add_test(suite, "should_not_render_a_directory_if_a_NULL_directory_header_is_provided", should_not_render_a_directory_if_a_NULL_directory_header_is_provided);
         CU_add_test(suite, "should_not_render_a_directory_if_an_empty_directory_header_is_provided", should_not_render_a_directory_if_an_empty_directory_header_is_provided);
         CU_add_test(suite, "should_not_render_a_directory_if_a_NULL_file_entry_array_is_provided", should_not_render_a_directory_if_a_NULL_file_entry_array_is_provided);
-        CU_add_test(suite, "should_not_print_a_leading_dir_header_newline_if_its_the_first_render", should_not_print_a_leading_dir_header_newline_if_its_the_first_render);
-        CU_add_test(suite, "should_print_a_leading_dir_header_newline_if_its_not_first_render", should_print_a_leading_dir_header_newline_if_its_not_first_render);
-        CU_add_test(suite, "should_not_print_the_types_separator_if_NULL_context_is_passed", should_not_print_the_types_separator_if_NULL_context_is_passed);
-        CU_add_test(suite, "should_print_the_types_separator_if_has_at_least_one_non_dir_and_one_dir", should_print_the_types_separator_if_has_at_least_one_non_dir_and_one_dir);
-        CU_add_test(suite, "should_not_print_the_types_separator_if_doesnt_have_at_least_one_non_dir_and_one_dir", should_not_print_the_types_separator_if_doesnt_have_at_least_one_non_dir_and_one_dir);
-        // CU_add_test(suite, "should_print_the_name_of_every_entry_with_a_file_entry_array_of_various_elements_separated_by_two_spaces", should_print_the_name_of_every_entry_with_a_file_entry_array_of_various_elements_separated_by_two_spaces);
+        CU_add_test(suite, "should_not_render_a_leading_dir_header_newline_if_its_the_first_render", should_not_render_a_leading_dir_header_newline_if_its_the_first_render);
+        CU_add_test(suite, "should_render_a_leading_dir_header_newline_if_its_not_first_render", should_render_a_leading_dir_header_newline_if_its_not_first_render);
+        CU_add_test(suite, "should_not_render_the_types_separator_if_NULL_context_is_passed", should_not_render_the_types_separator_if_NULL_context_is_passed);
+        CU_add_test(suite, "should_render_the_types_separator_if_has_at_least_one_non_dir_and_one_dir", should_render_the_types_separator_if_has_at_least_one_non_dir_and_one_dir);
+        CU_add_test(suite, "should_not_render_the_types_separator_if_doesnt_have_at_least_one_non_dir_and_one_dir", should_not_render_the_types_separator_if_doesnt_have_at_least_one_non_dir_and_one_dir);
+        // CU_add_test(suite, "should_render_the_name_of_every_entry_with_a_file_entry_array_of_various_elements_separated_by_two_spaces", should_render_the_name_of_every_entry_with_a_file_entry_array_of_various_elements_separated_by_two_spaces);
     }
 }

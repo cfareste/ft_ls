@@ -67,7 +67,7 @@ void render_entries(const t_file_entry_array *file_entry_array, const t_render_c
 
 void render_directory(t_render_context *context, const char *directory_header, const t_file_entry_array *file_entry_array)
 {
-    if (context == NULL || !ft_is_valid_path(directory_header))
+    if (context == NULL || !ft_is_valid_path(directory_header) || file_entry_array == NULL)
         return ;
 
     render_directory_header(context, directory_header);
