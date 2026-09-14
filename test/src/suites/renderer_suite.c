@@ -206,26 +206,15 @@ static void should_not_print_a_dir_header_if_an_empty_header_is_specified_in_the
     };
     vfs_mock_setup(vfs);
 
-    const char *expected_file_name[] = { "file", "file2", "file3" };
     const char *args[] = { "file", "file2", "file3", NULL };
     t_parsed_arguments *parsed_args = parse_arguments(3, args);
     t_render_context *context = render_context_create(parsed_args);
     render_context_set_directory_header(context, "");
-    t_file_entry_array *file_entry_array = file_entry_array_create();
-    file_entry_array_push(file_entry_array, file_entry_create(expected_file_name[0]));
-    file_entry_array_push(file_entry_array, file_entry_create(expected_file_name[1]));
-    file_entry_array_push(file_entry_array, file_entry_create(expected_file_name[2]));
 
-    render(file_entry_array, context);
+    render_directory_header(context);
 
-    CU_ASSERT(verify_that_the_output_printed_is(
-        "%s\n%s\n%s\n",
-        expected_file_name[0],
-        expected_file_name[1],
-        expected_file_name[2]
-    ));
+    CU_ASSERT(verify_that_no_output_was_printed());
 
-    file_entry_array_destroy(&file_entry_array);
     parsed_arguments_destroy(&parsed_args);
     render_context_destroy(&context);
 }
