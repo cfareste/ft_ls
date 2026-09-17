@@ -435,6 +435,29 @@ static void should_sort_the_directory_file_operands_by_ascii_by_default(void)
     parsed_arguments_destroy(&parsed_arguments);
 }
 
+static void should_be_created_correctly_even_if_the_specified_argument_cannot_be_accessed(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE_ACCESS_ERROR(ENOENT, "notExistent"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *valid_args[] = { "notExistent", NULL };
+
+    sut = parse_arguments(1, valid_args);
+    const char * const *non_directory_file_operands = parsed_arguments_get_directory_file_operands(sut);
+    const char * const *directory_file_operands = parsed_arguments_get_directory_file_operands(sut);
+
+    CU_ASSERT(verify_that_the_error_printed_is(
+        "ft_ls: cannot access '%s': %s\n",
+        "notExistent", strerror(ENOENT)
+    ));
+    CU_ASSERT_PTR_NULL(non_directory_file_operands[0]);
+    CU_ASSERT_PTR_NULL(directory_file_operands[0]);
+    CU_ASSERT_PTR_NOT_NULL(sut);
+}
+
 void register_parsed_arguments_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, test_teardown);
@@ -465,5 +488,6 @@ void register_parsed_arguments_suite(void)
         CU_add_test(suite, "should_return_true_for_has_mixed_types_file_operands_if_it_does_have_at_least_one_non_dir_and_one_dir", should_return_true_for_has_mixed_types_file_operands_if_it_does_have_at_least_one_non_dir_and_one_dir);
         CU_add_test(suite, "should_sort_the_non_directory_file_operands_by_ascii_by_default", should_sort_the_non_directory_file_operands_by_ascii_by_default);
         CU_add_test(suite, "should_sort_the_directory_file_operands_by_ascii_by_default", should_sort_the_directory_file_operands_by_ascii_by_default);
+        CU_add_test(suite, "should_be_created_correctly_even_if_the_specified_argument_cannot_be_accessed", should_be_created_correctly_even_if_the_specified_argument_cannot_be_accessed);
     }
 }

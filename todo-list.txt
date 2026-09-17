@@ -131,6 +131,13 @@ QA LS-12 Manage invalid operations
    - X Fallos:
        * 2 params, 2 fallos: Mezclar tipos de fallos
        * X params, X fallos: Mezclar entre fallos y successes (X dirs, X non_dirs, N fallos)
+3. Fallos mezclados (directory + stat)
+   - 2 Fallos: Combinación de fallos (inexistente + opendir, no directorio + closedir, etc.)
+   - X Fallos:
+       * Solo not dirs + stat
+       * Solo dirs + stat
+       * Solo dirs + directory
+       * Not dirs + Dirs + stat + directory
 No probado en E2E:
    - Readdir y closedir errores
    - Algunos errores de opendir y stat como EMFILE o ENOMEM

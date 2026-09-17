@@ -33,7 +33,7 @@ static unsigned int get_num_of_non_directory_file_operands(const t_file_type *fi
 
     for (unsigned int i = 0; file_operand_types[i] != 0; i++)
     {
-        if (file_operand_types[i] != FILE_TYPE_DIRECTORY)
+        if (file_operand_types[i] != FILE_TYPE_DIRECTORY && file_operand_types[i] != FILE_TYPE_UNKNOWN)
         {
             num_of_non_directory_file_operands++;
         }
@@ -90,7 +90,7 @@ char **file_operands_get_non_directory(char **file_operands, const t_file_type *
     int j = 0;
     for (int i = 0; file_operands[i] != NULL; i++)
     {
-        if (file_operands_types[i] != FILE_TYPE_DIRECTORY)
+        if (file_operands_types[i] != FILE_TYPE_DIRECTORY && file_operands_types[i] != FILE_TYPE_UNKNOWN)
         {
             non_directory_file_operands[j] = ft_safe_strdup(file_operands[i]);
             j++;
