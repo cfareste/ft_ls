@@ -39,3 +39,4 @@ nopermdir/ nopermdir                                                            
 src Makefile nopermdir/ .hiddir empty nopermdir .hidden2 dir_only_hidden        ::       src Makefile nopermdir/ .hiddir empty nopermdir .hidden2 dir_only_hidden
 nonExistent                                                                     ::       nonExistent
 src nopermdir/file                                                              ::       src nopermdir/file
+Makefile src Makefile/ .hidden .hiddir                                          ::       Makefile src Makefile/ .hidden .hiddir
