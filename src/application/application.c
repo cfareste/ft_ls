@@ -50,11 +50,13 @@ static int process_directory_file_operands(const t_parsed_arguments *parsed_argu
     return error_code;
 }
 
-int application_run(const t_parsed_arguments *parsed_arguments)
+int application_run(const t_result *parsing_arguments_result)
 {
-    if (parsed_arguments == NULL)
+    if (parsing_arguments_result == NULL)
         return FT_LS_APPLICATION_MAJOR_ERROR;
 
+    //TODO: Add const to void *
+    const t_parsed_arguments *parsed_arguments = result_get_value(parsing_arguments_result);
     t_render_context *render_context = render_context_create(parsed_arguments);
 
     process_non_directory_file_operands(parsed_arguments, render_context);
@@ -62,6 +64,9 @@ int application_run(const t_parsed_arguments *parsed_arguments)
     const int error_code = process_directory_file_operands(parsed_arguments, render_context);
 
     render_context_destroy(&render_context);
+
+    if (result_has_failed(parsing_arguments_result))
+        return FT_LS_APPLICATION_MAJOR_ERROR;
 
     return error_code;
 }

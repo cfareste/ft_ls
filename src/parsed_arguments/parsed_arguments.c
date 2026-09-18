@@ -17,7 +17,18 @@ static int compare_by_name(const void *first_str, const void *second_str)
     return ft_strcmp(first_str, second_str);
 }
 
-t_parsed_arguments *parse_arguments(const int num_of_arguments, const char **arguments)
+static int has_failed_to_access_a_file_operand(const unsigned int num_of_operands, const t_file_type *file_operands_types)
+{
+    for (unsigned int i = 0; i < num_of_operands; i++)
+    {
+        if (file_operands_types[i] == FILE_TYPE_UNKNOWN)
+            return 1;
+    }
+
+    return 0;
+}
+
+t_result *parse_arguments(const int num_of_arguments, const char **arguments)
 {
     if (num_of_arguments < 0 || arguments == NULL)
         return NULL;
@@ -30,7 +41,10 @@ t_parsed_arguments *parse_arguments(const int num_of_arguments, const char **arg
     sort_pointer_array((void **) parsed_arguments->non_directory_file_operands, compare_by_name);
     sort_pointer_array((void **) parsed_arguments->directory_file_operands, compare_by_name);
 
-    return parsed_arguments;
+    if (has_failed_to_access_a_file_operand(num_of_arguments, parsed_arguments->file_operand_types))
+        return result_create_failed(parsed_arguments);
+
+    return result_create_successful(parsed_arguments);
 }
 
 const char * const *parsed_arguments_get_file_operands(const t_parsed_arguments *parsed_arguments)

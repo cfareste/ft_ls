@@ -5,6 +5,7 @@
 
 #define SUITE_NAME "application"
 
+static t_result *parsed_arguments_result;
 static t_parsed_arguments *parsed_arguments = NULL;
 
 static void test_setup(void)
@@ -15,7 +16,14 @@ static void test_setup(void)
 
 static void test_teardown(void)
 {
+    result_destroy(&parsed_arguments_result);
     parsed_arguments_destroy(&parsed_arguments);
+}
+
+static void get_parsed_arguments_result(const int argc, const char **args)
+{
+    parsed_arguments_result = parse_arguments(argc, args);
+    parsed_arguments = result_get_value(parsed_arguments_result);
 }
 
 static void assert_application_execution_succeed(const int result)
@@ -25,7 +33,7 @@ static void assert_application_execution_succeed(const int result)
 
 static void should_return_a_major_error_when_passing_a_NULL_parsed_argument(void)
 {
-    CU_ASSERT_EQUAL(application_run(parsed_arguments), FT_LS_APPLICATION_MAJOR_ERROR);
+    CU_ASSERT_EQUAL(application_run(parsed_arguments_result), FT_LS_APPLICATION_MAJOR_ERROR);
     CU_ASSERT(verify_that_no_output_was_printed());
     CU_ASSERT(verify_that_no_error_was_printed());
 }
@@ -44,9 +52,9 @@ static void should_successfully_print_the_contents_of_the_current_directory_one_
 
     const char *arguments[] = { NULL };
     const char *expected_file_names[] = { "file1", "subdir1", "symlink", "zz" };
-    parsed_arguments = parse_arguments(0, arguments);
+    get_parsed_arguments_result(0, arguments);
 
-    const int result = application_run(parsed_arguments);
+    const int result = application_run(parsed_arguments_result);
 
     CU_ASSERT(verify_that_the_output_printed_is("%s\n%s\n%s\n%s\n",
         expected_file_names[0],
@@ -68,9 +76,9 @@ static void should_successfully_print_the_file_name_if_a_regular_file_operand_is
 
     const char *file_name = "../../ft_ls/test/./frameworks/../regular_file";
     const char *arguments[] = { file_name, NULL };
-    parsed_arguments = parse_arguments(1, arguments);
+    get_parsed_arguments_result(1, arguments);
 
-    const int result = application_run(parsed_arguments);
+    const int result = application_run(parsed_arguments_result);
 
     CU_ASSERT(verify_that_the_output_printed_is("%s\n", file_name));
     CU_ASSERT(verify_that_no_error_was_printed());
@@ -91,9 +99,9 @@ static void should_successfully_print_the_contents_of_the_directory_specified_as
 
     const char *arguments[] = { "dir", NULL };
     const char *expected_file_names[] = { "block_device", "char_device", "file_from_dir_1", "subdir_1" };
-    parsed_arguments = parse_arguments(1, arguments);
+    get_parsed_arguments_result(1, arguments);
 
-    const int result = application_run(parsed_arguments);
+    const int result = application_run(parsed_arguments_result);
 
     CU_ASSERT(verify_that_the_output_printed_is("%s\n%s\n%s\n%s\n",
         expected_file_names[0],
@@ -116,9 +124,9 @@ static void should_successfully_print_the_contents_of_multiple_non_directory_fil
     vfs_mock_setup(vfs);
 
     const char *arguments[] = { "block_device", "cd1", "cd1", "file1", NULL };
-    parsed_arguments = parse_arguments(4, arguments);
+    get_parsed_arguments_result(4, arguments);
 
-    const int result = application_run(parsed_arguments);
+    const int result = application_run(parsed_arguments_result);
 
     CU_ASSERT(verify_that_the_output_printed_is(
         "%s\n%s\n%s\n%s\n",
@@ -149,9 +157,9 @@ static void should_successfully_print_the_contents_of_multiple_directory_files(v
     const char *expected_first_dir_file_name = "file_dir_1";
     const char *expected_second_dir_file_names[] = { "file_dir_2", "symlink" };
     const char *expected_third_dir_file_name = "file_dir_3";
-    parsed_arguments = parse_arguments(3, arguments);
+    get_parsed_arguments_result(3, arguments);
 
-    const int result = application_run(parsed_arguments);
+    const int result = application_run(parsed_arguments_result);
 
     CU_ASSERT(verify_that_the_output_printed_is(
         "%s:\n"
@@ -193,9 +201,9 @@ static void should_successfully_print_the_contents_of_the_mixed_types_specified_
     const char *arguments[] = { "file", "dir", "linklink", "linkdir", "linkfile", "block_device", "char_device", "fifo", "socket", NULL };
     const char *expected_file_names[] = { "block_device", "char_device", "fifo", "file", "linkfile", "socket" };
     const char *expected_dir_file_names[] = { "dir2", "file" };
-    parsed_arguments = parse_arguments(9, arguments);
+    get_parsed_arguments_result(9, arguments);
 
-    const int result = application_run(parsed_arguments);
+    const int result = application_run(parsed_arguments_result);
 
     CU_ASSERT(verify_that_the_output_printed_is(
         "%s\n%s\n%s\n%s\n%s\n%s\n"
@@ -236,9 +244,9 @@ static void should_successfully_print_the_contents_of_the_explicitly_specified_h
     vfs_mock_setup(vfs);
 
     const char *arguments[] = { ".char_device", ".file1", "symlink", NULL };
-    parsed_arguments = parse_arguments(3, arguments);
+    get_parsed_arguments_result(3, arguments);
 
-    const int result = application_run(parsed_arguments);
+    const int result = application_run(parsed_arguments_result);
 
     CU_ASSERT(verify_that_the_output_printed_is(
         "%s\n%s\n%s\n",
@@ -274,9 +282,9 @@ static void should_successfully_print_the_contents_of_the_explicitly_specified_h
     const char *expected_first_dir_file_names[] = { "char_device", "file_from_dir_1" };
     const char *expected_second_dir_file_names[] = { "file_from_dir_2", "symlink" };
     const char *expected_third_dir_file_names[] = { "char_device", "file_from_dir_3", "normal_file" };
-    parsed_arguments = parse_arguments(3, arguments);
+    get_parsed_arguments_result(3, arguments);
 
-    const int result = application_run(parsed_arguments);
+    const int result = application_run(parsed_arguments_result);
 
     CU_ASSERT(verify_that_the_output_printed_is(
         "%s:\n"
@@ -321,9 +329,9 @@ static void should_successfully_print_the_contents_of_the_explicitly_specified_h
     const char *arguments[] = { ".dir", ".dir1", ".file1", ".symlink", NULL };
     const char *expected_first_dir_file_names[] = { "char_device", "file_from_dir_1" };
     const char *expected_second_dir_file_names[] = { "file_from_dir_2", "symlink" };
-    parsed_arguments = parse_arguments(4, arguments);
+    get_parsed_arguments_result(4, arguments);
 
-    const int result = application_run(parsed_arguments);
+    const int result = application_run(parsed_arguments_result);
 
     CU_ASSERT(verify_that_the_output_printed_is(
         "%s\n%s\n"
@@ -353,9 +361,9 @@ static void should_successfully_not_print_anything_if_the_specified_directory_is
     vfs_mock_setup(vfs);
 
     const char *arguments[] = { "dir", NULL };
-    parsed_arguments = parse_arguments(1, arguments);
+    get_parsed_arguments_result(1, arguments);
 
-    const int result = application_run(parsed_arguments);
+    const int result = application_run(parsed_arguments_result);
 
     CU_ASSERT(verify_that_no_output_was_printed());
     CU_ASSERT(verify_that_no_error_was_printed());
@@ -374,9 +382,9 @@ static void should_successfully_not_print_anything_if_the_specified_directory_on
     vfs_mock_setup(vfs);
 
     const char *arguments[] = { ".dir", NULL };
-    parsed_arguments = parse_arguments(1, arguments);
+    get_parsed_arguments_result(1, arguments);
 
-    const int result = application_run(parsed_arguments);
+    const int result = application_run(parsed_arguments_result);
 
     CU_ASSERT(verify_that_no_output_was_printed());
     CU_ASSERT(verify_that_no_error_was_printed());
@@ -393,9 +401,9 @@ static void should_successfully_only_print_dir_headers_if_the_specified_director
     vfs_mock_setup(vfs);
 
     const char *arguments[] = { ".dir", "dir1", NULL };
-    parsed_arguments = parse_arguments(2, arguments);
+    get_parsed_arguments_result(2, arguments);
 
-    const int result = application_run(parsed_arguments);
+    const int result = application_run(parsed_arguments_result);
 
     CU_ASSERT(verify_that_the_output_printed_is(
         "%s:\n"
@@ -420,9 +428,9 @@ static void should_successfully_only_print_dir_headers_if_the_specified_director
     vfs_mock_setup(vfs);
 
     const char *arguments[] = { ".dir1", "dir", NULL };
-    parsed_arguments = parse_arguments(2, arguments);
+    get_parsed_arguments_result(2, arguments);
 
-    const int result = application_run(parsed_arguments);
+    const int result = application_run(parsed_arguments_result);
 
     CU_ASSERT(verify_that_the_output_printed_is(
         "%s:\n"
@@ -446,9 +454,9 @@ static void should_successfully_only_print_dir_headers_with_non_directory_files_
     vfs_mock_setup(vfs);
 
     const char *arguments[] = { ".hidden", ".dir1", "dir", "file", NULL };
-    parsed_arguments = parse_arguments(4, arguments);
+    get_parsed_arguments_result(4, arguments);
 
-    const int result = application_run(parsed_arguments);
+    const int result = application_run(parsed_arguments_result);
 
     CU_ASSERT(verify_that_the_output_printed_is(
         "%s\n%s\n"
@@ -478,9 +486,9 @@ static void should_successfully_only_print_dir_headers_with_non_directory_files_
     vfs_mock_setup(vfs);
 
     const char *arguments[] = { "dir", ".hidden", "dir1", "file", NULL };
-    parsed_arguments = parse_arguments(4, arguments);
+    get_parsed_arguments_result(4, arguments);
 
-    const int result = application_run(parsed_arguments);
+    const int result = application_run(parsed_arguments_result);
 
     CU_ASSERT(verify_that_the_output_printed_is(
         "%s\n%s\n"
@@ -514,9 +522,9 @@ static void should_successfully_print_the_contents_of_the_current_directory_sort
 
     const char *arguments[] = { NULL };
     const char *expected_file_names[] = { "2file", "FILE", "_DIR", "_file", "a", "dir", "f" };
-    parsed_arguments = parse_arguments(0, arguments);
+    get_parsed_arguments_result(0, arguments);
 
-    const int result = application_run(parsed_arguments);
+    const int result = application_run(parsed_arguments_result);
 
     CU_ASSERT(verify_that_the_output_printed_is(
         "%s\n%s\n%s\n%s\n%s\n%s\n%s\n",
@@ -551,9 +559,9 @@ static void should_successfully_print_the_contents_of_the_specified_directory_so
 
     const char *arguments[] = { "dir", NULL };
     const char *expected_file_names[] = { "2file", "FILE", "_DIR", "_file", "a", "dir", "f" };
-    parsed_arguments = parse_arguments(1, arguments);
+    get_parsed_arguments_result(1, arguments);
 
-    const int result = application_run(parsed_arguments);
+    const int result = application_run(parsed_arguments_result);
 
     CU_ASSERT(verify_that_the_output_printed_is(
         "%s\n%s\n%s\n%s\n%s\n%s\n%s\n",
@@ -584,9 +592,9 @@ static void should_successfully_print_the_specified_non_directory_file_operands_
 
     const char *arguments[] = { "a", "2file", "_file", "f", ".hidden_file", "FILE", NULL };
     const char *expected_file_names[] = { ".hidden_file", "2file", "FILE", "_file", "a", "f" };
-    parsed_arguments = parse_arguments(6, arguments);
+    get_parsed_arguments_result(6, arguments);
 
-    const int result = application_run(parsed_arguments);
+    const int result = application_run(parsed_arguments_result);
 
     CU_ASSERT(verify_that_the_output_printed_is(
         "%s\n%s\n%s\n%s\n%s\n%s\n",
@@ -623,9 +631,9 @@ static void should_successfully_print_the_specified_directory_file_operands_and_
     const char *expected_first_dir_file_names[] = { "-file", "file1", "~file" };
     const char *expected_second_dir_file_names[] = { "FILE", "file2", "symlink" };
     const char *expected_third_dir_file_names[] = { "2FILE", "file3" };
-    parsed_arguments = parse_arguments(3, arguments);
+    get_parsed_arguments_result(3, arguments);
 
-    const int result = application_run(parsed_arguments);
+    const int result = application_run(parsed_arguments_result);
 
     CU_ASSERT(verify_that_the_output_printed_is(
         "%s:\n"
@@ -679,9 +687,9 @@ static void should_successfully_print_the_specified_mixed_types_file_operands_an
     const char *expected_first_dir_file_names[] = { "-file", "file1", "~file" };
     const char *expected_second_dir_file_names[] = { "FILE", "file2", "symlink" };
     const char *expected_third_dir_file_names[] = { "2FILE", "file3" };
-    parsed_arguments = parse_arguments(9, arguments);
+    get_parsed_arguments_result(9, arguments);
 
-    const int result = application_run(parsed_arguments);
+    const int result = application_run(parsed_arguments_result);
 
     CU_ASSERT(verify_that_the_output_printed_is(
         "%s\n%s\n%s\n%s\n%s\n%s\n"
@@ -731,9 +739,9 @@ static void should_successfully_print_the_contents_of_the_current_directory_with
 
     const char *arguments[] = { NULL };
     const char *expected_file_names[] = { "1_file", "2_subdir", "3_linkfile", "4_linkdir", "5_chardevice", "6_blockdevice", "7_fifo", "8_socket" };
-    parsed_arguments = parse_arguments(0, arguments);
+    get_parsed_arguments_result(0, arguments);
 
-    const int result = application_run(parsed_arguments);
+    const int result = application_run(parsed_arguments_result);
 
     CU_ASSERT(verify_that_the_output_printed_is("%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n",
         expected_file_names[0],
@@ -760,9 +768,9 @@ static void should_successfully_print_the_name_of_the_specified_symlink_pointing
 
     const char *arguments[] = { "linkfile", NULL };
     const char *expected_file_names[] = { "linkfile" };
-    parsed_arguments = parse_arguments(1, arguments);
+    get_parsed_arguments_result(1, arguments);
 
-    const int result = application_run(parsed_arguments);
+    const int result = application_run(parsed_arguments_result);
 
     CU_ASSERT(verify_that_the_output_printed_is("%s\n",
         expected_file_names[0]
@@ -786,9 +794,9 @@ static void should_successfully_print_the_contents_of_the_directory_pointed_by_t
 
     const char *arguments[] = { "linkdir", NULL };
     const char *expected_file_names[] = { "block_device", "char_device", "file", "subdir" };
-    parsed_arguments = parse_arguments(1, arguments);
+    get_parsed_arguments_result(1, arguments);
 
-    const int result = application_run(parsed_arguments);
+    const int result = application_run(parsed_arguments_result);
 
     CU_ASSERT(verify_that_the_output_printed_is("%s\n%s\n%s\n%s\n",
         expected_file_names[0],
@@ -809,9 +817,9 @@ static void should_fail_with_a_major_error_and_not_print_anything_if_fails_to_op
     vfs_mock_setup(vfs);
 
     const char *arguments[] = { "dir", NULL };
-    parsed_arguments = parse_arguments(1, arguments);
+    get_parsed_arguments_result(1, arguments);
 
-    const int result = application_run(parsed_arguments);
+    const int result = application_run(parsed_arguments_result);
 
     CU_ASSERT(verify_that_no_output_was_printed());
     CU_ASSERT(verify_that_the_error_printed_is("ft_ls: cannot open directory '%s': %s\n", "dir", strerror(EACCES)));
@@ -827,9 +835,9 @@ static void should_fail_with_a_major_error_and_not_print_anything_if_fails_to_re
     vfs_mock_setup(vfs);
 
     const char *arguments[] = { "dir", NULL };
-    parsed_arguments = parse_arguments(1, arguments);
+    get_parsed_arguments_result(1, arguments);
 
-    const int result = application_run(parsed_arguments);
+    const int result = application_run(parsed_arguments_result);
 
     CU_ASSERT(verify_that_no_output_was_printed());
     CU_ASSERT(verify_that_the_error_printed_is("ft_ls: reading directory '%s': %s\n", "dir", strerror(EBADF)));
@@ -846,9 +854,9 @@ static void should_fail_with_a_major_error_and_only_print_the_non_failed_entries
     vfs_mock_setup(vfs);
 
     const char *arguments[] = { "dir", NULL };
-    parsed_arguments = parse_arguments(1, arguments);
+    get_parsed_arguments_result(1, arguments);
 
-    const int result = application_run(parsed_arguments);
+    const int result = application_run(parsed_arguments_result);
 
     CU_ASSERT(verify_that_the_output_printed_is("file1\n"));
     CU_ASSERT(verify_that_the_error_printed_is("ft_ls: reading directory '%s': %s\n", "dir", strerror(EBADF)));
@@ -869,9 +877,9 @@ static void should_fail_with_a_major_error_print_the_contents_of_the_directory_i
 
     const char *arguments[] = { "dir", NULL };
     const char *expected_file_names[] = { "file1", "subdir1", "symlink", "zz" };
-    parsed_arguments = parse_arguments(1, arguments);
+    get_parsed_arguments_result(1, arguments);
 
-    const int result = application_run(parsed_arguments);
+    const int result = application_run(parsed_arguments_result);
 
     CU_ASSERT(verify_that_the_output_printed_is("%s\n%s\n%s\n%s\n",
         expected_file_names[0],
@@ -893,9 +901,9 @@ static void should_fail_with_a_major_error_and_print_only_the_non_directory_oper
     vfs_mock_setup(vfs);
 
     const char *arguments[] = { "dir", "file", NULL };
-    parsed_arguments = parse_arguments(2, arguments);
+    get_parsed_arguments_result(2, arguments);
 
-    const int result = application_run(parsed_arguments);
+    const int result = application_run(parsed_arguments_result);
 
     CU_ASSERT(verify_that_the_output_printed_is("file\n\n"));
     CU_ASSERT(verify_that_the_error_printed_is("ft_ls: cannot open directory '%s': %s\n", "dir", strerror(ENOTDIR)));
@@ -913,9 +921,9 @@ static void should_fail_with_a_major_error_and_print_only_the_working_directory_
 
     const char *expected_file_name = "fileDir";
     const char *arguments[] = { "workingDir", "noPermDir", NULL };
-    parsed_arguments = parse_arguments(2, arguments);
+    get_parsed_arguments_result(2, arguments);
 
-    const int result = application_run(parsed_arguments);
+    const int result = application_run(parsed_arguments_result);
 
     CU_ASSERT(verify_that_the_output_printed_is(
         "%s:\n"
@@ -943,9 +951,9 @@ static void should_fail_with_a_major_error_and_print_only_the_working_file_opera
     const char *expected_first_dir_file_name = "fileDir";
     const char *expected_second_dir_file_name = "zFileDir";
     const char *arguments[] = { "noPermDir", "workingDir", "file", "zWorkingDir", "zFile", NULL };
-    parsed_arguments = parse_arguments(5, arguments);
+    get_parsed_arguments_result(5, arguments);
 
-    const int result = application_run(parsed_arguments);
+    const int result = application_run(parsed_arguments_result);
 
     CU_ASSERT(verify_that_the_output_printed_is(
         "%s\n%s\n"
@@ -975,9 +983,9 @@ static void should_fail_with_a_major_error_and_not_print_anything_if_all_directo
 
     const char *arguments[] = { "zdir/", "dir", NULL };
     const char *expected_file_names[] = { "file1", "subdir1" };
-    parsed_arguments = parse_arguments(2, arguments);
+    get_parsed_arguments_result(2, arguments);
 
-    const int result = application_run(parsed_arguments);
+    const int result = application_run(parsed_arguments_result);
 
     CU_ASSERT(verify_that_the_output_printed_is(
         "%s:\n"
@@ -1013,9 +1021,9 @@ static void should_fail_with_a_major_error_and_print_only_the_working_file_opera
     const char *expected_first_dir_file_name = "fileDir";
     const char *expected_second_dir_file_name = "zFileDir";
     const char *expected_failed_dir_file_names[] = { "file1", "subdir1" };
-    parsed_arguments = parse_arguments(6, arguments);
+    get_parsed_arguments_result(6, arguments);
 
-    const int result = application_run(parsed_arguments);
+    const int result = application_run(parsed_arguments_result);
 
     CU_ASSERT(verify_that_the_output_printed_is(
         "%s\n%s\n"
@@ -1040,6 +1048,27 @@ static void should_fail_with_a_major_error_and_print_only_the_working_file_opera
         "ft_ls: reading directory '%s': %s\n",
         "dir", strerror(EACCES),
         "zdir/", strerror(EBADF))
+    );
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MAJOR_ERROR);
+}
+
+static void should_fail_with_a_major_error_and_not_print_anything_if_the_specified_file_operand_fails_to_be_accessed(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE_ACCESS_ERROR(ENOTDIR, "notADirectory/"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "notADirectory/", NULL };
+    get_parsed_arguments_result(1, arguments);
+
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_no_output_was_printed());
+    CU_ASSERT(verify_that_the_error_printed_is(
+        "ft_ls: cannot access '%s': %s\n",
+        "notADirectory/", strerror(ENOTDIR))
     );
     CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MAJOR_ERROR);
 }
@@ -1083,5 +1112,6 @@ void register_application_suite(void)
         CU_add_test(suite, "should_fail_with_a_major_error_and_print_only_the_working_file_operands_if_fails_to_scan_a_directory_operand", should_fail_with_a_major_error_and_print_only_the_working_file_operands_if_fails_to_scan_a_directory_operand);
         CU_add_test(suite, "should_fail_with_a_major_error_and_not_print_anything_if_all_directories_fail_to_scan", should_fail_with_a_major_error_and_not_print_anything_if_all_directories_fail_to_scan);
         CU_add_test(suite, "should_fail_with_a_major_error_and_print_only_the_working_file_operands_if_some_directories_fail_to_scan", should_fail_with_a_major_error_and_print_only_the_working_file_operands_if_some_directories_fail_to_scan);
+        CU_add_test(suite, "should_fail_with_a_major_error_and_not_print_anything_if_the_specified_file_operand_fails_to_be_accessed", should_fail_with_a_major_error_and_not_print_anything_if_the_specified_file_operand_fails_to_be_accessed);
     }
 }

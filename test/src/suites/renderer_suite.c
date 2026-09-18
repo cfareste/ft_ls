@@ -5,28 +5,37 @@
 
 #define SUITE_NAME "renderer"
 
+static t_result *parsed_arguments_result;
 static t_parsed_arguments *parsed_arguments;
 
+static void get_parsed_arguments_result(const int argc, const char **args)
+{
+    parsed_arguments_result = parse_arguments(argc, args);
+    parsed_arguments = result_get_value(parsed_arguments_result);
+}
+
 static void test_setup(void)
+{
+    reset_printing_buffer();
+    vfs_mock_reset();
+}
+
+static void test_teardown(void)
+{
+    result_destroy(&parsed_arguments_result);
+    parsed_arguments_destroy(&parsed_arguments);
+}
+
+static void should_create_a_context(void)
 {
     const t_vfs_mock_entry vfs[] = {
         MOCK_DIR(".", ".", ".."),
         MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
+
     const char *args[] = { NULL };
-    parsed_arguments = parse_arguments(0, args);
-    reset_printing_buffer();
-}
-
-static void test_teardown(void)
-{
-    parsed_arguments_destroy(&parsed_arguments);
-    vfs_mock_reset();
-}
-
-static void should_create_a_context(void)
-{
+    get_parsed_arguments_result(0, args);
     t_render_context *context = render_context_create(parsed_arguments);
 
     CU_ASSERT_PTR_NOT_NULL(context);
@@ -45,6 +54,14 @@ static void should_return_NULL_when_creating_a_context_if_null_parsed_args_are_s
 
 static void should_destroy_a_context(void)
 {
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", ".", ".."),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *args[] = { NULL };
+    get_parsed_arguments_result(0, args);
     t_render_context *context = render_context_create(parsed_arguments);
 
     render_context_destroy(&context);
@@ -79,6 +96,14 @@ static void should_not_render_anything_if_the_context_is_null(void)
 
 static void should_not_render_anything_if_the_file_entry_array_is_null(void)
 {
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", ".", ".."),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *args[] = { NULL };
+    get_parsed_arguments_result(0, args);
     t_render_context *context = render_context_create(parsed_arguments);
 
     render_entries(context, NULL);
@@ -98,18 +123,18 @@ static void should_render_the_name_of_the_entry_with_a_file_entry_array_of_one_e
 
     const char *expected_file_name = "file";
     const char *args[] = { expected_file_name, NULL };
-    t_parsed_arguments *parsed_args = parse_arguments(1, args);
+    get_parsed_arguments_result(1, args);
     t_file_entry_array *file_entry_array = file_entry_array_create();
     t_file_entry *file_entry = file_entry_create(expected_file_name);
     file_entry_array_push(file_entry_array, file_entry);
-    t_render_context *context = render_context_create(parsed_args);
+    t_render_context *context = render_context_create(parsed_arguments);
 
     render_entries(context, file_entry_array);
 
     CU_ASSERT(verify_that_the_output_printed_is("%s\n", expected_file_name));
 
     file_entry_array_destroy(&file_entry_array);
-    parsed_arguments_destroy(&parsed_args);
+    parsed_arguments_destroy(&parsed_arguments);
     render_context_destroy(&context);
 }
 
@@ -126,8 +151,8 @@ static void should_render_the_name_of_every_entry_with_a_file_entry_array_of_var
     vfs_mock_setup(vfs);
 
     const char *args[] = { "file", "file2", "file3", "file4", "file5", NULL };
-    t_parsed_arguments *parsed_args = parse_arguments(5, args);
-    t_render_context *context = render_context_create(parsed_args);
+    get_parsed_arguments_result(5, args);
+    t_render_context *context = render_context_create(parsed_arguments);
     const char *expected_file_name[] = { "file", "file2", "file3", "file4", "file5" };
     t_file_entry_array *file_entry_array = file_entry_array_create();
     file_entry_array_push(file_entry_array, file_entry_create(expected_file_name[0]));
@@ -148,7 +173,7 @@ static void should_render_the_name_of_every_entry_with_a_file_entry_array_of_var
     ));
 
     file_entry_array_destroy(&file_entry_array);
-    parsed_arguments_destroy(&parsed_args);
+    parsed_arguments_destroy(&parsed_arguments);
     render_context_destroy(&context);
 }
 
@@ -173,8 +198,8 @@ static void should_not_render_a_directory_if_a_NULL_directory_header_is_provided
     vfs_mock_setup(vfs);
 
     const char *args[] = { "dir", "dir2", NULL };
-    t_parsed_arguments *parsed_args = parse_arguments(2, args);
-    t_render_context *context = render_context_create(parsed_args);
+    get_parsed_arguments_result(2, args);
+    t_render_context *context = render_context_create(parsed_arguments);
     t_file_entry_array *file_entry_array = file_entry_array_create();
     file_entry_array_push(file_entry_array, file_entry_create("file"));
 
@@ -183,7 +208,7 @@ static void should_not_render_a_directory_if_a_NULL_directory_header_is_provided
     CU_ASSERT(verify_that_no_output_was_printed());
 
     file_entry_array_destroy(&file_entry_array);
-    parsed_arguments_destroy(&parsed_args);
+    parsed_arguments_destroy(&parsed_arguments);
     render_context_destroy(&context);
 }
 
@@ -197,8 +222,8 @@ static void should_not_render_a_directory_if_an_empty_directory_header_is_provid
     vfs_mock_setup(vfs);
 
     const char *args[] = { "dir", "dir2", NULL };
-    t_parsed_arguments *parsed_args = parse_arguments(2, args);
-    t_render_context *context = render_context_create(parsed_args);
+    get_parsed_arguments_result(2, args);
+    t_render_context *context = render_context_create(parsed_arguments);
     t_file_entry_array *file_entry_array = file_entry_array_create();
     file_entry_array_push(file_entry_array, file_entry_create("file"));
 
@@ -207,7 +232,7 @@ static void should_not_render_a_directory_if_an_empty_directory_header_is_provid
     CU_ASSERT(verify_that_no_output_was_printed());
 
     file_entry_array_destroy(&file_entry_array);
-    parsed_arguments_destroy(&parsed_args);
+    parsed_arguments_destroy(&parsed_arguments);
     render_context_destroy(&context);
 }
 
@@ -221,15 +246,15 @@ static void should_not_render_a_directory_if_a_NULL_file_entry_array_is_provided
     vfs_mock_setup(vfs);
 
     const char *args[] = { "dir", "dir2", NULL };
-    t_parsed_arguments *parsed_args = parse_arguments(2, args);
-    t_render_context *context = render_context_create(parsed_args);
+    get_parsed_arguments_result(2, args);
+    t_render_context *context = render_context_create(parsed_arguments);
 
     render_directory(context, "valid", NULL);
 
     CU_ASSERT(verify_that_no_output_was_printed());
 
     render_context_destroy(&context);
-    parsed_arguments_destroy(&parsed_args);
+    parsed_arguments_destroy(&parsed_arguments);
 }
 
 static void should_not_render_a_dir_header_if_its_not_needed(void)
@@ -243,8 +268,8 @@ static void should_not_render_a_dir_header_if_its_not_needed(void)
     const char *expected_file_name[] = { "file", "file2", "file3" };
     const char *dir_header = "dir";
     const char *args[] = { "dir", NULL };
-    t_parsed_arguments *parsed_args = parse_arguments(2, args);
-    t_render_context *context = render_context_create(parsed_args);
+    get_parsed_arguments_result(2, args);
+    t_render_context *context = render_context_create(parsed_arguments);
     t_file_entry_array *file_entry_array = file_entry_array_create();
     file_entry_array_push(file_entry_array, file_entry_create(expected_file_name[0]));
     file_entry_array_push(file_entry_array, file_entry_create(expected_file_name[1]));
@@ -260,7 +285,7 @@ static void should_not_render_a_dir_header_if_its_not_needed(void)
     ));
 
     file_entry_array_destroy(&file_entry_array);
-    parsed_arguments_destroy(&parsed_args);
+    parsed_arguments_destroy(&parsed_arguments);
     render_context_destroy(&context);
 }
 
@@ -276,8 +301,8 @@ static void should_not_render_a_leading_dir_header_newline_if_its_the_first_rend
     const char *expected_file_name[] = { "file", "file2", "file3" };
     const char *dir_header = "dir";
     const char *args[] = { "dir", "dir2", NULL };
-    t_parsed_arguments *parsed_args = parse_arguments(2, args);
-    t_render_context *context = render_context_create(parsed_args);
+    get_parsed_arguments_result(2, args);
+    t_render_context *context = render_context_create(parsed_arguments);
     t_file_entry_array *file_entry_array = file_entry_array_create();
     file_entry_array_push(file_entry_array, file_entry_create(expected_file_name[0]));
     file_entry_array_push(file_entry_array, file_entry_create(expected_file_name[1]));
@@ -294,7 +319,7 @@ static void should_not_render_a_leading_dir_header_newline_if_its_the_first_rend
     ));
 
     file_entry_array_destroy(&file_entry_array);
-    parsed_arguments_destroy(&parsed_args);
+    parsed_arguments_destroy(&parsed_arguments);
     render_context_destroy(&context);
 }
 
@@ -310,8 +335,8 @@ static void should_render_a_leading_dir_header_newline_if_its_not_first_render(v
     const char *expected_file_name[] = { "file", "file2" };
     const char *dir_header = "dir";
     const char *args[] = { "dir", "dir2", NULL };
-    t_parsed_arguments *parsed_args = parse_arguments(2, args);
-    t_render_context *context = render_context_create(parsed_args);
+    get_parsed_arguments_result(2, args);
+    t_render_context *context = render_context_create(parsed_arguments);
     t_file_entry_array *file_entry_array = file_entry_array_create();
     file_entry_array_push(file_entry_array, file_entry_create(expected_file_name[0]));
     file_entry_array_push(file_entry_array, file_entry_create(expected_file_name[1]));
@@ -333,7 +358,7 @@ static void should_render_a_leading_dir_header_newline_if_its_not_first_render(v
     ));
 
     file_entry_array_destroy(&file_entry_array);
-    parsed_arguments_destroy(&parsed_args);
+    parsed_arguments_destroy(&parsed_arguments);
     render_context_destroy(&context);
 }
 
@@ -354,14 +379,14 @@ static void should_render_the_types_separator_if_has_at_least_one_non_dir_and_on
     vfs_mock_setup(vfs);
 
     const char *args[] = { "dir", "file", NULL };
-    t_parsed_arguments *parsed_args = parse_arguments(2, args);
-    t_render_context *context = render_context_create(parsed_args);
+    get_parsed_arguments_result(2, args);
+    t_render_context *context = render_context_create(parsed_arguments);
 
     render_types_separator(context);
 
     CU_ASSERT(verify_that_the_output_printed_is("\n"));
 
-    parsed_arguments_destroy(&parsed_args);
+    parsed_arguments_destroy(&parsed_arguments);
     render_context_destroy(&context);
 }
 
@@ -375,14 +400,14 @@ static void should_not_render_the_types_separator_if_doesnt_have_at_least_one_no
     vfs_mock_setup(vfs);
 
     const char *args[] = { "file2", "file", NULL };
-    t_parsed_arguments *parsed_args = parse_arguments(2, args);
-    t_render_context *context = render_context_create(parsed_args);
+    get_parsed_arguments_result(2, args);
+    t_render_context *context = render_context_create(parsed_arguments);
 
     render_types_separator(context);
 
     CU_ASSERT(verify_that_no_output_was_printed());
 
-    parsed_arguments_destroy(&parsed_args);
+    parsed_arguments_destroy(&parsed_arguments);
     render_context_destroy(&context);
 }
 

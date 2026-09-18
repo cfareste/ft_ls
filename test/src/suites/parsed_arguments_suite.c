@@ -5,6 +5,7 @@
 
 #define SUITE_NAME "parsed_arguments"
 
+static t_result *parsed_arguments_result;
 static t_parsed_arguments *sut;
 
 static void test_setup(void)
@@ -15,7 +16,14 @@ static void test_setup(void)
 
 static void test_teardown(void)
 {
+    result_destroy(&parsed_arguments_result);
     parsed_arguments_destroy(&sut);
+}
+
+static void get_parsed_arguments_result(const int argc, const char **args)
+{
+    parsed_arguments_result = parse_arguments(argc, args);
+    sut = result_get_value(parsed_arguments_result);
 }
 
 static void should_be_created_correctly(void)
@@ -28,9 +36,10 @@ static void should_be_created_correctly(void)
 
     const char *valid_args[] = { NULL };
 
-    sut = parse_arguments(0, valid_args);
+    get_parsed_arguments_result(0, valid_args);
 
     CU_ASSERT_PTR_NOT_NULL(sut);
+    //TODO: Add assert for result status
     CU_ASSERT(verify_that_no_error_was_printed());
 }
 
@@ -43,7 +52,7 @@ static void should_be_destroyed_correctly(void)
     vfs_mock_setup(vfs);
 
     const char *valid_args[] = { NULL };
-    sut = parse_arguments(0, valid_args);
+    get_parsed_arguments_result(0, valid_args);
 
     parsed_arguments_destroy(&sut);
 
@@ -70,22 +79,22 @@ static void should_not_fail_to_destroy_if_its_already_null(void)
 static void should_return_NULL_if_num_of_arguments_is_negative(void)
 {
     const char *args[] = { "valid", "args", NULL };
-    t_parsed_arguments *parsed_arguments = parse_arguments(-1, args);
+    get_parsed_arguments_result(-1, args);
 
-    CU_ASSERT_PTR_NULL(parsed_arguments);
+    CU_ASSERT_PTR_NULL(sut);
     CU_ASSERT(verify_that_no_error_was_printed());
 
-    parsed_arguments_destroy(&parsed_arguments);
+    parsed_arguments_destroy(&sut);
 }
 
 static void should_return_NULL_if_arguments_are_NULL(void)
 {
-    t_parsed_arguments *parsed_arguments = parse_arguments(1, NULL);
+    get_parsed_arguments_result(1, NULL);
 
-    CU_ASSERT_PTR_NULL(parsed_arguments);
+    CU_ASSERT_PTR_NULL(sut);
     CU_ASSERT(verify_that_no_error_was_printed());
 
-    parsed_arguments_destroy(&parsed_arguments);
+    parsed_arguments_destroy(&sut);
 }
 
 static void should_return_default_values_if_arguments_are_NULL(void)
@@ -98,14 +107,14 @@ static void should_return_default_values_if_arguments_are_NULL(void)
 
     const char *arguments[] = { NULL };
 
-    t_parsed_arguments *parsed_arguments = parse_arguments(0, arguments);
-    const char * const *file_operands = parsed_arguments_get_file_operands(parsed_arguments);
+    get_parsed_arguments_result(0, arguments);
+    const char * const *file_operands = parsed_arguments_get_file_operands(sut);
 
-    CU_ASSERT_PTR_NOT_NULL(parsed_arguments);
+    CU_ASSERT_PTR_NOT_NULL(sut);
     CU_ASSERT_STRING_EQUAL(file_operands[0], ".");
     CU_ASSERT(verify_that_no_error_was_printed());
-
-    parsed_arguments_destroy(&parsed_arguments);
+    // TODO: Put this in test teardown
+    parsed_arguments_destroy(&sut);
 }
 
 static void should_return_NULL_file_operands_if_NULL_parsed_arguments_are_passed(void)
@@ -127,9 +136,9 @@ static void should_return_the_file_operands(void)
     vfs_mock_setup(vfs);
 
     const char *args[] = { "Valid", "file", "operands", NULL };
-    t_parsed_arguments *parsed_arguments = parse_arguments(3, args);
+    get_parsed_arguments_result(3, args);
 
-    const char * const *file_operands = parsed_arguments_get_file_operands(parsed_arguments);
+    const char * const *file_operands = parsed_arguments_get_file_operands(sut);
 
     CU_ASSERT_STRING_EQUAL(file_operands[0], args[0]);
     CU_ASSERT_STRING_EQUAL(file_operands[1], args[1]);
@@ -137,7 +146,7 @@ static void should_return_the_file_operands(void)
     CU_ASSERT_PTR_NULL(file_operands[3]);
     CU_ASSERT(verify_that_no_error_was_printed());
 
-    parsed_arguments_destroy(&parsed_arguments);
+    parsed_arguments_destroy(&sut);
 }
 
 static void should_return_NULL_non_directory_file_operands_if_NULL_parsed_arguments_are_passed(void)
@@ -163,9 +172,9 @@ static void should_return_the_non_directory_file_operands(void)
     vfs_mock_setup(vfs);
 
     const char *args[] = { "1_socket", "2_symlink", "3_char_device", "4_reg_file", "5_pipe", "6_dir", "7_block_device", NULL };
-    t_parsed_arguments *parsed_arguments = parse_arguments(7, args);
+    get_parsed_arguments_result(7, args);
 
-    const char * const *non_directory_file_operands = parsed_arguments_get_non_directory_file_operands(parsed_arguments);
+    const char * const *non_directory_file_operands = parsed_arguments_get_non_directory_file_operands(sut);
 
     CU_ASSERT_STRING_EQUAL(non_directory_file_operands[0], args[0]);
     CU_ASSERT_STRING_EQUAL(non_directory_file_operands[1], args[1]);
@@ -176,7 +185,7 @@ static void should_return_the_non_directory_file_operands(void)
     CU_ASSERT_PTR_NULL(non_directory_file_operands[6]);
     CU_ASSERT(verify_that_no_error_was_printed());
 
-    parsed_arguments_destroy(&parsed_arguments);
+    parsed_arguments_destroy(&sut);
 }
 
 static void should_return_NULL_directory_file_operands_if_NULL_parsed_arguments_are_passed(void)
@@ -203,16 +212,16 @@ static void should_return_the_directory_file_operands(void)
     vfs_mock_setup(vfs);
 
     const char *args[] = { "socket", "symlink", "dir1", "char_device", "reg_file", "pipe", "dir2", "block_device", NULL };
-    t_parsed_arguments *parsed_arguments = parse_arguments(8, args);
+    get_parsed_arguments_result(8, args);
 
-    const char * const *directory_file_operands = parsed_arguments_get_directory_file_operands(parsed_arguments);
+    const char * const *directory_file_operands = parsed_arguments_get_directory_file_operands(sut);
 
     CU_ASSERT_STRING_EQUAL(directory_file_operands[0], args[2]);
     CU_ASSERT_STRING_EQUAL(directory_file_operands[1], args[6]);
     CU_ASSERT_PTR_NULL(directory_file_operands[2]);
     CU_ASSERT(verify_that_no_error_was_printed());
 
-    parsed_arguments_destroy(&parsed_arguments);
+    parsed_arguments_destroy(&sut);
 }
 
 static void should_return_false_for_multiple_file_operands_if_NULL_parsed_arguments_are_passed(void)
@@ -232,14 +241,14 @@ static void should_return_false_for_multiple_file_operands_if_has_less_than_two(
     vfs_mock_setup(vfs);
 
     const char *args[] = { NULL };
-    t_parsed_arguments *parsed_arguments = parse_arguments(0, args);
+    get_parsed_arguments_result(0, args);
 
-    const int has_multiple_file_operands = parsed_arguments_has_multiple_file_operands(parsed_arguments);
+    const int has_multiple_file_operands = parsed_arguments_has_multiple_file_operands(sut);
 
     CU_ASSERT_EQUAL(has_multiple_file_operands, 0);
     CU_ASSERT(verify_that_no_error_was_printed());
 
-    parsed_arguments_destroy(&parsed_arguments);
+    parsed_arguments_destroy(&sut);
 }
 
 static void should_return_true_for_multiple_file_operands_if_has_equal_or_more_than_two(void)
@@ -252,14 +261,14 @@ static void should_return_true_for_multiple_file_operands_if_has_equal_or_more_t
     vfs_mock_setup(vfs);
 
     const char *args[] = { "file", "dir", NULL };
-    t_parsed_arguments *parsed_arguments = parse_arguments(2, args);
+    get_parsed_arguments_result(2, args);
 
-    const int has_multiple_file_operands = parsed_arguments_has_multiple_file_operands(parsed_arguments);
+    const int has_multiple_file_operands = parsed_arguments_has_multiple_file_operands(sut);
 
     CU_ASSERT_EQUAL(has_multiple_file_operands, 1);
     CU_ASSERT(verify_that_no_error_was_printed());
 
-    parsed_arguments_destroy(&parsed_arguments);
+    parsed_arguments_destroy(&sut);
 }
 
 static void should_return_false_for_has_directory_file_operands_if_NULL_parsed_arguments_are_passed(void)
@@ -281,14 +290,14 @@ static void should_return_false_for_has_directory_file_operands_if_it_does_not_h
     vfs_mock_setup(vfs);
 
     const char *args[] = { "file", "file2", "file3", NULL };
-    t_parsed_arguments *parsed_arguments = parse_arguments(3, args);
+    get_parsed_arguments_result(3, args);
 
-    const int has_directory_file_operands = parsed_arguments_has_directory_file_operands(parsed_arguments);
+    const int has_directory_file_operands = parsed_arguments_has_directory_file_operands(sut);
 
     CU_ASSERT_EQUAL(has_directory_file_operands, 0);
     CU_ASSERT(verify_that_no_error_was_printed());
 
-    parsed_arguments_destroy(&parsed_arguments);
+    parsed_arguments_destroy(&sut);
 }
 
 static void should_return_true_for_has_directory_file_operands_if_it_has_at_least_one(void)
@@ -300,14 +309,14 @@ static void should_return_true_for_has_directory_file_operands_if_it_has_at_leas
     vfs_mock_setup(vfs);
 
     const char *args[] = { "dir", NULL };
-    t_parsed_arguments *parsed_arguments = parse_arguments(1, args);
+    get_parsed_arguments_result(1, args);
 
-    const int has_directory_file_operands = parsed_arguments_has_directory_file_operands(parsed_arguments);
+    const int has_directory_file_operands = parsed_arguments_has_directory_file_operands(sut);
 
     CU_ASSERT_EQUAL(has_directory_file_operands, 1);
     CU_ASSERT(verify_that_no_error_was_printed());
 
-    parsed_arguments_destroy(&parsed_arguments);
+    parsed_arguments_destroy(&sut);
 }
 
 static void should_return_false_for_has_mixed_types_file_operands_if_it_null_parsed_arguments_are_specified(void)
@@ -326,14 +335,14 @@ static void should_return_false_for_has_mixed_types_file_operands_if_it_does_not
     vfs_mock_setup(vfs);
 
     const char *args[] = { "file2", "file", NULL };
-    t_parsed_arguments *parsed_arguments = parse_arguments(2, args);
+    get_parsed_arguments_result(2, args);
 
-    const int has_mixed_types_file_operands = parsed_arguments_has_mixed_types_file_operands(parsed_arguments);
+    const int has_mixed_types_file_operands = parsed_arguments_has_mixed_types_file_operands(sut);
 
     CU_ASSERT_EQUAL(has_mixed_types_file_operands, 0);
     CU_ASSERT(verify_that_no_error_was_printed());
 
-    parsed_arguments_destroy(&parsed_arguments);
+    parsed_arguments_destroy(&sut);
 }
 
 static void should_return_true_for_has_mixed_types_file_operands_if_it_does_have_at_least_one_non_dir_and_one_dir(void)
@@ -346,14 +355,14 @@ static void should_return_true_for_has_mixed_types_file_operands_if_it_does_have
     vfs_mock_setup(vfs);
 
     const char *args[] = { "dir", "file", NULL };
-    t_parsed_arguments *parsed_arguments = parse_arguments(2, args);
+    get_parsed_arguments_result(2, args);
 
-    const int has_mixed_types_file_operands = parsed_arguments_has_mixed_types_file_operands(parsed_arguments);
+    const int has_mixed_types_file_operands = parsed_arguments_has_mixed_types_file_operands(sut);
 
     CU_ASSERT_EQUAL(has_mixed_types_file_operands, 1);
     CU_ASSERT(verify_that_no_error_was_printed());
 
-    parsed_arguments_destroy(&parsed_arguments);
+    parsed_arguments_destroy(&sut);
 }
 
 static void should_sort_the_non_directory_file_operands_by_ascii_by_default(void)
@@ -381,9 +390,9 @@ static void should_sort_the_non_directory_file_operands_by_ascii_by_default(void
     vfs_mock_setup(vfs);
 
     const char *args[] = { "a", "2file", "_DIR", ".hiddir", "_file", "f", "dir", ".hidden_file", "FILE", NULL };
-    t_parsed_arguments *parsed_arguments = parse_arguments(9, args);
+    get_parsed_arguments_result(9, args);
 
-    const char * const *non_directory_file_operands = parsed_arguments_get_non_directory_file_operands(parsed_arguments);
+    const char * const *non_directory_file_operands = parsed_arguments_get_non_directory_file_operands(sut);
 
     CU_ASSERT_STRING_EQUAL(non_directory_file_operands[0], args[7]);
     CU_ASSERT_STRING_EQUAL(non_directory_file_operands[1], args[1]);
@@ -394,7 +403,7 @@ static void should_sort_the_non_directory_file_operands_by_ascii_by_default(void
     CU_ASSERT_PTR_NULL(non_directory_file_operands[6]);
     CU_ASSERT(verify_that_no_error_was_printed());
 
-    parsed_arguments_destroy(&parsed_arguments);
+    parsed_arguments_destroy(&sut);
 }
 
 static void should_sort_the_directory_file_operands_by_ascii_by_default(void)
@@ -422,9 +431,9 @@ static void should_sort_the_directory_file_operands_by_ascii_by_default(void)
     vfs_mock_setup(vfs);
 
     const char *args[] = { "a", "2file", "_DIR", ".hiddir", "_file", "f", "dir", ".hidden_file", "FILE", NULL };
-    t_parsed_arguments *parsed_arguments = parse_arguments(9, args);
+    get_parsed_arguments_result(9, args);
 
-    const char * const *directory_file_operands = parsed_arguments_get_directory_file_operands(parsed_arguments);
+    const char * const *directory_file_operands = parsed_arguments_get_directory_file_operands(sut);
 
     CU_ASSERT_STRING_EQUAL(directory_file_operands[0], args[3]);
     CU_ASSERT_STRING_EQUAL(directory_file_operands[1], args[2]);
@@ -432,7 +441,7 @@ static void should_sort_the_directory_file_operands_by_ascii_by_default(void)
     CU_ASSERT_PTR_NULL(directory_file_operands[3]);
     CU_ASSERT(verify_that_no_error_was_printed());
 
-    parsed_arguments_destroy(&parsed_arguments);
+    parsed_arguments_destroy(&sut);
 }
 
 static void should_be_created_correctly_even_if_the_specified_argument_cannot_be_accessed(void)
@@ -445,7 +454,7 @@ static void should_be_created_correctly_even_if_the_specified_argument_cannot_be
 
     const char *valid_args[] = { "notExistent", NULL };
 
-    sut = parse_arguments(1, valid_args);
+    get_parsed_arguments_result(1, valid_args);
     const char * const *non_directory_file_operands = parsed_arguments_get_directory_file_operands(sut);
     const char * const *directory_file_operands = parsed_arguments_get_directory_file_operands(sut);
 
