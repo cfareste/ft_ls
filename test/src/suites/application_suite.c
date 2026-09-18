@@ -1073,7 +1073,7 @@ static void should_fail_with_a_major_error_and_not_print_anything_if_the_specifi
     CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MAJOR_ERROR);
 }
 
-static void should_fail_with_a_major_error_and_not_print_anything_if_one_file_operand_fails_to_be_accessed(void)
+static void should_fail_with_a_major_error_and_print_the_working_operand_if_one_file_operand_fails_to_be_accessed(void)
 {
     const t_vfs_mock_entry vfs[] = {
         MOCK_FILE_ACCESS_ERROR(EACCES, "no/perms"),
@@ -1095,6 +1095,46 @@ static void should_fail_with_a_major_error_and_not_print_anything_if_one_file_op
         "ft_ls: cannot access '%s': %s\n",
         "no/perms", strerror(EACCES))
     );
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MAJOR_ERROR);
+}
+
+static void should_fail_with_a_major_error_and_print_only_the_working_operands_if_one_file_operand_fails_to_be_accessed(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE_ACCESS_ERROR(ELOOP, "linkloop"),
+        MOCK_FILE("file"),
+        MOCK_FILE("zFile"),
+        MOCK_DIR("workingDir", ".", "..", "fileDir"),
+        MOCK_DIR("zWorkingDir", ".", "..", "zFileDir"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "linkloop", "file", "workingDir", "zWorkingDir", "zFile", NULL };
+    const char *expected_file_names[] = { "file", "zFile" };
+    const char *expected_first_dir_file_name = "fileDir";
+    const char *expected_second_dir_file_name = "zFileDir";
+    get_parsed_arguments_result(6, arguments);
+
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n"
+        "\n%s:\n"
+        "%s\n",
+        expected_file_names[0],
+        expected_file_names[1],
+        arguments[2],
+        expected_first_dir_file_name,
+        arguments[3],
+        expected_second_dir_file_name
+    ));
+    CU_ASSERT(verify_that_the_error_printed_is(
+        "ft_ls: cannot access '%s': %s\n",
+        "linkloop", strerror(ELOOP)
+    ));
     CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MAJOR_ERROR);
 }
 
@@ -1138,6 +1178,7 @@ void register_application_suite(void)
         CU_add_test(suite, "should_fail_with_a_major_error_and_not_print_anything_if_all_directories_fail_to_scan", should_fail_with_a_major_error_and_not_print_anything_if_all_directories_fail_to_scan);
         CU_add_test(suite, "should_fail_with_a_major_error_and_print_only_the_working_file_operands_if_some_directories_fail_to_scan", should_fail_with_a_major_error_and_print_only_the_working_file_operands_if_some_directories_fail_to_scan);
         CU_add_test(suite, "should_fail_with_a_major_error_and_not_print_anything_if_the_specified_file_operand_fails_to_be_accessed", should_fail_with_a_major_error_and_not_print_anything_if_the_specified_file_operand_fails_to_be_accessed);
-        CU_add_test(suite, "should_fail_with_a_major_error_and_not_print_anything_if_one_file_operand_fails_to_be_accessed", should_fail_with_a_major_error_and_not_print_anything_if_one_file_operand_fails_to_be_accessed);
+        CU_add_test(suite, "should_fail_with_a_major_error_and_print_the_working_operand_if_one_file_operand_fails_to_be_accessed", should_fail_with_a_major_error_and_print_the_working_operand_if_one_file_operand_fails_to_be_accessed);
+        CU_add_test(suite, "should_fail_with_a_major_error_and_print_only_the_working_operands_if_one_file_operand_fails_to_be_accessed", should_fail_with_a_major_error_and_print_only_the_working_operands_if_one_file_operand_fails_to_be_accessed);
     }
 }
