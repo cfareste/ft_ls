@@ -31,7 +31,7 @@ static unsigned int get_num_of_non_directory_file_operands(const t_file_type *fi
 {
     unsigned int num_of_non_directory_file_operands = 0;
 
-    for (unsigned int i = 0; file_operand_types[i] != 0; i++)
+    for (unsigned int i = 0; file_operand_types[i] != FILE_TYPE_NONE; i++)
     {
         if (file_operand_types[i] != FILE_TYPE_DIRECTORY && file_operand_types[i] != FILE_TYPE_UNKNOWN)
         {
@@ -46,7 +46,7 @@ static unsigned int get_num_of_directory_file_operands(const t_file_type *file_o
 {
     unsigned int num_of_directory_file_operands = 0;
 
-    for (unsigned int i = 0; file_operand_types[i] != 0; i++)
+    for (unsigned int i = 0; file_operand_types[i] != FILE_TYPE_NONE; i++)
     {
         if (file_operand_types[i] == FILE_TYPE_DIRECTORY)
         {
@@ -78,6 +78,8 @@ t_file_type *file_operands_get_types(char **file_operands)
 
         file_stats_destroy(&file_operand_stats);
     }
+
+    file_operands_types[num_of_operands] = FILE_TYPE_NONE;
 
     return file_operands_types;
 }

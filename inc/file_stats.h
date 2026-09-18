@@ -2,6 +2,7 @@
 
 typedef enum e_file_type
 {
+    FILE_TYPE_NONE,
     FILE_TYPE_UNKNOWN,
     FILE_TYPE_REGULAR,
     FILE_TYPE_DIRECTORY,
