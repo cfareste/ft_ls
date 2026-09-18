@@ -55,7 +55,6 @@ int application_run(const t_result *parsing_arguments_result)
     if (parsing_arguments_result == NULL)
         return FT_LS_APPLICATION_MAJOR_ERROR;
 
-    //TODO: Add const to void *
     const t_parsed_arguments *parsed_arguments = result_get_value(parsing_arguments_result);
     t_render_context *render_context = render_context_create(parsed_arguments);
 

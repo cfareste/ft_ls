@@ -8,7 +8,6 @@ int	main(const int argc, const char **argv)
 	const int result = application_run(parsing_arguments_result);
 
 	parsed_arguments_destroy(&parsed_arguments);
-	// TODO: add destroy function as parameter
 	result_destroy(&parsing_arguments_result);
 
 	return result;

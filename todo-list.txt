@@ -1,14 +1,8 @@
 TODO:
 1. Implementar LS-12 Manage invalid operations
 2. Añadir valgrind a los tests E2E
-3. Error de stat
-   - Manejarlo en parsed arguments (saltarse ese file operand)
-   - Código de error
-4. Estado de error de parsed args (stat) en caso de ser file operand
-5. Estado de error de parsed args (stat) en caso de NO ser file operand
-6. Tests parsed args y application stat
-7. Mirar posibles refactors que me haya dejado (list_changed_files_in_branch)
-8. Revisar requerimientos y apuntarlos más claramente (comportamiento local con 1 fallo, comportamiento global, errores faltantes...)
+3. Tests parsed args y application stat
+4. Mirar posibles refactors que me haya dejado (list_changed_files_in_branch)
 
 
 TODO En algún momento:
