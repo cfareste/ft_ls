@@ -87,14 +87,14 @@ char **file_operands_get_non_directory(char **file_operands, const t_file_type *
     const unsigned int num_of_non_directory_file_operands = get_num_of_non_directory_file_operands(file_operands_types);
     char **non_directory_file_operands = ft_safe_calloc(num_of_non_directory_file_operands + 1, sizeof(char *));
 
-    int j = 0;
+    int num_of_non_directory_operands = 0;
     for (int i = 0; file_operands[i] != NULL; i++)
     {
         if (file_operands_types[i] == FILE_TYPE_DIRECTORY || file_operands_types[i] == FILE_TYPE_UNKNOWN)
             continue ;
 
-        non_directory_file_operands[j] = ft_safe_strdup(file_operands[i]);
-        j++;
+        non_directory_file_operands[num_of_non_directory_operands] = ft_safe_strdup(file_operands[i]);
+        num_of_non_directory_operands++;
     }
 
     return non_directory_file_operands;
@@ -105,14 +105,14 @@ char **file_operands_get_directory(char **file_operands, const t_file_type *file
     const unsigned int num_of_directory_file_operands = get_num_of_directory_file_operands(file_operand_types);
     char **directory_file_operands = ft_safe_calloc(num_of_directory_file_operands + 1, sizeof(char *));
 
-    int j = 0;
+    int num_of_directory_operands = 0;
     for (int i = 0; file_operands[i] != NULL; i++)
     {
         if (file_operand_types[i] != FILE_TYPE_DIRECTORY)
             continue ;
 
-        directory_file_operands[j] = ft_safe_strdup(file_operands[i]);
-        j++;
+        directory_file_operands[num_of_directory_operands] = ft_safe_strdup(file_operands[i]);
+        num_of_directory_operands++;
     }
 
     return directory_file_operands;
