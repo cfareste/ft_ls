@@ -35,7 +35,7 @@ QA LS-8 Execution without parameters (`ls -aU | cat`)
 2. Un solo fichero - No aplicable (siempre hay '.' y '..')
 3. Múltiples ficheros
 4. No memory leaks
-No probado en E2E: Directorio vacío, 1 fichero
+No probado en E2E: Current dir solo 1 fichero
 
 
 QA LS-11 Execution with parameters (`ls -aU file ... | cat`)

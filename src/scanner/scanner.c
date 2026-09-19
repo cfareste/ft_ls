@@ -21,28 +21,22 @@ t_result *scan(const char *path)
         return result_create_failed(NULL);
 
     t_dir_stream *dir_stream = directory_open(path);
-
     if (dir_stream == NULL)
         return result_create_failed(NULL);
 
-    int failed = 0;
     t_file_entry_array *file_entry_array = file_entry_array_create();
     t_dir_entry *dir_entry = directory_get_next_entry(dir_stream);
-
-    if (dir_entry == NULL)
-        failed = 1;
-
     while (!directory_is_entry_empty(dir_entry))
     {
         push_entry(file_entry_array, dir_entry);
 
         directory_destroy_entry(&dir_entry);
         dir_entry = directory_get_next_entry(dir_stream);
-
-        if (dir_entry == NULL)
-            failed = 1;
     }
 
+    int failed = 0;
+    if (dir_entry == NULL)
+        failed = 1;
     directory_destroy_entry(&dir_entry);
     if (directory_close(&dir_stream) == -1)
         failed = 1;
