@@ -22,6 +22,12 @@ static t_dir_stream *handle_opendir_error(const char *path)
     return NULL;
 }
 
+static t_dir_entry *handle_readdir_error(const char *dir_name)
+{
+    report_reading_directory_error(dir_name);
+    return NULL;
+}
+
 t_dir_stream *directory_open(const char *path)
 {
     if (!ft_is_valid_path(path))
@@ -46,10 +52,7 @@ t_dir_entry *directory_get_next_entry(const t_dir_stream *dir_stream)
     errno = 0;
     struct dirent *entry = readdir(dir_stream->dir);
     if (entry == NULL && errno != 0)
-    {
-        report_reading_directory_error(dir_stream->dir_name);
-        return NULL;
-    }
+        return handle_readdir_error(dir_stream->dir_name);
 
     t_dir_entry *dir_entry = ft_safe_calloc(1, sizeof(t_dir_entry));
     dir_entry->entry = entry;
