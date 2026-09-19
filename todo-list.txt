@@ -1,5 +1,4 @@
 TODO:
-1. Implementar LS-12 Manage invalid operations
 
 
 TODO En algún momento:
