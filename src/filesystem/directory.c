@@ -104,7 +104,6 @@ int directory_close(t_dir_stream **dir_stream)
         return -1;
 
     const int result = closedir((*dir_stream)->dir);
-
     if (result != 0)
         report_closing_directory_error((* dir_stream)->dir_name);
 
