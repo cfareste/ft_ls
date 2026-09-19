@@ -9,6 +9,5 @@ int	main(const int argc, const char **argv)
 
 	parsed_arguments_destroy(&parsed_arguments);
 	result_destroy(&parsing_arguments_result);
-
 	return result;
 }
