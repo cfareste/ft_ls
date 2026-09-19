@@ -16,6 +16,12 @@ struct s_dir_entry
     struct dirent *entry;
 };
 
+static t_dir_stream *handle_opendir_error(const char *path)
+{
+    report_opening_directory_error(path);
+    return NULL;
+}
+
 t_dir_stream *directory_open(const char *path)
 {
     if (!ft_is_valid_path(path))
@@ -23,10 +29,7 @@ t_dir_stream *directory_open(const char *path)
 
     DIR *dir = opendir(path);
     if (dir == NULL)
-    {
-        report_opening_directory_error(path);
-        return NULL;
-    }
+        return handle_opendir_error(path);
 
     t_dir_stream *dir_stream = ft_safe_calloc(1, sizeof(t_dir_stream));
     dir_stream->dir = dir;
@@ -50,6 +53,7 @@ t_dir_entry *directory_get_next_entry(const t_dir_stream *dir_stream)
 
     t_dir_entry *dir_entry = ft_safe_calloc(1, sizeof(t_dir_entry));
     dir_entry->entry = entry;
+
     return dir_entry;
 }
 
