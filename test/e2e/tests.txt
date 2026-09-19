@@ -41,3 +41,4 @@ nonExistent                                                                     
 src nopermdir/file                                                              ::       src nopermdir/file
 Makefile src Makefile/ .hidden .hiddir                                          ::       Makefile src Makefile/ .hidden .hiddir
 nonExistent nopermdir/file                                                      ::       nonExistent nopermdir/file
+nonExistent src Makefile Makefile/ linkdir/ nopermdir/file                      ::       nonExistent src Makefile Makefile/ linkdir/ nopermdir/file
