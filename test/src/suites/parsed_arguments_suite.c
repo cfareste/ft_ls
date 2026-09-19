@@ -104,41 +104,13 @@ static void should_return_default_values_if_arguments_are_NULL(void)
     const char *arguments[] = { NULL };
 
     get_parsed_arguments_result(0, arguments);
-    const char * const *file_operands = parsed_arguments_get_file_operands(sut);
+    const char * const *non_directory_file_operands = parsed_arguments_get_non_directory_file_operands(sut);
+    const char * const *directory_file_operands = parsed_arguments_get_directory_file_operands(sut);
 
     CU_ASSERT_PTR_NOT_NULL(sut);
-    CU_ASSERT_STRING_EQUAL(file_operands[0], ".");
-    CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
-    CU_ASSERT(verify_that_no_error_was_printed());
-}
-
-static void should_return_NULL_file_operands_if_NULL_parsed_arguments_are_passed(void)
-{
-    const char * const *file_operands = parsed_arguments_get_file_operands(NULL);
-
-    CU_ASSERT_PTR_NULL(file_operands);
-    CU_ASSERT(verify_that_no_error_was_printed());
-}
-
-static void should_return_the_file_operands(void)
-{
-    const t_vfs_mock_entry vfs[] = {
-        MOCK_FILE("Valid"),
-        MOCK_FILE("file"),
-        MOCK_FILE("operands"),
-        MOCK_NULL_TERMINATOR()
-    };
-    vfs_mock_setup(vfs);
-
-    const char *args[] = { "Valid", "file", "operands", NULL };
-    get_parsed_arguments_result(3, args);
-
-    const char * const *file_operands = parsed_arguments_get_file_operands(sut);
-
-    CU_ASSERT_STRING_EQUAL(file_operands[0], args[0]);
-    CU_ASSERT_STRING_EQUAL(file_operands[1], args[1]);
-    CU_ASSERT_STRING_EQUAL(file_operands[2], args[2]);
-    CU_ASSERT_PTR_NULL(file_operands[3]);
+    CU_ASSERT_PTR_NULL(non_directory_file_operands[0]);
+    CU_ASSERT_STRING_EQUAL(directory_file_operands[0], ".");
+    CU_ASSERT_PTR_NULL(directory_file_operands[1]);
     CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
     CU_ASSERT(verify_that_no_error_was_printed());
 }
@@ -592,8 +564,6 @@ void register_parsed_arguments_suite(void)
         CU_add_test(suite, "should_return_NULL_if_num_of_arguments_is_negative", should_return_NULL_if_num_of_arguments_is_negative);
         CU_add_test(suite, "should_return_NULL_if_arguments_are_NULL", should_return_NULL_if_arguments_are_NULL);
         CU_add_test(suite, "should_be_created_with_default_values_if_arguments_are_NULL", should_return_default_values_if_arguments_are_NULL);
-        CU_add_test(suite, "should_return_NULL_file_operands_if_NULL_parsed_arguments_are_passed", should_return_NULL_file_operands_if_NULL_parsed_arguments_are_passed);
-        CU_add_test(suite, "should_return_the_file_operands", should_return_the_file_operands);
         CU_add_test(suite, "should_return_NULL_non_directory_file_operands_if_NULL_parsed_arguments_are_passed", should_return_NULL_non_directory_file_operands_if_NULL_parsed_arguments_are_passed);
         CU_add_test(suite, "should_return_the_non_directory_file_operands", should_return_the_non_directory_file_operands);
         CU_add_test(suite, "should_return_NULL_directory_file_operands_if_NULL_parsed_arguments_are_passed", should_return_NULL_directory_file_operands_if_NULL_parsed_arguments_are_passed);

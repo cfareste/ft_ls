@@ -47,14 +47,6 @@ t_result *parse_arguments(const int num_of_arguments, const char **arguments)
     return result_create_successful(parsed_arguments);
 }
 
-const char * const *parsed_arguments_get_file_operands(const t_parsed_arguments *parsed_arguments)
-{
-    if (parsed_arguments == NULL)
-        return NULL;
-
-    return (const char * const *) parsed_arguments->file_operands;
-}
-
 const char * const *parsed_arguments_get_non_directory_file_operands(const t_parsed_arguments *parsed_arguments)
 {
     if (parsed_arguments == NULL)
