@@ -1,63 +1,79 @@
 #include <stddef.h>
 #include "application.h"
 #include "renderer.h"
-#include "error_codes.h"
 #include "scanner.h"
 
-static int check_if_should_print_directory_header(const t_parsed_arguments *parsed_arguments)
+static t_file_entry_array *create_non_directory_entry_array(const char *non_directory_file_operand)
 {
-    const int has_multiple_file_operands = parsed_arguments_has_multiple_file_operands(parsed_arguments);
-    const int has_directory_file_operands = parsed_arguments_has_directory_file_operands(parsed_arguments);
+    t_file_entry_array *file_entry_array = file_entry_array_create();
+    t_file_entry *file_entry = file_entry_create(non_directory_file_operand);
+    file_entry_array_push(file_entry_array, file_entry);
 
-    return has_multiple_file_operands && has_directory_file_operands;
+    return file_entry_array;
 }
 
-static void process_non_directory_file_operands(const t_parsed_arguments *parsed_arguments, t_render_context *render_context)
+static void process_non_directory_file_operands(const t_parsed_arguments *parsed_arguments, const t_render_context *render_context)
 {
     const char * const *non_directory_file_operands = parsed_arguments_get_non_directory_file_operands(parsed_arguments);
 
     for (unsigned int i = 0; non_directory_file_operands[i] != NULL; i++)
     {
-        t_file_entry_array *file_entry_array = file_entry_array_create();
-        t_file_entry *file_entry = file_entry_create(non_directory_file_operands[i]);
-        file_entry_array_push(file_entry_array, file_entry);
+        t_file_entry_array *file_entry_array = create_non_directory_entry_array(non_directory_file_operands[i]);
 
-        render(file_entry_array, render_context);
+        render_entries(render_context, file_entry_array);
 
         file_entry_array_destroy(&file_entry_array);
     }
 }
 
-static void process_directory_file_operands(const t_parsed_arguments *parsed_arguments, t_render_context *render_context)
+static t_ft_ls_error_code process_directory_file_operands(const t_parsed_arguments *parsed_arguments, t_render_context *render_context)
 {
+    t_ft_ls_error_code error_code = FT_LS_APPLICATION_SUCCESS;
     const char * const *directory_file_operands = parsed_arguments_get_directory_file_operands(parsed_arguments);
-    const int should_print_directory_header = check_if_should_print_directory_header(parsed_arguments);
 
     for (unsigned int i = 0; directory_file_operands[i] != NULL; i++)
     {
-        const char *directory_header = should_print_directory_header ? directory_file_operands[i] : NULL;
-        t_file_entry_array *file_entry_array = scan(directory_file_operands[i]);
+        t_result *result = scan(directory_file_operands[i]);
+        t_file_entry_array *file_entry_array = result_get_value(result);
+
+        if (result_has_failed(result))
+            error_code = FT_LS_APPLICATION_MAJOR_ERROR;
 
         file_entry_array_sort(file_entry_array);
+        render_directory(render_context, directory_file_operands[i], file_entry_array);
 
-        render_context_set_directory_header(render_context, directory_header);
-        render(file_entry_array, render_context);
-
+        result_destroy(&result);
         file_entry_array_destroy(&file_entry_array);
     }
+
+    return error_code;
 }
 
-int application_run(const t_parsed_arguments *parsed_arguments)
+static t_ft_ls_error_code process_file_operands(const t_parsed_arguments *parsed_arguments, t_render_context *render_context)
 {
-    if (parsed_arguments == NULL)
+    process_non_directory_file_operands(parsed_arguments, render_context);
+    render_types_separator(render_context);
+    return process_directory_file_operands(parsed_arguments, render_context);
+}
+
+static t_ft_ls_error_code get_ft_ls_error_code(const t_result *parsing_arguments_result, const t_ft_ls_error_code file_operands_code)
+{
+    if (result_has_failed(parsing_arguments_result))
         return FT_LS_APPLICATION_MAJOR_ERROR;
 
-    t_render_context *render_context = render_context_create();
+    return file_operands_code;
+}
 
-    process_non_directory_file_operands(parsed_arguments, render_context);
-    process_directory_file_operands(parsed_arguments, render_context);
+t_ft_ls_error_code application_run(const t_result *parsing_arguments_result)
+{
+    if (parsing_arguments_result == NULL)
+        return FT_LS_APPLICATION_MAJOR_ERROR;
+
+    const t_parsed_arguments *parsed_arguments = result_get_value(parsing_arguments_result);
+    t_render_context *render_context = render_context_create(parsed_arguments);
+
+    const t_ft_ls_error_code file_operands_error_code = process_file_operands(parsed_arguments, render_context);
 
     render_context_destroy(&render_context);
-
-    return FT_LS_APPLICATION_SUCCESS;
+    return get_ft_ls_error_code(parsing_arguments_result, file_operands_error_code);
 }

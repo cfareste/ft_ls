@@ -7,6 +7,7 @@
 
 static void test_setup(void)
 {
+    reset_printing_buffer();
     vfs_mock_reset();
 }
 
@@ -21,6 +22,7 @@ static void should_create_file_stats_correctly(void)
     t_file_stats *stats = file_stats_get("valid_file");
 
     CU_ASSERT_PTR_NOT_NULL(stats);
+    CU_ASSERT(verify_that_no_error_was_printed());
 
     file_stats_destroy(&stats);
 }
@@ -30,6 +32,7 @@ static void should_return_NULL_when_creating_file_stats_with_a_NULL_path(void)
     const t_file_stats *stats = file_stats_get(NULL);
 
     CU_ASSERT_PTR_NULL(stats);
+    CU_ASSERT(verify_that_no_error_was_printed());
 }
 
 static void should_return_NULL_when_creating_file_stats_with_an_empty_path(void)
@@ -37,6 +40,7 @@ static void should_return_NULL_when_creating_file_stats_with_an_empty_path(void)
     const t_file_stats *stats = file_stats_get("");
 
     CU_ASSERT_PTR_NULL(stats);
+    CU_ASSERT(verify_that_no_error_was_printed());
 }
 
 static void should_destroy_file_stats_correctly(void)
@@ -52,11 +56,14 @@ static void should_destroy_file_stats_correctly(void)
     file_stats_destroy(&stats);
 
     CU_ASSERT_PTR_NULL(stats);
+    CU_ASSERT(verify_that_no_error_was_printed());
 }
 
 static void should_not_fail_to_destroy_file_stats_if_a_NULL_pointer_is_passed(void)
 {
     file_stats_destroy(NULL);
+
+    CU_ASSERT(verify_that_no_error_was_printed());
 }
 
 static void should_not_fail_to_destroy_file_stats_if_a_NULL_file_stats_is_passed(void)
@@ -64,13 +71,16 @@ static void should_not_fail_to_destroy_file_stats_if_a_NULL_file_stats_is_passed
     t_file_stats *invalid_stats = NULL;
 
     file_stats_destroy(&invalid_stats);
+
+    CU_ASSERT(verify_that_no_error_was_printed());
 }
 
 static void should_return_unknown_file_type_when_a_NULL_file_stats_are_specified(void)
 {
     const t_file_type invalid = file_stats_get_file_type(NULL);
 
-    CU_ASSERT_EQUAL(invalid, UNKNOWN_FILE_TYPE);
+    CU_ASSERT_EQUAL(invalid, FILE_TYPE_UNKNOWN);
+    CU_ASSERT(verify_that_no_error_was_printed());
 }
 
 static void should_return_the_file_type_of_the_specified_file_stats(void)
@@ -95,13 +105,14 @@ static void should_return_the_file_type_of_the_specified_file_stats(void)
     t_file_stats *symlink_stats = file_stats_get("symlink");
     t_file_stats *socket_stats = file_stats_get("socket");
 
-    CU_ASSERT_EQUAL(file_stats_get_file_type(reg_file_stats), REGULAR_FILE_TYPE);
-    CU_ASSERT_EQUAL(file_stats_get_file_type(dir_stats), DIRECTORY_FILE_TYPE);
-    CU_ASSERT_EQUAL(file_stats_get_file_type(chardevice_stats), CHARDEVICE_FILE_TYPE);
-    CU_ASSERT_EQUAL(file_stats_get_file_type(blockdevice_stats), BLOCKDEVICE_FILE_TYPE);
-    CU_ASSERT_EQUAL(file_stats_get_file_type(fifo_stats), FIFO_FILE_TYPE);
-    CU_ASSERT_EQUAL(file_stats_get_file_type(symlink_stats), DIRECTORY_FILE_TYPE);
-    CU_ASSERT_EQUAL(file_stats_get_file_type(socket_stats), SOCKET_FILE_TYPE);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(reg_file_stats), FILE_TYPE_REGULAR);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(dir_stats), FILE_TYPE_DIRECTORY);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(chardevice_stats), FILE_TYPE_CHARDEVICE);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(blockdevice_stats), FILE_TYPE_BLOCKDEVICE);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(fifo_stats), FILE_TYPE_FIFO);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(symlink_stats), FILE_TYPE_DIRECTORY);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(socket_stats), FILE_TYPE_SOCKET);
+    CU_ASSERT(verify_that_no_error_was_printed());
 
     file_stats_destroy(&reg_file_stats);
     file_stats_destroy(&dir_stats);
@@ -110,6 +121,45 @@ static void should_return_the_file_type_of_the_specified_file_stats(void)
     file_stats_destroy(&fifo_stats);
     file_stats_destroy(&symlink_stats);
     file_stats_destroy(&socket_stats);
+}
+
+static void should_return_NULL_when_an_error_accessing_a_file_occurs(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE_ACCESS_ERROR(EACCES, "noPermissions"),
+        MOCK_FILE_ACCESS_ERROR(EFAULT, "badAddress"),
+        MOCK_FILE_ACCESS_ERROR(ELOOP, "symlinkLoop"),
+        MOCK_FILE_ACCESS_ERROR(ENAMETOOLONG, "nameTooLong"),
+        MOCK_FILE_ACCESS_ERROR(ENOENT, "nonExisting"),
+        MOCK_FILE_ACCESS_ERROR(ENOMEM, "noMemory"),
+        MOCK_FILE_ACCESS_ERROR(ENOTDIR, "notADirectory"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    CU_ASSERT_PTR_NULL(file_stats_get("noPermissions"));
+    CU_ASSERT_PTR_NULL(file_stats_get("badAddress"));
+    CU_ASSERT_PTR_NULL(file_stats_get("symlinkLoop"));
+    CU_ASSERT_PTR_NULL(file_stats_get("nameTooLong"));
+    CU_ASSERT_PTR_NULL(file_stats_get("nonExisting"));
+    CU_ASSERT_PTR_NULL(file_stats_get("noMemory"));
+    CU_ASSERT_PTR_NULL(file_stats_get("notADirectory"));
+    CU_ASSERT(verify_that_the_error_printed_is(
+        "ft_ls: cannot access '%s': %s\n"
+        "ft_ls: cannot access '%s': %s\n"
+        "ft_ls: cannot access '%s': %s\n"
+        "ft_ls: cannot access '%s': %s\n"
+        "ft_ls: cannot access '%s': %s\n"
+        "ft_ls: cannot access '%s': %s\n"
+        "ft_ls: cannot access '%s': %s\n",
+        "noPermissions", strerror(EACCES),
+        "badAddress", strerror(EFAULT),
+        "symlinkLoop", strerror(ELOOP),
+        "nameTooLong", strerror(ENAMETOOLONG),
+        "nonExisting", strerror(ENOENT),
+        "noMemory", strerror(ENOMEM),
+        "notADirectory", strerror(ENOTDIR)
+    ));
 }
 
 void register_file_stats_suite(void)
@@ -126,5 +176,6 @@ void register_file_stats_suite(void)
         CU_add_test(suite, "should_not_fail_to_destroy_file_stats_if_a_NULL_file_stats_is_passed", should_not_fail_to_destroy_file_stats_if_a_NULL_file_stats_is_passed);
         CU_add_test(suite, "should_return_unknown_file_type_when_a_NULL_file_stats_are_specified", should_return_unknown_file_type_when_a_NULL_file_stats_are_specified);
         CU_add_test(suite, "should_return_the_file_type_of_the_specified_file_stats", should_return_the_file_type_of_the_specified_file_stats);
+        CU_add_test(suite, "should_return_NULL_when_an_error_accessing_a_file_occurs", should_return_NULL_when_an_error_accessing_a_file_occurs);
     }
 }

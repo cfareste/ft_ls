@@ -81,9 +81,15 @@ prepare_test_environment() {
     ln -s firstDir linkdir
     ln -s linkdir linklink
     mkfifo fifo
+
+    # Error files
+    mkdir nopermdir
+    touch "nopermdir/file"
+    chmod 000 nopermdir
 }
 
 remove_test_environment() {
+    chmod -R 755 "${SCRIPT_DIR}/testdir"
     rm -rf "${SCRIPT_DIR}/testdir"
 }
 
@@ -117,6 +123,33 @@ print_output_block() {
     printf '%b--------------------------%b\n' "${RED_THIN}" "${RESET}"
 }
 
+outputs_match() {
+    local model_output="$1"
+    local ft_output="$2"
+    local -a model_lines=()
+    local -a ft_lines=()
+    local index=0
+
+    mapfile -t model_lines < "${model_output}"
+    mapfile -t ft_lines < "${ft_output}"
+
+    if [[ "${#model_lines[@]}" -ne "${#ft_lines[@]}" ]]; then
+        return 1
+    fi
+
+    while [[ "${index}" -lt "${#model_lines[@]}" ]]; do
+        if [[ "${model_lines[index]}" != "${ft_lines[index]}" ]] && \
+            ! [[ "${model_lines[index]}" == ls:\ * && \
+                "${ft_lines[index]}" == ft_ls:\ * && \
+                "${model_lines[index]#ls:}" == "${ft_lines[index]#ft_ls:}" ]]; then
+            return 1
+        fi
+        index=$((index + 1))
+    done
+
+    return 0
+}
+
 run_single_test() {
     local ft_args="$1"
     local model_args="$2"
@@ -134,7 +167,7 @@ run_single_test() {
     bash -lc "${ft_cmd}" >"${ft_output}" 2>&1 || ft_status=$?
     bash -lc "${model_cmd}" >"${model_output}" 2>&1 || model_status=$?
 
-    if [[ "${ft_status}" -eq "${model_status}" ]] && diff -u "${model_output}" "${ft_output}" >/dev/null 2>&1; then
+    if [[ "${ft_status}" -eq "${model_status}" ]] && outputs_match "${model_output}" "${ft_output}"; then
         print_pass "ft_ls ${ft_args}"
         passed=$((passed + 1))
     else

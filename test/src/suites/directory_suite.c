@@ -10,6 +10,7 @@ static t_dir_stream *dir_stream_sut;
 
 static void test_setup(void)
 {
+    reset_printing_buffer();
     vfs_mock_reset();
 }
 
@@ -32,6 +33,7 @@ static void should_return_NULL_when_opening_a_NULL_path(void)
 {
     open_directory_stream(NULL);
 
+    CU_ASSERT(verify_that_no_error_was_printed());
     assert_dir_stream_is_null();
 }
 
@@ -39,6 +41,7 @@ static void should_return_NULL_when_opening_an_empty_path(void)
 {
     open_directory_stream("");
 
+    CU_ASSERT(verify_that_no_error_was_printed());
     assert_dir_stream_is_null();
 }
 
@@ -52,6 +55,7 @@ static void should_return_a_directory_stream_when_opening_a_valid_path(void)
 
     open_directory_stream(VALID_DIRECTORY_PATH);
 
+    CU_ASSERT(verify_that_no_error_was_printed());
     CU_ASSERT_PTR_NOT_NULL(dir_stream_sut);
 }
 
@@ -59,6 +63,7 @@ static void should_return_NULL_for_next_entry_if_a_NULL_dir_stream_is_specified(
 {
     const t_dir_entry *dir_entry = directory_get_next_entry(NULL);
 
+    CU_ASSERT(verify_that_no_error_was_printed());
     CU_ASSERT_PTR_NULL(dir_entry);
 }
 
@@ -75,6 +80,7 @@ static void should_return_the_next_entry_when_reading_from_a_valid_directory(voi
 
     t_dir_entry *dir_entry = directory_get_next_entry(dir_stream_sut);
 
+    CU_ASSERT(verify_that_no_error_was_printed());
     CU_ASSERT_STRING_EQUAL(directory_get_entry_name(dir_entry), "file");
 
     directory_destroy_entry(&dir_entry);
@@ -83,11 +89,15 @@ static void should_return_the_next_entry_when_reading_from_a_valid_directory(voi
 static void should_not_fail_to_destroy_a_null_pointer_dir_entry(void)
 {
     directory_destroy_entry(NULL);
+
+    CU_ASSERT(verify_that_no_error_was_printed());
 }
 
 static void should_not_fail_to_destroy_a_null_dir_entry(void)
 {
     t_dir_entry *dir_entry = NULL;
+
+    CU_ASSERT(verify_that_no_error_was_printed());
 
     directory_destroy_entry(&dir_entry);
 }
@@ -106,6 +116,7 @@ static void should_destroy_a_valid_dir_entry_correctly(void)
 
     directory_destroy_entry(&dir_entry);
 
+    CU_ASSERT(verify_that_no_error_was_printed());
     CU_ASSERT_PTR_NULL(dir_entry);
 }
 
@@ -114,6 +125,7 @@ static void should_return_NULL_for_the_entry_name_if_a_NULL_entry_is_specified(v
     const char *invalid_name = directory_get_entry_name(NULL);
 
     CU_ASSERT_PTR_NULL(invalid_name);
+    CU_ASSERT(verify_that_no_error_was_printed());
 }
 
 static void should_return_the_dir_entry_name(void)
@@ -127,6 +139,7 @@ static void should_return_the_dir_entry_name(void)
     open_directory_stream(".");
     t_dir_entry *dir_entry = directory_get_next_entry(dir_stream_sut);
 
+    CU_ASSERT(verify_that_no_error_was_printed());
     CU_ASSERT_STRING_EQUAL(directory_get_entry_name(dir_entry), "valid file");
 
     directory_destroy_entry(&dir_entry);
@@ -135,12 +148,13 @@ static void should_return_the_dir_entry_name(void)
 static void should_return_true_for_is_entry_empty_if_the_dir_entry_is_NULL(void)
 {
     CU_ASSERT_TRUE(directory_is_entry_empty(NULL));
+    CU_ASSERT(verify_that_no_error_was_printed());
 }
 
 static void should_return_false_for_is_entry_empty_if_the_dir_entry_is_not_empty(void)
 {
     const t_vfs_mock_entry vfs[] = {
-        MOCK_DIR(".", ".."),
+        MOCK_DIR(".", "file", ".", ".."),
         MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
@@ -149,6 +163,7 @@ static void should_return_false_for_is_entry_empty_if_the_dir_entry_is_not_empty
     t_dir_entry *first_entry = directory_get_next_entry(dir_stream_sut);
 
     CU_ASSERT_FALSE(directory_is_entry_empty(first_entry));
+    CU_ASSERT(verify_that_no_error_was_printed());
 
     directory_destroy_entry(&first_entry);
 }
@@ -168,8 +183,49 @@ static void should_return_true_for_is_entry_empty_if_the_dir_entry_is_empty(void
     t_dir_entry *second_entry = directory_get_next_entry(dir_stream_sut);
 
     CU_ASSERT_TRUE(directory_is_entry_empty(second_entry));
+    CU_ASSERT(verify_that_no_error_was_printed());
 
     directory_destroy_entry(&second_entry);
+}
+
+static void should_return_false_for_is_hidden_file_entry_if_the_dir_entry_is_NULL(void)
+{
+    CU_ASSERT_FALSE(directory_is_entry_hidden_file(NULL));
+    CU_ASSERT(verify_that_no_error_was_printed());
+}
+
+static void should_return_false_for_is_hidden_file_entry_if_the_entry_points_to_a_non_hidden_file(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", "reg_file", ".", ".."),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    open_directory_stream(".");
+    t_dir_entry *first_entry = directory_get_next_entry(dir_stream_sut);
+
+    CU_ASSERT_FALSE(directory_is_entry_hidden_file(first_entry));
+    CU_ASSERT(verify_that_no_error_was_printed());
+
+    directory_destroy_entry(&first_entry);
+}
+
+static void should_return_true_for_is_hidden_file_entry_if_the_entry_points_to_a_hidden_file(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", ".hidden_file", ".", ".."),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    open_directory_stream(".");
+    t_dir_entry *first_entry = directory_get_next_entry(dir_stream_sut);
+
+    CU_ASSERT_TRUE(directory_is_entry_hidden_file(first_entry));
+    CU_ASSERT(verify_that_no_error_was_printed());
+
+    directory_destroy_entry(&first_entry);
 }
 
 static void should_return_minus_one_when_closing_a_null_pointer(void)
@@ -177,6 +233,7 @@ static void should_return_minus_one_when_closing_a_null_pointer(void)
     const int actual = directory_close(NULL);
 
     CU_ASSERT_EQUAL(actual, -1);
+    CU_ASSERT(verify_that_no_error_was_printed());
 }
 
 static void should_return_minus_one_when_closing_a_null_directory(void)
@@ -184,6 +241,7 @@ static void should_return_minus_one_when_closing_a_null_directory(void)
     t_dir_stream *dir_stream = NULL;
 
     CU_ASSERT_EQUAL(directory_close(&dir_stream), -1);
+    CU_ASSERT(verify_that_no_error_was_printed());
 }
 
 static void should_return_zero_when_closing_a_valid_directory(void)
@@ -196,10 +254,83 @@ static void should_return_zero_when_closing_a_valid_directory(void)
 
     open_directory_stream(VALID_DIRECTORY_PATH);
 
-    const int actual = directory_close(&dir_stream_sut);
+    const int result = directory_close(&dir_stream_sut);
 
     assert_dir_stream_is_null();
-    CU_ASSERT_EQUAL(actual, 0);
+    CU_ASSERT_EQUAL(result, 0);
+    CU_ASSERT(verify_that_no_error_was_printed());
+}
+
+static void should_return_NULL_when_an_error_opening_a_directory_occurs(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR_OPEN_ERROR(EACCES, "noPerm", ".", ".."),
+        MOCK_DIR_OPEN_ERROR(EMFILE, "processFD", ".", ".."),
+        MOCK_DIR_OPEN_ERROR(ENAMETOOLONG, "nameTooLong", ".", ".."),
+        MOCK_DIR_OPEN_ERROR(ENFILE, "systemFD", ".", ".."),
+        MOCK_DIR_OPEN_ERROR(ENOTDIR, "notADirectory", ".", ".."),
+        MOCK_DIR_OPEN_ERROR(ENOMEM, "noMemory", ".", ".."),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    open_directory_stream("noPerm");
+    open_directory_stream("processFD");
+    open_directory_stream("nameTooLong");
+    open_directory_stream("systemFD");
+    open_directory_stream("dirDoesntExist");
+    open_directory_stream("notADirectory");
+    open_directory_stream("noMemory");
+
+    CU_ASSERT(verify_that_the_error_printed_is(
+        "ft_ls: cannot open directory '%s': Permission denied\n"
+        "ft_ls: cannot open directory '%s': Too many open files\n"
+        "ft_ls: cannot open directory '%s': File name too long\n"
+        "ft_ls: cannot open directory '%s': Too many open files in system\n"
+        "ft_ls: cannot open directory '%s': No such file or directory\n"
+        "ft_ls: cannot open directory '%s': Not a directory\n"
+        "ft_ls: cannot open directory '%s': Cannot allocate memory\n",
+        "noPerm", "processFD", "nameTooLong", "systemFD", "dirDoesntExist", "notADirectory", "noMemory"
+    ));
+    assert_dir_stream_is_null();
+}
+
+static void should_return_NULL_when_an_error_reading_a_directory_occurs(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR_READ_ERROR("failingDir", 0, ".", ".."),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    open_directory_stream("failingDir");
+
+    const t_dir_entry *dir_entry = directory_get_next_entry(dir_stream_sut);
+
+    CU_ASSERT(verify_that_the_error_printed_is(
+        "ft_ls: reading directory '%s': Bad file descriptor\n",
+        "failingDir"
+    ));
+    CU_ASSERT_PTR_NULL(dir_entry);
+}
+
+static void should_return_negative_value_when_an_error_closing_a_directory_occurs(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR_CLOSE_ERROR("failingDir", ".", ".."),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    open_directory_stream("failingDir");
+
+    const int result = directory_close(&dir_stream_sut);
+
+    CU_ASSERT(verify_that_the_error_printed_is(
+        "ft_ls: closing directory '%s': Bad file descriptor\n",
+        "failingDir"
+    ));
+    CU_ASSERT_EQUAL(result, -1);
 }
 
 void register_directory_suite(void)
@@ -221,8 +352,14 @@ void register_directory_suite(void)
         CU_add_test(suite, "should_return_true_for_is_entry_empty_if_the_dir_entry_is_NULL", should_return_true_for_is_entry_empty_if_the_dir_entry_is_NULL);
         CU_add_test(suite, "should_return_false_for_is_entry_empty_if_the_dir_entry_is_not_empty", should_return_false_for_is_entry_empty_if_the_dir_entry_is_not_empty);
         CU_add_test(suite, "should_return_true_for_is_entry_empty_if_the_dir_entry_is_empty", should_return_true_for_is_entry_empty_if_the_dir_entry_is_empty);
+        CU_add_test(suite, "should_return_false_for_is_hidden_file_entry_if_the_dir_entry_is_NULL", should_return_false_for_is_hidden_file_entry_if_the_dir_entry_is_NULL);
+        CU_add_test(suite, "should_return_false_for_is_hidden_file_entry_if_the_entry_points_to_a_non_hidden_file", should_return_false_for_is_hidden_file_entry_if_the_entry_points_to_a_non_hidden_file);
+        CU_add_test(suite, "should_return_true_for_is_hidden_file_entry_if_the_entry_points_to_a_hidden_file", should_return_true_for_is_hidden_file_entry_if_the_entry_points_to_a_hidden_file);
         CU_add_test(suite, "should_return_minus_one_when_closing_a_null_pointer", should_return_minus_one_when_closing_a_null_pointer);
         CU_add_test(suite, "should_return_minus_one_when_closing_a_null_directory", should_return_minus_one_when_closing_a_null_directory);
         CU_add_test(suite, "should_return_zero_when_closing_a_valid_directory", should_return_zero_when_closing_a_valid_directory);
+        CU_add_test(suite, "should_return_NULL_when_an_error_opening_a_directory_occurs", should_return_NULL_when_an_error_opening_a_directory_occurs);
+        CU_add_test(suite, "should_return_NULL_when_an_error_reading_a_directory_occurs", should_return_NULL_when_an_error_reading_a_directory_occurs);
+        CU_add_test(suite, "should_return_negative_value_when_an_error_closing_a_directory_occurs", should_return_negative_value_when_an_error_closing_a_directory_occurs);
     }
 }

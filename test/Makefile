@@ -16,7 +16,9 @@ CYAN = \033[1;36m
 
 #----COMPILER----#
 CC = cc
-CCFLAGS += -g -Wall -Wextra -Werror -Wpedantic -fsanitize=address -Dopendir=mock_opendir -Dreaddir=mock_readdir -Dclosedir=mock_closedir -Dft_printf=printf_mock -Dstat=stat_mock
+CCFLAGS += -g -Wall -Wextra -Werror -Wpedantic -fsanitize=address \
+		   -Dopendir=mock_opendir -Dreaddir=mock_readdir -Dclosedir=mock_closedir -Dstat=stat_mock \
+		   -Dft_printf=printf_mock -Dft_fprintf=fprintf_mock
 COVERAGE_FLAGS = -fprofile-arcs -ftest-coverage
 
 
@@ -65,7 +67,9 @@ vpath %.c	$(SRC):\
 			$(ROOT_SRC)/file_entry:\
 			$(ROOT_SRC)/scanner:\
 			$(ROOT_SRC)/renderer:\
-			$(ROOT_SRC)/sorter
+			$(ROOT_SRC)/sorter:\
+			$(ROOT_SRC)/error_reporter:\
+			$(ROOT_SRC)/result
 
 
 
@@ -78,7 +82,9 @@ ROOT_SRCS = application.c \
 			file_entry.c \
 			scanner.c \
 			renderer.c \
-			sorter.c
+			sorter.c \
+			error_reporter.c \
+			result.c
 
 SRCS = main.c \
 		vfs_mock.c \
@@ -93,6 +99,8 @@ SRCS = main.c \
 		sorter_suite.c \
 		parsed_arguments_suite.c \
 		application_suite.c \
+		error_reporter_suite.c \
+		result_suite.c \
 		$(ROOT_SRCS)
 
 OBJS = $(SRCS:%.c=$(BIN_DIR)%.o)
@@ -160,9 +168,12 @@ e2e:
 	@rm -rf ./testdir
 	@mkdir -p ./testdir
 	@(cd ./testdir && nc -lkU my_socket.sock > /dev/null) & socket_pid=$$!; \
-		cp ../ft_ls .; \
-		./run_e2e.sh ; \
-		kill $$socket_pid 2>/dev/null || true; rm -f ./testdir/my_socket.sock
+	   cp ../ft_ls .; \
+	   ./run_e2e.sh; \
+	   e2e_status=$$?; \
+	   kill $$socket_pid 2>/dev/null || true; \
+	   rm -f ./testdir/my_socket.sock; \
+	   exit $$e2e_status
 	@rm -rf ./ft_ls
 
 .PHONY: all \

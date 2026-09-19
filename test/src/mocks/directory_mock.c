@@ -1,4 +1,5 @@
 #include <dirent.h>
+#include <errno.h>
 #include <stdlib.h>
 #include "libft.h"
 #include "mocks.h"
@@ -8,6 +9,7 @@ typedef struct s_mock_dir
     const t_vfs_mock_entry *dir_entry;
     struct dirent entry;
     unsigned int next_index;
+    int error_on_close;
 } t_mock_dir;
 
 DIR *mock_opendir(const char *path)
@@ -15,7 +17,16 @@ DIR *mock_opendir(const char *path)
     const t_vfs_mock_entry *dir_entry = find_vfs_entry(path);
 
     if (dir_entry == NULL)
+    {
+        errno = ENOENT;
         return NULL;
+    }
+
+    if (dir_entry->errors.opendir_errno != 0)
+    {
+        errno = dir_entry->errors.opendir_errno;
+        return NULL;
+    }
 
     while (S_ISLNK(dir_entry->mode))
     {
@@ -30,6 +41,7 @@ DIR *mock_opendir(const char *path)
     t_mock_dir *dir = ft_safe_calloc(1, sizeof(t_mock_dir));
     dir->dir_entry = dir_entry;
     dir->next_index = 0;
+    dir->error_on_close = dir_entry->errors.closedir_errno;
     return (DIR *) dir;
 }
 
@@ -39,6 +51,12 @@ struct dirent *mock_readdir(DIR *dirp)
 
     if (stream == NULL || stream->dir_entry == NULL || stream->dir_entry->entries == NULL)
         return NULL;
+
+    if (stream->dir_entry->errors.readdir_error.code != 0 && stream->dir_entry->errors.readdir_error.entry_idx == stream->next_index)
+    {
+        errno = stream->dir_entry->errors.readdir_error.code;
+        return NULL;
+    }
 
     const char *next_entry_name = stream->dir_entry->entries[stream->next_index];
     if (next_entry_name == NULL)
@@ -53,6 +71,14 @@ struct dirent *mock_readdir(DIR *dirp)
 
 int mock_closedir(DIR *dirp)
 {
+    int result = 0;
+    const t_mock_dir *stream = (t_mock_dir *)dirp;
+
+    if (stream != NULL && stream->error_on_close != 0) {
+        errno = stream->error_on_close;
+        result = -1;
+    }
+
     free(dirp);
-    return 0;
+    return result;
 }
