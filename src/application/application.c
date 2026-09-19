@@ -57,6 +57,14 @@ static t_ft_ls_error_code process_file_operands(const t_parsed_arguments *parsed
     return process_directory_file_operands(parsed_arguments, render_context);
 }
 
+static t_ft_ls_error_code get_ft_ls_error_code(const t_result *parsing_arguments_result, const t_ft_ls_error_code file_operands_code)
+{
+    if (result_has_failed(parsing_arguments_result))
+        return FT_LS_APPLICATION_MAJOR_ERROR;
+
+    return file_operands_code;
+}
+
 t_ft_ls_error_code application_run(const t_result *parsing_arguments_result)
 {
     if (parsing_arguments_result == NULL)
@@ -65,12 +73,8 @@ t_ft_ls_error_code application_run(const t_result *parsing_arguments_result)
     const t_parsed_arguments *parsed_arguments = result_get_value(parsing_arguments_result);
     t_render_context *render_context = render_context_create(parsed_arguments);
 
-    const t_ft_ls_error_code error_code = process_file_operands(parsed_arguments, render_context);
+    const t_ft_ls_error_code file_operands_error_code = process_file_operands(parsed_arguments, render_context);
 
     render_context_destroy(&render_context);
-
-    if (result_has_failed(parsing_arguments_result))
-        return FT_LS_APPLICATION_MAJOR_ERROR;
-
-    return error_code;
+    return get_ft_ls_error_code(parsing_arguments_result, file_operands_error_code);
 }
