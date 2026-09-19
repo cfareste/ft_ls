@@ -1208,6 +1208,30 @@ static void should_fail_with_a_major_error_and_print_only_the_working_operands_i
     CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MAJOR_ERROR);
 }
 
+static void should_fail_with_a_major_error_and_not_print_anything_if_fails_to_access_an_operand_and_process_a_directory(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE_ACCESS_ERROR(ENOTDIR, "notADirectory/"),
+        MOCK_DIR_OPEN_ERROR(EACCES, "noPermDir", ".", "..", "file"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "noPermDir", "notADirectory/", NULL };
+    get_parsed_arguments_result(2, arguments);
+
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_no_output_was_printed());
+    CU_ASSERT(verify_that_the_error_printed_is(
+        "ft_ls: cannot access '%s': %s\n"
+        "ft_ls: cannot open directory '%s': %s\n",
+        "notADirectory/", strerror(ENOTDIR),
+        "noPermDir", strerror(EACCES)
+    ));
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MAJOR_ERROR);
+}
+
 void register_application_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, test_teardown);
@@ -1252,5 +1276,6 @@ void register_application_suite(void)
         CU_add_test(suite, "should_fail_with_a_major_error_and_print_only_the_working_operands_if_one_file_operand_fails_to_be_accessed", should_fail_with_a_major_error_and_print_only_the_working_operands_if_one_file_operand_fails_to_be_accessed);
         CU_add_test(suite, "should_fail_with_a_major_error_and_not_print_anything_if_the_specified_file_operands_fail_to_be_accessed", should_fail_with_a_major_error_and_not_print_anything_if_the_specified_file_operands_fail_to_be_accessed);
         CU_add_test(suite, "should_fail_with_a_major_error_and_print_only_the_working_operands_if_some_file_operands_fail_to_be_accessed", should_fail_with_a_major_error_and_print_only_the_working_operands_if_some_file_operands_fail_to_be_accessed);
+        CU_add_test(suite, "should_fail_with_a_major_error_and_not_print_anything_if_fails_to_access_an_operand_and_process_a_directory", should_fail_with_a_major_error_and_not_print_anything_if_fails_to_access_an_operand_and_process_a_directory);
     }
 }
