@@ -2,8 +2,11 @@
 
 #include "parsed_arguments.h"
 
-#define FT_LS_APPLICATION_SUCCESS (0)
-#define FT_LS_APPLICATION_MINOR_ERROR (1)
-#define FT_LS_APPLICATION_MAJOR_ERROR (2)
+typedef enum e_ft_ls_application_status
+{
+    FT_LS_APPLICATION_SUCCESS,
+    FT_LS_APPLICATION_MINOR_ERROR,
+    FT_LS_APPLICATION_MAJOR_ERROR
+} t_ft_ls_application_status;
 
-int application_run(const t_result *parsing_arguments_result);
+t_ft_ls_application_status application_run(const t_result *parsing_arguments_result);

@@ -50,7 +50,7 @@ static int process_directory_file_operands(const t_parsed_arguments *parsed_argu
     return error_code;
 }
 
-int application_run(const t_result *parsing_arguments_result)
+t_ft_ls_application_status application_run(const t_result *parsing_arguments_result)
 {
     if (parsing_arguments_result == NULL)
         return FT_LS_APPLICATION_MAJOR_ERROR;
