@@ -43,7 +43,7 @@ t_result *scan(const char *path)
     }
     const int failed_to_read_directory = dir_entry == NULL;
     const int failed_to_close_directory = directory_close(&dir_stream) == -1;
-
     directory_destroy_entry(&dir_entry);
+
     return create_scan_result(file_entry_array, failed_to_read_directory, failed_to_close_directory);
 }
