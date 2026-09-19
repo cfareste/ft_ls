@@ -15,6 +15,14 @@ static void push_entry(t_file_entry_array *file_entry_array, const t_dir_entry *
     file_entry_array_push(file_entry_array, entry);
 }
 
+static t_result *create_scan_result(t_file_entry_array *file_entry_array, const int failed_to_read_directory, const int failed_to_close_directory)
+{
+    if (failed_to_read_directory || failed_to_close_directory)
+        return result_create_failed(file_entry_array);
+
+    return result_create_successful(file_entry_array);
+}
+
 t_result *scan(const char *path)
 {
     if (!ft_is_valid_path(path))
@@ -33,13 +41,9 @@ t_result *scan(const char *path)
         directory_destroy_entry(&dir_entry);
         dir_entry = directory_get_next_entry(dir_stream);
     }
-
-    const int failed = directory_close(&dir_stream) == -1 || dir_entry == NULL;
+    const int failed_to_read_directory = dir_entry == NULL;
+    const int failed_to_close_directory = directory_close(&dir_stream) == -1;
 
     directory_destroy_entry(&dir_entry);
-
-    if (failed)
-        return result_create_failed(file_entry_array);
-
-    return result_create_successful(file_entry_array);
+    return create_scan_result(file_entry_array, failed_to_read_directory, failed_to_close_directory);
 }
