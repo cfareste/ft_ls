@@ -28,7 +28,7 @@ static void process_non_directory_file_operands(const t_parsed_arguments *parsed
 
 static t_ft_ls_error_code process_directory_file_operands(const t_parsed_arguments *parsed_arguments, t_render_context *render_context)
 {
-    int error_code = FT_LS_APPLICATION_SUCCESS;
+    t_ft_ls_error_code error_code = FT_LS_APPLICATION_SUCCESS;
     const char * const *directory_file_operands = parsed_arguments_get_directory_file_operands(parsed_arguments);
 
     for (unsigned int i = 0; directory_file_operands[i] != NULL; i++)
@@ -40,7 +40,6 @@ static t_ft_ls_error_code process_directory_file_operands(const t_parsed_argumen
             error_code = FT_LS_APPLICATION_MAJOR_ERROR;
 
         file_entry_array_sort(file_entry_array);
-
         render_directory(render_context, directory_file_operands[i], file_entry_array);
 
         result_destroy(&result);
