@@ -128,9 +128,7 @@ QA LS-12 Manage invalid operations
 3. Fallos mezclados (directory + stat)
    - 2 Fallos: Combinación de fallos (inexistente + opendir, no directorio + closedir, etc.)
    - X Fallos:
-       * Solo not dirs + stat
-       * Solo dirs + stat
-       * Solo dirs + directory
+       * Solo dirs + directory (test dir header)
        * Not dirs + Dirs + stat + directory
 No probado en E2E:
    - Readdir y closedir errores

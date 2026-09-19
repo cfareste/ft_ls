@@ -43,3 +43,6 @@ Makefile src Makefile/ .hidden .hiddir                                          
 nonExistent nopermdir/file                                                      ::       nonExistent nopermdir/file
 nonExistent src Makefile Makefile/ linkdir/ nopermdir/file                      ::       nonExistent src Makefile Makefile/ linkdir/ nopermdir/file
 nopermdir nonExistent                                                           ::       nopermdir nonExistent
+nopermdir src src                                                               ::       nopermdir src src
+.hiddir nopermdir src                                                           ::       .hiddir nopermdir src
+.hiddir .hiddir src                                                             ::       .hiddir .hiddir src
