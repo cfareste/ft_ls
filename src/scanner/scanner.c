@@ -34,12 +34,9 @@ t_result *scan(const char *path)
         dir_entry = directory_get_next_entry(dir_stream);
     }
 
-    int failed = 0;
-    if (dir_entry == NULL)
-        failed = 1;
+    const int failed = directory_close(&dir_stream) == -1 || dir_entry == NULL;
+
     directory_destroy_entry(&dir_entry);
-    if (directory_close(&dir_stream) == -1)
-        failed = 1;
 
     if (failed)
         return result_create_failed(file_entry_array);
