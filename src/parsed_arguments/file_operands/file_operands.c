@@ -1,6 +1,5 @@
 #include <stddef.h>
 #include "file_operands.h"
-#include "file_stats.h"
 #include "libft.h"
 
 #define DEFAULT_NUM_OF_OPERANDS 1
