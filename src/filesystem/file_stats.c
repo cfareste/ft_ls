@@ -9,6 +9,12 @@ struct s_file_stats
     t_file_type type;
 };
 
+static t_file_stats *handle_stat_error(const char *file_path)
+{
+    report_access_file_error(file_path);
+    return NULL;
+}
+
 static t_file_type get_file_type(const mode_t mode)
 {
     t_file_type file_type = FILE_TYPE_UNKNOWN;
@@ -38,10 +44,7 @@ t_file_stats *file_stats_get(const char *file_path)
 
     struct stat stats;
     if (stat(file_path, &stats) == -1)
-    {
-        report_access_file_error(file_path);
-        return NULL;
-    }
+        return handle_stat_error(file_path);
 
     t_file_stats *file_stats = ft_safe_calloc(1, sizeof(t_file_stats));
     file_stats->type = get_file_type(stats.st_mode);
