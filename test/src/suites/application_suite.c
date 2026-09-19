@@ -1162,6 +1162,52 @@ static void should_fail_with_a_major_error_and_not_print_anything_if_the_specifi
     CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MAJOR_ERROR);
 }
 
+static void should_fail_with_a_major_error_and_print_only_the_working_operands_if_some_file_operands_fail_to_be_accessed(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE_ACCESS_ERROR(EACCES, "noPerms"),
+        MOCK_FILE_ACCESS_ERROR(ENOENT, "nonExistent"),
+        MOCK_FILE_ACCESS_ERROR(ENOTDIR, "notADir/"),
+        MOCK_FILE("file"),
+        MOCK_FILE("zFile"),
+        MOCK_DIR("workingDir", ".", "..", "fileDir"),
+        MOCK_DIR("zWorkingDir", ".", "..", "zFileDir"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "noPerms", "file", "workingDir", "zWorkingDir", "nonExistent", "zFile", "notADir/", NULL };
+    const char *expected_file_names[] = { "file", "zFile" };
+    const char *expected_first_dir_file_name = "fileDir";
+    const char *expected_second_dir_file_name = "zFileDir";
+    get_parsed_arguments_result(7, arguments);
+
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n"
+        "\n%s:\n"
+        "%s\n",
+        expected_file_names[0],
+        expected_file_names[1],
+        arguments[2],
+        expected_first_dir_file_name,
+        arguments[3],
+        expected_second_dir_file_name
+    ));
+    CU_ASSERT(verify_that_the_error_printed_is(
+        "ft_ls: cannot access '%s': %s\n"
+        "ft_ls: cannot access '%s': %s\n"
+        "ft_ls: cannot access '%s': %s\n",
+        "noPerms", strerror(EACCES),
+        "nonExistent", strerror(ENOENT),
+        "notADir/", strerror(ENOTDIR)
+    ));
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MAJOR_ERROR);
+}
+
 void register_application_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, test_teardown);
@@ -1205,5 +1251,6 @@ void register_application_suite(void)
         CU_add_test(suite, "should_fail_with_a_major_error_and_print_the_working_operand_if_one_file_operand_fails_to_be_accessed", should_fail_with_a_major_error_and_print_the_working_operand_if_one_file_operand_fails_to_be_accessed);
         CU_add_test(suite, "should_fail_with_a_major_error_and_print_only_the_working_operands_if_one_file_operand_fails_to_be_accessed", should_fail_with_a_major_error_and_print_only_the_working_operands_if_one_file_operand_fails_to_be_accessed);
         CU_add_test(suite, "should_fail_with_a_major_error_and_not_print_anything_if_the_specified_file_operands_fail_to_be_accessed", should_fail_with_a_major_error_and_not_print_anything_if_the_specified_file_operands_fail_to_be_accessed);
+        CU_add_test(suite, "should_fail_with_a_major_error_and_print_only_the_working_operands_if_some_file_operands_fail_to_be_accessed", should_fail_with_a_major_error_and_print_only_the_working_operands_if_some_file_operands_fail_to_be_accessed);
     }
 }
