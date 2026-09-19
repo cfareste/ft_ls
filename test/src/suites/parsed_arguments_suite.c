@@ -512,6 +512,33 @@ static void should_be_created_correctly_even_if_one_argument_cannot_be_accessed_
     CU_ASSERT_PTR_NOT_NULL(sut);
 }
 
+static void should_be_created_correctly_even_if_the_specified_arguments_cannot_be_accessed(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE_ACCESS_ERROR(ENOENT, "notExistent"),
+        MOCK_FILE_ACCESS_ERROR(ENOTDIR, "notADir/"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *valid_args[] = { "notExistent", "notADir/", NULL };
+
+    get_parsed_arguments_result(2, valid_args);
+    const char * const *non_directory_file_operands = parsed_arguments_get_directory_file_operands(sut);
+    const char * const *directory_file_operands = parsed_arguments_get_directory_file_operands(sut);
+
+    CU_ASSERT(verify_that_the_error_printed_is(
+        "ft_ls: cannot access '%s': %s\n"
+        "ft_ls: cannot access '%s': %s\n",
+        "notExistent", strerror(ENOENT),
+        "notADir/", strerror(ENOTDIR)
+    ));
+    CU_ASSERT_PTR_NULL(non_directory_file_operands[0]);
+    CU_ASSERT_PTR_NULL(directory_file_operands[0]);
+    CU_ASSERT_FALSE(result_has_succeed(parsed_arguments_result));
+    CU_ASSERT_PTR_NOT_NULL(sut);
+}
+
 void register_parsed_arguments_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, test_teardown);
@@ -545,5 +572,6 @@ void register_parsed_arguments_suite(void)
         CU_add_test(suite, "should_be_created_correctly_even_if_the_specified_argument_cannot_be_accessed", should_be_created_correctly_even_if_the_specified_argument_cannot_be_accessed);
         CU_add_test(suite, "should_be_created_correctly_even_if_one_argument_cannot_be_accessed", should_be_created_correctly_even_if_one_argument_cannot_be_accessed);
         CU_add_test(suite, "should_be_created_correctly_even_if_one_argument_cannot_be_accessed_with_multiple_mixed_file_operands", should_be_created_correctly_even_if_one_argument_cannot_be_accessed_with_multiple_mixed_file_operands);
+        CU_add_test(suite, "should_be_created_correctly_even_if_the_specified_arguments_cannot_be_accessed", should_be_created_correctly_even_if_the_specified_arguments_cannot_be_accessed);
     }
 }

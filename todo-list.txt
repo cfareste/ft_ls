@@ -135,3 +135,4 @@ QA LS-12 Manage invalid operations
 No probado en E2E:
    - Readdir y closedir errores
    - Algunos errores de opendir y stat como EMFILE o ENOMEM
+   - Error de stat en un directorio actual (sin parámetros) con 0 permisos
