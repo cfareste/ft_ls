@@ -1,8 +1,7 @@
 TODO:
 1. Implementar LS-12 Manage invalid operations
 2. Añadir valgrind a los tests E2E
-3. Tests parsed args y application stat
-4. Mirar posibles refactors que me haya dejado (list_changed_files_in_branch)
+3. Mirar posibles refactors que me haya dejado (list_changed_files_in_branch)
 
 
 TODO En algún momento:

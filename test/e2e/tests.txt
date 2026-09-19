@@ -1,48 +1,50 @@
+#
 # Format: <ft_ls arguments> :: <model ls/gls args>
 # Example: file :: -U file -> this will compare 'ft_ls file' to 'ls/gls -U file'
 #
 # Remember: Columns without tty: -C | Colors without tty: --colors
 #
 
-                                                                                ::
-.                                                                               ::       .
-Makefile                                                                        ::       Makefile
-src                                                                             ::       src
-../../../ft_ls/./test/testdir                                                   ::       ../../../ft_ls/./test/testdir
-../../../ft_ls/./test/testdir/file                                              ::       ../../../ft_ls/./test/testdir/file
-/tmp/tempfile                                                                   ::       /tmp/tempfile
-/tmp/tempdir/                                                                   ::       /tmp/tempdir/
-Makefile file Makefile file2                                                    ::       Makefile file Makefile file2
-inc/ src firstDir src                                                           ::       inc/ src firstDir src
-file2 firstDir secondDir file                                                   ::       file2 firstDir secondDir file
-.hidden2 .hidden                                                                ::       .hidden2 .hidden
-.hiddir2 .hiddir                                                                ::       .hiddir2 .hiddir
-.hidden2 .hiddir .hiddir2 .hidden                                               ::       .hidden2 .hiddir .hiddir2 .hidden
-empty                                                                           ::       empty
-dir_only_hidden                                                                 ::       dir_only_hidden
-empty empty/                                                                    ::       empty empty/
-dir_only_hidden dir_only_hidden/                                                ::       dir_only_hidden dir_only_hidden/
-empty .hidden                                                                   ::       empty .hidden
-.hidden dir_only_hidden/                                                        ::       .hidden dir_only_hidden/
-.hidden firstDir file dir_only_hidden/ .hiddir empty                            ::       .hidden firstDir file dir_only_hidden/ .hiddir empty
-capacity/ capacity2/                                                            ::       capacity/ capacity2/
-linkfile                                                                        ::       linkfile
-linkdir                                                                         ::       linkdir
-linkdir/                                                                        ::       linkdir/
-file src linklink linkdir linkfile /dev/sda /dev/null fifo my_socket.sock       ::       file src linklink linkdir linkfile /dev/sda /dev/null fifo my_socket.sock
-nopermdir                                                                       ::       nopermdir
-nopermdir Makefile                                                              ::       nopermdir Makefile
-nopermdir/ .hiddir                                                              ::       nopermdir/ .hiddir
-nopermdir/ src                                                                  ::       nopermdir/ src
-Makefile src .hidden .hiddir nopermdir                                          ::       Makefile src .hidden .hiddir nopermdir
-nopermdir/ nopermdir                                                            ::       nopermdir/ nopermdir
-src Makefile nopermdir/ .hiddir empty nopermdir .hidden2 dir_only_hidden        ::       src Makefile nopermdir/ .hiddir empty nopermdir .hidden2 dir_only_hidden
-nonExistent                                                                     ::       nonExistent
-src nopermdir/file                                                              ::       src nopermdir/file
-Makefile src Makefile/ .hidden .hiddir                                          ::       Makefile src Makefile/ .hidden .hiddir
-nonExistent nopermdir/file                                                      ::       nonExistent nopermdir/file
-nonExistent src Makefile Makefile/ linkdir/ nopermdir/file                      ::       nonExistent src Makefile Makefile/ linkdir/ nopermdir/file
-nopermdir nonExistent                                                           ::       nopermdir nonExistent
-nopermdir src src                                                               ::       nopermdir src src
-.hiddir nopermdir src                                                           ::       .hiddir nopermdir src
-.hiddir .hiddir src                                                             ::       .hiddir .hiddir src
+                                                                                        ::
+.                                                                                       ::       .
+Makefile                                                                                ::       Makefile
+src                                                                                     ::       src
+../../../ft_ls/./test/testdir                                                           ::       ../../../ft_ls/./test/testdir
+../../../ft_ls/./test/testdir/file                                                      ::       ../../../ft_ls/./test/testdir/file
+/tmp/tempfile                                                                           ::       /tmp/tempfile
+/tmp/tempdir/                                                                           ::       /tmp/tempdir/
+Makefile file Makefile file2                                                            ::       Makefile file Makefile file2
+inc/ src firstDir src                                                                   ::       inc/ src firstDir src
+file2 firstDir secondDir file                                                           ::       file2 firstDir secondDir file
+.hidden2 .hidden                                                                        ::       .hidden2 .hidden
+.hiddir2 .hiddir                                                                        ::       .hiddir2 .hiddir
+.hidden2 .hiddir .hiddir2 .hidden                                                       ::       .hidden2 .hiddir .hiddir2 .hidden
+empty                                                                                   ::       empty
+dir_only_hidden                                                                         ::       dir_only_hidden
+empty empty/                                                                            ::       empty empty/
+dir_only_hidden dir_only_hidden/                                                        ::       dir_only_hidden dir_only_hidden/
+empty .hidden                                                                           ::       empty .hidden
+.hidden dir_only_hidden/                                                                ::       .hidden dir_only_hidden/
+.hidden firstDir file dir_only_hidden/ .hiddir empty                                    ::       .hidden firstDir file dir_only_hidden/ .hiddir empty
+capacity/ capacity2/                                                                    ::       capacity/ capacity2/
+linkfile                                                                                ::       linkfile
+linkdir                                                                                 ::       linkdir
+linkdir/                                                                                ::       linkdir/
+file src linklink linkdir linkfile /dev/sda /dev/null fifo my_socket.sock               ::       file src linklink linkdir linkfile /dev/sda /dev/null fifo my_socket.sock
+nopermdir                                                                               ::       nopermdir
+nopermdir Makefile                                                                      ::       nopermdir Makefile
+nopermdir/ .hiddir                                                                      ::       nopermdir/ .hiddir
+nopermdir/ src                                                                          ::       nopermdir/ src
+Makefile src .hidden .hiddir nopermdir                                                  ::       Makefile src .hidden .hiddir nopermdir
+nopermdir/ nopermdir                                                                    ::       nopermdir/ nopermdir
+src Makefile nopermdir/ .hiddir empty nopermdir .hidden2 dir_only_hidden                ::       src Makefile nopermdir/ .hiddir empty nopermdir .hidden2 dir_only_hidden
+nonExistent                                                                             ::       nonExistent
+src nopermdir/file                                                                      ::       src nopermdir/file
+Makefile src Makefile/ .hidden .hiddir                                                  ::       Makefile src Makefile/ .hidden .hiddir
+nonExistent nopermdir/file                                                              ::       nonExistent nopermdir/file
+nonExistent src Makefile Makefile/ linkdir/ nopermdir/file                              ::       nonExistent src Makefile Makefile/ linkdir/ nopermdir/file
+nopermdir nonExistent                                                                   ::       nopermdir nonExistent
+nopermdir src src                                                                       ::       nopermdir src src
+.hiddir nopermdir src                                                                   ::       .hiddir nopermdir src
+.hiddir .hiddir src                                                                     ::       .hiddir .hiddir src
+.hidden linkdir nonExistent nopermdir src nopermdir Makefile nopermdir/file empty       ::       .hidden linkdir nonExistent nopermdir src nopermdir Makefile nopermdir/file empty
