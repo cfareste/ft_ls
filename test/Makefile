@@ -17,7 +17,8 @@ CYAN = \033[1;36m
 #----COMPILER----#
 CC = cc
 CCFLAGS += -g -Wall -Wextra -Werror -Wpedantic -fsanitize=address \
-		   -Dopendir=mock_opendir -Dreaddir=mock_readdir -Dclosedir=mock_closedir -Dstat=stat_mock \
+		   -Dopendir=mock_opendir -Dreaddir=mock_readdir -Dclosedir=mock_closedir \
+		   -Dstat=stat_mock -Dlstat=lstat_mock \
 		   -Dft_printf=printf_mock -Dft_fprintf=fprintf_mock
 COVERAGE_FLAGS = -fprofile-arcs -ftest-coverage
 

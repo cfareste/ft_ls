@@ -33,3 +33,24 @@ int stat_mock(const char *restrict pathname, struct stat *restrict statbuf)
     statbuf->st_mode = entry->mode;
     return 0;
 }
+
+int lstat_mock(const char *restrict pathname, struct stat *restrict statbuf)
+{
+    const t_vfs_mock_entry *entry = find_vfs_entry(pathname);
+
+    if (entry == NULL)
+    {
+        errno = ENOENT;
+        return (-1);
+    }
+
+    if (entry->errors.lstat_errno != 0)
+    {
+        errno = entry->errors.lstat_errno;
+        return (-1);
+    }
+
+    ft_bzero(statbuf, sizeof(struct stat));
+    statbuf->st_mode = entry->mode;
+    return (0);
+}
