@@ -13,13 +13,18 @@ struct s_file_stats
     t_file_type type;
 };
 
+static int should_retrieve_with_lstat(const int retrieve_error, const struct stat_mock *stats)
+{
+    return retrieve_error == -1
+           ? (errno == ENOENT || errno == ELOOP)
+           : !S_ISDIR(stats->st_mode);
+}
+
 static int retrieve_file_stats(const char *file_path, struct stat *stats)
 {
     int retrieve_error = stat(file_path, stats);
 
-    if (retrieve_error == -1
-        ? (errno == ENOENT || errno == ELOOP)
-        : !S_ISDIR(stats->st_mode))
+    if (should_retrieve_with_lstat(retrieve_error, stats))
     {
         retrieve_error = lstat(file_path, stats);
     }
