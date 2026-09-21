@@ -13,7 +13,7 @@ struct s_file_stats
     t_file_type type;
 };
 
-static int should_retrieve_with_lstat(const int retrieve_error, const struct stat_mock *stats)
+static int should_retrieve_with_lstat(const int retrieve_error, const struct stat *stats)
 {
     return retrieve_error == -1
            ? (errno == ENOENT || errno == ELOOP)
