@@ -812,12 +812,13 @@ static void should_successfully_print_the_contents_of_the_symlinks_to_different_
 {
     const t_vfs_mock_entry vfs[] = {
         MOCK_FILE("file"),
-        MOCK_DIR("dir", ".", "..", "dirFile", "symlink"),
+        MOCK_DIR("dir", ".", "..", "dirFile", "symlink", "symDir"),
         MOCK_SYMLINK("fileLink", "file"),
         MOCK_SYMLINK("dirLink", "dir"),
         MOCK_SYMLINK("multihopFile", "fileLink"),
         MOCK_SYMLINK("multihopDir", "dirLink"),
         MOCK_SYMLINK("dir/symlink", "dir/dirFile"),
+        MOCK_SYMLINK("dir/symDir", "dir"),
         MOCK_BROKEN_LINK("brokenLink"),
         MOCK_LOOP_LINK("loopLink"),
         MOCK_FILE_ACCESS_ERROR(ENOENT, "nonExistent"),
@@ -828,7 +829,7 @@ static void should_successfully_print_the_contents_of_the_symlinks_to_different_
     const char *arguments[] = { "dirLink", "fileLink", "file", "multihopDir", "brokenLink", "dir", "multihopFile", "loopLink", "nonExistent", NULL };
     const char *expected_file_names[] = { "brokenLink", "file", "fileLink", "loopLink", "multihopFile" };
     const char *expected_dir_headers[] = { "dir", "dirLink", "multihopDir" };
-    const char *expected_dir_contents[] = { "dirFile", "symlink" };
+    const char *expected_dir_contents[] = { "dirFile", "symDir", "symlink" };
     get_parsed_arguments_result(9, arguments);
 
     const int result = application_run(parsed_arguments_result);
@@ -836,11 +837,11 @@ static void should_successfully_print_the_contents_of_the_symlinks_to_different_
     CU_ASSERT(verify_that_the_output_printed_is(
         "%s\n%s\n%s\n%s\n%s\n"
         "\n%s:\n"
-        "%s\n%s\n"
+        "%s\n%s\n%s\n"
         "\n%s:\n"
-        "%s\n%s\n"
+        "%s\n%s\n%s\n"
         "\n%s:\n"
-        "%s\n%s\n",
+        "%s\n%s\n%s\n",
         expected_file_names[0],
         expected_file_names[1],
         expected_file_names[2],
@@ -849,12 +850,15 @@ static void should_successfully_print_the_contents_of_the_symlinks_to_different_
         expected_dir_headers[0],
         expected_dir_contents[0],
         expected_dir_contents[1],
+        expected_dir_contents[2],
         expected_dir_headers[1],
         expected_dir_contents[0],
         expected_dir_contents[1],
+        expected_dir_contents[2],
         expected_dir_headers[2],
         expected_dir_contents[0],
-        expected_dir_contents[1]
+        expected_dir_contents[1],
+        expected_dir_contents[2]
     ));
     CU_ASSERT(verify_that_the_error_printed_is("ft_ls: cannot access '%s': %s\n", arguments[8], strerror(ENOENT)));
     CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MAJOR_ERROR);
