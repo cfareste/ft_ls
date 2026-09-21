@@ -205,6 +205,30 @@ static void should_return_link_file_stats_if_the_specified_file_is_a_looped_syml
     file_stats_destroy(&looped_link_stats);
 }
 
+static void should_return_the_correct_file_stats_if_the_specified_files_are_multi_hop_symlinks(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("file"),
+        MOCK_DIR("dir", ".", ".."),
+        MOCK_SYMLINK("fileLink1", "file"),
+        MOCK_SYMLINK("dirLink1", "dir"),
+        MOCK_SYMLINK("fileLink2", "fileLink1"),
+        MOCK_SYMLINK("dirLink2", "dirLink1"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    t_file_stats *file_link_stats = file_stats_get("fileLink2");
+    t_file_stats *dir_link_stats = file_stats_get("dirLink2");
+
+    CU_ASSERT_EQUAL(file_stats_get_file_type(file_link_stats), FILE_TYPE_SYMLINK);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(dir_link_stats), FILE_TYPE_DIRECTORY);
+    CU_ASSERT(verify_that_no_error_was_printed());
+
+    file_stats_destroy(&file_link_stats);
+    file_stats_destroy(&dir_link_stats);
+}
+
 static void should_return_NULL_when_an_error_accessing_a_file_occurs(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -262,6 +286,7 @@ void register_file_stats_suite(void)
         CU_add_test(suite, "should_return_directory_file_stats_if_the_specified_files_are_symlinks_to_directories", should_return_directory_file_stats_if_the_specified_files_are_symlinks_to_directories);
         CU_add_test(suite, "should_return_link_file_stats_if_the_specified_file_is_a_broken_symlink", should_return_link_file_stats_if_the_specified_file_is_a_broken_symlink);
         CU_add_test(suite, "should_return_link_file_stats_if_the_specified_file_is_a_looped_symlink", should_return_link_file_stats_if_the_specified_file_is_a_looped_symlink);
+        CU_add_test(suite, "should_return_the_correct_file_stats_if_the_specified_files_are_multi_hop_symlinks", should_return_the_correct_file_stats_if_the_specified_files_are_multi_hop_symlinks);
         CU_add_test(suite, "should_return_NULL_when_an_error_accessing_a_file_occurs", should_return_NULL_when_an_error_accessing_a_file_occurs);
     }
 }
