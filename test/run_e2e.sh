@@ -83,8 +83,8 @@ prepare_test_environment() {
     ln -s firstDir linkdir
     ln -s linkfile linklinkFile
     ln -s linkdir linklinkDir
-    ln -s firstDir/fileLink firstDir/file
-    ln -s firstDir/dirLink firstDir/dir
+    ln -s firstDir/file firstDir/fileLink
+    ln -s firstDir/dir firstDir/dirLink
     ln -s noTarget brokenLink
     ln -s loop1 loop2
     ln -s loop2 loop1
