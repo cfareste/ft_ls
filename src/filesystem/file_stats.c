@@ -20,6 +20,17 @@ static int should_retrieve_with_lstat(const int retrieve_error, const struct sta
            : !S_ISDIR(stats->st_mode);
 }
 
+static int handle_retrieve_error(const int retrieve_error, const char *file_path)
+{
+    if (retrieve_error == -1)
+    {
+        report_access_file_error(file_path);
+        return STATS_RETRIEVAL_ERROR;
+    }
+
+    return STATS_RETRIEVAL_SUCCESS;
+}
+
 static int retrieve_file_stats(const char *file_path, struct stat *stats)
 {
     int retrieve_error = stat(file_path, stats);
@@ -29,13 +40,7 @@ static int retrieve_file_stats(const char *file_path, struct stat *stats)
         retrieve_error = lstat(file_path, stats);
     }
 
-    if (retrieve_error == -1)
-    {
-        report_access_file_error(file_path);
-        return STATS_RETRIEVAL_ERROR;
-    }
-
-    return STATS_RETRIEVAL_SUCCESS;
+    return handle_retrieve_error(retrieve_error, file_path);
 }
 
 static t_file_type get_file_type(const mode_t mode)
