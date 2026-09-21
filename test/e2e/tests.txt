@@ -30,7 +30,7 @@ capacity/ capacity2/                                                            
 linkfile                                                                                ::       linkfile
 linkdir                                                                                 ::       linkdir
 linkdir/                                                                                ::       linkdir/
-file src linklink linkdir linkfile /dev/sda /dev/null fifo my_socket.sock               ::       file src linklink linkdir linkfile /dev/sda /dev/null fifo my_socket.sock
+file src linklinkDir linkdir linkfile /dev/sda /dev/null fifo my_socket.sock            ::       file src linklinkDir linkdir linkfile /dev/sda /dev/null fifo my_socket.sock
 nopermdir                                                                               ::       nopermdir
 nopermdir Makefile                                                                      ::       nopermdir Makefile
 nopermdir/ .hiddir                                                                      ::       nopermdir/ .hiddir
@@ -48,3 +48,4 @@ nopermdir src src                                                               
 .hiddir nopermdir src                                                                   ::       .hiddir nopermdir src
 .hiddir .hiddir src                                                                     ::       .hiddir .hiddir src
 .hidden linkdir nonExistent nopermdir src nopermdir Makefile nopermdir/file empty       ::       .hidden linkdir nonExistent nopermdir src nopermdir Makefile nopermdir/file empty
+linklinkDir firstDir loop2 noTarget linkfile file linklinkFile linkdir loop1 linkfile/  ::       linklinkDir firstDir loop2 noTarget linkfile file linklinkFile linkdir loop1 linkfile/

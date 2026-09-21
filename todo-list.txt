@@ -5,6 +5,7 @@ TODO En algún momento:
 - Investigar si los tests están acoplados a la implementación interna de las cosas
 - Refactor renderer, donde render llama a render_strategy o lo que sea basado en options
 - Para manejar errores de cualquier tipo, mirar la conversación de: https://chatgpt.com/c/6a711028-5c44-83eb-a7a4-e50ff2877990
+- Refactor file stats "file_stats_is_file_type()"
 
 
 TODO Para mejorar siguientes proyectos:
@@ -131,3 +132,16 @@ No probado en E2E:
    - Algunos errores de opendir y stat como EMFILE o ENOMEM
    - Error de opendir en un directorio actual (sin parámetros)
    - Error de stat en un directorio actual (sin parámetros) con 0 permisos
+
+
+QA LS-50 Always following symbolic links
+1. Non dir (and not link)
+2. Dir
+3. Link non dir
+4. Link dir
+5. Link roto
+6. Link loop
+7. Multi-hop link
+8. Link con / (non dir y falla, y dir y no falla)
+9. Links dentro de un directorio (ls dir: link)
+10. Otro tipo de error que no sea link roto o loop (ENOENT real, ...)

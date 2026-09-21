@@ -1,18 +1,42 @@
+#include <errno.h>
 #include <stdlib.h>
 #include <sys/stat.h>
 #include "libft.h"
 #include "file_stats.h"
 #include "error_reporter.h"
 
+#define STATS_RETRIEVAL_ERROR 0
+#define STATS_RETRIEVAL_SUCCESS 1
+
 struct s_file_stats
 {
     t_file_type type;
 };
 
-static t_file_stats *handle_stat_error(const char *file_path)
+static int should_retrieve_with_lstat(const int retrieve_error, const struct stat *stats)
 {
+    return retrieve_error == -1
+           ? (errno == ENOENT || errno == ELOOP)
+           : !S_ISDIR(stats->st_mode);
+}
+
+static int handle_retrieve_error(const int retrieve_error, const char *file_path)
+{
+    if (retrieve_error != -1)
+       return STATS_RETRIEVAL_SUCCESS;
+
     report_access_file_error(file_path);
-    return NULL;
+    return STATS_RETRIEVAL_ERROR;
+}
+
+static int retrieve_file_stats(const char *file_path, struct stat *stats)
+{
+    int retrieve_error = stat(file_path, stats);
+
+    if (should_retrieve_with_lstat(retrieve_error, stats))
+        retrieve_error = lstat(file_path, stats);
+
+    return handle_retrieve_error(retrieve_error, file_path);
 }
 
 static t_file_type get_file_type(const mode_t mode)
@@ -43,8 +67,8 @@ t_file_stats *file_stats_get(const char *file_path)
         return NULL;
 
     struct stat stats;
-    if (stat(file_path, &stats) == -1)
-        return handle_stat_error(file_path);
+    if (retrieve_file_stats(file_path, &stats) == STATS_RETRIEVAL_ERROR)
+        return NULL;
 
     t_file_stats *file_stats = ft_safe_calloc(1, sizeof(t_file_stats));
     file_stats->type = get_file_type(stats.st_mode);
