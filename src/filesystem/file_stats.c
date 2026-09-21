@@ -44,7 +44,7 @@ t_file_stats *file_stats_get(const char *file_path)
         return NULL;
 
     struct stat stats;
-    if (stat(file_path, &stats) == -1  && errno != ENOENT)
+    if (stat(file_path, &stats) == -1  && errno != ENOENT && errno != ELOOP)
         return handle_stat_error(file_path);
 
     if (!S_ISDIR(stats.st_mode) && lstat(file_path, &stats) == -1)

@@ -189,6 +189,22 @@ static void should_return_link_file_stats_if_the_specified_file_is_a_broken_syml
     file_stats_destroy(&broken_link_stats);
 }
 
+static void should_return_link_file_stats_if_the_specified_file_is_a_looped_symlink(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_LOOP_LINK("loopedLink"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    t_file_stats *looped_link_stats = file_stats_get("loopedLink");
+
+    CU_ASSERT_EQUAL(file_stats_get_file_type(looped_link_stats), FILE_TYPE_SYMLINK);
+    CU_ASSERT(verify_that_no_error_was_printed());
+
+    file_stats_destroy(&looped_link_stats);
+}
+
 static void should_return_NULL_when_an_error_accessing_a_file_occurs(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -245,6 +261,7 @@ void register_file_stats_suite(void)
         CU_add_test(suite, "should_return_link_file_stats_if_the_specified_files_are_symlinks_to_non_directories", should_return_link_file_stats_if_the_specified_files_are_symlinks_to_non_directories);
         CU_add_test(suite, "should_return_directory_file_stats_if_the_specified_files_are_symlinks_to_directories", should_return_directory_file_stats_if_the_specified_files_are_symlinks_to_directories);
         CU_add_test(suite, "should_return_link_file_stats_if_the_specified_file_is_a_broken_symlink", should_return_link_file_stats_if_the_specified_file_is_a_broken_symlink);
+        CU_add_test(suite, "should_return_link_file_stats_if_the_specified_file_is_a_looped_symlink", should_return_link_file_stats_if_the_specified_file_is_a_looped_symlink);
         CU_add_test(suite, "should_return_NULL_when_an_error_accessing_a_file_occurs", should_return_NULL_when_an_error_accessing_a_file_occurs);
     }
 }
