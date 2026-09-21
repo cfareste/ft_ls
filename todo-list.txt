@@ -1,14 +1,11 @@
 TODO:
-1. Arreglar bug de los symlinks (probar con un eloop o broken link)
-   - Hacer stat
-   - Si falla stat por ENOENT o ELOOP, o si el fichero NO es un directorio, se hace fallback a lstat
-2. Refactor file stats "file_stats_is_file_type()"
 
 
 TODO En algún momento:
 - Investigar si los tests están acoplados a la implementación interna de las cosas
 - Refactor renderer, donde render llama a render_strategy o lo que sea basado en options
 - Para manejar errores de cualquier tipo, mirar la conversación de: https://chatgpt.com/c/6a711028-5c44-83eb-a7a4-e50ff2877990
+- Refactor file stats "file_stats_is_file_type()"
 
 
 TODO Para mejorar siguientes proyectos:
