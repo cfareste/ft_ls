@@ -17,13 +17,14 @@ static int retrieve_file_stats(const char *file_path, struct stat *stats)
 {
     int retrieve_error = stat(file_path, stats);
 
-    if (retrieve_error == -1 && errno != ENOENT && errno != ELOOP)
+    if (retrieve_error == -1
+        ? (errno == ENOENT || errno == ELOOP)
+        : !S_ISDIR(stats->st_mode))
     {
-        report_access_file_error(file_path);
-        return STATS_RETRIEVAL_ERROR;
+        retrieve_error = lstat(file_path, stats);
     }
 
-    if (!S_ISDIR(stats->st_mode) && lstat(file_path, stats) == -1)
+    if (retrieve_error == -1)
     {
         report_access_file_error(file_path);
         return STATS_RETRIEVAL_ERROR;
