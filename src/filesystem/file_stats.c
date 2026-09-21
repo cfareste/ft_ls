@@ -5,6 +5,9 @@
 #include "file_stats.h"
 #include "error_reporter.h"
 
+#define STATS_RETRIEVAL_ERROR 0
+#define STATS_RETRIEVAL_SUCCESS 1
+
 struct s_file_stats
 {
     t_file_type type;
@@ -17,16 +20,16 @@ static int retrieve_file_stats(const char *file_path, struct stat *stats)
     if (retrieve_error == -1 && errno != ENOENT && errno != ELOOP)
     {
         report_access_file_error(file_path);
-        return 0;
+        return STATS_RETRIEVAL_ERROR;
     }
 
     if (!S_ISDIR(stats->st_mode) && lstat(file_path, stats) == -1)
     {
         report_access_file_error(file_path);
-        return 0;
+        return STATS_RETRIEVAL_ERROR;
     }
 
-    return 1;
+    return STATS_RETRIEVAL_SUCCESS;
 }
 
 static t_file_type get_file_type(const mode_t mode)
@@ -57,7 +60,7 @@ t_file_stats *file_stats_get(const char *file_path)
         return NULL;
 
     struct stat stats;
-    if (!retrieve_file_stats(file_path, &stats))
+    if (retrieve_file_stats(file_path, &stats) == STATS_RETRIEVAL_ERROR)
         return NULL;
 
     t_file_stats *file_stats = ft_safe_calloc(1, sizeof(t_file_stats));
