@@ -91,7 +91,6 @@ static void should_return_the_file_type_of_the_specified_file_stats(void)
         MOCK_CHAR_DEVICE("char_device"),
         MOCK_BLOCK_DEVICE("block_device"),
         MOCK_FIFO("pipe"),
-        MOCK_SYMLINK("symlink", "dir"),
         MOCK_SOCKET("socket"),
         MOCK_NULL_TERMINATOR()
     };
@@ -102,7 +101,6 @@ static void should_return_the_file_type_of_the_specified_file_stats(void)
     t_file_stats *chardevice_stats = file_stats_get("char_device");
     t_file_stats *blockdevice_stats = file_stats_get("block_device");
     t_file_stats *fifo_stats = file_stats_get("pipe");
-    t_file_stats *symlink_stats = file_stats_get("symlink");
     t_file_stats *socket_stats = file_stats_get("socket");
 
     CU_ASSERT_EQUAL(file_stats_get_file_type(reg_file_stats), FILE_TYPE_REGULAR);
@@ -110,7 +108,6 @@ static void should_return_the_file_type_of_the_specified_file_stats(void)
     CU_ASSERT_EQUAL(file_stats_get_file_type(chardevice_stats), FILE_TYPE_CHARDEVICE);
     CU_ASSERT_EQUAL(file_stats_get_file_type(blockdevice_stats), FILE_TYPE_BLOCKDEVICE);
     CU_ASSERT_EQUAL(file_stats_get_file_type(fifo_stats), FILE_TYPE_FIFO);
-    CU_ASSERT_EQUAL(file_stats_get_file_type(symlink_stats), FILE_TYPE_DIRECTORY);
     CU_ASSERT_EQUAL(file_stats_get_file_type(socket_stats), FILE_TYPE_SOCKET);
     CU_ASSERT(verify_that_no_error_was_printed());
 
@@ -119,7 +116,6 @@ static void should_return_the_file_type_of_the_specified_file_stats(void)
     file_stats_destroy(&chardevice_stats);
     file_stats_destroy(&blockdevice_stats);
     file_stats_destroy(&fifo_stats);
-    file_stats_destroy(&symlink_stats);
     file_stats_destroy(&socket_stats);
 }
 

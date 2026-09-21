@@ -1,4 +1,8 @@
 TODO:
+1. Arreglar bug de los symlinks (probar con un eloop o broken link)
+   - Hacer stat
+   - Si falla stat por ENOENT o ELOOP, o si el fichero NO es un directorio, se hace fallback a lstat
+2. Refactor file stats "file_stats_is_file_type()"
 
 
 TODO En algún momento:
@@ -131,3 +135,16 @@ No probado en E2E:
    - Algunos errores de opendir y stat como EMFILE o ENOMEM
    - Error de opendir en un directorio actual (sin parámetros)
    - Error de stat en un directorio actual (sin parámetros) con 0 permisos
+
+
+QA LS-50 Always following symbolic links
+1. Non dir
+2. Dir
+3. Link non dir
+4. Link dir
+5. Link roto
+6. Link loop
+7. Multi-hop link
+8. Link con / (non dir y falla, y dir y no falla)
+9. Links dentro de un directorio (ls dir: link)
+10. Combinación
