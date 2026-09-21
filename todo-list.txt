@@ -147,5 +147,4 @@ QA LS-50 Always following symbolic links
 7. Multi-hop link
 8. Link con / (non dir y falla, y dir y no falla)
 9. Links dentro de un directorio (ls dir: link)
-10. Combinación
-11. Otro tipo de error que no sea link roto o loop (ENOENT real, ...)
+10. Otro tipo de error que no sea link roto o loop (ENOENT real, ...)

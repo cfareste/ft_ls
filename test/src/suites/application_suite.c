@@ -808,6 +808,58 @@ static void should_successfully_print_the_contents_of_the_directory_pointed_by_t
     assert_application_execution_succeed(result);
 }
 
+static void should_successfully_print_the_contents_of_the_symlinks_to_different_file_types(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("file"),
+        MOCK_DIR("dir", ".", "..", "dirFile", "symlink"),
+        MOCK_SYMLINK("fileLink", "file"),
+        MOCK_SYMLINK("dirLink", "dir"),
+        MOCK_SYMLINK("multihopFile", "fileLink"),
+        MOCK_SYMLINK("multihopDir", "dirLink"),
+        MOCK_SYMLINK("dir/symlink", "dir/dirFile"),
+        MOCK_BROKEN_LINK("brokenLink"),
+        MOCK_LOOP_LINK("loopLink"),
+        MOCK_FILE_ACCESS_ERROR(ENOENT, "nonExistent"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "dirLink", "fileLink", "file", "multihopDir", "brokenLink", "dir", "multihopFile", "loopLink", "nonExistent", NULL };
+    const char *expected_file_names[] = { "brokenLink", "file", "fileLink", "loopLink", "multihopFile" };
+    const char *expected_dir_headers[] = { "dir", "dirLink", "multihopDir" };
+    const char *expected_dir_contents[] = { "dirFile", "symlink" };
+    get_parsed_arguments_result(9, arguments);
+
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "%s\n%s\n%s\n%s\n%s\n"
+        "\n%s:\n"
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n%s\n",
+        expected_file_names[0],
+        expected_file_names[1],
+        expected_file_names[2],
+        expected_file_names[3],
+        expected_file_names[4],
+        expected_dir_headers[0],
+        expected_dir_contents[0],
+        expected_dir_contents[1],
+        expected_dir_headers[1],
+        expected_dir_contents[0],
+        expected_dir_contents[1],
+        expected_dir_headers[2],
+        expected_dir_contents[0],
+        expected_dir_contents[1]
+    ));
+    CU_ASSERT(verify_that_the_error_printed_is("ft_ls: cannot access '%s': %s\n", arguments[8], strerror(ENOENT)));
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MAJOR_ERROR);
+}
+
 static void should_fail_with_a_major_error_and_not_print_anything_if_fails_to_open_the_directory(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -1262,6 +1314,7 @@ void register_application_suite(void)
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_current_directory_without_following_symlinks", should_successfully_print_the_contents_of_the_current_directory_without_following_symlinks);
         CU_add_test(suite, "should_successfully_print_the_name_of_the_specified_symlink_pointing_to_a_non_directory_file", should_successfully_print_the_name_of_the_specified_symlink_pointing_to_a_non_directory_file);
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_directory_pointed_by_the_specified_symlink", should_successfully_print_the_contents_of_the_directory_pointed_by_the_specified_symlink);
+        CU_add_test(suite, "should_successfully_print_the_contents_of_the_symlinks_to_different_file_types", should_successfully_print_the_contents_of_the_symlinks_to_different_file_types);
         CU_add_test(suite, "should_fail_with_a_major_error_and_not_print_anything_if_fails_to_open_the_directory", should_fail_with_a_major_error_and_not_print_anything_if_fails_to_open_the_directory);
         CU_add_test(suite, "should_fail_with_a_major_error_and_not_print_anything_if_fails_to_read_the_first_entry_of_the_directory", should_fail_with_a_major_error_and_not_print_anything_if_fails_to_read_the_first_entry_of_the_directory);
         CU_add_test(suite, "should_fail_with_a_major_error_and_only_print_the_non_failed_entries_if_fails_to_read_a_middle_entry_of_the_directory", should_fail_with_a_major_error_and_only_print_the_non_failed_entries_if_fails_to_read_a_middle_entry_of_the_directory);
