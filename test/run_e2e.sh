@@ -77,9 +77,17 @@ prepare_test_environment() {
     touch "capacity2/a" "capacity2/b" "capacity2/c" "capacity2/d" "capacity2/e" "capacity2/f" "capacity2/g" "capacity2/h"
 
     # Different file types
+    mkdir -p firstDir/dir
+    touch firstDir/file firstDir/dir/file
     ln -s file linkfile
     ln -s firstDir linkdir
-    ln -s linkdir linklink
+    ln -s linkfile linklinkFile
+    ln -s linkdir linklinkDir
+    ln -s firstDir/fileLink firstDir/file
+    ln -s firstDir/dirLink firstDir/dir
+    ln -s noTarget brokenLink
+    ln -s loop1 loop2
+    ln -s loop2 loop1
     mkfifo fifo
 
     # Error files
