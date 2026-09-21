@@ -22,13 +22,11 @@ static int should_retrieve_with_lstat(const int retrieve_error, const struct sta
 
 static int handle_retrieve_error(const int retrieve_error, const char *file_path)
 {
-    if (retrieve_error == -1)
-    {
-        report_access_file_error(file_path);
-        return STATS_RETRIEVAL_ERROR;
-    }
+    if (retrieve_error != -1)
+       return STATS_RETRIEVAL_SUCCESS;
 
-    return STATS_RETRIEVAL_SUCCESS;
+    report_access_file_error(file_path);
+    return STATS_RETRIEVAL_ERROR;
 }
 
 static int retrieve_file_stats(const char *file_path, struct stat *stats)
@@ -36,9 +34,7 @@ static int retrieve_file_stats(const char *file_path, struct stat *stats)
     int retrieve_error = stat(file_path, stats);
 
     if (should_retrieve_with_lstat(retrieve_error, stats))
-    {
         retrieve_error = lstat(file_path, stats);
-    }
 
     return handle_retrieve_error(retrieve_error, file_path);
 }
