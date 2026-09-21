@@ -12,7 +12,9 @@ struct s_file_stats
 
 static int retrieve_file_stats(const char *file_path, struct stat *stats)
 {
-    if (stat(file_path, stats) == -1  && errno != ENOENT && errno != ELOOP)
+    int retrieve_error = stat(file_path, stats);
+
+    if (retrieve_error == -1 && errno != ENOENT && errno != ELOOP)
     {
         report_access_file_error(file_path);
         return 0;
