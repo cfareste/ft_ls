@@ -10,23 +10,17 @@ struct s_file_stats
     t_file_type type;
 };
 
-static t_file_stats *handle_stat_error(const char *file_path)
-{
-    report_access_file_error(file_path);
-    return NULL;
-}
-
 static int retrieve_file_stats(const char *file_path, struct stat *stats)
 {
     if (stat(file_path, stats) == -1  && errno != ENOENT && errno != ELOOP)
     {
-        handle_stat_error(file_path);
+        report_access_file_error(file_path);
         return 0;
     }
 
     if (!S_ISDIR(stats->st_mode) && lstat(file_path, stats) == -1)
     {
-        handle_stat_error(file_path);
+        report_access_file_error(file_path);
         return 0;
     }
 
