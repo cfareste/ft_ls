@@ -83,7 +83,7 @@ static void should_return_unknown_file_type_when_a_NULL_file_stats_are_specified
     CU_ASSERT(verify_that_no_error_was_printed());
 }
 
-static void should_return_the_file_type_of_the_specified_non_link_files(void)
+static void should_return_the_file_stats_of_the_specified_non_link_files(void)
 {
     const t_vfs_mock_entry vfs[] = {
         MOCK_FILE("reg_file"),
@@ -119,7 +119,7 @@ static void should_return_the_file_type_of_the_specified_non_link_files(void)
     file_stats_destroy(&socket_stats);
 }
 
-static void should_return_link_file_type_if_the_specified_files_are_symlinks_to_non_directory(void)
+static void should_return_link_file_stats_if_the_specified_files_are_symlinks_to_non_directories(void)
 {
     const t_vfs_mock_entry vfs[] = {
         MOCK_FILE("reg"),
@@ -154,6 +154,23 @@ static void should_return_link_file_type_if_the_specified_files_are_symlinks_to_
     file_stats_destroy(&block_link_stats);
     file_stats_destroy(&pipe_link_stats);
     file_stats_destroy(&sock_link_stats);
+}
+
+static void should_return_directory_file_stats_if_the_specified_files_are_symlinks_to_directories(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("dir", ".", ".."),
+        MOCK_SYMLINK("sym_dir", "dir"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    t_file_stats *dir_link_stats = file_stats_get("sym_dir");
+
+    CU_ASSERT_EQUAL(file_stats_get_file_type(dir_link_stats), FILE_TYPE_DIRECTORY);
+    CU_ASSERT(verify_that_no_error_was_printed());
+
+    file_stats_destroy(&dir_link_stats);
 }
 
 static void should_return_NULL_when_an_error_accessing_a_file_occurs(void)
@@ -208,8 +225,9 @@ void register_file_stats_suite(void)
         CU_add_test(suite, "should_not_fail_to_destroy_file_stats_if_a_NULL_pointer_is_passed", should_not_fail_to_destroy_file_stats_if_a_NULL_pointer_is_passed);
         CU_add_test(suite, "should_not_fail_to_destroy_file_stats_if_a_NULL_file_stats_is_passed", should_not_fail_to_destroy_file_stats_if_a_NULL_file_stats_is_passed);
         CU_add_test(suite, "should_return_unknown_file_type_when_a_NULL_file_stats_are_specified", should_return_unknown_file_type_when_a_NULL_file_stats_are_specified);
-        CU_add_test(suite, "should_return_the_file_type_of_the_specified_non_link_files", should_return_the_file_type_of_the_specified_non_link_files);
-        CU_add_test(suite, "should_return_link_file_type_if_the_specified_files_are_symlinks_to_non_directory", should_return_link_file_type_if_the_specified_files_are_symlinks_to_non_directory);
+        CU_add_test(suite, "should_return_the_file_stats_of_the_specified_non_link_files", should_return_the_file_stats_of_the_specified_non_link_files);
+        CU_add_test(suite, "should_return_link_file_stats_if_the_specified_files_are_symlinks_to_non_directories", should_return_link_file_stats_if_the_specified_files_are_symlinks_to_non_directories);
+        CU_add_test(suite, "should_return_directory_file_stats_if_the_specified_files_are_symlinks_to_directories", should_return_directory_file_stats_if_the_specified_files_are_symlinks_to_directories);
         CU_add_test(suite, "should_return_NULL_when_an_error_accessing_a_file_occurs", should_return_NULL_when_an_error_accessing_a_file_occurs);
     }
 }
