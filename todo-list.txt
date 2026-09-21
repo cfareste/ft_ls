@@ -138,7 +138,7 @@ No probado en E2E:
 
 
 QA LS-50 Always following symbolic links
-1. Non dir
+1. Non dir (and not link)
 2. Dir
 3. Link non dir
 4. Link dir
@@ -148,3 +148,4 @@ QA LS-50 Always following symbolic links
 8. Link con / (non dir y falla, y dir y no falla)
 9. Links dentro de un directorio (ls dir: link)
 10. Combinación
+11. Otro tipo de error que no sea link roto o loop (ENOENT real, ...)

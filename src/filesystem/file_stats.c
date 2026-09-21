@@ -46,6 +46,9 @@ t_file_stats *file_stats_get(const char *file_path)
     if (stat(file_path, &stats) == -1)
         return handle_stat_error(file_path);
 
+    if (!S_ISDIR(stats.st_mode))
+        lstat(file_path, &stats);
+
     t_file_stats *file_stats = ft_safe_calloc(1, sizeof(t_file_stats));
     file_stats->type = get_file_type(stats.st_mode);
 

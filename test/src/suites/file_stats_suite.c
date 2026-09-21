@@ -83,7 +83,7 @@ static void should_return_unknown_file_type_when_a_NULL_file_stats_are_specified
     CU_ASSERT(verify_that_no_error_was_printed());
 }
 
-static void should_return_the_file_type_of_the_specified_file_stats(void)
+static void should_return_the_file_type_of_the_specified_non_link_files(void)
 {
     const t_vfs_mock_entry vfs[] = {
         MOCK_FILE("reg_file"),
@@ -117,6 +117,43 @@ static void should_return_the_file_type_of_the_specified_file_stats(void)
     file_stats_destroy(&blockdevice_stats);
     file_stats_destroy(&fifo_stats);
     file_stats_destroy(&socket_stats);
+}
+
+static void should_return_link_file_type_if_the_specified_files_are_symlinks_to_non_directory(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("reg"),
+        MOCK_CHAR_DEVICE("char_device"),
+        MOCK_BLOCK_DEVICE("block_device"),
+        MOCK_FIFO("pipe"),
+        MOCK_SOCKET("socket"),
+        MOCK_SYMLINK("sym_reg", "reg"),
+        MOCK_SYMLINK("sym_char", "char_device"),
+        MOCK_SYMLINK("sym_block", "block_device"),
+        MOCK_SYMLINK("sym_pipe", "pipe"),
+        MOCK_SYMLINK("sym_sock", "socket"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    t_file_stats *reg_link_stats = file_stats_get("sym_reg");
+    t_file_stats *char_link_stats = file_stats_get("sym_char");
+    t_file_stats *block_link_stats = file_stats_get("sym_block");
+    t_file_stats *pipe_link_stats = file_stats_get("sym_pipe");
+    t_file_stats *sock_link_stats = file_stats_get("sym_sock");
+
+    CU_ASSERT_EQUAL(file_stats_get_file_type(reg_link_stats), FILE_TYPE_SYMLINK);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(char_link_stats), FILE_TYPE_SYMLINK);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(block_link_stats), FILE_TYPE_SYMLINK);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(pipe_link_stats), FILE_TYPE_SYMLINK);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(sock_link_stats), FILE_TYPE_SYMLINK);
+    CU_ASSERT(verify_that_no_error_was_printed());
+
+    file_stats_destroy(&reg_link_stats);
+    file_stats_destroy(&char_link_stats);
+    file_stats_destroy(&block_link_stats);
+    file_stats_destroy(&pipe_link_stats);
+    file_stats_destroy(&sock_link_stats);
 }
 
 static void should_return_NULL_when_an_error_accessing_a_file_occurs(void)
@@ -171,7 +208,8 @@ void register_file_stats_suite(void)
         CU_add_test(suite, "should_not_fail_to_destroy_file_stats_if_a_NULL_pointer_is_passed", should_not_fail_to_destroy_file_stats_if_a_NULL_pointer_is_passed);
         CU_add_test(suite, "should_not_fail_to_destroy_file_stats_if_a_NULL_file_stats_is_passed", should_not_fail_to_destroy_file_stats_if_a_NULL_file_stats_is_passed);
         CU_add_test(suite, "should_return_unknown_file_type_when_a_NULL_file_stats_are_specified", should_return_unknown_file_type_when_a_NULL_file_stats_are_specified);
-        CU_add_test(suite, "should_return_the_file_type_of_the_specified_file_stats", should_return_the_file_type_of_the_specified_file_stats);
+        CU_add_test(suite, "should_return_the_file_type_of_the_specified_non_link_files", should_return_the_file_type_of_the_specified_non_link_files);
+        CU_add_test(suite, "should_return_link_file_type_if_the_specified_files_are_symlinks_to_non_directory", should_return_link_file_type_if_the_specified_files_are_symlinks_to_non_directory);
         CU_add_test(suite, "should_return_NULL_when_an_error_accessing_a_file_occurs", should_return_NULL_when_an_error_accessing_a_file_occurs);
     }
 }
