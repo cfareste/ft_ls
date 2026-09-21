@@ -1,3 +1,4 @@
+#include <errno.h>
 #include <stdlib.h>
 #include <sys/stat.h>
 #include "libft.h"
@@ -43,11 +44,11 @@ t_file_stats *file_stats_get(const char *file_path)
         return NULL;
 
     struct stat stats;
-    if (stat(file_path, &stats) == -1)
+    if (stat(file_path, &stats) == -1  && errno != ENOENT)
         return handle_stat_error(file_path);
 
-    if (!S_ISDIR(stats.st_mode))
-        lstat(file_path, &stats);
+    if (!S_ISDIR(stats.st_mode) && lstat(file_path, &stats) == -1)
+        return handle_stat_error(file_path);
 
     t_file_stats *file_stats = ft_safe_calloc(1, sizeof(t_file_stats));
     file_stats->type = get_file_type(stats.st_mode);
