@@ -11,7 +11,8 @@
 #define MOCK_FIFO(p) { (p), S_IFIFO | 0664, NULL, NULL, { 0, 0, 0, { 0, 0 }, 0 } }
 #define MOCK_NULL_TERMINATOR() { NULL, 0, NULL, NULL, { 0, 0, 0, { 0, 0 }, 0 } }
 
-#define MOCK_FILE_ACCESS_ERROR(err, p) { (p), S_IFREG | 0755, NULL, NULL, { err, err, 0, { 0, 0 }, 0 } }
+#define MOCK_FILE_ACCESS_ERROR(err, p) { (p), S_IFREG | 0644, NULL, NULL, { err, err, 0, { 0, 0 }, 0 } }
+#define MOCK_DIR_ACCESS_ERROR(err, p, ...) { (p), S_IFDIR | 0755, (const char *[]){ __VA_ARGS__, NULL }, NULL, { err, err, 0, { 0, 0 }, 0 } }
 #define MOCK_BROKEN_LINK(p) { (p), S_IFLNK | 0755, NULL, NULL, { ENOENT, 0, 0, { 0, 0 }, 0 } }
 #define MOCK_LOOP_LINK(p) { (p), S_IFLNK | 0755, NULL, NULL, { ELOOP, 0, 0, { 0, 0 }, 0 } }
 #define MOCK_DIR_OPEN_ERROR(err, p, ...) { (p), S_IFDIR | 0755, (const char *[]){ __VA_ARGS__, NULL }, NULL, { 0, 0, err, { 0, 0 }, 0 } }

@@ -82,7 +82,7 @@ QA LS-14 Default sorting output (`ls file ... | cat`)
 5. No memory leaks
 
 
-QA LS-13 Support for multiple types of files
+QA LS-13 Support for multiple types of files (`ls block_dev symlink ... | cat`)
 - Disclaimer: Al listar contenido de un directorio, se escribe el nombre de los ficheros contenidos, incluso
               si es un symlink (no del target)
 1. Sin parámetros
@@ -99,7 +99,7 @@ QA LS-13 Support for multiple types of files
 4. No memory leaks
 
 
-QA LS-12 Manage invalid operations
+QA LS-12 Manage invalid operations (`ls nonExistent ... | cat`)
 1. Opendir + readdir + closedir | Note: los parámetros que fallan son solo directorios
    - Sin fallos (sin parámetros, 1 parámetro de cada tipo, múltiples parámetros)
    - 1 Fallo:
@@ -134,7 +134,7 @@ No probado en E2E:
    - Error de stat en un directorio actual (sin parámetros) con 0 permisos
 
 
-QA LS-50 Always following symbolic links
+QA LS-50 Always following symbolic links (`ls linkFile linkDir brokenLink ... | cat`)
 1. Non dir (and not link)
 2. Dir
 3. Link non dir
@@ -145,3 +145,18 @@ QA LS-50 Always following symbolic links
 8. Link con / (non dir y falla, y dir y no falla)
 9. Links dentro de un directorio (ls dir: link)
 10. Otro tipo de error que no sea link roto o loop (ENOENT real, ...)
+
+
+QA LS-51 Accessing current directory stats if it was not explicitly stated as an operand (`ls | cat` with EACCES)
+1. Sin parámetros
+   - Válido
+   - Error
+2. Parámetro '.' explícito
+   - Válido
+   - Error
+3. Cualquier otro parámetro (single o multi)
+   - Válido/s
+   - Error/es
+No probado en E2E:
+   _ Sin parámetros con errores
+   - Parámetro '.' explícito con errores

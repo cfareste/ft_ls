@@ -4,6 +4,7 @@
 
 #define DEFAULT_NUM_OF_OPERANDS 1
 #define DEFAULT_FILE_OPERAND "."
+#define DEFAULT_FILE_OPERAND_TYPE FILE_TYPE_DIRECTORY
 
 static char **get_default_file_operands(void)
 {
@@ -24,6 +25,34 @@ static char **get_file_operands_from_arguments(const int num_of_arguments, const
     }
 
     return file_operands;
+}
+
+static t_file_type *get_default_file_operand_type(void)
+{
+    t_file_type *file_operands_types = ft_safe_calloc(DEFAULT_NUM_OF_OPERANDS + 1, sizeof(t_file_type));
+
+    file_operands_types[0] = DEFAULT_FILE_OPERAND_TYPE;
+    file_operands_types[1] = FILE_TYPE_NONE;
+
+    return file_operands_types;
+}
+
+static t_file_type *get_file_operands_types_from_arguments(char **file_operands)
+{
+    const unsigned int num_of_operands = ft_str_matrix_length(file_operands);
+    t_file_type *file_operands_types = ft_safe_calloc(num_of_operands + 1, sizeof(t_file_type));
+
+    for (unsigned int i = 0; i < num_of_operands; i++)
+    {
+        t_file_stats *file_operand_stats = file_stats_get(file_operands[i]);
+
+        file_operands_types[i] = file_stats_get_file_type(file_operand_stats);
+
+        file_stats_destroy(&file_operand_stats);
+    }
+
+    file_operands_types[num_of_operands] = FILE_TYPE_NONE;
+    return file_operands_types;
 }
 
 static unsigned int get_num_of_non_directory_file_operands(const t_file_type *file_operand_types)
@@ -64,22 +93,12 @@ char **file_operands_get(const int num_of_arguments, const char **arguments)
     return get_file_operands_from_arguments(num_of_arguments, arguments);
 }
 
-t_file_type *file_operands_get_types(char **file_operands)
+t_file_type *file_operands_get_types(const int num_of_arguments, char **file_operands)
 {
-    const unsigned int num_of_operands = ft_str_matrix_length(file_operands);
-    t_file_type *file_operands_types = ft_safe_calloc(num_of_operands + 1, sizeof(t_file_type));
+    if (num_of_arguments == 0)
+        return get_default_file_operand_type();
 
-    for (unsigned int i = 0; i < num_of_operands; i++)
-    {
-        t_file_stats *file_operand_stats = file_stats_get(file_operands[i]);
-
-        file_operands_types[i] = file_stats_get_file_type(file_operand_stats);
-
-        file_stats_destroy(&file_operand_stats);
-    }
-
-    file_operands_types[num_of_operands] = FILE_TYPE_NONE;
-    return file_operands_types;
+    return get_file_operands_types_from_arguments(file_operands);
 }
 
 char **file_operands_get_non_directory(char **file_operands, const t_file_type *file_operands_types)
