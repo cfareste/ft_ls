@@ -1166,6 +1166,24 @@ static void should_fail_with_a_major_error_and_print_only_the_working_file_opera
     CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MAJOR_ERROR);
 }
 
+static void should_fail_with_a_major_error_and_not_print_anything_if_fails_to_access_the_current_directory(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR_ACCESS_ERROR(EACCES, ".", "..", ".", "file"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { ".", NULL };
+    get_parsed_arguments_result(1, arguments);
+
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_no_output_was_printed());
+    CU_ASSERT(verify_that_the_error_printed_is("ft_ls: cannot access '%s': %s\n", ".", strerror(EACCES)));
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MAJOR_ERROR);
+}
+
 static void should_fail_with_a_major_error_and_not_print_anything_if_the_specified_file_operand_fails_to_be_accessed(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -1388,6 +1406,7 @@ void register_application_suite(void)
         CU_add_test(suite, "should_fail_with_a_major_error_and_print_only_the_working_file_operands_if_fails_to_scan_a_directory_operand", should_fail_with_a_major_error_and_print_only_the_working_file_operands_if_fails_to_scan_a_directory_operand);
         CU_add_test(suite, "should_fail_with_a_major_error_and_not_print_anything_if_all_directories_fail_to_scan", should_fail_with_a_major_error_and_not_print_anything_if_all_directories_fail_to_scan);
         CU_add_test(suite, "should_fail_with_a_major_error_and_print_only_the_working_file_operands_if_some_directories_fail_to_scan", should_fail_with_a_major_error_and_print_only_the_working_file_operands_if_some_directories_fail_to_scan);
+        CU_add_test(suite, "should_fail_with_a_major_error_and_not_print_anything_if_fails_to_access_the_current_directory", should_fail_with_a_major_error_and_not_print_anything_if_fails_to_access_the_current_directory);
         CU_add_test(suite, "should_fail_with_a_major_error_and_not_print_anything_if_the_specified_file_operand_fails_to_be_accessed", should_fail_with_a_major_error_and_not_print_anything_if_the_specified_file_operand_fails_to_be_accessed);
         CU_add_test(suite, "should_fail_with_a_major_error_and_print_the_working_operand_if_one_file_operand_fails_to_be_accessed", should_fail_with_a_major_error_and_print_the_working_operand_if_one_file_operand_fails_to_be_accessed);
         CU_add_test(suite, "should_fail_with_a_major_error_and_print_only_the_working_operands_if_one_file_operand_fails_to_be_accessed", should_fail_with_a_major_error_and_print_only_the_working_operands_if_one_file_operand_fails_to_be_accessed);
