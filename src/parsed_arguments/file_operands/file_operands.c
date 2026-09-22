@@ -64,8 +64,16 @@ char **file_operands_get(const int num_of_arguments, const char **arguments)
     return get_file_operands_from_arguments(num_of_arguments, arguments);
 }
 
-t_file_type *file_operands_get_types(char **file_operands)
+t_file_type *file_operands_get_types(const int num_of_arguments, char **file_operands)
 {
+    if (num_of_arguments == 0)
+    {
+        t_file_type *file_operands_types = ft_safe_calloc(2, sizeof(t_file_type));
+        file_operands_types[0] = FILE_TYPE_DIRECTORY;
+        file_operands_types[1] = FILE_TYPE_NONE;
+        return file_operands_types;
+    }
+
     const unsigned int num_of_operands = ft_str_matrix_length(file_operands);
     t_file_type *file_operands_types = ft_safe_calloc(num_of_operands + 1, sizeof(t_file_type));
 

@@ -400,6 +400,26 @@ static void should_sort_the_directory_file_operands_by_ascii_by_default(void)
     CU_ASSERT(verify_that_no_error_was_printed());
 }
 
+static void should_be_created_correctly_even_if_current_directory_is_invalid_if_no_parameters_were_specified(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR_ACCESS_ERROR(EACCES, ".", "..", ".", "file"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *valid_args[] = { NULL };
+
+    get_parsed_arguments_result(0, valid_args);
+    const char * const *directory_file_operands = parsed_arguments_get_directory_file_operands(sut);
+
+    CU_ASSERT_PTR_NOT_NULL(sut);
+    CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
+    CU_ASSERT_STRING_EQUAL(directory_file_operands[0], ".");
+    CU_ASSERT_PTR_NULL(directory_file_operands[1]);
+    CU_ASSERT(verify_that_no_error_was_printed());
+}
+
 static void should_be_created_correctly_even_if_the_specified_argument_cannot_be_accessed(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -579,6 +599,7 @@ void register_parsed_arguments_suite(void)
         CU_add_test(suite, "should_return_true_for_has_mixed_types_file_operands_if_it_does_have_at_least_one_non_dir_and_one_dir", should_return_true_for_has_mixed_types_file_operands_if_it_does_have_at_least_one_non_dir_and_one_dir);
         CU_add_test(suite, "should_sort_the_non_directory_file_operands_by_ascii_by_default", should_sort_the_non_directory_file_operands_by_ascii_by_default);
         CU_add_test(suite, "should_sort_the_directory_file_operands_by_ascii_by_default", should_sort_the_directory_file_operands_by_ascii_by_default);
+        CU_add_test(suite, "should_be_created_correctly_even_if_current_directory_is_invalid_if_no_parameters_were_specified", should_be_created_correctly_even_if_current_directory_is_invalid_if_no_parameters_were_specified);
         CU_add_test(suite, "should_be_created_correctly_even_if_the_specified_argument_cannot_be_accessed", should_be_created_correctly_even_if_the_specified_argument_cannot_be_accessed);
         CU_add_test(suite, "should_be_created_correctly_even_if_one_argument_cannot_be_accessed", should_be_created_correctly_even_if_one_argument_cannot_be_accessed);
         CU_add_test(suite, "should_be_created_correctly_even_if_one_argument_cannot_be_accessed_with_multiple_mixed_file_operands", should_be_created_correctly_even_if_one_argument_cannot_be_accessed_with_multiple_mixed_file_operands);
