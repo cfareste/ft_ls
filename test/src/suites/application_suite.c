@@ -910,6 +910,36 @@ static void should_fail_with_a_major_error_and_not_print_anything_if_fails_to_op
     CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MAJOR_ERROR);
 }
 
+static void should_fail_with_a_major_error_and_not_print_anything_if_fails_to_open_the_current_directory_without_arguments(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        {
+            .path = ".",
+            .mode = S_IFDIR | 0755,
+            .entries = (const char *[]){ ".", "..", "file", NULL },
+            .target = NULL,
+            .errors ={
+                .stat_errno = EACCES,
+                .lstat_errno =EACCES,
+                .opendir_errno =EACCES,
+                .readdir_error = { 0, 0 },
+                .closedir_errno = 0
+            }
+        },
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { NULL };
+    get_parsed_arguments_result(0, arguments);
+
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_no_output_was_printed());
+    CU_ASSERT(verify_that_the_error_printed_is("ft_ls: cannot open directory '%s': %s\n", ".", strerror(EACCES)));
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MAJOR_ERROR);
+}
+
 static void should_fail_with_a_major_error_and_not_print_anything_if_fails_to_read_the_first_entry_of_the_directory(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -1349,6 +1379,7 @@ void register_application_suite(void)
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_directory_pointed_by_the_specified_symlink", should_successfully_print_the_contents_of_the_directory_pointed_by_the_specified_symlink);
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_symlinks_to_different_file_types", should_successfully_print_the_contents_of_the_symlinks_to_different_file_types);
         CU_add_test(suite, "should_fail_with_a_major_error_and_not_print_anything_if_fails_to_open_the_directory", should_fail_with_a_major_error_and_not_print_anything_if_fails_to_open_the_directory);
+        CU_add_test(suite, "should_fail_with_a_major_error_and_not_print_anything_if_fails_to_open_the_current_directory_without_arguments", should_fail_with_a_major_error_and_not_print_anything_if_fails_to_open_the_current_directory_without_arguments);
         CU_add_test(suite, "should_fail_with_a_major_error_and_not_print_anything_if_fails_to_read_the_first_entry_of_the_directory", should_fail_with_a_major_error_and_not_print_anything_if_fails_to_read_the_first_entry_of_the_directory);
         CU_add_test(suite, "should_fail_with_a_major_error_and_only_print_the_non_failed_entries_if_fails_to_read_a_middle_entry_of_the_directory", should_fail_with_a_major_error_and_only_print_the_non_failed_entries_if_fails_to_read_a_middle_entry_of_the_directory);
         CU_add_test(suite, "should_fail_with_a_major_error_print_the_contents_of_the_directory_if_fails_to_close_it", should_fail_with_a_major_error_print_the_contents_of_the_directory_if_fails_to_close_it);
