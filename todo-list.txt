@@ -158,3 +158,6 @@ QA LS-51 Accessing current directory stats if it was not explicitly stated as an
 3. Cualquier otro parámetro (single o multi)
    - Válido/s
    - Error/es
+No probado en E2E:
+   _ Sin parámetros con errores
+   - Parámetro '.' explícito con errores

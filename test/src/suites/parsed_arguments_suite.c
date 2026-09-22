@@ -34,11 +34,16 @@ static void should_be_created_correctly(void)
     };
     vfs_mock_setup(vfs);
 
-    const char *valid_args[] = { NULL };
+    const char *valid_args[] = { ".", NULL };
 
-    get_parsed_arguments_result(0, valid_args);
+    get_parsed_arguments_result(1, valid_args);
+    const char * const *non_directory_file_operands = parsed_arguments_get_non_directory_file_operands(sut);
+    const char * const *directory_file_operands = parsed_arguments_get_directory_file_operands(sut);
 
     CU_ASSERT_PTR_NOT_NULL(sut);
+    CU_ASSERT_PTR_NULL(non_directory_file_operands[0]);
+    CU_ASSERT_STRING_EQUAL(directory_file_operands[0], ".");
+    CU_ASSERT_PTR_NULL(directory_file_operands[1]);
     CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
     CU_ASSERT(verify_that_no_error_was_printed());
 }
