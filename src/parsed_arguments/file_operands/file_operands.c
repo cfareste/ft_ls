@@ -4,6 +4,7 @@
 
 #define DEFAULT_NUM_OF_OPERANDS 1
 #define DEFAULT_FILE_OPERAND "."
+#define DEFAULT_FILE_OPERAND_TYPE FILE_TYPE_DIRECTORY
 
 static char **get_default_file_operands(void)
 {
@@ -24,6 +25,16 @@ static char **get_file_operands_from_arguments(const int num_of_arguments, const
     }
 
     return file_operands;
+}
+
+static t_file_type *get_default_file_operand_type(void)
+{
+    t_file_type *file_operands_types = ft_safe_calloc(DEFAULT_NUM_OF_OPERANDS + 1, sizeof(t_file_type));
+
+    file_operands_types[0] = DEFAULT_FILE_OPERAND_TYPE;
+    file_operands_types[1] = FILE_TYPE_NONE;
+
+    return file_operands_types;
 }
 
 static unsigned int get_num_of_non_directory_file_operands(const t_file_type *file_operand_types)
@@ -67,12 +78,7 @@ char **file_operands_get(const int num_of_arguments, const char **arguments)
 t_file_type *file_operands_get_types(const int num_of_arguments, char **file_operands)
 {
     if (num_of_arguments == 0)
-    {
-        t_file_type *file_operands_types = ft_safe_calloc(2, sizeof(t_file_type));
-        file_operands_types[0] = FILE_TYPE_DIRECTORY;
-        file_operands_types[1] = FILE_TYPE_NONE;
-        return file_operands_types;
-    }
+        return get_default_file_operand_type();
 
     const unsigned int num_of_operands = ft_str_matrix_length(file_operands);
     t_file_type *file_operands_types = ft_safe_calloc(num_of_operands + 1, sizeof(t_file_type));
