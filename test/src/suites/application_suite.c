@@ -66,6 +66,34 @@ static void should_successfully_print_the_contents_of_the_current_directory_one_
     assert_application_execution_succeed(result);
 }
 
+static void should_successfully_print_the_contents_of_the_current_directory(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", ".", "..", "file1", "subdir1", "symlink", "zz"),
+        MOCK_FILE("./file1"),
+        MOCK_DIR("./subdir1", ".", ".."),
+        MOCK_SYMLINK("./symlink", "file1"),
+        MOCK_FILE("./zz"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { ".", NULL };
+    const char *expected_file_names[] = { "file1", "subdir1", "symlink", "zz" };
+    get_parsed_arguments_result(1, arguments);
+
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is("%s\n%s\n%s\n%s\n",
+        expected_file_names[0],
+        expected_file_names[1],
+        expected_file_names[2],
+        expected_file_names[3]
+    ));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    assert_application_execution_succeed(result);
+}
+
 static void should_successfully_print_the_file_name_if_a_regular_file_operand_is_specified(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -1296,6 +1324,7 @@ void register_application_suite(void)
     {
         CU_add_test(suite, "should_return_a_major_error_when_passing_a_NULL_parsed_argument", should_return_a_major_error_when_passing_a_NULL_parsed_argument);
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_current_directory_one_per_line_if_no_file_operands_are_specified", should_successfully_print_the_contents_of_the_current_directory_one_per_line_if_no_file_operands_are_specified);
+        CU_add_test(suite, "should_successfully_print_the_contents_of_the_current_directory", should_successfully_print_the_contents_of_the_current_directory);
         CU_add_test(suite, "should_successfully_print_the_file_name_if_a_regular_file_operand_is_specified", should_successfully_print_the_file_name_if_a_regular_file_operand_is_specified);
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_directory_specified_as_an_operand", should_successfully_print_the_contents_of_the_directory_specified_as_an_operand);
         CU_add_test(suite, "should_successfully_print_the_contents_of_multiple_non_directory_files", should_successfully_print_the_contents_of_multiple_non_directory_files);

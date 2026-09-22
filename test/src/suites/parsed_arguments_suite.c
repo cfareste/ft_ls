@@ -447,6 +447,7 @@ static void should_be_created_correctly_even_if_current_directory_is_invalid_and
     CU_ASSERT_PTR_NULL(directory_file_operands[0]);
     CU_ASSERT(verify_that_the_error_printed_is("ft_ls: cannot access '%s': %s\n", valid_args[0], strerror(EACCES)));
 }
+
 static void should_be_created_correctly_even_if_the_specified_argument_cannot_be_accessed(void)
 {
     const t_vfs_mock_entry vfs[] = {
