@@ -1246,7 +1246,7 @@ static void should_fail_with_a_major_error_and_print_only_the_working_operands_i
     const char *expected_file_names[] = { "file", "zFile" };
     const char *expected_first_dir_file_name = "fileDir";
     const char *expected_second_dir_file_name = "zFileDir";
-    get_parsed_arguments_result(6, arguments);
+    get_parsed_arguments_result(5, arguments);
 
     const int result = application_run(parsed_arguments_result);
 

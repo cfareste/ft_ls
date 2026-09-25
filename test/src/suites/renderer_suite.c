@@ -268,7 +268,7 @@ static void should_not_render_a_dir_header_if_its_not_needed(void)
     const char *expected_file_name[] = { "file", "file2", "file3" };
     const char *dir_header = "dir";
     const char *args[] = { "dir", NULL };
-    get_parsed_arguments_result(2, args);
+    get_parsed_arguments_result(1, args);
     t_render_context *context = render_context_create(parsed_arguments);
     t_file_entry_array *file_entry_array = file_entry_array_create();
     file_entry_array_push(file_entry_array, file_entry_create(expected_file_name[0]));
