@@ -19,9 +19,19 @@ static char **get_file_operands_from_arguments(const int num_of_arguments, const
 {
     char **file_operands = ft_safe_calloc(num_of_arguments + 1, sizeof(char *));
 
-    for (int i = 0; i < num_of_arguments; i++)
+    int operands_i = 0;
+    int arguments_i = 0;
+    while (arguments_i < num_of_arguments)
     {
-        file_operands[i] = ft_safe_strdup(arguments[i]);
+        if (arguments[arguments_i][0] == '-')
+        {
+            arguments_i++;
+            continue;
+        }
+
+        file_operands[operands_i] = ft_safe_strdup(arguments[arguments_i]);
+        arguments_i++;
+        operands_i++;
     }
 
     return file_operands;

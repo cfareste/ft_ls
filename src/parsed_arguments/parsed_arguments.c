@@ -6,6 +6,7 @@
 
 struct s_parsed_arguments
 {
+    t_options options;
     char **file_operands;
     t_file_type *file_operand_types;
     char **non_directory_file_operands;
@@ -38,6 +39,19 @@ static t_result *create_parsing_arguments_result(t_parsed_arguments *parsed_argu
     return result_create_successful(parsed_arguments);
 }
 
+static t_options options_get(const int num_of_arguments, const char **arguments)
+{
+    int options = OPTIONS_NONE;
+
+    for (int i = 0; i < num_of_arguments; i++)
+    {
+        if (arguments[i][1] == 'R')
+            options |= OPTIONS_RECURSIVE;
+    }
+
+    return options;
+}
+
 t_result *parse_arguments(const int num_of_arguments, const char **arguments)
 {
     if (num_of_arguments < 0 || arguments == NULL)
@@ -45,6 +59,7 @@ t_result *parse_arguments(const int num_of_arguments, const char **arguments)
 
     t_parsed_arguments *parsed_arguments = ft_safe_calloc(1, sizeof(t_parsed_arguments));
 
+    parsed_arguments->options = options_get(num_of_arguments, arguments);
     parsed_arguments->file_operands = file_operands_get(num_of_arguments, arguments);
     parsed_arguments->file_operand_types = file_operands_get_types(num_of_arguments, parsed_arguments->file_operands);
     parsed_arguments->non_directory_file_operands = file_operands_get_non_directory(parsed_arguments->file_operands, parsed_arguments->file_operand_types);
@@ -69,6 +84,11 @@ const char * const *parsed_arguments_get_directory_file_operands(const t_parsed_
         return NULL;
 
     return (const char * const *) parsed_arguments->directory_file_operands;
+}
+
+unsigned int parsed_arguments_has_option(const t_parsed_arguments *parsed_arguments, const t_options option)
+{
+    return parsed_arguments->options & option;
 }
 
 int parsed_arguments_has_multiple_file_operands(const t_parsed_arguments *parsed_arguments)
