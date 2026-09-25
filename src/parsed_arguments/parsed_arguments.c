@@ -39,22 +39,6 @@ static t_result *create_parsing_arguments_result(t_parsed_arguments *parsed_argu
     return result_create_successful(parsed_arguments);
 }
 
-static t_options options_get(const int num_of_arguments, const char **arguments)
-{
-    int options = OPTIONS_NONE;
-
-    for (int i = 0; i < num_of_arguments; i++)
-    {
-        if (arguments[i][0] != '-')
-            continue ;
-
-        if (arguments[i][1] == 'R')
-            options |= OPTIONS_RECURSIVE;
-    }
-
-    return options;
-}
-
 t_result *parse_arguments(const int num_of_arguments, const char **arguments)
 {
     if (num_of_arguments < 0 || arguments == NULL)

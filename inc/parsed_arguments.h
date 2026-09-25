@@ -1,12 +1,7 @@
 #pragma once
 
 #include "result.h"
-
-typedef enum e_options
-{
-    OPTIONS_NONE = 0,
-    OPTIONS_RECURSIVE = 1 << 0
-} t_options;
+#include "options.h"
 
 typedef struct s_parsed_arguments t_parsed_arguments;
 

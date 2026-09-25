@@ -63,6 +63,7 @@ vpath %.c	$(SRC):\
 			$(MOCKS_DIR):\
 			$(ROOT_SRC)/application:\
 			$(ROOT_SRC)/parsed_arguments:\
+			$(ROOT_SRC)/parsed_arguments/options:\
 			$(ROOT_SRC)/parsed_arguments/file_operands:\
 			$(ROOT_SRC)/filesystem:\
 			$(ROOT_SRC)/file_entry:\
@@ -77,6 +78,7 @@ vpath %.c	$(SRC):\
 #----SHARED----#
 ROOT_SRCS = application.c \
 			parsed_arguments.c \
+			options.c \
 			file_operands.c \
 			directory.c \
 			file_stats.c \
