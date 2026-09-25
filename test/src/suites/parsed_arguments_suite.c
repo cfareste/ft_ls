@@ -337,7 +337,7 @@ static void should_sort_the_non_directory_file_operands_by_ascii_by_default(void
     const t_vfs_mock_entry vfs[] = {
         MOCK_FILE("a"),
         MOCK_FILE("2file"),
-        MOCK_FILE("_file"),
+        MOCK_FILE("_Reg"),
         MOCK_FILE("f"),
         MOCK_FILE(".hidden_file"),
         MOCK_FILE("FILE"),
@@ -356,7 +356,7 @@ static void should_sort_the_non_directory_file_operands_by_ascii_by_default(void
     };
     vfs_mock_setup(vfs);
 
-    const char *args[] = { "a", "2file", "_DIR", ".hiddir", "_file", "f", "dir", ".hidden_file", "FILE", NULL };
+    const char *args[] = { "a", "2file", "_DIR", ".hiddir", "_Reg", "f", "dir", ".hidden_file", "FILE", NULL };
     get_parsed_arguments_result(9, args);
 
     const char * const *non_directory_file_operands = parsed_arguments_get_non_directory_file_operands(sut);
@@ -378,7 +378,7 @@ static void should_sort_the_directory_file_operands_by_ascii_by_default(void)
     const t_vfs_mock_entry vfs[] = {
         MOCK_FILE("a"),
         MOCK_FILE("2file"),
-        MOCK_FILE("_file"),
+        MOCK_FILE("_Reg"),
         MOCK_FILE("f"),
         MOCK_FILE(".hidden_file"),
         MOCK_FILE("FILE"),
@@ -397,7 +397,7 @@ static void should_sort_the_directory_file_operands_by_ascii_by_default(void)
     };
     vfs_mock_setup(vfs);
 
-    const char *args[] = { "a", "2file", "_DIR", ".hiddir", "_file", "f", "dir", ".hidden_file", "FILE", NULL };
+    const char *args[] = { "a", "2file", "_DIR", ".hiddir", "_Reg", "f", "dir", ".hidden_file", "FILE", NULL };
     get_parsed_arguments_result(9, args);
 
     const char * const *directory_file_operands = parsed_arguments_get_directory_file_operands(sut);
