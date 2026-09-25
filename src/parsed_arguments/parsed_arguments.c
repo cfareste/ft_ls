@@ -94,9 +94,9 @@ int parsed_arguments_has_any_option(const t_parsed_arguments *parsed_arguments)
     return parsed_arguments->options != OPTIONS_NONE;
 }
 
-unsigned int parsed_arguments_has_option(const t_parsed_arguments *parsed_arguments, const t_options option)
+int parsed_arguments_has_option(const t_parsed_arguments *parsed_arguments, const t_options option)
 {
-    return parsed_arguments->options & option;
+    return (parsed_arguments->options & option) != OPTIONS_NONE;
 }
 
 int parsed_arguments_has_multiple_file_operands(const t_parsed_arguments *parsed_arguments)
