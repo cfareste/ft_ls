@@ -197,8 +197,6 @@ static void should_return_the_directory_file_operands(void)
     CU_ASSERT(verify_that_no_error_was_printed());
 }
 
-// -
-
 static void should_return_false_for_has_any_option_if_NULL_parsed_arguments_are_passed(void)
 {
     const int has_any_option = parsed_arguments_has_any_option(NULL);
@@ -235,6 +233,14 @@ static void should_return_true_for_has_any_option_if_at_least_one_option_was_spe
 
     CU_ASSERT_TRUE(has_any_option);
     CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
+    CU_ASSERT(verify_that_no_error_was_printed());
+}
+
+static void should_return_false_for_has_option_if_NULL_parsed_arguments_are_passed(void)
+{
+    const int has_option = parsed_arguments_has_option(NULL, OPTIONS_RECURSIVE);
+
+    CU_ASSERT_FALSE(has_option);
     CU_ASSERT(verify_that_no_error_was_printed());
 }
 
@@ -723,10 +729,10 @@ void register_parsed_arguments_suite(void)
         CU_add_test(suite, "should_return_the_non_directory_file_operands", should_return_the_non_directory_file_operands);
         CU_add_test(suite, "should_return_NULL_directory_file_operands_if_NULL_parsed_arguments_are_passed", should_return_NULL_directory_file_operands_if_NULL_parsed_arguments_are_passed);
         CU_add_test(suite, "should_return_the_directory_file_operands", should_return_the_directory_file_operands);
-        // -
         CU_add_test(suite, "should_return_false_for_has_any_option_if_NULL_parsed_arguments_are_passed", should_return_false_for_has_any_option_if_NULL_parsed_arguments_are_passed);
         CU_add_test(suite, "should_return_false_for_has_any_option_if_at_no_option_was_specified", should_return_false_for_has_any_option_if_at_no_option_was_specified);
         CU_add_test(suite, "should_return_true_for_has_any_option_if_at_least_one_option_was_specified", should_return_true_for_has_any_option_if_at_least_one_option_was_specified);
+        CU_add_test(suite, "should_return_false_for_has_option_if_NULL_parsed_arguments_are_passed", should_return_false_for_has_option_if_NULL_parsed_arguments_are_passed);
         CU_add_test(suite, "should_return_false_for_has_option_if_the_specified_option_was_NOT_parsed", should_return_false_for_has_option_if_the_specified_option_was_NOT_parsed);
         CU_add_test(suite, "should_return_true_for_has_option_if_the_specified_option_was_parsed", should_return_true_for_has_option_if_the_specified_option_was_parsed);
         CU_add_test(suite, "should_return_false_for_multiple_file_operands_if_NULL_parsed_arguments_are_passed", should_return_false_for_multiple_file_operands_if_NULL_parsed_arguments_are_passed);

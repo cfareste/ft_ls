@@ -99,6 +99,9 @@ int parsed_arguments_has_any_option(const t_parsed_arguments *parsed_arguments)
 
 int parsed_arguments_has_option(const t_parsed_arguments *parsed_arguments, const t_options option)
 {
+    if (parsed_arguments == NULL)
+        return 0;
+
     return (parsed_arguments->options & option) != OPTIONS_NONE;
 }
 
