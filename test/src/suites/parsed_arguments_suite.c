@@ -520,6 +520,32 @@ static void should_parse_the_option_and_file_operands_if_the_option_was_the_firs
     CU_ASSERT(verify_that_no_error_was_printed());
 }
 
+static void should_parse_the_option_and_file_operands_if_the_option_was_a_middle_specified_argument(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("file"),
+        MOCK_FILE("file2"),
+        MOCK_DIR("dir", ".", ".."),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "file", "file2", "-R", "dir", NULL };
+
+    get_parsed_arguments_result(4, arguments);
+    const char * const *non_directory_file_operands = parsed_arguments_get_non_directory_file_operands(sut);
+    const char * const *directory_file_operands = parsed_arguments_get_directory_file_operands(sut);
+
+    CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
+    CU_ASSERT_TRUE(parsed_arguments_has_option(sut, OPTIONS_RECURSIVE));
+    CU_ASSERT_STRING_EQUAL(non_directory_file_operands[0], "file");
+    CU_ASSERT_STRING_EQUAL(non_directory_file_operands[1], "file2");
+    CU_ASSERT_PTR_NULL(non_directory_file_operands[2]);
+    CU_ASSERT_STRING_EQUAL(directory_file_operands[0], "dir");
+    CU_ASSERT_PTR_NULL(directory_file_operands[1]);
+    CU_ASSERT(verify_that_no_error_was_printed());
+}
+
 static void should_parse_the_recursive_option(void)
 {
     const char *arguments[] = { "-R", NULL };
@@ -773,6 +799,7 @@ void register_parsed_arguments_suite(void)
         CU_add_test(suite, "should_sort_the_non_directory_file_operands_by_ascii_by_default", should_sort_the_non_directory_file_operands_by_ascii_by_default);
         CU_add_test(suite, "should_sort_the_directory_file_operands_by_ascii_by_default", should_sort_the_directory_file_operands_by_ascii_by_default);
         CU_add_test(suite, "should_parse_the_option_and_file_operands_if_the_option_was_the_first_specified_argument", should_parse_the_option_and_file_operands_if_the_option_was_the_first_specified_argument);
+        CU_add_test(suite, "should_parse_the_option_and_file_operands_if_the_option_was_a_middle_specified_argument", should_parse_the_option_and_file_operands_if_the_option_was_a_middle_specified_argument);
         CU_add_test(suite, "should_parse_the_recursive_option", should_parse_the_recursive_option);
         //------
         CU_add_test(suite, "should_be_created_correctly_even_if_current_directory_is_invalid_if_no_parameters_were_specified", should_be_created_correctly_even_if_current_directory_is_invalid_if_no_parameters_were_specified);
