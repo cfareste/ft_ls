@@ -238,6 +238,24 @@ static void should_return_true_for_has_any_option_if_at_least_one_option_was_spe
     CU_ASSERT(verify_that_no_error_was_printed());
 }
 
+static void should_return_true_for_has_option_if_the_specified_option_was_parsed(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("file"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *args[] = { "file", "-R", NULL };
+    get_parsed_arguments_result(2, args);
+
+    const int has_any_option = parsed_arguments_has_option(sut, OPTIONS_RECURSIVE);
+
+    CU_ASSERT_TRUE(has_any_option);
+    CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
+    CU_ASSERT(verify_that_no_error_was_printed());
+}
+
 static void should_return_false_for_multiple_file_operands_if_NULL_parsed_arguments_are_passed(void)
 {
     const int has_multiple_file_operands = parsed_arguments_has_multiple_file_operands(NULL);
@@ -691,6 +709,7 @@ void register_parsed_arguments_suite(void)
         CU_add_test(suite, "should_return_false_for_has_any_option_if_NULL_parsed_arguments_are_passed", should_return_false_for_has_any_option_if_NULL_parsed_arguments_are_passed);
         CU_add_test(suite, "should_return_false_for_has_any_option_if_at_no_option_was_specified", should_return_false_for_has_any_option_if_at_no_option_was_specified);
         CU_add_test(suite, "should_return_true_for_has_any_option_if_at_least_one_option_was_specified", should_return_true_for_has_any_option_if_at_least_one_option_was_specified);
+        CU_add_test(suite, "should_return_true_for_has_option_if_the_specified_option_was_parsed", should_return_true_for_has_option_if_the_specified_option_was_parsed);
         CU_add_test(suite, "should_return_false_for_multiple_file_operands_if_NULL_parsed_arguments_are_passed", should_return_false_for_multiple_file_operands_if_NULL_parsed_arguments_are_passed);
         CU_add_test(suite, "should_return_false_for_multiple_file_operands_if_has_less_than_two", should_return_false_for_multiple_file_operands_if_has_less_than_two);
         CU_add_test(suite, "should_return_true_for_multiple_file_operands_if_has_equal_or_more_than_two", should_return_true_for_multiple_file_operands_if_has_equal_or_more_than_two);
