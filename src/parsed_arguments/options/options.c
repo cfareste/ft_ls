@@ -4,7 +4,7 @@
 
 static int argument_is_an_option(const char *argument)
 {
-    return argument[0] != '-';
+    return argument[0] == '-';
 }
 
 t_options options_get(const int num_of_arguments, const char **arguments)
@@ -13,7 +13,7 @@ t_options options_get(const int num_of_arguments, const char **arguments)
 
     for (int i = 0; i < num_of_arguments; i++)
     {
-        if (argument_is_an_option(arguments[i]))
+        if (!argument_is_an_option(arguments[i]))
             continue ;
 
         if (arguments[i][1] == RECURSIVE_OPTION_CHAR)
