@@ -41,6 +41,7 @@ static void should_be_created_correctly(void)
     const char * const *directory_file_operands = parsed_arguments_get_directory_file_operands(sut);
 
     CU_ASSERT_PTR_NOT_NULL(sut);
+    CU_ASSERT_FALSE(parsed_arguments_has_any_option(sut));
     CU_ASSERT_PTR_NULL(non_directory_file_operands[0]);
     CU_ASSERT_STRING_EQUAL(directory_file_operands[0], ".");
     CU_ASSERT_PTR_NULL(directory_file_operands[1]);
@@ -113,6 +114,7 @@ static void should_return_default_values_if_arguments_are_NULL(void)
     const char * const *directory_file_operands = parsed_arguments_get_directory_file_operands(sut);
 
     CU_ASSERT_PTR_NOT_NULL(sut);
+    CU_ASSERT_FALSE(parsed_arguments_has_any_option(sut));
     CU_ASSERT_PTR_NULL(non_directory_file_operands[0]);
     CU_ASSERT_STRING_EQUAL(directory_file_operands[0], ".");
     CU_ASSERT_PTR_NULL(directory_file_operands[1]);
@@ -147,6 +149,7 @@ static void should_return_the_non_directory_file_operands(void)
 
     const char * const *non_directory_file_operands = parsed_arguments_get_non_directory_file_operands(sut);
 
+    CU_ASSERT_FALSE(parsed_arguments_has_any_option(sut));
     CU_ASSERT_STRING_EQUAL(non_directory_file_operands[0], args[0]);
     CU_ASSERT_STRING_EQUAL(non_directory_file_operands[1], args[1]);
     CU_ASSERT_STRING_EQUAL(non_directory_file_operands[2], args[2]);
@@ -186,6 +189,7 @@ static void should_return_the_directory_file_operands(void)
 
     const char * const *directory_file_operands = parsed_arguments_get_directory_file_operands(sut);
 
+    CU_ASSERT_FALSE(parsed_arguments_has_any_option(sut));
     CU_ASSERT_STRING_EQUAL(directory_file_operands[0], args[2]);
     CU_ASSERT_STRING_EQUAL(directory_file_operands[1], args[6]);
     CU_ASSERT_PTR_NULL(directory_file_operands[2]);
@@ -197,7 +201,7 @@ static void should_return_false_for_multiple_file_operands_if_NULL_parsed_argume
 {
     const int has_multiple_file_operands = parsed_arguments_has_multiple_file_operands(NULL);
 
-    CU_ASSERT_EQUAL(has_multiple_file_operands, 0);
+    CU_ASSERT_FALSE(has_multiple_file_operands);
     CU_ASSERT(verify_that_no_error_was_printed());
 }
 
@@ -214,7 +218,7 @@ static void should_return_false_for_multiple_file_operands_if_has_less_than_two(
 
     const int has_multiple_file_operands = parsed_arguments_has_multiple_file_operands(sut);
 
-    CU_ASSERT_EQUAL(has_multiple_file_operands, 0);
+    CU_ASSERT_FALSE(has_multiple_file_operands);
     CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
     CU_ASSERT(verify_that_no_error_was_printed());
 }
@@ -233,7 +237,7 @@ static void should_return_true_for_multiple_file_operands_if_has_equal_or_more_t
 
     const int has_multiple_file_operands = parsed_arguments_has_multiple_file_operands(sut);
 
-    CU_ASSERT_EQUAL(has_multiple_file_operands, 1);
+    CU_ASSERT_TRUE(has_multiple_file_operands);
     CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
     CU_ASSERT(verify_that_no_error_was_printed());
 }
@@ -242,7 +246,7 @@ static void should_return_false_for_has_directory_file_operands_if_NULL_parsed_a
 {
     const int has_directory_file_operands = parsed_arguments_has_directory_file_operands(NULL);
 
-    CU_ASSERT_EQUAL(has_directory_file_operands, 0);
+    CU_ASSERT_FALSE(has_directory_file_operands);
     CU_ASSERT(verify_that_no_error_was_printed());
 }
 
@@ -261,7 +265,7 @@ static void should_return_false_for_has_directory_file_operands_if_it_does_not_h
 
     const int has_directory_file_operands = parsed_arguments_has_directory_file_operands(sut);
 
-    CU_ASSERT_EQUAL(has_directory_file_operands, 0);
+    CU_ASSERT_FALSE(has_directory_file_operands);
     CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
     CU_ASSERT(verify_that_no_error_was_printed());
 }
@@ -279,14 +283,14 @@ static void should_return_true_for_has_directory_file_operands_if_it_has_at_leas
 
     const int has_directory_file_operands = parsed_arguments_has_directory_file_operands(sut);
 
-    CU_ASSERT_EQUAL(has_directory_file_operands, 1);
+    CU_ASSERT_TRUE(has_directory_file_operands);
     CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
     CU_ASSERT(verify_that_no_error_was_printed());
 }
 
 static void should_return_false_for_has_mixed_types_file_operands_if_it_null_parsed_arguments_are_specified(void)
 {
-    CU_ASSERT_EQUAL(parsed_arguments_has_mixed_types_file_operands(NULL), 0);
+    CU_ASSERT_FALSE(parsed_arguments_has_mixed_types_file_operands(NULL));
     CU_ASSERT(verify_that_no_error_was_printed());
 }
 
@@ -304,7 +308,7 @@ static void should_return_false_for_has_mixed_types_file_operands_if_it_does_not
 
     const int has_mixed_types_file_operands = parsed_arguments_has_mixed_types_file_operands(sut);
 
-    CU_ASSERT_EQUAL(has_mixed_types_file_operands, 0);
+    CU_ASSERT_FALSE(has_mixed_types_file_operands);
     CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
     CU_ASSERT(verify_that_no_error_was_printed());
 }
@@ -323,7 +327,7 @@ static void should_return_true_for_has_mixed_types_file_operands_if_it_does_have
 
     const int has_mixed_types_file_operands = parsed_arguments_has_mixed_types_file_operands(sut);
 
-    CU_ASSERT_EQUAL(has_mixed_types_file_operands, 1);
+    CU_ASSERT_TRUE(has_mixed_types_file_operands);
     CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
     CU_ASSERT(verify_that_no_error_was_printed());
 }
@@ -357,6 +361,7 @@ static void should_sort_the_non_directory_file_operands_by_ascii_by_default(void
 
     const char * const *non_directory_file_operands = parsed_arguments_get_non_directory_file_operands(sut);
 
+    CU_ASSERT_FALSE(parsed_arguments_has_any_option(sut));
     CU_ASSERT_STRING_EQUAL(non_directory_file_operands[0], args[7]);
     CU_ASSERT_STRING_EQUAL(non_directory_file_operands[1], args[1]);
     CU_ASSERT_STRING_EQUAL(non_directory_file_operands[2], args[8]);
@@ -397,6 +402,7 @@ static void should_sort_the_directory_file_operands_by_ascii_by_default(void)
 
     const char * const *directory_file_operands = parsed_arguments_get_directory_file_operands(sut);
 
+    CU_ASSERT_FALSE(parsed_arguments_has_any_option(sut));
     CU_ASSERT_STRING_EQUAL(directory_file_operands[0], args[3]);
     CU_ASSERT_STRING_EQUAL(directory_file_operands[1], args[2]);
     CU_ASSERT_STRING_EQUAL(directory_file_operands[2], args[6]);
@@ -438,6 +444,7 @@ static void should_be_created_correctly_even_if_current_directory_is_invalid_if_
 
     CU_ASSERT_PTR_NOT_NULL(sut);
     CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
+    CU_ASSERT_FALSE(parsed_arguments_has_any_option(sut));
     CU_ASSERT_PTR_NULL(non_directory_file_operands[0]);
     CU_ASSERT_STRING_EQUAL(directory_file_operands[0], ".");
     CU_ASSERT_PTR_NULL(directory_file_operands[1]);
@@ -460,6 +467,7 @@ static void should_be_created_correctly_even_if_current_directory_is_invalid_and
 
     CU_ASSERT_PTR_NOT_NULL(sut);
     CU_ASSERT_TRUE(result_has_failed(parsed_arguments_result));
+    CU_ASSERT_FALSE(parsed_arguments_has_any_option(sut));
     CU_ASSERT_PTR_NULL(non_directory_file_operands[0]);
     CU_ASSERT_PTR_NULL(directory_file_operands[0]);
     CU_ASSERT(verify_that_the_error_printed_is("ft_ls: cannot access '%s': %s\n", valid_args[0], strerror(EACCES)));
@@ -483,6 +491,7 @@ static void should_be_created_correctly_even_if_the_specified_argument_cannot_be
         "ft_ls: cannot access '%s': %s\n",
         "notExistent", strerror(ENOENT)
     ));
+    CU_ASSERT_FALSE(parsed_arguments_has_any_option(sut));
     CU_ASSERT_PTR_NULL(non_directory_file_operands[0]);
     CU_ASSERT_PTR_NULL(directory_file_operands[0]);
     CU_ASSERT_FALSE(result_has_succeed(parsed_arguments_result));
@@ -508,6 +517,7 @@ static void should_be_created_correctly_even_if_one_argument_cannot_be_accessed(
         "ft_ls: cannot access '%s': %s\n",
         "notExistent", strerror(ENOENT)
     ));
+    CU_ASSERT_FALSE(parsed_arguments_has_any_option(sut));
     CU_ASSERT_STRING_EQUAL(non_directory_file_operands[0], "file");
     CU_ASSERT_PTR_NULL(non_directory_file_operands[1]);
     CU_ASSERT_PTR_NULL(directory_file_operands[0]);
@@ -538,6 +548,7 @@ static void should_be_created_correctly_even_if_one_argument_cannot_be_accessed_
         "ft_ls: cannot access '%s': %s\n",
         "linkloop", strerror(ELOOP)
     ));
+    CU_ASSERT_FALSE(parsed_arguments_has_any_option(sut));
     CU_ASSERT_STRING_EQUAL(non_directory_file_operands[0], "file");
     CU_ASSERT_STRING_EQUAL(non_directory_file_operands[1], "filelink");
     CU_ASSERT_PTR_NULL(non_directory_file_operands[2]);
@@ -570,6 +581,7 @@ static void should_be_created_correctly_even_if_the_specified_arguments_cannot_b
         "notExistent", strerror(ENOENT),
         "notADir/", strerror(ENOTDIR)
     ));
+    CU_ASSERT_FALSE(parsed_arguments_has_any_option(sut));
     CU_ASSERT_PTR_NULL(non_directory_file_operands[0]);
     CU_ASSERT_PTR_NULL(directory_file_operands[0]);
     CU_ASSERT_FALSE(result_has_succeed(parsed_arguments_result));
@@ -605,6 +617,7 @@ static void should_be_created_correctly_even_if_some_arguments_cannot_be_accesse
         "badAddress", strerror(EFAULT),
         "noMem", strerror(ENOMEM)
     ));
+    CU_ASSERT_FALSE(parsed_arguments_has_any_option(sut));
     CU_ASSERT_STRING_EQUAL(non_directory_file_operands[0], "file");
     CU_ASSERT_STRING_EQUAL(non_directory_file_operands[1], "filelink");
     CU_ASSERT_PTR_NULL(non_directory_file_operands[2]);
