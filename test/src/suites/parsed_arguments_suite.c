@@ -587,8 +587,6 @@ static void should_parse_the_recursive_option(void)
     CU_ASSERT(verify_that_no_error_was_printed());
 }
 
-// -------
-
 static void should_be_created_correctly_even_if_current_directory_is_invalid_if_no_parameters_were_specified(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -828,7 +826,6 @@ void register_parsed_arguments_suite(void)
         CU_add_test(suite, "should_parse_the_option_and_file_operands_if_the_option_was_a_middle_specified_argument", should_parse_the_option_and_file_operands_if_the_option_was_a_middle_specified_argument);
         CU_add_test(suite, "should_parse_the_option_and_file_operands_if_the_option_was_the_last_specified_argument", should_parse_the_option_and_file_operands_if_the_option_was_the_last_specified_argument);
         CU_add_test(suite, "should_parse_the_recursive_option", should_parse_the_recursive_option);
-        //------
         CU_add_test(suite, "should_be_created_correctly_even_if_current_directory_is_invalid_if_no_parameters_were_specified", should_be_created_correctly_even_if_current_directory_is_invalid_if_no_parameters_were_specified);
         CU_add_test(suite, "should_be_created_correctly_even_if_current_directory_is_invalid_and_was_specified", should_be_created_correctly_even_if_current_directory_is_invalid_and_was_specified);
         CU_add_test(suite, "should_be_created_correctly_even_if_the_specified_argument_cannot_be_accessed", should_be_created_correctly_even_if_the_specified_argument_cannot_be_accessed);

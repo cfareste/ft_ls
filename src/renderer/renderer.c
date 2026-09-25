@@ -13,8 +13,9 @@ static int check_if_should_print_directory_header(const t_parsed_arguments *pars
 {
     const int has_multiple_file_operands = parsed_arguments_has_multiple_file_operands(parsed_arguments);
     const int has_directory_file_operands = parsed_arguments_has_directory_file_operands(parsed_arguments);
+    const int has_recursive_option = parsed_arguments_has_option(parsed_arguments, OPTIONS_RECURSIVE);
 
-    return has_multiple_file_operands && has_directory_file_operands;
+    return (has_multiple_file_operands && has_directory_file_operands) || has_recursive_option;
 }
 
 static void render_directory_header(t_render_context *context, const char *directory_header)
