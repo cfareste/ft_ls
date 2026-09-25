@@ -95,17 +95,17 @@ static unsigned int get_num_of_directory_file_operands(const t_file_type *file_o
     return num_of_directory_file_operands;
 }
 
-char **file_operands_get(const int num_of_arguments, const char **arguments)
+char **file_operands_get(const int num_of_file_operands, const char **arguments)
 {
-    if (num_of_arguments == 0 || *arguments == NULL)
+    if (num_of_file_operands == 0)
         return get_default_file_operands();
 
-    return get_file_operands_from_arguments(num_of_arguments, arguments);
+    return get_file_operands_from_arguments(num_of_file_operands, arguments);
 }
 
-t_file_type *file_operands_get_types(const int num_of_arguments, char **file_operands)
+t_file_type *file_operands_get_types(const int num_of_file_operands, char **file_operands)
 {
-    if (num_of_arguments == 0)
+    if (num_of_file_operands == 0)
         return get_default_file_operand_type();
 
     return get_file_operands_types_from_arguments(file_operands);
