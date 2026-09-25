@@ -197,6 +197,20 @@ static void should_return_the_directory_file_operands(void)
     CU_ASSERT(verify_that_no_error_was_printed());
 }
 
+// -
+
+static void should_return_true_for_has_any_option_if_at_least_one_option_was_specified(void)
+{
+    const char *args[] = { "-R", NULL };
+    get_parsed_arguments_result(1, args);
+
+    const int has_any_option = parsed_arguments_has_any_option(sut);
+
+    CU_ASSERT_TRUE(has_any_option);
+    CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
+    CU_ASSERT(verify_that_no_error_was_printed());
+}
+
 static void should_return_false_for_multiple_file_operands_if_NULL_parsed_arguments_are_passed(void)
 {
     const int has_multiple_file_operands = parsed_arguments_has_multiple_file_operands(NULL);
@@ -646,6 +660,8 @@ void register_parsed_arguments_suite(void)
         CU_add_test(suite, "should_return_the_non_directory_file_operands", should_return_the_non_directory_file_operands);
         CU_add_test(suite, "should_return_NULL_directory_file_operands_if_NULL_parsed_arguments_are_passed", should_return_NULL_directory_file_operands_if_NULL_parsed_arguments_are_passed);
         CU_add_test(suite, "should_return_the_directory_file_operands", should_return_the_directory_file_operands);
+        // -
+        CU_add_test(suite, "should_return_true_for_has_any_option_if_at_least_one_option_was_specified", should_return_true_for_has_any_option_if_at_least_one_option_was_specified);
         CU_add_test(suite, "should_return_false_for_multiple_file_operands_if_NULL_parsed_arguments_are_passed", should_return_false_for_multiple_file_operands_if_NULL_parsed_arguments_are_passed);
         CU_add_test(suite, "should_return_false_for_multiple_file_operands_if_has_less_than_two", should_return_false_for_multiple_file_operands_if_has_less_than_two);
         CU_add_test(suite, "should_return_true_for_multiple_file_operands_if_has_equal_or_more_than_two", should_return_true_for_multiple_file_operands_if_has_equal_or_more_than_two);
