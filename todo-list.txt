@@ -1,10 +1,8 @@
 TODO:
 1. Implementar LS-16 Support for -R option
    - Implementar funcionalidad
-     - Al leer las entradas de los directorios, se construye el path nuevo y se llama a función recursiva para volver a escanear
-     - Los dir headers se imprimen siempre, incluso cuando no hay parámetros o solo hay 1 (ls -R | ls -R dir)
-     - Los ficheros ocultos se ignoran como de normal.
      - Solo se encolan directorios, no symlinks que apunten a directorios (lstat, no stat)
+     - Al leer las entradas de los directorios, se construye el path nuevo y se llama a función recursiva para volver a escanear
      - El major error solo será si el full path == file operand. Cualquier otro error será minor error
 
 

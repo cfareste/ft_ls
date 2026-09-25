@@ -7,3 +7,4 @@ typedef enum e_options
 } t_options;
 
 t_options options_get(int num_of_arguments, const char **arguments);
+int options_get_amount(const char **arguments);

@@ -21,7 +21,7 @@ static char **get_file_operands_from_arguments(const int num_of_arguments, const
 
     int operands_i = 0;
     int arguments_i = 0;
-    while (arguments_i < num_of_arguments)
+    while (arguments[arguments_i] != NULL)
     {
         if (arguments[arguments_i][0] == '-')
         {

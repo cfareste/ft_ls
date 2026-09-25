@@ -583,7 +583,8 @@ static void should_parse_the_recursive_option(void)
     CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
     CU_ASSERT_TRUE(parsed_arguments_has_option(sut, OPTIONS_RECURSIVE));
     CU_ASSERT_PTR_NULL(non_directory_file_operands[0]);
-    CU_ASSERT_PTR_NULL(directory_file_operands[0]);
+    CU_ASSERT_STRING_EQUAL(directory_file_operands[0], ".");
+    CU_ASSERT_PTR_NULL(directory_file_operands[1]);
     CU_ASSERT(verify_that_no_error_was_printed());
 }
 

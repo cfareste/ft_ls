@@ -22,3 +22,16 @@ t_options options_get(const int num_of_arguments, const char **arguments)
 
     return options;
 }
+
+int options_get_amount(const char **arguments)
+{
+    int num_of_options = 0;
+
+    for (int i = 0; arguments[i] != 0; i++)
+    {
+        if (argument_is_an_option(arguments[i]))
+            num_of_options++;
+    }
+
+    return num_of_options;
+}
