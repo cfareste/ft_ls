@@ -29,12 +29,17 @@ static int handle_retrieve_error(const int retrieve_error, const char *file_path
     return STATS_RETRIEVAL_ERROR;
 }
 
+static int retrieve_file_stats_without_following_symlinks(const char *file_path, struct stat *stats)
+{
+    return lstat(file_path, stats);
+}
+
 static int retrieve_file_stats(const char *file_path, struct stat *stats)
 {
     int retrieve_error = stat(file_path, stats);
 
     if (should_retrieve_with_lstat(retrieve_error, stats))
-        retrieve_error = lstat(file_path, stats);
+        retrieve_error = retrieve_file_stats_without_following_symlinks(file_path, stats);
 
     return handle_retrieve_error(retrieve_error, file_path);
 }
@@ -82,7 +87,7 @@ t_file_stats *file_stats_get_without_following_symlinks(const char *file_path)
         return NULL;
 
     struct stat stats;
-    if (lstat(file_path, &stats) == -1)
+    if (retrieve_file_stats_without_following_symlinks(file_path, &stats) == -1)
     {
         report_access_file_error(file_path);
         return NULL;
