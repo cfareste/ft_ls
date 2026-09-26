@@ -5,8 +5,8 @@
 #include "file_stats.h"
 #include "error_reporter.h"
 
-#define STATS_RETRIEVAL_ERROR 0
-#define STATS_RETRIEVAL_SUCCESS 1
+#define STATS_RETRIEVAL_ERROR (-1)
+#define STATS_RETRIEVAL_SUCCESS 0
 
 struct s_file_stats
 {
@@ -39,7 +39,7 @@ static int retrieve_file_stats(const char *file_path, struct stat *stats)
     int retrieve_error = stat(file_path, stats);
 
     if (should_retrieve_file_stats_without_following_symlinks(retrieve_error, stats))
-        retrieve_error = retrieve_file_stats_without_following_symlinks(file_path, stats);
+        retrieve_error = lstat(file_path, stats);
 
     return handle_retrieve_error(retrieve_error, file_path);
 }
@@ -87,7 +87,7 @@ t_file_stats *file_stats_get_without_following_symlinks(const char *file_path)
         return NULL;
 
     struct stat stats;
-    if (retrieve_file_stats_without_following_symlinks(file_path, &stats) == -1)
+    if (retrieve_file_stats_without_following_symlinks(file_path, &stats) == STATS_RETRIEVAL_ERROR)
     {
         report_access_file_error(file_path);
         return NULL;
