@@ -30,8 +30,10 @@ static void should_create_file_stats_correctly(void)
 static void should_return_NULL_when_creating_file_stats_with_a_NULL_path(void)
 {
     const t_file_stats *stats = file_stats_get(NULL);
+    const t_file_stats *no_following_stats = file_stats_get_without_following_symlinks(NULL);
 
     CU_ASSERT_PTR_NULL(stats);
+    CU_ASSERT_PTR_NULL(no_following_stats);
     CU_ASSERT(verify_that_no_error_was_printed());
 }
 

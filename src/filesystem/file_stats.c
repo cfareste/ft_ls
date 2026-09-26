@@ -78,6 +78,9 @@ t_file_stats *file_stats_get(const char *file_path)
 
 t_file_stats *file_stats_get_without_following_symlinks(const char *file_path)
 {
+    if (file_path == NULL)
+        return NULL;
+
     struct stat stats;
     if (lstat(file_path, &stats) == -1)
     {
