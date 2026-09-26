@@ -87,6 +87,9 @@ t_file_type file_entry_get_file_type(const t_file_entry *entry)
 
 void file_entry_set_file_type(t_file_entry *entry, const t_file_type file_type)
 {
+    if (entry == NULL)
+        return ;
+
     entry->type = file_type;
 }
 
