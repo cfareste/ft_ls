@@ -78,6 +78,9 @@ void file_entry_set_name(t_file_entry *entry, const char *name)
 
 t_file_type file_entry_get_file_type(const t_file_entry *entry)
 {
+    if (entry == NULL)
+        return FILE_TYPE_UNKNOWN;
+
     return entry->type;
 }
 

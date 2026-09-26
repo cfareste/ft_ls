@@ -129,6 +129,13 @@ static void should_not_set_the_entry_name_if_an_empty_file_name_is_passed(void)
     CU_ASSERT_STRING_EQUAL(entry_name, DEFAULT_NAME);
 }
 
+static void should_return_unknown_for_the_entry_file_type_if_a_NULL_entry_is_passed(void)
+{
+    const t_file_type file_type = file_entry_get_file_type(NULL);
+
+    CU_ASSERT_EQUAL(file_type, FILE_TYPE_UNKNOWN);
+}
+
 static void should_return_the_entry_file_type_correctly(void)
 {
     file_entry_set_file_type(entry_sut, FILE_TYPE_REGULAR);
@@ -277,6 +284,7 @@ void register_file_entry_suite(void)
         CU_add_test(suite, "should_not_fail_setting_the_entry_name_if_a_NULL_file_entry_is_passed", should_not_fail_setting_the_entry_name_if_a_NULL_file_entry_is_passed);
         CU_add_test(suite, "should_not_set_the_entry_name_if_a_NULL_file_name_is_passed", should_not_set_the_entry_name_if_a_NULL_file_name_is_passed);
         CU_add_test(suite, "should_not_set_the_entry_name_if_an_empty_file_name_is_passed", should_not_set_the_entry_name_if_an_empty_file_name_is_passed);
+        CU_add_test(suite, "should_return_unknown_for_the_entry_file_type_if_a_NULL_entry_is_passed", should_return_unknown_for_the_entry_file_type_if_a_NULL_entry_is_passed);
         CU_add_test(suite, "should_return_the_entry_file_type_correctly", should_return_the_entry_file_type_correctly);
         CU_add_test(suite, "should_return_a_length_of_zero_when_passed_a_NULL_file_entry_array", should_return_a_length_of_zero_when_passed_a_NULL_file_entry_array);
         CU_add_test(suite, "should_return_the_correct_length", should_return_the_correct_length);
