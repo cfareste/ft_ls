@@ -44,6 +44,15 @@ static void should_return_the_built_path_without_adding_a_slash_if_directory_alr
     free(sut);
 }
 
+static void should_return_the_built_path_adding_a_slash_if_directory_does_not_have_it(void)
+{
+    sut = build_path("dir", "file");
+
+    CU_ASSERT_STRING_EQUAL(sut, "dir/file");
+
+    free(sut);
+}
+
 void register_path_builder_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, NULL, NULL);
@@ -55,5 +64,6 @@ void register_path_builder_suite(void)
         CU_add_test(suite, "should_return_NULL_if_child_path_is_NULL", should_return_NULL_if_child_path_is_NULL);
         CU_add_test(suite, "should_return_NULL_if_child_path_is_empty", should_return_NULL_if_child_path_is_empty);
         CU_add_test(suite, "should_return_the_built_path_without_adding_a_slash_if_directory_already_had_it", should_return_the_built_path_without_adding_a_slash_if_directory_already_had_it);
+        CU_add_test(suite, "should_return_the_built_path_adding_a_slash_if_directory_does_not_have_it", should_return_the_built_path_adding_a_slash_if_directory_does_not_have_it);
     }
 }
