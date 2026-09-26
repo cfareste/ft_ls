@@ -29,6 +29,7 @@ static void should_create_file_entry_correctly(void)
 {
     CU_ASSERT_PTR_NOT_NULL(entry_sut);
     CU_ASSERT_STRING_EQUAL(file_entry_get_name(entry_sut), DEFAULT_NAME);
+    CU_ASSERT_EQUAL(file_entry_get_file_type(entry_sut), FILE_TYPE_UNKNOWN);
 }
 
 static void should_create_file_entry_array_correctly(void)

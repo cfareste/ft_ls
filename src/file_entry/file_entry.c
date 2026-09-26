@@ -44,6 +44,7 @@ t_file_entry *file_entry_create(const char *file_name)
 
     t_file_entry *file_entry = ft_safe_calloc(1, sizeof(t_file_entry));
     file_entry_set_name(file_entry, file_name);
+    file_entry->type = FILE_TYPE_UNKNOWN;
 
     return file_entry;
 }
