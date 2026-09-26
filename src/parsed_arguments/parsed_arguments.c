@@ -82,7 +82,7 @@ int parsed_arguments_has_any_option(const t_parsed_arguments *parsed_arguments)
     return parsed_arguments->options != OPTIONS_NONE;
 }
 
-int parsed_arguments_has_option(const t_parsed_arguments *parsed_arguments, const t_options option)
+int parsed_arguments_is_option_active(const t_parsed_arguments *parsed_arguments, const t_options option)
 {
     if (parsed_arguments == NULL)
         return 0;

@@ -428,7 +428,7 @@ static void should_parse_the_option_and_file_operands_if_the_option_was_the_firs
     const char * const *directory_file_operands = parsed_arguments_get_directory_file_operands(sut);
 
     CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
-    CU_ASSERT_TRUE(parsed_arguments_has_option(sut, OPTIONS_RECURSIVE));
+    CU_ASSERT_TRUE(parsed_arguments_is_option_active(sut, OPTIONS_RECURSIVE));
     CU_ASSERT_STRING_EQUAL(non_directory_file_operands[0], "file");
     CU_ASSERT_STRING_EQUAL(non_directory_file_operands[1], "file2");
     CU_ASSERT_PTR_NULL(non_directory_file_operands[2]);
@@ -454,7 +454,7 @@ static void should_parse_the_option_and_file_operands_if_the_option_was_a_middle
     const char * const *directory_file_operands = parsed_arguments_get_directory_file_operands(sut);
 
     CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
-    CU_ASSERT_TRUE(parsed_arguments_has_option(sut, OPTIONS_RECURSIVE));
+    CU_ASSERT_TRUE(parsed_arguments_is_option_active(sut, OPTIONS_RECURSIVE));
     CU_ASSERT_STRING_EQUAL(non_directory_file_operands[0], "file");
     CU_ASSERT_STRING_EQUAL(non_directory_file_operands[1], "file2");
     CU_ASSERT_PTR_NULL(non_directory_file_operands[2]);
@@ -480,7 +480,7 @@ static void should_parse_the_option_and_file_operands_if_the_option_was_the_last
     const char * const *directory_file_operands = parsed_arguments_get_directory_file_operands(sut);
 
     CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
-    CU_ASSERT_TRUE(parsed_arguments_has_option(sut, OPTIONS_RECURSIVE));
+    CU_ASSERT_TRUE(parsed_arguments_is_option_active(sut, OPTIONS_RECURSIVE));
     CU_ASSERT_STRING_EQUAL(non_directory_file_operands[0], "file");
     CU_ASSERT_STRING_EQUAL(non_directory_file_operands[1], "file2");
     CU_ASSERT_PTR_NULL(non_directory_file_operands[2]);
@@ -498,7 +498,7 @@ static void should_parse_the_recursive_option(void)
     const char * const *directory_file_operands = parsed_arguments_get_directory_file_operands(sut);
 
     CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
-    CU_ASSERT_TRUE(parsed_arguments_has_option(sut, OPTIONS_RECURSIVE));
+    CU_ASSERT_TRUE(parsed_arguments_is_option_active(sut, OPTIONS_RECURSIVE));
     CU_ASSERT_PTR_NULL(non_directory_file_operands[0]);
     CU_ASSERT_STRING_EQUAL(directory_file_operands[0], ".");
     CU_ASSERT_PTR_NULL(directory_file_operands[1]);
@@ -546,7 +546,7 @@ static void should_return_true_for_has_any_option_if_at_least_one_option_was_spe
 
 static void should_return_false_for_has_option_if_NULL_parsed_arguments_are_passed(void)
 {
-    const int has_option = parsed_arguments_has_option(NULL, OPTIONS_RECURSIVE);
+    const int has_option = parsed_arguments_is_option_active(NULL, OPTIONS_RECURSIVE);
 
     CU_ASSERT_FALSE(has_option);
     CU_ASSERT(verify_that_no_error_was_printed());
@@ -563,7 +563,7 @@ static void should_return_false_for_has_option_if_the_specified_option_was_NOT_p
     const char *args[] = { "dir", "-l", NULL };
     get_parsed_arguments_result(2, args);
 
-    const int has_option = parsed_arguments_has_option(sut, OPTIONS_RECURSIVE);
+    const int has_option = parsed_arguments_is_option_active(sut, OPTIONS_RECURSIVE);
 
     CU_ASSERT_FALSE(has_option);
     CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
@@ -581,7 +581,7 @@ static void should_return_true_for_has_option_if_the_specified_option_was_parsed
     const char *args[] = { "file", "-R", NULL };
     get_parsed_arguments_result(2, args);
 
-    const int has_option = parsed_arguments_has_option(sut, OPTIONS_RECURSIVE);
+    const int has_option = parsed_arguments_is_option_active(sut, OPTIONS_RECURSIVE);
 
     CU_ASSERT_TRUE(has_option);
     CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
