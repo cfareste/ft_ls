@@ -6,6 +6,11 @@
 #define DEFAULT_FILE_OPERAND "."
 #define DEFAULT_FILE_OPERAND_TYPE FILE_TYPE_DIRECTORY
 
+static int argument_is_an_option(const char *argument)
+{
+    return argument[0] == '-';
+}
+
 static char **get_default_file_operands(void)
 {
     char **file_operands = ft_safe_calloc(DEFAULT_NUM_OF_OPERANDS + 1, sizeof(char *));
@@ -23,7 +28,7 @@ static char **get_file_operands_from_arguments(const int num_of_file_operands, c
     int arguments_i = 0;
     while (arguments[arguments_i] != NULL)
     {
-        if (arguments[arguments_i][0] == '-')
+        if (argument_is_an_option(arguments[arguments_i]))
         {
             arguments_i++;
             continue;
