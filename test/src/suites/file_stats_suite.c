@@ -346,6 +346,41 @@ static void should_return_NULL_when_an_error_accessing_a_file_occurs(void)
     ));
 }
 
+static void should_return_NULL_when_an_error_accessing_a_file_without_following_symlinks_occurs(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE_ACCESS_ERROR(EACCES, "noPermissions"),
+        MOCK_FILE_ACCESS_ERROR(EFAULT, "badAddress"),
+        MOCK_FILE_ACCESS_ERROR(ENAMETOOLONG, "nameTooLong"),
+        MOCK_FILE_ACCESS_ERROR(ENOENT, "nonExisting"),
+        MOCK_FILE_ACCESS_ERROR(ENOMEM, "noMemory"),
+        MOCK_FILE_ACCESS_ERROR(ENOTDIR, "notADirectory"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    CU_ASSERT_PTR_NULL(file_stats_get_without_following_symlinks("noPermissions"));
+    CU_ASSERT_PTR_NULL(file_stats_get_without_following_symlinks("badAddress"));
+    CU_ASSERT_PTR_NULL(file_stats_get_without_following_symlinks("nameTooLong"));
+    CU_ASSERT_PTR_NULL(file_stats_get_without_following_symlinks("nonExisting"));
+    CU_ASSERT_PTR_NULL(file_stats_get_without_following_symlinks("noMemory"));
+    CU_ASSERT_PTR_NULL(file_stats_get_without_following_symlinks("notADirectory"));
+    CU_ASSERT(verify_that_the_error_printed_is(
+        "ft_ls: cannot access '%s': %s\n"
+        "ft_ls: cannot access '%s': %s\n"
+        "ft_ls: cannot access '%s': %s\n"
+        "ft_ls: cannot access '%s': %s\n"
+        "ft_ls: cannot access '%s': %s\n"
+        "ft_ls: cannot access '%s': %s\n",
+        "noPermissions", strerror(EACCES),
+        "badAddress", strerror(EFAULT),
+        "nameTooLong", strerror(ENAMETOOLONG),
+        "nonExisting", strerror(ENOENT),
+        "noMemory", strerror(ENOMEM),
+        "notADirectory", strerror(ENOTDIR)
+    ));
+}
+
 void register_file_stats_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, NULL);
@@ -367,5 +402,6 @@ void register_file_stats_suite(void)
         CU_add_test(suite, "should_return_the_correct_file_stats_if_the_specified_files_are_multi_hop_symlinks", should_return_the_correct_file_stats_if_the_specified_files_are_multi_hop_symlinks);
         CU_add_test(suite, "should_always_return_link_file_stats_when_retrieving_stats_without_following_symlinks", should_always_return_link_file_stats_when_retrieving_stats_without_following_symlinks);
         CU_add_test(suite, "should_return_NULL_when_an_error_accessing_a_file_occurs", should_return_NULL_when_an_error_accessing_a_file_occurs);
+        CU_add_test(suite, "should_return_NULL_when_an_error_accessing_a_file_without_following_symlinks_occurs", should_return_NULL_when_an_error_accessing_a_file_without_following_symlinks_occurs);
     }
 }

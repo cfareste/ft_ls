@@ -79,7 +79,11 @@ t_file_stats *file_stats_get(const char *file_path)
 t_file_stats *file_stats_get_without_following_symlinks(const char *file_path)
 {
     struct stat stats;
-    lstat(file_path, &stats);
+    if (lstat(file_path, &stats) == -1)
+    {
+        report_access_file_error(file_path);
+        return NULL;
+    }
 
     t_file_stats *file_stats = ft_safe_calloc(1, sizeof(t_file_stats));
     file_stats->type = get_file_type(stats.st_mode);
