@@ -8,6 +8,7 @@
 struct s_file_entry
 {
     char *name;
+    t_file_type type;
 };
 
 struct s_file_entry_array
@@ -73,6 +74,16 @@ void file_entry_set_name(t_file_entry *entry, const char *name)
 
     free(entry->name);
     entry->name = ft_safe_strdup(name);
+}
+
+t_file_type file_entry_get_file_type(const t_file_entry *entry)
+{
+    return entry->type;
+}
+
+void file_entry_set_file_type(t_file_entry *entry, const t_file_type file_type)
+{
+    entry->type = file_type;
 }
 
 const t_file_entry *file_entry_array_get_at(const t_file_entry_array *file_entry_array, const unsigned int index)
