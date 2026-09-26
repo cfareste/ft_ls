@@ -29,11 +29,6 @@ static int handle_retrieve_error(const int retrieve_error, const char *file_path
     return STATS_RETRIEVAL_ERROR;
 }
 
-static int retrieve_file_stats_without_following_symlinks(const char *file_path, struct stat *stats)
-{
-    return lstat(file_path, stats);
-}
-
 static int retrieve_file_stats(const char *file_path, struct stat *stats)
 {
     int retrieve_error = stat(file_path, stats);
@@ -42,6 +37,15 @@ static int retrieve_file_stats(const char *file_path, struct stat *stats)
         retrieve_error = lstat(file_path, stats);
 
     return handle_retrieve_error(retrieve_error, file_path);
+}
+
+static int retrieve_file_stats_without_following_symlinks(const char *file_path, struct stat *stats)
+{
+    if (lstat(file_path, stats) == 0)
+        return STATS_RETRIEVAL_SUCCESS;
+
+    report_access_file_error(file_path);
+    return STATS_RETRIEVAL_ERROR;
 }
 
 static t_file_type get_file_type(const mode_t mode)
@@ -88,10 +92,7 @@ t_file_stats *file_stats_get_without_following_symlinks(const char *file_path)
 
     struct stat stats;
     if (retrieve_file_stats_without_following_symlinks(file_path, &stats) == STATS_RETRIEVAL_ERROR)
-    {
-        report_access_file_error(file_path);
         return NULL;
-    }
 
     t_file_stats *file_stats = ft_safe_calloc(1, sizeof(t_file_stats));
     file_stats->type = get_file_type(stats.st_mode);
