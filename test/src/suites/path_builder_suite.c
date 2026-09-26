@@ -4,32 +4,34 @@
 
 #define SUITE_NAME "path_builder"
 
+static char *sut = NULL;
+
 static void should_return_NULL_if_directory_path_is_NULL(void)
 {
-    const char *path = build_path(NULL, "valid_path");
+    sut = build_path(NULL, "valid_path");
 
-    CU_ASSERT_PTR_NULL(path);
+    CU_ASSERT_PTR_NULL(sut);
 }
 
 static void should_return_NULL_if_directory_path_is_empty(void)
 {
-    const char *path = build_path("", "valid_path");
+    sut = build_path("", "valid_path");
 
-    CU_ASSERT_PTR_NULL(path);
+    CU_ASSERT_PTR_NULL(sut);
 }
 
 static void should_return_NULL_if_child_path_is_NULL(void)
 {
-    const char *path = build_path("valid_dir/", NULL);
+    sut = build_path("valid_dir/", NULL);
 
-    CU_ASSERT_PTR_NULL(path);
+    CU_ASSERT_PTR_NULL(sut);
 }
 
 static void should_return_NULL_if_child_path_is_empty(void)
 {
-    const char *path = build_path("valid_dir/", "");
+    sut = build_path("valid_dir/", "");
 
-    CU_ASSERT_PTR_NULL(path);
+    CU_ASSERT_PTR_NULL(sut);
 }
 
 void register_path_builder_suite(void)
