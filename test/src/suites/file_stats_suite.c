@@ -229,6 +229,84 @@ static void should_return_the_correct_file_stats_if_the_specified_files_are_mult
     file_stats_destroy(&dir_link_stats);
 }
 
+static void should_always_return_link_file_stats_when_retrieving_stats_without_following_symlinks(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("reg"),
+        MOCK_DIR("dir", ".", ".."),
+        MOCK_CHAR_DEVICE("char_device"),
+        MOCK_BLOCK_DEVICE("block_device"),
+        MOCK_FIFO("pipe"),
+        MOCK_SOCKET("socket"),
+        MOCK_SYMLINK("sym_reg", "reg"),
+        MOCK_SYMLINK("sym_dir", "dir"),
+        MOCK_SYMLINK("sym_char", "char_device"),
+        MOCK_SYMLINK("sym_block", "block_device"),
+        MOCK_SYMLINK("sym_pipe", "pipe"),
+        MOCK_SYMLINK("sym_sock", "socket"),
+        MOCK_BROKEN_LINK("brokenLink"),
+        MOCK_LOOP_LINK("loopedLink"),
+        MOCK_SYMLINK("regLink1", "reg"),
+        MOCK_SYMLINK("dirLink1", "dir"),
+        MOCK_SYMLINK("regLink2", "regLink1"),
+        MOCK_SYMLINK("dirLink2", "dirLink1"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    t_file_stats *reg_stats = file_stats_get_without_following_symlinks("reg");
+    t_file_stats *dir_stats = file_stats_get_without_following_symlinks("dir");
+    t_file_stats *charDev_stats = file_stats_get_without_following_symlinks("char_device");
+    t_file_stats *blockDev_stats = file_stats_get_without_following_symlinks("block_device");
+    t_file_stats *pipe_stats = file_stats_get_without_following_symlinks("pipe");
+    t_file_stats *socket_stats = file_stats_get_without_following_symlinks("socket");
+    t_file_stats *symReg_stats = file_stats_get_without_following_symlinks("sym_reg");
+    t_file_stats *symDir_stats = file_stats_get_without_following_symlinks("sym_dir");
+    t_file_stats *symChar_stats = file_stats_get_without_following_symlinks("sym_char");
+    t_file_stats *symBlock_stats = file_stats_get_without_following_symlinks("sym_block");
+    t_file_stats *symPipe_stats = file_stats_get_without_following_symlinks("sym_pipe");
+    t_file_stats *symSocket_stats = file_stats_get_without_following_symlinks("sym_sock");
+    t_file_stats *broken_link_stats = file_stats_get_without_following_symlinks("brokenLink");
+    t_file_stats *looped_link_stats = file_stats_get_without_following_symlinks("loopedLink");
+    t_file_stats *multiReg_stats = file_stats_get_without_following_symlinks("regLink2");
+    t_file_stats *multiDir_stats = file_stats_get_without_following_symlinks("dirLink2");
+
+    CU_ASSERT_EQUAL(file_stats_get_file_type(reg_stats), FILE_TYPE_REGULAR);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(dir_stats), FILE_TYPE_DIRECTORY);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(charDev_stats), FILE_TYPE_CHARDEVICE);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(blockDev_stats), FILE_TYPE_BLOCKDEVICE);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(pipe_stats), FILE_TYPE_FIFO);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(socket_stats), FILE_TYPE_SOCKET);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(symReg_stats), FILE_TYPE_SYMLINK);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(symDir_stats), FILE_TYPE_SYMLINK);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(symChar_stats), FILE_TYPE_SYMLINK);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(symBlock_stats), FILE_TYPE_SYMLINK);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(symPipe_stats), FILE_TYPE_SYMLINK);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(symSocket_stats), FILE_TYPE_SYMLINK);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(broken_link_stats), FILE_TYPE_SYMLINK);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(looped_link_stats), FILE_TYPE_SYMLINK);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(multiReg_stats), FILE_TYPE_SYMLINK);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(multiDir_stats), FILE_TYPE_SYMLINK);
+    CU_ASSERT(verify_that_no_error_was_printed());
+
+    file_stats_destroy(&reg_stats);
+    file_stats_destroy(&dir_stats);
+    file_stats_destroy(&charDev_stats);
+    file_stats_destroy(&blockDev_stats);
+    file_stats_destroy(&pipe_stats);
+    file_stats_destroy(&socket_stats);
+    file_stats_destroy(&symReg_stats);
+    file_stats_destroy(&symDir_stats);
+    file_stats_destroy(&symChar_stats);
+    file_stats_destroy(&symBlock_stats);
+    file_stats_destroy(&symPipe_stats);
+    file_stats_destroy(&symSocket_stats);
+    file_stats_destroy(&broken_link_stats);
+    file_stats_destroy(&looped_link_stats);
+    file_stats_destroy(&multiReg_stats);
+    file_stats_destroy(&multiDir_stats);
+}
+
 static void should_return_NULL_when_an_error_accessing_a_file_occurs(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -287,6 +365,7 @@ void register_file_stats_suite(void)
         CU_add_test(suite, "should_return_link_file_stats_if_the_specified_file_is_a_broken_symlink", should_return_link_file_stats_if_the_specified_file_is_a_broken_symlink);
         CU_add_test(suite, "should_return_link_file_stats_if_the_specified_file_is_a_looped_symlink", should_return_link_file_stats_if_the_specified_file_is_a_looped_symlink);
         CU_add_test(suite, "should_return_the_correct_file_stats_if_the_specified_files_are_multi_hop_symlinks", should_return_the_correct_file_stats_if_the_specified_files_are_multi_hop_symlinks);
+        CU_add_test(suite, "should_always_return_link_file_stats_when_retrieving_stats_without_following_symlinks", should_always_return_link_file_stats_when_retrieving_stats_without_following_symlinks);
         CU_add_test(suite, "should_return_NULL_when_an_error_accessing_a_file_occurs", should_return_NULL_when_an_error_accessing_a_file_occurs);
     }
 }
