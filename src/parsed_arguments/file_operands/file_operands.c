@@ -28,15 +28,12 @@ static char **get_file_operands_from_arguments(const int num_of_file_operands, c
     int arguments_i = 0;
     while (arguments[arguments_i] != NULL)
     {
-        if (argument_is_an_option(arguments[arguments_i]))
+        if (!argument_is_an_option(arguments[arguments_i]))
         {
-            arguments_i++;
-            continue;
+            file_operands[operands_i] = ft_safe_strdup(arguments[arguments_i]);
+            operands_i++;
         }
-
-        file_operands[operands_i] = ft_safe_strdup(arguments[arguments_i]);
         arguments_i++;
-        operands_i++;
     }
 
     return file_operands;
