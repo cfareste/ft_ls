@@ -70,6 +70,7 @@ vpath %.c	$(SRC):\
 			$(ROOT_SRC)/scanner:\
 			$(ROOT_SRC)/renderer:\
 			$(ROOT_SRC)/sorter:\
+			$(ROOT_SRC)/path_builder:\
 			$(ROOT_SRC)/error_reporter:\
 			$(ROOT_SRC)/result
 
@@ -86,6 +87,7 @@ ROOT_SRCS = application.c \
 			scanner.c \
 			renderer.c \
 			sorter.c \
+			path_builder.c \
 			error_reporter.c \
 			result.c
 
@@ -100,6 +102,7 @@ SRCS = main.c \
 		scanner_suite.c \
 		file_stats_suite.c \
 		sorter_suite.c \
+		path_builder_suite.c \
 		parsed_arguments_suite.c \
 		application_suite.c \
 		error_reporter_suite.c \

@@ -52,6 +52,7 @@ vpath %.c	$(SRC):\
 			$(SRC)/scanner:\
 			$(SRC)/renderer:\
 			$(SRC)/sorter:\
+			$(SRC)/path_builder:\
 			$(SRC)/error_reporter:\
 			$(SRC)/result
 
@@ -67,6 +68,7 @@ SRCS = ft_ls.c \
 		scanner.c \
 		renderer.c \
 		sorter.c \
+		path_builder.c \
 		error_reporter.c \
 		result.c
 
