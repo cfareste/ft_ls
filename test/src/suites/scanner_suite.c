@@ -86,6 +86,7 @@ static void should_return_NULL_if_a_NULL_path_is_specified(void)
 
     CU_ASSERT(verify_that_no_error_was_printed());
     CU_ASSERT_EQUAL(result_has_failed(result), 1);
+    CU_ASSERT_PTR_NULL(result_get_error_context(result));
     assert_file_entry_array_is_null();
 }
 
@@ -95,6 +96,7 @@ static void should_return_NULL_if_an_empty_path_is_specified(void)
 
     CU_ASSERT(verify_that_no_error_was_printed());
     CU_ASSERT_EQUAL(result_has_failed(result), 1);
+    CU_ASSERT_PTR_NULL(result_get_error_context(result));
     assert_file_entry_array_is_null();
 }
 
@@ -258,6 +260,7 @@ static void should_return_NULL_if_fails_to_open_a_directory(void)
         "no_perm_dir", strerror(errno))
     );
     CU_ASSERT_EQUAL(result_has_failed(result), 1);
+    CU_ASSERT_STRING_EQUAL(result_get_error_context(result), "no_perm_dir");
     assert_file_entry_array_is_null();
 }
 
@@ -276,6 +279,7 @@ static void should_return_an_empty_array_if_fails_to_read_the_first_entry_of_a_d
         "read_dir", strerror(errno))
     );
     CU_ASSERT_EQUAL(result_has_failed(result), 1);
+    CU_ASSERT_STRING_EQUAL(result_get_error_context(result), "read_dir");
     assert_file_entry_array_length_is(0);
 }
 
@@ -299,6 +303,7 @@ static void should_return_an_array_with_the_elements_that_didnt_fail_if_fails_to
         "read_dir", strerror(errno))
     );
     CU_ASSERT_EQUAL(result_has_failed(result), 1);
+    CU_ASSERT_STRING_EQUAL(result_get_error_context(result), "read_dir");
     assert_file_entry_array_length_is(2);
     assert_file_entry_array_names_are(expected_file_names);
     assert_file_entry_array_types_are(expected_file_types);
@@ -325,6 +330,7 @@ static void should_return_a_valid_array_even_if_it_fails_to_close_a_directory(vo
         "close_error", strerror(errno))
     );
     CU_ASSERT_EQUAL(result_has_failed(result), 1);
+    CU_ASSERT_STRING_EQUAL(result_get_error_context(result), "close_error");
     assert_file_entry_array_length_is(3);
     assert_file_entry_array_names_are(expected_file_names);
     assert_file_entry_array_types_are(expected_file_types);
@@ -352,6 +358,7 @@ static void should_return_a_valid_array_even_if_it_fails_to_access_an_entry(void
         "valid_dir/nonValid", strerror(ENOTDIR))
     );
     CU_ASSERT_TRUE(result_has_failed(result));
+    CU_ASSERT_STRING_EQUAL(result_get_error_context(result), "valid_dir/nonValid");
     assert_file_entry_array_length_is(4);
     assert_file_entry_array_names_are(expected_file_names);
     assert_file_entry_array_types_are(expected_file_types);
