@@ -82,7 +82,7 @@ static void should_return_one_entry_if_the_current_directory_has_one_file(void)
 {
     const t_vfs_mock_entry vfs[] = {
         MOCK_DIR(CURRENT_DIRECTORY_PATH, ".", "..", "file"),
-        MOCK_FILE("./file"),
+        MOCK_FILE("file"),
         MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
@@ -100,9 +100,9 @@ static void should_return_multiple_entries_if_the_current_directory_has_more_tha
 {
     const t_vfs_mock_entry vfs[] = {
         MOCK_DIR(CURRENT_DIRECTORY_PATH, ".", "..", "multiple", "multiple2", "multiple3"),
-        MOCK_FILE("./multiple"),
-        MOCK_FILE("./multiple2"),
-        MOCK_FILE("./multiple3"),
+        MOCK_FILE("multiple"),
+        MOCK_FILE("multiple2"),
+        MOCK_FILE("multiple3"),
         MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
@@ -254,6 +254,8 @@ static void should_return_an_array_with_the_elements_that_didnt_fail_if_fails_to
 {
     const t_vfs_mock_entry vfs[] = {
         MOCK_DIR_READ_ERROR("read_dir", 2, "valid", "file", "..", ".", "failed"),
+        MOCK_FILE("read_dir/valid"),
+        MOCK_FILE("read_dir/file"),
         MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
@@ -275,6 +277,9 @@ static void should_return_a_valid_array_even_if_it_fails_to_close_a_directory(vo
 {
     const t_vfs_mock_entry vfs[] = {
         MOCK_DIR_CLOSE_ERROR("close_error", "valid", ".", "dir", "..", "entries"),
+        MOCK_FILE("close_error/valid"),
+        MOCK_FILE("close_error/dir"),
+        MOCK_FILE("close_error/entries"),
         MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);

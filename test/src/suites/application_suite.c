@@ -43,10 +43,10 @@ static void should_successfully_print_the_contents_of_the_current_directory_one_
 {
     const t_vfs_mock_entry vfs[] = {
         MOCK_DIR(".", ".", "..", "file1", "subdir1", "symlink", "zz"),
-        MOCK_FILE("./file1"),
-        MOCK_DIR("./subdir1", ".", ".."),
-        MOCK_SYMLINK("./symlink", "file1"),
-        MOCK_FILE("./zz"),
+        MOCK_FILE("file1"),
+        MOCK_DIR("subdir1", ".", ".."),
+        MOCK_SYMLINK("symlink", "file1"),
+        MOCK_FILE("zz"),
         MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
@@ -71,10 +71,10 @@ static void should_successfully_print_the_contents_of_the_current_directory(void
 {
     const t_vfs_mock_entry vfs[] = {
         MOCK_DIR(".", ".", "..", "file1", "subdir1", "symlink", "zz"),
-        MOCK_FILE("./file1"),
-        MOCK_DIR("./subdir1", ".", ".."),
-        MOCK_SYMLINK("./symlink", "file1"),
-        MOCK_FILE("./zz"),
+        MOCK_FILE("file1"),
+        MOCK_DIR("subdir1", ".", ".."),
+        MOCK_SYMLINK("symlink", "file1"),
+        MOCK_FILE("zz"),
         MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
@@ -223,6 +223,10 @@ static void should_successfully_print_the_contents_of_the_mixed_types_specified_
         MOCK_SOCKET("socket"),
         MOCK_FILE("dir/file"),
         MOCK_DIR("dir/dir2", ".", ".."),
+        MOCK_FILE("linkdir/file"),
+        MOCK_DIR("linkdir/dir2", ".", ".."),
+        MOCK_FILE("linklink/file"),
+        MOCK_DIR("linklink/dir2", ".", ".."),
         MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
@@ -536,15 +540,15 @@ static void should_successfully_print_the_contents_of_the_current_directory_sort
 {
     const t_vfs_mock_entry vfs[] = {
         MOCK_DIR(".", "a", "2file", "..", "_DIR", ".hiddir", "_file", "f", "dir", ".hidden_file", ".", "FILE"),
-        MOCK_FILE("./a"),
-        MOCK_FILE("./2file"),
-        MOCK_DIR("./_DIR", ".", ".."),
-        MOCK_DIR("./.hiddir", ".", ".."),
-        MOCK_FILE("./_file"),
-        MOCK_FILE("./f"),
-        MOCK_DIR("./dir", ".", ".."),
-        MOCK_FILE("./.hidden_file"),
-        MOCK_FILE("./FILE"),
+        MOCK_FILE("a"),
+        MOCK_FILE("2file"),
+        MOCK_DIR("_DIR", ".", ".."),
+        MOCK_DIR(".hiddir", ".", ".."),
+        MOCK_FILE("_file"),
+        MOCK_FILE("f"),
+        MOCK_DIR("dir", ".", ".."),
+        MOCK_FILE(".hidden_file"),
+        MOCK_FILE("FILE"),
         MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
@@ -754,14 +758,14 @@ static void should_successfully_print_the_contents_of_the_current_directory_with
 {
     const t_vfs_mock_entry vfs[] = {
         MOCK_DIR(".", ".", "..", "1_file", "2_subdir", "3_linkfile", "4_linkdir", "5_chardevice", "6_blockdevice", "7_fifo", "8_socket"),
-        MOCK_FILE("./1_file"),
-        MOCK_DIR("./2_subdir", ".", ".."),
-        MOCK_SYMLINK("./3_linkfile", "1_file"),
-        MOCK_SYMLINK("./4_linkdir", "2_subdir"),
-        MOCK_CHAR_DEVICE("./5_chardevice"),
-        MOCK_BLOCK_DEVICE("./6_blockdevice"),
-        MOCK_FIFO("./7_fifo"),
-        MOCK_SOCKET("./8_socket"),
+        MOCK_FILE("1_file"),
+        MOCK_DIR("2_subdir", ".", ".."),
+        MOCK_SYMLINK("3_linkfile", "1_file"),
+        MOCK_SYMLINK("4_linkdir", "2_subdir"),
+        MOCK_CHAR_DEVICE("5_chardevice"),
+        MOCK_BLOCK_DEVICE("6_blockdevice"),
+        MOCK_FIFO("7_fifo"),
+        MOCK_SOCKET("8_socket"),
         MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
@@ -817,6 +821,10 @@ static void should_successfully_print_the_contents_of_the_directory_pointed_by_t
         MOCK_CHAR_DEVICE("dir/char_device"),
         MOCK_FILE("dir/file"),
         MOCK_DIR("dir/subdir", ".", ".."),
+        MOCK_BLOCK_DEVICE("linkdir/block_device"),
+        MOCK_CHAR_DEVICE("linkdir/char_device"),
+        MOCK_FILE("linkdir/file"),
+        MOCK_DIR("linkdir/subdir", ".", ".."),
         MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
@@ -851,6 +859,14 @@ static void should_successfully_print_the_contents_of_the_symlinks_to_different_
         MOCK_BROKEN_LINK("brokenLink"),
         MOCK_LOOP_LINK("loopLink"),
         MOCK_FILE_ACCESS_ERROR(ENOENT, "nonExistent"),
+        MOCK_FILE("dir/dirFile"),
+        MOCK_DIR("dir/symDir", ".", ".."),
+        MOCK_FILE("dirLink/dirFile"),
+        MOCK_SYMLINK("dirLink/symlink", "dirLink/dirFile"),
+        MOCK_DIR("dirLink/symDir", ".", ".."),
+        MOCK_FILE("multihopDir/dirFile"),
+        MOCK_SYMLINK("multihopDir/symlink", "multihopDir/dirFile"),
+        MOCK_DIR("multihopDir/symDir", ".", ".."),
         MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
@@ -1030,6 +1046,7 @@ static void should_fail_with_a_major_error_and_print_only_the_working_directory_
     const t_vfs_mock_entry vfs[] = {
         MOCK_DIR_OPEN_ERROR(EACCES, "noPermDir", ".", "..", "file1", "subdir1", "symlink", "zz"),
         MOCK_DIR("workingDir", ".", "..", "fileDir"),
+        MOCK_FILE("workingDir/fileDir"),
         MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
@@ -1058,6 +1075,8 @@ static void should_fail_with_a_major_error_and_print_only_the_working_file_opera
         MOCK_FILE("zFile"),
         MOCK_DIR("workingDir", ".", "..", "fileDir"),
         MOCK_DIR("zWorkingDir", ".", "..", "zFileDir"),
+        MOCK_FILE("workingDir/fileDir"),
+        MOCK_FILE("zWorkingDir/zFileDir"),
         MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
@@ -1092,6 +1111,8 @@ static void should_fail_with_a_major_error_and_not_print_anything_if_all_directo
     const t_vfs_mock_entry vfs[] = {
         MOCK_DIR_OPEN_ERROR(EACCES, "dir", ".", "..", "file1", "subdir1", "symlink", "zz"),
         MOCK_DIR_READ_ERROR("zdir/", 4, ".", "..", "file1", "subdir1", "symlink", "zz"),
+        MOCK_FILE("zdir/file1"),
+        MOCK_DIR("zdir/subdir1", ".", ".."),
         MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
@@ -1127,6 +1148,10 @@ static void should_fail_with_a_major_error_and_print_only_the_working_file_opera
         MOCK_FILE("zFile"),
         MOCK_DIR("workingDir", ".", "..", "fileDir"),
         MOCK_DIR("zWorkingDir", ".", "..", "zFileDir"),
+        MOCK_FILE("zdir/file1"),
+        MOCK_DIR("zdir/subdir1", ".", ".."),
+        MOCK_FILE("workingDir/fileDir"),
+        MOCK_FILE("zWorkingDir/zFileDir"),
         MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
@@ -1211,6 +1236,7 @@ static void should_fail_with_a_major_error_and_print_the_working_operand_if_one_
     const t_vfs_mock_entry vfs[] = {
         MOCK_FILE_ACCESS_ERROR(EACCES, "no/perms"),
         MOCK_DIR("dir", ".", "..", "file"),
+        MOCK_FILE("dir/file"),
         MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
@@ -1239,6 +1265,8 @@ static void should_fail_with_a_major_error_and_print_only_the_working_operands_i
         MOCK_FILE("zFile"),
         MOCK_DIR("workingDir", ".", "..", "fileDir"),
         MOCK_DIR("zWorkingDir", ".", "..", "zFileDir"),
+        MOCK_FILE("workingDir/fileDir"),
+        MOCK_FILE("zWorkingDir/zFileDir"),
         MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
@@ -1305,6 +1333,8 @@ static void should_fail_with_a_major_error_and_print_only_the_working_operands_i
         MOCK_FILE("zFile"),
         MOCK_DIR("workingDir", ".", "..", "fileDir"),
         MOCK_DIR("zWorkingDir", ".", "..", "zFileDir"),
+        MOCK_FILE("workingDir/fileDir"),
+        MOCK_FILE("zWorkingDir/zFileDir"),
         MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
