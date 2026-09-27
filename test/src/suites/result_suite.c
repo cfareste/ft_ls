@@ -11,6 +11,7 @@ static void should_create_a_successful_result(void)
     t_result *result = result_create_successful("value");
 
     CU_ASSERT_STRING_EQUAL(result_get_value(result), "value");
+    CU_ASSERT_PTR_NULL(result_get_error_context(result));
     CU_ASSERT_EQUAL(result_has_failed(result), 0);
 
     result_destroy(&result);

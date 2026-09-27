@@ -14,6 +14,7 @@ t_result *result_create_successful(void *value)
     t_result *result = ft_safe_calloc(1, sizeof(t_result));
 
     result->value = value;
+    result->error_context = NULL;
     result->has_failed = 0;
 
     return result;
