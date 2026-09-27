@@ -7,6 +7,12 @@
 
 static char *sut = NULL;
 
+static void test_teardown(void)
+{
+    free(sut);
+    sut = NULL;
+}
+
 static void should_return_NULL_if_directory_path_is_NULL(void)
 {
     sut = build_path(NULL, "valid_path");
@@ -40,8 +46,6 @@ static void should_return_the_built_path_without_adding_a_slash_if_directory_alr
     sut = build_path("dir/", "file");
 
     CU_ASSERT_STRING_EQUAL(sut, "dir/file");
-
-    free(sut);
 }
 
 static void should_return_the_built_path_adding_a_slash_if_directory_does_not_have_it(void)
@@ -49,13 +53,11 @@ static void should_return_the_built_path_adding_a_slash_if_directory_does_not_ha
     sut = build_path("dir", "file");
 
     CU_ASSERT_STRING_EQUAL(sut, "dir/file");
-
-    free(sut);
 }
 
 void register_path_builder_suite(void)
 {
-    const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, NULL, NULL);
+    const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, NULL, test_teardown);
 
     if (suite != NULL)
     {
