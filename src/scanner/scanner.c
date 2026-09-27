@@ -34,9 +34,9 @@ static int push_entry(t_file_entry_array *file_entry_array, const t_dir_entry *d
     return error_code;
 }
 
-static t_result *create_scan_result(t_file_entry_array *file_entry_array, const int failed_to_read_directory, const int failed_to_close_directory)
+static t_result *create_scan_result(t_file_entry_array *file_entry_array, const int directory_operation_failed)
 {
-    if (failed_to_read_directory || failed_to_close_directory)
+    if (directory_operation_failed)
         return result_create_failed(file_entry_array);
 
     return result_create_successful(file_entry_array);
@@ -62,11 +62,11 @@ t_result *scan(const char *path)
         directory_destroy_entry(&dir_entry);
         dir_entry = directory_get_next_entry(dir_stream);
     }
-    const int failed_to_read_directory = dir_entry == NULL;
-    const int failed_to_close_directory = directory_close(&dir_stream) == -1;
+    const int close_directory_error = directory_close(&dir_stream);
+    const int directory_operation_failed = dir_entry == NULL || close_directory_error == -1;
     directory_destroy_entry(&dir_entry);
 
     if (error_code != ENTRY_PUSH_SUCCESS)
         return result_create_failed(file_entry_array);
-    return create_scan_result(file_entry_array, failed_to_read_directory, failed_to_close_directory);
+    return create_scan_result(file_entry_array, directory_operation_failed);
 }
