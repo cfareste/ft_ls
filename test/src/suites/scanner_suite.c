@@ -45,6 +45,11 @@ static void assert_file_entry_name_is(const t_file_entry *file_entry, const char
     CU_ASSERT_STRING_EQUAL(file_entry_get_name(file_entry), name);
 }
 
+static void assert_file_entry_file_type_is(const t_file_entry *file_entry, const t_file_type file_type)
+{
+    CU_ASSERT_EQUAL(file_entry_get_file_type(file_entry), file_type);
+}
+
 static void assert_file_entry_array_names_are(const char **files_names)
 {
     unsigned int i = 0;
@@ -58,6 +63,21 @@ static void assert_file_entry_array_names_are(const char **files_names)
     }
 
     CU_ASSERT_PTR_NULL(files_names[i]);
+}
+
+static void assert_file_entry_array_types_are(const t_file_type *file_types)
+{
+    unsigned int i = 0;
+    const unsigned int count = file_entry_array_get_length(sut);
+
+    while (i < count)
+    {
+        const t_file_entry *file_entry = file_entry_array_get_at(sut, i);
+        assert_file_entry_file_type_is(file_entry, file_types[i]);
+        i++;
+    }
+
+    CU_ASSERT_PTR_EQUAL(file_types[i], FILE_TYPE_NONE);
 }
 
 static void should_return_NULL_if_a_NULL_path_is_specified(void)
@@ -94,6 +114,7 @@ static void should_return_one_entry_if_the_current_directory_has_one_file(void)
     CU_ASSERT_EQUAL(result_has_failed(result), 0);
     assert_file_entry_array_length_is(1);
     assert_file_entry_name_is(file_entry, "file");
+    assert_file_entry_file_type_is(file_entry, FILE_TYPE_REGULAR);
 }
 
 static void should_return_multiple_entries_if_the_current_directory_has_more_than_one_file(void)
@@ -108,6 +129,7 @@ static void should_return_multiple_entries_if_the_current_directory_has_more_tha
     vfs_mock_setup(vfs);
 
     const char *expected_files_names[] = { "multiple", "multiple2", "multiple3", NULL };
+    const t_file_type expected_file_types[] = { FILE_TYPE_REGULAR, FILE_TYPE_REGULAR, FILE_TYPE_REGULAR, FILE_TYPE_NONE };
 
     scan_directory(CURRENT_DIRECTORY_PATH);
 
@@ -115,6 +137,7 @@ static void should_return_multiple_entries_if_the_current_directory_has_more_tha
     CU_ASSERT_EQUAL(result_has_failed(result), 0);
     assert_file_entry_array_length_is(3);
     assert_file_entry_array_names_are(expected_files_names);
+    assert_file_entry_array_types_are(expected_file_types);
 }
 
 static void should_return_an_array_of_entries_if_one_non_empty_directory_path_is_specified(void)
@@ -130,6 +153,7 @@ static void should_return_an_array_of_entries_if_one_non_empty_directory_path_is
     vfs_mock_setup(vfs);
 
     const char *expected_files_names[] = { "file", "subdir", "file2", "subdir2", NULL };
+    const t_file_type expected_file_types[] = { FILE_TYPE_REGULAR, FILE_TYPE_DIRECTORY, FILE_TYPE_REGULAR, FILE_TYPE_DIRECTORY, FILE_TYPE_NONE };
 
     scan_directory("valid_dir");
 
@@ -137,6 +161,7 @@ static void should_return_an_array_of_entries_if_one_non_empty_directory_path_is
     CU_ASSERT_EQUAL(result_has_failed(result), 0);
     assert_file_entry_array_length_is(4);
     assert_file_entry_array_names_are(expected_files_names);
+    assert_file_entry_array_types_are(expected_file_types);
 }
 
 static void should_return_an_array_of_entries_without_hidden_files_if_a_directory_with_hidden_files_is_specified(void)
@@ -152,6 +177,7 @@ static void should_return_an_array_of_entries_without_hidden_files_if_a_director
     vfs_mock_setup(vfs);
 
     const char *expected_file_names[] = { "subdir", "subdir2", "file", NULL };
+    const t_file_type expected_file_types[] = { FILE_TYPE_DIRECTORY, FILE_TYPE_DIRECTORY, FILE_TYPE_REGULAR, FILE_TYPE_NONE };
 
     scan_directory("dir");
 
@@ -159,6 +185,7 @@ static void should_return_an_array_of_entries_without_hidden_files_if_a_director
     CU_ASSERT_EQUAL(result_has_failed(result), 0);
     assert_file_entry_array_length_is(3);
     assert_file_entry_array_names_are(expected_file_names);
+    assert_file_entry_array_types_are(expected_file_types);
 }
 
 static void should_return_an_array_of_entries_if_a_hidden_directory_is_specified(void)
@@ -172,6 +199,7 @@ static void should_return_an_array_of_entries_if_a_hidden_directory_is_specified
     vfs_mock_setup(vfs);
 
     const char *expected_file_names[] = { "file", "subdir1", NULL };
+    const t_file_type expected_file_types[] = { FILE_TYPE_REGULAR, FILE_TYPE_DIRECTORY, FILE_TYPE_NONE };
 
     scan_directory(".dir");
 
@@ -179,6 +207,7 @@ static void should_return_an_array_of_entries_if_a_hidden_directory_is_specified
     CU_ASSERT_EQUAL(result_has_failed(result), 0);
     assert_file_entry_array_length_is(2);
     assert_file_entry_array_names_are(expected_file_names);
+    assert_file_entry_array_types_are(expected_file_types);
 }
 
 static void should_return_an_empty_array_if_the_specified_directory_is_empty(void)
@@ -261,6 +290,7 @@ static void should_return_an_array_with_the_elements_that_didnt_fail_if_fails_to
     vfs_mock_setup(vfs);
 
     const char *expected_file_names[] = { "valid", "file", NULL };
+    const t_file_type expected_file_types[] = { FILE_TYPE_REGULAR, FILE_TYPE_REGULAR, FILE_TYPE_NONE };
 
     scan_directory("read_dir");
 
@@ -271,6 +301,7 @@ static void should_return_an_array_with_the_elements_that_didnt_fail_if_fails_to
     CU_ASSERT_EQUAL(result_has_failed(result), 1);
     assert_file_entry_array_length_is(2);
     assert_file_entry_array_names_are(expected_file_names);
+    assert_file_entry_array_types_are(expected_file_types);
 }
 
 static void should_return_a_valid_array_even_if_it_fails_to_close_a_directory(void)
@@ -285,6 +316,7 @@ static void should_return_a_valid_array_even_if_it_fails_to_close_a_directory(vo
     vfs_mock_setup(vfs);
 
     const char *expected_file_names[] = { "valid", "dir", "entries", NULL };
+    const t_file_type expected_file_types[] = { FILE_TYPE_REGULAR, FILE_TYPE_REGULAR, FILE_TYPE_REGULAR, FILE_TYPE_NONE };
 
     scan_directory("close_error");
 
@@ -295,6 +327,7 @@ static void should_return_a_valid_array_even_if_it_fails_to_close_a_directory(vo
     CU_ASSERT_EQUAL(result_has_failed(result), 1);
     assert_file_entry_array_length_is(3);
     assert_file_entry_array_names_are(expected_file_names);
+    assert_file_entry_array_types_are(expected_file_types);
 }
 
 void register_scanner_suite(void)
