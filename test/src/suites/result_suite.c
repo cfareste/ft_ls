@@ -62,6 +62,11 @@ static void should_return_the_result_value_of_the_specified_result(void)
     result_destroy(&result);
 }
 
+static void should_return_NULL_for_the_error_context_if_a_NULL_result_is_passed(void)
+{
+    CU_ASSERT_PTR_NULL(result_get_error_context(NULL));
+}
+
 static void should_return_the_error_context_of_the_specified_result(void)
 {
     t_result *result = result_create_failed("value", "context");
@@ -112,6 +117,7 @@ void register_result_suite(void)
         CU_add_test(suite, "should_not_fail_to_destroy_a_NULL_result", should_not_fail_to_destroy_a_NULL_result);
         CU_add_test(suite, "should_return_NULL_for_value_if_a_NULL_result_is_passed", should_return_NULL_for_value_if_a_NULL_result_is_passed);
         CU_add_test(suite, "should_return_the_result_value_of_the_specified_result", should_return_the_result_value_of_the_specified_result);
+        CU_add_test(suite, "should_return_NULL_for_the_error_context_if_a_NULL_result_is_passed", should_return_NULL_for_the_error_context_if_a_NULL_result_is_passed);
         CU_add_test(suite, "should_return_the_error_context_of_the_specified_result", should_return_the_error_context_of_the_specified_result);
         CU_add_test(suite, "should_return_true_for_has_failed_if_a_NULL_result_is_passed", should_return_true_for_has_failed_if_a_NULL_result_is_passed);
         CU_add_test(suite, "should_return_false_for_has_failed_if_a_successful_result_is_passed", should_return_false_for_has_failed_if_a_successful_result_is_passed);

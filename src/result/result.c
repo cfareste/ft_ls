@@ -40,6 +40,9 @@ void *result_get_value(const t_result *result)
 
 const char *result_get_error_context(const t_result *result)
 {
+    if (result == NULL)
+        return NULL;
+
     return result->error_context;
 }
 
