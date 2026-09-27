@@ -34,7 +34,7 @@ static int has_failed_to_access_a_file_operand(const t_file_type *file_operands_
 static t_result *create_parsing_arguments_result(t_parsed_arguments *parsed_arguments)
 {
     if (has_failed_to_access_a_file_operand(parsed_arguments->file_operand_types))
-        return result_create_failed(parsed_arguments);
+        return result_create_failed(parsed_arguments, NULL);
 
     return result_create_successful(parsed_arguments);
 }

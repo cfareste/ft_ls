@@ -37,13 +37,13 @@ static int push_entry(t_file_entry_array *file_entry_array, const t_dir_entry *d
 t_result *scan(const char *path)
 {
     if (!ft_is_valid_path(path))
-        return result_create_failed(NULL);
+        return result_create_failed(NULL, NULL);
 
     int error_code = ENTRY_PUSH_SUCCESS;
 
     t_dir_stream *dir_stream = directory_open(path);
     if (dir_stream == NULL)
-        return result_create_failed(NULL);
+        return result_create_failed(NULL, NULL);
 
     t_file_entry_array *file_entry_array = file_entry_array_create();
     t_dir_entry *dir_entry = directory_get_next_entry(dir_stream);
@@ -59,8 +59,9 @@ t_result *scan(const char *path)
     directory_destroy_entry(&dir_entry);
 
     if (error_code != ENTRY_PUSH_SUCCESS)
-        return result_create_failed(file_entry_array);
+        return result_create_failed(file_entry_array, NULL);
     if (directory_operation_failed)
-        return result_create_failed(file_entry_array);
+        return result_create_failed(file_entry_array, NULL);
+
     return result_create_successful(file_entry_array);
 }
