@@ -47,6 +47,7 @@ static void should_be_created_correctly(void)
     CU_ASSERT_STRING_EQUAL(directory_file_operands[0], ".");
     CU_ASSERT_PTR_NULL(directory_file_operands[1]);
     CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
+    CU_ASSERT_PTR_NULL(result_get_error_context(parsed_arguments_result));
     CU_ASSERT(verify_that_no_error_was_printed());
 }
 
@@ -628,6 +629,7 @@ static void should_be_created_correctly_even_if_current_directory_is_invalid_and
 
     CU_ASSERT_PTR_NOT_NULL(sut);
     CU_ASSERT_TRUE(result_has_failed(parsed_arguments_result));
+    CU_ASSERT_PTR_NULL(result_get_error_context(parsed_arguments_result));
     CU_ASSERT_FALSE(parsed_arguments_has_any_option_active(sut));
     CU_ASSERT_PTR_NULL(non_directory_file_operands[0]);
     CU_ASSERT_PTR_NULL(directory_file_operands[0]);
@@ -656,6 +658,7 @@ static void should_be_created_correctly_even_if_the_specified_argument_cannot_be
     CU_ASSERT_PTR_NULL(non_directory_file_operands[0]);
     CU_ASSERT_PTR_NULL(directory_file_operands[0]);
     CU_ASSERT_FALSE(result_has_succeed(parsed_arguments_result));
+    CU_ASSERT_PTR_NULL(result_get_error_context(parsed_arguments_result));
     CU_ASSERT_PTR_NOT_NULL(sut);
 }
 
@@ -683,6 +686,7 @@ static void should_be_created_correctly_even_if_one_argument_cannot_be_accessed(
     CU_ASSERT_PTR_NULL(non_directory_file_operands[1]);
     CU_ASSERT_PTR_NULL(directory_file_operands[0]);
     CU_ASSERT_FALSE(result_has_succeed(parsed_arguments_result));
+    CU_ASSERT_PTR_NULL(result_get_error_context(parsed_arguments_result));
     CU_ASSERT_PTR_NOT_NULL(sut);
 }
 
@@ -718,6 +722,7 @@ static void should_be_created_correctly_even_if_one_argument_cannot_be_accessed_
     CU_ASSERT_STRING_EQUAL(directory_file_operands[2], "empty");
     CU_ASSERT_PTR_NULL(directory_file_operands[3]);
     CU_ASSERT_FALSE(result_has_succeed(parsed_arguments_result));
+    CU_ASSERT_PTR_NULL(result_get_error_context(parsed_arguments_result));
     CU_ASSERT_PTR_NOT_NULL(sut);
 }
 
@@ -746,6 +751,7 @@ static void should_be_created_correctly_even_if_the_specified_arguments_cannot_b
     CU_ASSERT_PTR_NULL(non_directory_file_operands[0]);
     CU_ASSERT_PTR_NULL(directory_file_operands[0]);
     CU_ASSERT_FALSE(result_has_succeed(parsed_arguments_result));
+    CU_ASSERT_PTR_NULL(result_get_error_context(parsed_arguments_result));
     CU_ASSERT_PTR_NOT_NULL(sut);
 }
 
@@ -787,6 +793,7 @@ static void should_be_created_correctly_even_if_some_arguments_cannot_be_accesse
     CU_ASSERT_STRING_EQUAL(directory_file_operands[2], "empty");
     CU_ASSERT_PTR_NULL(directory_file_operands[3]);
     CU_ASSERT_FALSE(result_has_succeed(parsed_arguments_result));
+    CU_ASSERT_PTR_NULL(result_get_error_context(parsed_arguments_result));
     CU_ASSERT_PTR_NOT_NULL(sut);
 }
 
