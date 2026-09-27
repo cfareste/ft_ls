@@ -1,5 +1,6 @@
-#include <stddef.h>
+#include <stdlib.h>
 #include "application.h"
+#include "path_builder.h"
 #include "renderer.h"
 #include "scanner.h"
 
@@ -26,6 +27,37 @@ static void process_non_directory_file_operands(const t_parsed_arguments *parsed
     }
 }
 
+static void process_directory(const char *directory_path, const t_parsed_arguments *parsed_arguments, t_render_context *render_context, t_ft_ls_error_code *error_code)
+{
+    t_result *result = scan(directory_path);
+    t_file_entry_array *file_entry_array = result_get_value(result);
+
+    if (result_has_failed(result))
+        // error_code = file's full_path that failed is from args ? major : minor
+        *error_code = FT_LS_APPLICATION_MAJOR_ERROR;
+
+    file_entry_array_sort(file_entry_array);
+    render_directory(render_context, directory_path, file_entry_array);
+
+    if (parsed_arguments_is_option_active(parsed_arguments, OPTIONS_RECURSIVE))
+    {
+        const unsigned int entries_amount = file_entry_array_get_length(file_entry_array);
+        for (unsigned int i = 0; i < entries_amount; i++)
+        {
+            const t_file_entry *entry = file_entry_array_get_at(file_entry_array, i);
+            if (file_entry_get_file_type(entry) == FILE_TYPE_DIRECTORY)
+            {
+                char *subdir_path = build_full_path(directory_path, file_entry_get_name(entry));
+                process_directory(subdir_path, parsed_arguments, render_context, error_code);
+                free(subdir_path);
+            }
+        }
+    }
+
+    result_destroy(&result);
+    file_entry_array_destroy(&file_entry_array);
+}
+
 static t_ft_ls_error_code process_directory_file_operands(const t_parsed_arguments *parsed_arguments, t_render_context *render_context)
 {
     t_ft_ls_error_code error_code = FT_LS_APPLICATION_SUCCESS;
@@ -33,17 +65,7 @@ static t_ft_ls_error_code process_directory_file_operands(const t_parsed_argumen
 
     for (unsigned int i = 0; directory_file_operands[i] != NULL; i++)
     {
-        t_result *result = scan(directory_file_operands[i]);
-        t_file_entry_array *file_entry_array = result_get_value(result);
-
-        if (result_has_failed(result))
-            error_code = FT_LS_APPLICATION_MAJOR_ERROR;
-
-        file_entry_array_sort(file_entry_array);
-        render_directory(render_context, directory_file_operands[i], file_entry_array);
-
-        result_destroy(&result);
-        file_entry_array_destroy(&file_entry_array);
+        process_directory(directory_file_operands[i], parsed_arguments, render_context, &error_code);
     }
 
     return error_code;
