@@ -34,14 +34,6 @@ static int push_entry(t_file_entry_array *file_entry_array, const t_dir_entry *d
     return error_code;
 }
 
-static t_result *create_scan_result(t_file_entry_array *file_entry_array, const int directory_operation_failed)
-{
-    if (directory_operation_failed)
-        return result_create_failed(file_entry_array);
-
-    return result_create_successful(file_entry_array);
-}
-
 t_result *scan(const char *path)
 {
     if (!ft_is_valid_path(path))
@@ -68,5 +60,7 @@ t_result *scan(const char *path)
 
     if (error_code != ENTRY_PUSH_SUCCESS)
         return result_create_failed(file_entry_array);
-    return create_scan_result(file_entry_array, directory_operation_failed);
+    if (directory_operation_failed)
+        return result_create_failed(file_entry_array);
+    return result_create_successful(file_entry_array);
 }
