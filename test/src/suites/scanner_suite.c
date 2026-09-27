@@ -1,4 +1,5 @@
 #include <string.h>
+#include "suites.h"
 #include "CUnit/CUnit.h"
 #include "CUnit/Basic.h"
 #include "mocks.h"

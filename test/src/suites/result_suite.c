@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include "suites.h"
 #include "CUnit/CUnit.h"
 #include "CUnit/Basic.h"
 #include "result.h"

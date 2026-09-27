@@ -1,3 +1,4 @@
+#include "suites.h"
 #include "CUnit/CUnit.h"
 #include "CUnit/Basic.h"
 #include "directory.h"
