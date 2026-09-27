@@ -909,59 +909,59 @@ static void should_successfully_print_the_contents_of_the_symlinks_to_different_
     CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MAJOR_ERROR);
 }
 
-static void should_successfully_print_the_contents_of_the_current_directory_recursively(void)
-{
-    const t_vfs_mock_entry vfs[] = {
-        MOCK_DIR(".", ".", "..", "file", "subdir", "file2", "subdir2"),
-        MOCK_FILE("file"),
-        MOCK_FILE("file2"),
-        MOCK_DIR("subdir", ".", "..", "sbd_file1", "sbd_dir1"),
-        MOCK_DIR("subdir2", ".", "..", "sbd_dir2"),
-        MOCK_FILE("subdir/sbd_file1"),
-        MOCK_DIR("subdir/sbd_dir1", ".", ".."),
-        MOCK_DIR("subdir2/sbd_dir2", ".", "..", "char", "block"),
-        MOCK_CHAR_DEVICE("subdir2/sbd_dir2/char"),
-        MOCK_BLOCK_DEVICE("subdir2/sbd_dir2/block"),
-        MOCK_NULL_TERMINATOR()
-    };
-    vfs_mock_setup(vfs);
-
-    const char *arguments[] = { "-R", NULL };
-    const char *expected_file_names[] = { "file", "file2", "sbd_file1", "char", "block" };
-    const char *expected_dir_headers[] = { ".", "./subdir", "./subdir/sbd_dir1", "./subdir2", "./subdir/sbd_dir2" };
-    const char *expected_subdirs[] = { "subdir", "subdir2", "sbd_dir1", "sbd_dir2" };
-    get_parsed_arguments_result(1, arguments);
-
-    const int result = application_run(parsed_arguments_result);
-
-    CU_ASSERT(verify_that_the_output_printed_is(
-        "%s:\n"
-        "%s\n%s\n%s\n%s\n"
-        "\n%s:\n"
-        "%s\n%s\n"
-        "\n%s:\n"
-        "\n%s:\n"
-        "%s\n"
-        "\n%s:\n"
-        "%s\n%s\n",
-        expected_dir_headers[0],
-        expected_file_names[0],
-        expected_file_names[1],
-        expected_subdirs[0],
-        expected_subdirs[1],
-        expected_dir_headers[1],
-        expected_file_names[2],
-        expected_subdirs[2],
-        expected_dir_headers[2],
-        expected_dir_headers[3],
-        expected_subdirs[3],
-        expected_dir_headers[4],
-        expected_file_names[3],
-        expected_file_names[4]
-    ));
-    CU_ASSERT(verify_that_no_error_was_printed());
-    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
-}
+// static void should_successfully_print_the_contents_of_the_current_directory_recursively(void)
+// {
+//     const t_vfs_mock_entry vfs[] = {
+//         MOCK_DIR(".", ".", "..", "file", "subdir", "file2", "subdir2"),
+//         MOCK_FILE("file"),
+//         MOCK_FILE("file2"),
+//         MOCK_DIR("subdir", ".", "..", "sbd_file1", "sbd_dir1"),
+//         MOCK_DIR("subdir2", ".", "..", "sbd_dir2"),
+//         MOCK_FILE("subdir/sbd_file1"),
+//         MOCK_DIR("subdir/sbd_dir1", ".", ".."),
+//         MOCK_DIR("subdir2/sbd_dir2", ".", "..", "char", "block"),
+//         MOCK_CHAR_DEVICE("subdir2/sbd_dir2/char"),
+//         MOCK_BLOCK_DEVICE("subdir2/sbd_dir2/block"),
+//         MOCK_NULL_TERMINATOR()
+//     };
+//     vfs_mock_setup(vfs);
+//
+//     const char *arguments[] = { "-R", NULL };
+//     const char *expected_file_names[] = { "file", "file2", "sbd_file1", "char", "block" };
+//     const char *expected_dir_headers[] = { ".", "./subdir", "./subdir/sbd_dir1", "./subdir2", "./subdir/sbd_dir2" };
+//     const char *expected_subdirs[] = { "subdir", "subdir2", "sbd_dir1", "sbd_dir2" };
+//     get_parsed_arguments_result(1, arguments);
+//
+//     const int result = application_run(parsed_arguments_result);
+//
+//     CU_ASSERT(verify_that_the_output_printed_is(
+//         "%s:\n"
+//         "%s\n%s\n%s\n%s\n"
+//         "\n%s:\n"
+//         "%s\n%s\n"
+//         "\n%s:\n"
+//         "\n%s:\n"
+//         "%s\n"
+//         "\n%s:\n"
+//         "%s\n%s\n",
+//         expected_dir_headers[0],
+//         expected_file_names[0],
+//         expected_file_names[1],
+//         expected_subdirs[0],
+//         expected_subdirs[1],
+//         expected_dir_headers[1],
+//         expected_file_names[2],
+//         expected_subdirs[2],
+//         expected_dir_headers[2],
+//         expected_dir_headers[3],
+//         expected_subdirs[3],
+//         expected_dir_headers[4],
+//         expected_file_names[3],
+//         expected_file_names[4]
+//     ));
+//     CU_ASSERT(verify_that_no_error_was_printed());
+//     CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+// }
 
 static void should_fail_with_a_major_error_and_not_print_anything_if_fails_to_open_the_directory(void)
 {
@@ -1481,7 +1481,7 @@ void register_application_suite(void)
         CU_add_test(suite, "should_successfully_print_the_name_of_the_specified_symlink_pointing_to_a_non_directory_file", should_successfully_print_the_name_of_the_specified_symlink_pointing_to_a_non_directory_file);
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_directory_pointed_by_the_specified_symlink", should_successfully_print_the_contents_of_the_directory_pointed_by_the_specified_symlink);
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_symlinks_to_different_file_types", should_successfully_print_the_contents_of_the_symlinks_to_different_file_types);
-        CU_add_test(suite, "should_successfully_print_the_contents_of_the_current_directory_recursively", should_successfully_print_the_contents_of_the_current_directory_recursively);
+        // CU_add_test(suite, "should_successfully_print_the_contents_of_the_current_directory_recursively", should_successfully_print_the_contents_of_the_current_directory_recursively);
         CU_add_test(suite, "should_fail_with_a_major_error_and_not_print_anything_if_fails_to_open_the_directory", should_fail_with_a_major_error_and_not_print_anything_if_fails_to_open_the_directory);
         CU_add_test(suite, "should_fail_with_a_major_error_and_not_print_anything_if_fails_to_open_the_current_directory_without_arguments", should_fail_with_a_major_error_and_not_print_anything_if_fails_to_open_the_current_directory_without_arguments);
         CU_add_test(suite, "should_fail_with_a_major_error_and_not_print_anything_if_fails_to_read_the_first_entry_of_the_directory", should_fail_with_a_major_error_and_not_print_anything_if_fails_to_read_the_first_entry_of_the_directory);

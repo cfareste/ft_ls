@@ -105,6 +105,13 @@ static void should_return_the_built_path_adding_a_slash_if_directory_does_not_ha
     CU_ASSERT_STRING_EQUAL(sut, "dir/file");
 }
 
+static void should_build_the_full_path_even_if_the_directory_path_is_current_directory(void)
+{
+    sut = build_full_path(".", "file");
+
+    CU_ASSERT_STRING_EQUAL(sut, "./file");
+}
+
 void register_path_builder_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, NULL, test_teardown);
@@ -124,5 +131,6 @@ void register_path_builder_suite(void)
         CU_add_test(suite, "should_return_a_copy_of_the_child_path_if_the_directory_path_is_current_directory", should_return_a_copy_of_the_child_path_if_the_directory_path_is_current_directory);
         CU_add_test(suite, "should_return_the_built_path_without_adding_a_slash_if_directory_already_had_it_when_building_full_path", should_return_the_built_path_without_adding_a_slash_if_directory_already_had_it_when_building_full_path);
         CU_add_test(suite, "should_return_the_built_path_adding_a_slash_if_directory_does_not_have_it_when_building_full_path", should_return_the_built_path_adding_a_slash_if_directory_does_not_have_it_when_building_full_path);
+        CU_add_test(suite, "should_build_the_full_path_even_if_the_directory_path_is_current_directory", should_build_the_full_path_even_if_the_directory_path_is_current_directory);
     }
 }
