@@ -4,6 +4,13 @@
 
 #define CURRENT_DIRECTORY "."
 
+char *build_full_path(const char *directory_path, const char *child_path)
+{
+    (void) directory_path;
+    (void) child_path;
+    return NULL;
+}
+
 char *build_path(const char *directory_path, const char *child_path)
 {
     if (!ft_is_valid_path(directory_path) || !ft_is_valid_path(child_path))
