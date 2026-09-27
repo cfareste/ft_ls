@@ -2,12 +2,14 @@
 #include "path_builder.h"
 #include "libft.h"
 
+#define CURRENT_DIRECTORY "."
+
 char *build_path(const char *directory_path, const char *child_path)
 {
     if (!ft_is_valid_path(directory_path) || !ft_is_valid_path(child_path))
         return NULL;
 
-    if (ft_are_string_equals(directory_path, "."))
+    if (ft_are_string_equals(directory_path, CURRENT_DIRECTORY))
         return ft_safe_strdup(child_path);
 
     const unsigned int directory_path_size = ft_strlen(directory_path);
