@@ -33,8 +33,17 @@ static void process_directory(const char *directory_path, const t_parsed_argumen
     t_file_entry_array *file_entry_array = result_get_value(result);
 
     if (result_has_failed(result))
-        // error_code = file's full_path that failed is from args ? major : minor
-        *error_code = FT_LS_APPLICATION_MAJOR_ERROR;
+    {
+        const char *failed_file = result_get_error_context(result);
+        if (parsed_arguments_is_file_operand(parsed_arguments, failed_file))
+        {
+            *error_code = FT_LS_APPLICATION_MAJOR_ERROR;
+        }
+        else
+        {
+            *error_code = FT_LS_APPLICATION_MINOR_ERROR;
+        }
+    }
 
     file_entry_array_sort(file_entry_array);
     render_directory(render_context, directory_path, file_entry_array);
