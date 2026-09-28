@@ -590,6 +590,24 @@ static void should_return_true_for_has_option_if_the_specified_option_was_parsed
     CU_ASSERT(verify_that_no_error_was_printed());
 }
 
+static void should_return_true_for_is_file_operand_if_the_specified_file_was_passed_as_an_operand(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("file"),
+        MOCK_DIR("directory", ".", ".."),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *args[] = { "file", "directory", NULL };
+    get_parsed_arguments_result(2, args);
+
+    CU_ASSERT_TRUE(parsed_arguments_is_file_operand(sut, "file"));
+    CU_ASSERT_TRUE(parsed_arguments_is_file_operand(sut, "directory"));
+    CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
+    CU_ASSERT(verify_that_no_error_was_printed());
+}
+
 static void should_be_created_correctly_even_if_current_directory_is_invalid_if_no_parameters_were_specified(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -835,6 +853,7 @@ void register_parsed_arguments_suite(void)
         CU_add_test(suite, "should_return_false_for_has_option_if_NULL_parsed_arguments_are_passed", should_return_false_for_has_option_if_NULL_parsed_arguments_are_passed);
         CU_add_test(suite, "should_return_false_for_has_option_if_the_specified_option_was_NOT_parsed", should_return_false_for_has_option_if_the_specified_option_was_NOT_parsed);
         CU_add_test(suite, "should_return_true_for_has_option_if_the_specified_option_was_parsed", should_return_true_for_has_option_if_the_specified_option_was_parsed);
+        CU_add_test(suite, "should_return_true_for_is_file_operand_if_the_specified_file_was_passed_as_an_operand", should_return_true_for_is_file_operand_if_the_specified_file_was_passed_as_an_operand);
         CU_add_test(suite, "should_be_created_correctly_even_if_current_directory_is_invalid_if_no_parameters_were_specified", should_be_created_correctly_even_if_current_directory_is_invalid_if_no_parameters_were_specified);
         CU_add_test(suite, "should_be_created_correctly_even_if_current_directory_is_invalid_and_was_specified", should_be_created_correctly_even_if_current_directory_is_invalid_and_was_specified);
         CU_add_test(suite, "should_be_created_correctly_even_if_the_specified_argument_cannot_be_accessed", should_be_created_correctly_even_if_the_specified_argument_cannot_be_accessed);

@@ -90,6 +90,13 @@ int parsed_arguments_is_option_active(const t_parsed_arguments *parsed_arguments
     return (parsed_arguments->options & option) != OPTIONS_NONE;
 }
 
+int parsed_arguments_is_file_operand(const t_parsed_arguments *parsed_arguments, const char *file)
+{
+    (void) parsed_arguments;
+    (void) file;
+    return 1;
+}
+
 int parsed_arguments_has_multiple_file_operands(const t_parsed_arguments *parsed_arguments)
 {
     if (parsed_arguments == NULL)
