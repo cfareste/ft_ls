@@ -590,6 +590,12 @@ static void should_return_true_for_has_option_if_the_specified_option_was_parsed
     CU_ASSERT(verify_that_no_error_was_printed());
 }
 
+static void should_return_false_for_is_file_operand_if_NULL_parsed_arguments_are_specified(void)
+{
+    CU_ASSERT_FALSE(parsed_arguments_is_file_operand(NULL, "file"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+}
+
 static void should_return_false_for_is_file_operand_if_the_specified_file_was_not_passed_as_an_operand(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -871,6 +877,7 @@ void register_parsed_arguments_suite(void)
         CU_add_test(suite, "should_return_false_for_has_option_if_NULL_parsed_arguments_are_passed", should_return_false_for_has_option_if_NULL_parsed_arguments_are_passed);
         CU_add_test(suite, "should_return_false_for_has_option_if_the_specified_option_was_NOT_parsed", should_return_false_for_has_option_if_the_specified_option_was_NOT_parsed);
         CU_add_test(suite, "should_return_true_for_has_option_if_the_specified_option_was_parsed", should_return_true_for_has_option_if_the_specified_option_was_parsed);
+        CU_add_test(suite, "should_return_false_for_is_file_operand_if_NULL_parsed_arguments_are_specified", should_return_false_for_is_file_operand_if_NULL_parsed_arguments_are_specified);
         CU_add_test(suite, "should_return_false_for_is_file_operand_if_the_specified_file_was_not_passed_as_an_operand", should_return_false_for_is_file_operand_if_the_specified_file_was_not_passed_as_an_operand);
         CU_add_test(suite, "should_return_true_for_is_file_operand_if_the_specified_file_was_passed_as_an_operand", should_return_true_for_is_file_operand_if_the_specified_file_was_passed_as_an_operand);
         CU_add_test(suite, "should_be_created_correctly_even_if_current_directory_is_invalid_if_no_parameters_were_specified", should_be_created_correctly_even_if_current_directory_is_invalid_if_no_parameters_were_specified);

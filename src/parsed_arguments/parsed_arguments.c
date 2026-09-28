@@ -92,6 +92,9 @@ int parsed_arguments_is_option_active(const t_parsed_arguments *parsed_arguments
 
 int parsed_arguments_is_file_operand(const t_parsed_arguments *parsed_arguments, const char *file)
 {
+    if (parsed_arguments == NULL)
+        return 0;
+
     for (unsigned int i = 0; parsed_arguments->file_operands[i] != NULL; i++)
     {
         if (ft_are_string_equals(parsed_arguments->file_operands[i], file))
