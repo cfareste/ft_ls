@@ -1,11 +1,8 @@
 TODO:
-1. Implementar LS-16 Support for -R option
-   - Implementar funcionalidad
-     - El major error solo será si el full path == file operand. Cualquier otro error será minor error
-2. Revisión rápida de que los cambios metidos estén testeados en el scope que toca
-3. Refactor del código espagueti (list_changes...)
-4. QA LS-16
-5. Asegurarse de que los cambios metidos y la implementación esté bien probada
+1. Revisión rápida de que los cambios metidos estén testeados en el scope que toca
+2. Refactor del código espagueti (list_changes...)
+3. QA LS-16
+4. Asegurarse de que los cambios metidos y la implementación esté bien probada
 
 
 TODO En algún momento:
