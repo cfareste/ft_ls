@@ -5,6 +5,7 @@
 
 #define SUITE_NAME "file_entry"
 #define DEFAULT_NAME "default"
+#define DEFAULT_TYPE FILE_TYPE_UNKNOWN
 
 static t_file_entry *entry_sut;
 static t_file_entry_array *array_sut;
@@ -30,7 +31,7 @@ static void should_create_file_entry_correctly(void)
 {
     CU_ASSERT_PTR_NOT_NULL(entry_sut);
     CU_ASSERT_STRING_EQUAL(file_entry_get_name(entry_sut), DEFAULT_NAME);
-    CU_ASSERT_EQUAL(file_entry_get_file_type(entry_sut), FILE_TYPE_UNKNOWN);
+    CU_ASSERT_EQUAL(file_entry_get_file_type(entry_sut), DEFAULT_TYPE);
 }
 
 static void should_create_file_entry_array_correctly(void)
