@@ -1,8 +1,7 @@
 TODO:
-1. Revisión rápida de que los cambios metidos estén testeados en el scope que toca
+1. QA LS-16
 2. Refactor del código espagueti (list_changes...)
-3. QA LS-16
-4. Asegurarse de que los cambios metidos y la implementación esté bien probada
+3. Asegurarse de que los cambios metidos y la implementación esté bien probada
 
 
 TODO En algún momento:
@@ -87,8 +86,7 @@ QA LS-14 Default sorting output (`ls file ... | cat`)
 
 
 QA LS-13 Support for multiple types of files (`ls block_dev symlink ... | cat`)
-- Disclaimer: Al listar contenido de un directorio, se escribe el nombre de los ficheros contenidos, incluso
-              si es un symlink (no del target)
+Note: Al listar contenido de un directorio, se escribe el nombre de los ficheros contenidos, incluso si es un symlink (no del target)
 1. Sin parámetros
 2. 1 parámetro
    - Archivo cualquiera
@@ -162,5 +160,46 @@ QA LS-51 Accessing current directory stats if it was not explicitly stated as an
    - Válido/s
    - Error/es
 No probado en E2E:
-   _ Sin parámetros con errores
+   - Sin parámetros con errores
    - Parámetro '.' explícito con errores
+
+
+QA LS-16 Recursive option (ls -R ... | cat)
+Note: Siempre debe estar presente la opción -R en este QA. Además, en esta historia se probará paralelamente el comportamiento
+con parámetros en general; las siguientes historias (-l, -a) no probarán exhaustivamente el comportamiento de la aplicación con
+parámetros y probarán directamente el comportamiento de ese parámetro (es decir, no se probará ls -l operand, ls operand -l ...)
+1. No fallos
+   - Sin parámetros (ls -R)
+   - 1 parámetro (nonDir y dir)
+       * -R y operand
+       * operand y -R
+   - X parámetros (mix nonDirs y dirs)
+       * -R y operands
+       * operands, -R, operands
+       * operands y -R
+2. Con fallos
+   - Solo minor
+       * Falla al hacer lstat del contenido de un directorio
+       * Falla al abrir un subdirectorio
+       * Falla al leer un subdirectorio
+       * Falla al cerrar un subdirectorio
+   - Solo major
+       * Falla al hacer stat de un operand
+       * Falla al abrir un dir operand
+       * Falla al leer un dir operand
+       * Falla al cerrar un dir operand
+   - Minor y major
+       * Minor y luego major - Falla primero al hacer lstat del contenido de un directorio u operar (abrir, leer, cerrar) un subdirectorio, y luego:
+           · Falla al abrir un directorio pasado como operand
+           · Falla al leer un directorio pasado como operand
+           · Falla al cerrar un directorio pasado como operand
+       * Major y luego minor
+           · Falla al hacer stat de un operand, y luego lstat del contenido de un directorio u operar en un subdirectorio
+           · Falla al abrir un dir operand, y luego lstat del contenido de un directorio u operar en un subdirectorio
+           · Falla al leer un dir operand, y luego lstat del contenido de un directorio u operar en un subdirectorio
+           · Falla al cerrar un dir operand, y luego lstat del contenido de un directorio u operar en un subdirectorio
+3. Casos especiales
+    - Directorios vacíos
+    - Múltiple recursión (a/b/c/file -> ls -R a)
+    - Symlinks a directorios no se siguen si no son operandos
+    - No se detiene la recursión por un minor error
