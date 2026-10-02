@@ -1060,15 +1060,19 @@ static void should_successfully_print_the_contents_of_the_specified_operands_rec
         MOCK_DIR("dir/subdir2/sbd_dir2", ".", "..", "char", "block"),
         MOCK_CHAR_DEVICE("dir/subdir2/sbd_dir2/char"),
         MOCK_BLOCK_DEVICE("dir/subdir2/sbd_dir2/block"),
+        MOCK_DIR("dir2/", ".", "..", "file", "subdirDir2"),
+        MOCK_FILE("dir2/file"),
+        MOCK_DIR("dir2/subdirDir2", ".", "..", "file2"),
+        MOCK_FILE("dir2/subdirDir2/file2"),
         MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
 
-    const char *arguments[] = { "nonDir", "nonDir2", "-R", "dir", NULL };
+    const char *arguments[] = { "nonDir", "dir2/", "nonDir2", "-R", "dir", NULL };
     const char *expected_file_names[] = { "file", "file2", "symlink", "sbd_file1", "block", "char" };
-    const char *expected_dir_headers[] = { "dir", "dir/subdir", "dir/subdir/sbd_dir1", "dir/subdir2", "dir/subdir2/sbd_dir2" };
-    const char *expected_subdirs[] = { "subdir", "subdir2", "sbd_dir1", "sbd_dir2" };
-    get_parsed_arguments_result(4, arguments);
+    const char *expected_dir_headers[] = { "dir", "dir/subdir", "dir/subdir/sbd_dir1", "dir/subdir2", "dir/subdir2/sbd_dir2", "dir2/", "dir2/subdirDir2" };
+    const char *expected_subdirs[] = { "subdir", "subdir2", "sbd_dir1", "sbd_dir2", "subdirDir2" };
+    get_parsed_arguments_result(5, arguments);
 
     const int result = application_run(parsed_arguments_result);
 
@@ -1082,9 +1086,13 @@ static void should_successfully_print_the_contents_of_the_specified_operands_rec
         "\n%s:\n"
         "%s\n"
         "\n%s:\n"
-        "%s\n%s\n",
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n",
         arguments[0],
-        arguments[1],
+        arguments[2],
         expected_dir_headers[0],
         expected_file_names[0],
         expected_file_names[1],
@@ -1099,7 +1107,12 @@ static void should_successfully_print_the_contents_of_the_specified_operands_rec
         expected_subdirs[3],
         expected_dir_headers[4],
         expected_file_names[4],
-        expected_file_names[5]
+        expected_file_names[5],
+        expected_dir_headers[5],
+        expected_file_names[0],
+        expected_subdirs[4],
+        expected_dir_headers[6],
+        expected_file_names[1]
     ));
     CU_ASSERT(verify_that_no_error_was_printed());
     CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
