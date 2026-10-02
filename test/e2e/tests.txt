@@ -51,3 +51,4 @@ nopermdir src src                                                               
 linklinkDir firstDir loop2 noTarget linkfile file linklinkFile linkdir loop1 linkfile/  ::       linklinkDir firstDir loop2 noTarget linkfile file linklinkFile linkdir loop1 linkfile/
 -R                                                                                      ::       -R
 Makefile -R                                                                             ::       Makefile -R
+-R src                                                                                  ::       -R src
