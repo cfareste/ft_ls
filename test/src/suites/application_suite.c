@@ -1662,6 +1662,62 @@ static void should_fail_with_a_minor_error_and_print_the_non_failing_files_if_fa
     CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MINOR_ERROR);
 }
 
+static void should_fail_with_a_minor_error_and_print_the_non_failing_files_if_fails_to_open_a_subdirectory(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("dir", ".", "..", "file", "subdir", "file2", "subdir2", "symlink"),
+        MOCK_FILE("dir/file"),
+        MOCK_FILE("dir/file2"),
+        MOCK_SYMLINK("dir/symlink", "dir/subdir"),
+        MOCK_DIR("subdir", ".", "..", "sbd_file1", "sbd_dir1"),
+        MOCK_DIR("subdir2", ".", "..", "sbd_dir2"),
+        MOCK_DIR("dir/subdir", ".", "..", "sbd_file1", "sbd_dir1"),
+        MOCK_DIR("dir/subdir2", ".", "..", "sbd_dir2"),
+        MOCK_FILE("dir/subdir/sbd_file1"),
+        MOCK_DIR_OPEN_ERROR(EACCES, "dir/subdir/sbd_dir1", ".", ".."),
+        MOCK_DIR("dir/subdir2/sbd_dir2", ".", "..", "char", "block"),
+        MOCK_CHAR_DEVICE("dir/subdir2/sbd_dir2/char"),
+        MOCK_BLOCK_DEVICE("dir/subdir2/sbd_dir2/block"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-R", "dir", NULL };
+    const char *expected_file_names[] = { "file", "file2", "symlink", "sbd_file1", "block", "char" };
+    const char *expected_dir_headers[] = { "dir", "dir/subdir", "dir/subdir2", "dir/subdir2/sbd_dir2" };
+    const char *expected_subdirs[] = { "subdir", "subdir2", "sbd_dir1", "sbd_dir2" };
+    get_parsed_arguments_result(2, arguments);
+
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "%s:\n"
+        "%s\n%s\n%s\n%s\n%s\n"
+        "\n%s:\n"
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n"
+        "\n%s:\n"
+        "%s\n%s\n",
+        expected_dir_headers[0],
+        expected_file_names[0],
+        expected_file_names[1],
+        expected_subdirs[0],
+        expected_subdirs[1],
+        expected_file_names[2],
+        expected_dir_headers[1],
+        expected_subdirs[2],
+        expected_file_names[3],
+        expected_dir_headers[2],
+        expected_subdirs[3],
+        expected_dir_headers[3],
+        expected_file_names[4],
+        expected_file_names[5]
+    ));
+    CU_ASSERT(verify_that_the_error_printed_is("ft_ls: cannot open directory '%s': %s\n", "dir/subdir/sbd_dir1", strerror(EACCES)));
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MINOR_ERROR);
+}
+
 void register_application_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, test_teardown);
@@ -1716,5 +1772,6 @@ void register_application_suite(void)
         CU_add_test(suite, "should_fail_with_a_major_error_and_print_only_the_working_operands_if_some_file_operands_fail_to_be_accessed", should_fail_with_a_major_error_and_print_only_the_working_operands_if_some_file_operands_fail_to_be_accessed);
         CU_add_test(suite, "should_fail_with_a_major_error_and_not_print_anything_if_fails_to_access_an_operand_and_process_a_directory", should_fail_with_a_major_error_and_not_print_anything_if_fails_to_access_an_operand_and_process_a_directory);
         CU_add_test(suite, "should_fail_with_a_minor_error_and_print_the_non_failing_files_if_fails_to_access_a_child_file_of_a_directory_operand", should_fail_with_a_minor_error_and_print_the_non_failing_files_if_fails_to_access_a_child_file_of_a_directory_operand);
+        CU_add_test(suite, "should_fail_with_a_minor_error_and_print_the_non_failing_files_if_fails_to_open_a_subdirectory", should_fail_with_a_minor_error_and_print_the_non_failing_files_if_fails_to_open_a_subdirectory);
     }
 }
