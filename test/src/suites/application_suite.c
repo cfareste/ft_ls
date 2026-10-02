@@ -967,6 +967,27 @@ static void should_successfully_print_the_contents_of_the_current_directory_recu
     CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
 }
 
+static void should_successfully_print_the_contents_of_the_specified_non_directory_even_with_recursive_option(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("file"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "file", "-R", NULL };
+    get_parsed_arguments_result(2, arguments);
+
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "%s\n",
+        arguments[0]
+    ));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
 static void should_successfully_print_the_contents_of_the_specified_directory_recursively(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -1661,6 +1682,7 @@ void register_application_suite(void)
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_directory_pointed_by_the_specified_symlink", should_successfully_print_the_contents_of_the_directory_pointed_by_the_specified_symlink);
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_symlinks_to_different_file_types", should_successfully_print_the_contents_of_the_symlinks_to_different_file_types);
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_current_directory_recursively", should_successfully_print_the_contents_of_the_current_directory_recursively);
+        CU_add_test(suite, "should_successfully_print_the_contents_of_the_specified_non_directory_even_with_recursive_option", should_successfully_print_the_contents_of_the_specified_non_directory_even_with_recursive_option);
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_specified_directory_recursively", should_successfully_print_the_contents_of_the_specified_directory_recursively);
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_specified_operands_recursively", should_successfully_print_the_contents_of_the_specified_operands_recursively);
         CU_add_test(suite, "should_fail_with_a_major_error_and_not_print_anything_if_fails_to_open_the_directory", should_fail_with_a_major_error_and_not_print_anything_if_fails_to_open_the_directory);
