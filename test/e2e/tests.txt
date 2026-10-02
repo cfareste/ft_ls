@@ -52,3 +52,4 @@ linklinkDir firstDir loop2 noTarget linkfile file linklinkFile linkdir loop1 lin
 -R                                                                                      ::       -R
 Makefile -R                                                                             ::       Makefile -R
 -R src                                                                                  ::       -R src
+Makefile -R .hidden src -R .                                                            ::       Makefile -R .hidden src -R .
