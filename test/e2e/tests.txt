@@ -55,3 +55,4 @@ Makefile -R                                                                     
 Makefile -R .hidden src -R .hiddir                                                      ::       Makefile -R .hidden src -R .hiddir
 . . -R                                                                                  ::       . . -R
 . nonExistent -R                                                                        ::       . nonExistent -R
+nonExistent . -R                                                                        ::       . nonExistent -R
