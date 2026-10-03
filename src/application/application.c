@@ -36,7 +36,8 @@ static void process_directory(const char *directory_path, const t_parsed_argumen
     {
         const char *failed_file = result_get_error_context(result);
         const int is_failed_file_an_operand = parsed_arguments_is_file_operand(parsed_arguments, failed_file);
-        *error_code = is_failed_file_an_operand ? FT_LS_APPLICATION_MAJOR_ERROR : FT_LS_APPLICATION_MINOR_ERROR ;
+        if (*error_code != FT_LS_APPLICATION_MAJOR_ERROR)
+            *error_code = is_failed_file_an_operand ? FT_LS_APPLICATION_MAJOR_ERROR : FT_LS_APPLICATION_MINOR_ERROR ;
     }
 
     file_entry_array_sort(file_entry_array);
