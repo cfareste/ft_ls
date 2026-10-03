@@ -2258,6 +2258,47 @@ static void should_fail_with_a_minor_error_and_print_the_non_failing_files_if_fa
     CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MINOR_ERROR);
 }
 
+static void should_fail_with_a_major_error_and_print_the_non_failing_files_if_fails_to_access_subdir_content_and_to_open_operand(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", ".", "..", "file", "subdir", "file2", "subdir2"),
+        MOCK_FILE("file"),
+        MOCK_FILE("file2"),
+        MOCK_DIR("subdir", ".", "..", "sbd_file1", "sbd_dir1"),
+        MOCK_FILE("subdir/sbd_file1"),
+        MOCK_DIR_ACCESS_ERROR(ENOTDIR, "subdir/sbd_dir1", ".", ".."),
+        MOCK_DIR_OPEN_ERROR(EACCES, "subdir2", ".", "..", "sbd_dir2"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-R", "file", "subdir", "file2", "subdir2", NULL };
+    const char *expected_non_dir_operands[] = { "file", "file2" };
+    const char *expected_dir_headers[] = { "subdir" };
+    const char *expected_subdir_content[] = { "sbd_dir1", "sbd_file1" };
+    get_parsed_arguments_result(5, arguments);
+
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n%s\n",
+        expected_non_dir_operands[0],
+        expected_non_dir_operands[1],
+        expected_dir_headers[0],
+        expected_subdir_content[0],
+        expected_subdir_content[1]
+    ));
+    CU_ASSERT(verify_that_the_error_printed_is(
+        "ft_ls: cannot access '%s': %s\n"
+        "ft_ls: cannot open directory '%s': %s\n",
+        "subdir/sbd_dir1", strerror(ENOTDIR),
+        "subdir2", strerror(EACCES)
+    ));
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MAJOR_ERROR);
+}
+
 void register_application_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, test_teardown);
@@ -2321,5 +2362,6 @@ void register_application_suite(void)
         CU_add_test(suite, "should_fail_with_a_minor_error_and_print_the_non_failing_files_if_fails_to_access_and_read_content_of_a_directory", should_fail_with_a_minor_error_and_print_the_non_failing_files_if_fails_to_access_and_read_content_of_a_directory);
         CU_add_test(suite, "should_fail_with_a_minor_error_and_print_the_non_failing_files_if_fails_to_access_and_close_content_of_a_directory", should_fail_with_a_minor_error_and_print_the_non_failing_files_if_fails_to_access_and_close_content_of_a_directory);
         CU_add_test(suite, "should_fail_with_a_minor_error_and_print_the_non_failing_files_if_fails_to_operate_multiple_subdirectories", should_fail_with_a_minor_error_and_print_the_non_failing_files_if_fails_to_operate_multiple_subdirectories);
+        CU_add_test(suite, "should_fail_with_a_major_error_and_print_the_non_failing_files_if_fails_to_access_subdir_content_and_to_open_operand", should_fail_with_a_major_error_and_print_the_non_failing_files_if_fails_to_access_subdir_content_and_to_open_operand);
     }
 }
