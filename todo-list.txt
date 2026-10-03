@@ -1,7 +1,6 @@
 TODO:
-1. QA LS-16
-2. Refactor del código espagueti (list_changes...)
-3. Asegurarse de que los cambios metidos y la implementación esté bien probada
+1. Refactor del código espagueti (list_changes...)
+2. Asegurarse de que los cambios metidos y la implementación estén bien probados
 
 
 TODO En algún momento:
@@ -178,28 +177,44 @@ parámetros y probarán directamente el comportamiento de ese parámetro (es dec
        * operands, -R, operands
        * operands y -R
 2. Con fallos
-   - Solo minor
+   - 1 fallo, solo minor
        * Falla al hacer lstat del contenido de un directorio
        * Falla al abrir un subdirectorio
        * Falla al leer un subdirectorio
        * Falla al cerrar un subdirectorio
-   - Solo major
+   - 1 fallo, solo major
        * Falla al hacer stat de un operand
        * Falla al abrir un dir operand
        * Falla al leer un dir operand
        * Falla al cerrar un dir operand
-   - Minor y major
-       * Minor y luego major - Falla primero al hacer lstat del contenido de un directorio u operar (abrir, leer, cerrar) un subdirectorio, y luego:
+   - X fallos, solo minors
+       * lstat + lstat mismo dir
+       * lstat + lstat diferente dir
+       * lstat + directorio open (diferente dir)
+       * lstat + directorio read / close (mismo dir)
+       * directorio + directorio
+   - X fallos, solo majors
+       * stat + stat
+       * stat + directorio
+       * directorio + directorio
+   - X fallos, minor y major
+       * Minor y luego major
+         Falla primero al hacer lstat del contenido de un directorio u operar (abrir, leer, cerrar) un subdirectorio, y luego:
            · Falla al abrir un directorio pasado como operand
            · Falla al leer un directorio pasado como operand
            · Falla al cerrar un directorio pasado como operand
        * Major y luego minor
-           · Falla al hacer stat de un operand, y luego lstat del contenido de un directorio u operar en un subdirectorio
-           · Falla al abrir un dir operand, y luego lstat del contenido de un directorio u operar en un subdirectorio
-           · Falla al leer un dir operand, y luego lstat del contenido de un directorio u operar en un subdirectorio
-           · Falla al cerrar un dir operand, y luego lstat del contenido de un directorio u operar en un subdirectorio
+           · Falla al hacer stat de un operand
+           · Falla al abrir un dir operand
+           · Falla al leer un dir operand
+           · Falla al cerrar un dir operand
+         Luego lstat del contenido de un directorio u operar en un subdirectorio
 3. Casos especiales
     - Directorios vacíos
     - Múltiple recursión (a/b/c/file -> ls -R a)
     - Symlinks a directorios no se siguen si no son operandos
+    - Symlinks a directorios se siguen si son operandos
     - No se detiene la recursión por un minor error
+No probado en E2E:
+    - lstat minor error (probar con ENAMETOOLONG)
+    - readdir o closedir major/minor error
