@@ -33,6 +33,7 @@ t_result *scan(const char *path)
             t_file_stats *entry_stats = file_stats_get_without_following_symlinks(full_path);
             if (entry_stats == NULL)
             {
+                free(failed_file);
                 failed_file = ft_safe_strdup(full_path);
             }
             else
