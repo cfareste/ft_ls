@@ -2348,6 +2348,61 @@ static void should_fail_with_a_major_error_and_print_the_non_failing_files_if_fa
     CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MAJOR_ERROR);
 }
 
+static void should_fail_with_a_major_error_and_print_the_non_failing_files_if_fails_to_open_subdir_content_and_close_operand(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", ".", "..", "file", "subdir", "file2", "subdir2"),
+        MOCK_FILE("file"),
+        MOCK_FILE("file2"),
+        MOCK_DIR("subdir", ".", "..", "sbd_file1", "sbd_dir1"),
+        MOCK_FILE("subdir/sbd_file1"),
+        MOCK_DIR_OPEN_ERROR(EACCES, "subdir/sbd_dir1", ".", ".."),
+        MOCK_DIR_CLOSE_ERROR("subdir2", ".", "..", "sbd_dir2", "sbd_file2"),
+        MOCK_DIR("subdir2/sbd_dir2", ".", "..", "symlink"),
+        MOCK_SYMLINK("subdir2/sbd_dir2/symlink", "subdir"),
+        MOCK_FILE("subdir2/sbd_file2"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-R", "file", "subdir", "file2", "subdir2", NULL };
+    const char *expected_non_dir_operands[] = { "file", "file2" };
+    const char *expected_dir_headers[] = { "subdir", "subdir2", "subdir2/sbd_dir2" };
+    const char *expected_subdir_content[] = { "sbd_dir1", "sbd_file1" };
+    const char *expected_subdir2_content[] = { "sbd_dir2", "sbd_file2" };
+    const char *expected_sbd_dir2_content[] = { "symlink" };
+    get_parsed_arguments_result(5, arguments);
+
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n",
+        expected_non_dir_operands[0],
+        expected_non_dir_operands[1],
+        expected_dir_headers[0],
+        expected_subdir_content[0],
+        expected_subdir_content[1],
+        expected_dir_headers[1],
+        expected_subdir2_content[0],
+        expected_subdir2_content[1],
+        expected_dir_headers[2],
+        expected_sbd_dir2_content[0]
+    ));
+    CU_ASSERT(verify_that_the_error_printed_is(
+        "ft_ls: cannot open directory '%s': %s\n"
+        "ft_ls: closing directory '%s': %s\n",
+        "subdir/sbd_dir1", strerror(EACCES),
+        "subdir2", strerror(EBADF)
+    ));
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MAJOR_ERROR);
+}
+
 void register_application_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, test_teardown);
@@ -2413,5 +2468,6 @@ void register_application_suite(void)
         CU_add_test(suite, "should_fail_with_a_minor_error_and_print_the_non_failing_files_if_fails_to_operate_multiple_subdirectories", should_fail_with_a_minor_error_and_print_the_non_failing_files_if_fails_to_operate_multiple_subdirectories);
         CU_add_test(suite, "should_fail_with_a_major_error_and_print_the_non_failing_files_if_fails_to_access_subdir_content_and_to_open_directory_operand", should_fail_with_a_major_error_and_print_the_non_failing_files_if_fails_to_access_subdir_content_and_to_open_directory_operand);
         CU_add_test(suite, "should_fail_with_a_major_error_and_print_the_non_failing_files_if_fails_to_read_subdir_content_and_directory_operand", should_fail_with_a_major_error_and_print_the_non_failing_files_if_fails_to_read_subdir_content_and_directory_operand);
+        CU_add_test(suite, "should_fail_with_a_major_error_and_print_the_non_failing_files_if_fails_to_open_subdir_content_and_close_operand", should_fail_with_a_major_error_and_print_the_non_failing_files_if_fails_to_open_subdir_content_and_close_operand);
     }
 }
