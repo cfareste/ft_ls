@@ -2413,7 +2413,7 @@ static void should_fail_with_a_major_error_and_print_the_non_failing_files_if_fa
         MOCK_DIR("subdir2", ".", "..", "sbd_dir2", "sbd_file2"),
         MOCK_DIR("subdir2/sbd_dir2", ".", "..", "symlink"),
         MOCK_SYMLINK("subdir2/sbd_dir2/symlink", "subdir"),
-        MOCK_FILE_ACCESS_ERROR(ENOTDIR, "subdir2/sbd_file2"),
+        MOCK_DIR_OPEN_ERROR(EACCES, "subdir2/sbd_file2", ".", ".."),
         MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
@@ -2443,9 +2443,9 @@ static void should_fail_with_a_major_error_and_print_the_non_failing_files_if_fa
     ));
     CU_ASSERT(verify_that_the_error_printed_is(
         "ft_ls: cannot access '%s': %s\n"
-        "ft_ls: cannot access '%s': %s\n",
+        "ft_ls: cannot open directory '%s': %s\n",
         "subdir", strerror(ENOTDIR),
-        "subdir2/sbd_file2", strerror(ENOTDIR)
+        "subdir2/sbd_file2", strerror(EACCES)
     ));
     CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MAJOR_ERROR);
 }
