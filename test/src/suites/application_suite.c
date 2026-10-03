@@ -1860,6 +1860,71 @@ static void should_fail_with_a_minor_error_and_print_the_non_failing_files_if_fa
     CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MINOR_ERROR);
 }
 
+static void should_fail_with_a_minor_error_and_print_the_non_failing_files_if_fails_to_access_content_of_different_directories(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", ".", "..", "file", "subdir", "file2", "subdir2"),
+        MOCK_FILE("file"),
+        MOCK_FILE("file2"),
+        MOCK_DIR("subdir", ".", "..", "sbd_file1", "sbd_dir1"),
+        MOCK_DIR("subdir2", ".", "..", "sbd_dir2"),
+        MOCK_FILE("subdir/sbd_file1"),
+        MOCK_DIR("subdir/sbd_dir1", ".", "..", "sbdFile1", "sbdDir1", "sbdFile2", "sbdDir2"),
+        MOCK_FILE("subdir/sbd_dir1/sbdFile1"),
+        MOCK_DIR_ACCESS_ERROR(ENOTDIR, "subdir/sbd_dir1/sbdDir1", ".", "..", "sock", "fifo"),
+        MOCK_FILE("subdir/sbd_dir1/sbdDir1/sock"),
+        MOCK_FILE("subdir/sbd_dir1/sbdDir1/fifo"),
+        MOCK_FILE("subdir/sbd_dir1/sbdFile2"),
+        MOCK_DIR("subdir/sbd_dir1/sbdDir2", ".", ".."),
+        MOCK_DIR_ACCESS_ERROR(ENAMETOOLONG, "subdir2/sbd_dir2", ".", "..", "char", "block"),
+        MOCK_CHAR_DEVICE("subdir2/sbd_dir2/char"),
+        MOCK_BLOCK_DEVICE("subdir2/sbd_dir2/block"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-R", "file", "subdir", "file2", "subdir2", NULL };
+    const char *expected_non_dir_operands[] = { "file", "file2" };
+    const char *expected_dir_headers[] = { "subdir", "subdir/sbd_dir1", "subdir/sbd_dir1/sbdDir2", "subdir2" };
+    const char *expected_subdir_content[] = { "sbd_dir1", "sbd_file1" };
+    const char *expected_subdir2_content[] = { "sbd_dir2" };
+    const char *expected_sbdDir1_content[] = { "sbdDir1", "sbdDir2", "sbdFile1", "sbdFile2" };
+    get_parsed_arguments_result(5, arguments);
+
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n%s\n%s\n%s\n"
+        "\n%s:\n"
+        "\n%s:\n"
+        "%s\n",
+        expected_non_dir_operands[0],
+        expected_non_dir_operands[1],
+        expected_dir_headers[0],
+        expected_subdir_content[0],
+        expected_subdir_content[1],
+        expected_dir_headers[1],
+        expected_sbdDir1_content[0],
+        expected_sbdDir1_content[1],
+        expected_sbdDir1_content[2],
+        expected_sbdDir1_content[3],
+        expected_dir_headers[2],
+        expected_dir_headers[3],
+        expected_subdir2_content[0]
+    ));
+    CU_ASSERT(verify_that_the_error_printed_is(
+        "ft_ls: cannot access '%s': %s\n"
+        "ft_ls: cannot access '%s': %s\n",
+        "subdir/sbd_dir1/sbdDir1", strerror(ENOTDIR),
+        "subdir2/sbd_dir2", strerror(ENAMETOOLONG)
+    ));
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MINOR_ERROR);
+}
+
 void register_application_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, test_teardown);
@@ -1917,5 +1982,6 @@ void register_application_suite(void)
         CU_add_test(suite, "should_fail_with_a_minor_error_and_print_the_non_failing_files_if_fails_to_open_a_subdirectory", should_fail_with_a_minor_error_and_print_the_non_failing_files_if_fails_to_open_a_subdirectory);
         CU_add_test(suite, "should_fail_with_a_minor_error_and_print_the_non_failing_files_if_fails_to_read_a_subdirectory", should_fail_with_a_minor_error_and_print_the_non_failing_files_if_fails_to_read_a_subdirectory);
         CU_add_test(suite, "should_fail_with_a_minor_error_and_print_the_non_failing_files_if_fails_to_close_a_subdirectory", should_fail_with_a_minor_error_and_print_the_non_failing_files_if_fails_to_close_a_subdirectory);
+        CU_add_test(suite, "should_fail_with_a_minor_error_and_print_the_non_failing_files_if_fails_to_access_content_of_different_directories", should_fail_with_a_minor_error_and_print_the_non_failing_files_if_fails_to_access_content_of_different_directories);
     }
 }
