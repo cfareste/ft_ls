@@ -1064,15 +1064,21 @@ static void should_successfully_print_the_contents_of_the_specified_operands_rec
         MOCK_FILE("dir2/file"),
         MOCK_DIR("dir2/subdirDir2", ".", "..", "file2"),
         MOCK_FILE("dir2/subdirDir2/file2"),
+        MOCK_SYMLINK("symlink", "dir2/"),
+        MOCK_FILE("symlink/file"),
+        MOCK_DIR("symlink/subdirDir2", ".", "..", "file2"),
+        MOCK_FILE("symlink/subdirDir2/file2"),
         MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
 
-    const char *arguments[] = { "nonDir", "dir2/", "nonDir2", "-R", "dir", NULL };
+    const char *arguments[] = { "nonDir", "dir2/", "nonDir2", "-R", "dir", "symlink", NULL };
     const char *expected_file_names[] = { "file", "file2", "symlink", "sbd_file1", "block", "char" };
     const char *expected_dir_headers[] = { "dir", "dir/subdir", "dir/subdir/sbd_dir1", "dir/subdir2", "dir/subdir2/sbd_dir2", "dir2/", "dir2/subdirDir2" };
+    const char *expected_symlink_headers[] = { "symlink", "symlink/subdirDir2" };
     const char *expected_subdirs[] = { "subdir", "subdir2", "sbd_dir1", "sbd_dir2", "subdirDir2" };
-    get_parsed_arguments_result(5, arguments);
+    const char *expected_symlink_subdirs[] = { "subdirDir2" };
+    get_parsed_arguments_result(6, arguments);
 
     const int result = application_run(parsed_arguments_result);
 
@@ -1087,6 +1093,10 @@ static void should_successfully_print_the_contents_of_the_specified_operands_rec
         "%s\n"
         "\n%s:\n"
         "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n"
         "\n%s:\n"
         "%s\n%s\n"
         "\n%s:\n"
@@ -1112,6 +1122,11 @@ static void should_successfully_print_the_contents_of_the_specified_operands_rec
         expected_file_names[0],
         expected_subdirs[4],
         expected_dir_headers[6],
+        expected_file_names[1],
+        expected_symlink_headers[0],
+        expected_file_names[0],
+        expected_symlink_subdirs[0],
+        expected_symlink_headers[1],
         expected_file_names[1]
     ));
     CU_ASSERT(verify_that_no_error_was_printed());
