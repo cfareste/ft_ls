@@ -507,6 +507,22 @@ static void should_parse_the_recursive_option(void)
     CU_ASSERT(verify_that_no_error_was_printed());
 }
 
+static void should_parse_the_long_format_option(void)
+{
+    const char *arguments[] = { "-l", NULL };
+
+    get_parsed_arguments_result(1, arguments);
+    const char * const *non_directory_file_operands = parsed_arguments_get_non_directory_file_operands(sut);
+    const char * const *directory_file_operands = parsed_arguments_get_directory_file_operands(sut);
+
+    CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
+    CU_ASSERT_TRUE(parsed_arguments_is_option_active(sut, OPTIONS_LONG_FORMAT));
+    CU_ASSERT_PTR_NULL(non_directory_file_operands[0]);
+    CU_ASSERT_STRING_EQUAL(directory_file_operands[0], ".");
+    CU_ASSERT_PTR_NULL(directory_file_operands[1]);
+    CU_ASSERT(verify_that_no_error_was_printed());
+}
+
 static void should_return_false_for_has_any_option_if_NULL_parsed_arguments_are_passed(void)
 {
     const int has_any_option = parsed_arguments_has_any_option_active(NULL);
@@ -888,6 +904,7 @@ void register_parsed_arguments_suite(void)
         CU_add_test(suite, "should_parse_the_option_and_file_operands_if_the_option_was_a_middle_specified_argument", should_parse_the_option_and_file_operands_if_the_option_was_a_middle_specified_argument);
         CU_add_test(suite, "should_parse_the_option_and_file_operands_if_the_option_was_the_last_specified_argument", should_parse_the_option_and_file_operands_if_the_option_was_the_last_specified_argument);
         CU_add_test(suite, "should_parse_the_recursive_option", should_parse_the_recursive_option);
+        CU_add_test(suite, "should_parse_the_long_format_option", should_parse_the_long_format_option);
         CU_add_test(suite, "should_return_false_for_has_any_option_if_NULL_parsed_arguments_are_passed", should_return_false_for_has_any_option_if_NULL_parsed_arguments_are_passed);
         CU_add_test(suite, "should_return_false_for_has_any_option_if_at_no_option_was_specified", should_return_false_for_has_any_option_if_at_no_option_was_specified);
         CU_add_test(suite, "should_return_true_for_has_any_option_if_at_least_one_option_was_specified", should_return_true_for_has_any_option_if_at_least_one_option_was_specified);

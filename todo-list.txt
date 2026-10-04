@@ -1,10 +1,10 @@
 TODO:
+1. Implementar opción -l
+2. Refactor renderer, donde render llama a render_strategy o lo que sea basado en options
 
 
 TODO En algún momento:
 - Investigar si los tests están acoplados a la implementación interna de las cosas
-- Refactor renderer, donde render llama a render_strategy o lo que sea basado en options
-- Para manejar errores de cualquier tipo, mirar la conversación de: https://chatgpt.com/c/6a711028-5c44-83eb-a7a4-e50ff2877990
 - Refactor file stats "file_stats_is_file_type()"
 
 
