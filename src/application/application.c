@@ -36,23 +36,36 @@ static void process_non_directory_file_operands(const t_parsed_arguments *parsed
     }
 }
 
-static void record_directory_error(t_application_context *context, const t_result *result)
+// Rename
+static void record_directory_error(t_application_context *context, const t_ft_ls_error_code error_code)
 {
-    if (!result_has_failed(result))
-        return;
+    if (context->error_code == FT_LS_APPLICATION_MAJOR_ERROR)
+        return ;
 
-    const char *failed_file = result_get_error_context(result);
-    if (parsed_arguments_is_file_operand(context->parsed_arguments, failed_file))
-        context->error_code = FT_LS_APPLICATION_MAJOR_ERROR;
-    else if (context->error_code == FT_LS_APPLICATION_SUCCESS)
-        context->error_code = FT_LS_APPLICATION_MINOR_ERROR;
+    if ((context->error_code == FT_LS_APPLICATION_MINOR_ERROR && error_code != FT_LS_APPLICATION_SUCCESS)
+        || context->error_code == FT_LS_APPLICATION_SUCCESS)
+        context->error_code = error_code;
 }
 
+static t_ft_ls_error_code get_scan_error(const t_application_context *context, const t_result *scan_result)
+{
+    if (result_has_succeed(scan_result))
+        return FT_LS_APPLICATION_SUCCESS;
+
+    const char *failed_file = result_get_error_context(scan_result);
+    if (parsed_arguments_is_file_operand(context->parsed_arguments, failed_file))
+        return FT_LS_APPLICATION_MAJOR_ERROR;
+
+    return FT_LS_APPLICATION_MINOR_ERROR;
+}
+
+// Rename get directory content
 static t_file_entry_array *get_file_entry_array(t_application_context *context, const char *directory_path)
 {
     t_result *result = scan(directory_path);
+    const t_ft_ls_error_code scan_error = get_scan_error(context, result);
 
-    record_directory_error(context, result);
+    record_directory_error(context, scan_error);
     t_file_entry_array *file_entry_array = result_get_value(result);
     file_entry_array_sort(file_entry_array);
 
