@@ -56,10 +56,10 @@ static int scan_directory_entries(t_scan_context *context, t_file_entry_array *f
 
 static t_result *create_scan_result(const t_scan_context *context, t_file_entry_array *file_entry_array)
 {
-    if (context->failed_file != NULL)
-        return result_create_failed(file_entry_array, context->failed_file);
     if (context->read_failed || context->close_failed)
         return result_create_failed(file_entry_array, context->directory_path);
+    if (context->failed_file != NULL)
+        return result_create_failed(file_entry_array, context->failed_file);
 
     return result_create_successful(file_entry_array);
 }
