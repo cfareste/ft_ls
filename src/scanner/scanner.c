@@ -14,26 +14,27 @@ typedef struct s_scan_context
     int close_failed;
 } t_scan_context;
 
-static char *push_entry(const t_scan_context *context, const t_dir_entry *dir_entry, t_file_entry_array *file_entry_array)
+static void push_entry(t_scan_context *context, const t_dir_entry *dir_entry, t_file_entry_array *file_entry_array)
 {
     if (directory_is_entry_hidden_file(dir_entry))
-        return NULL;
+        return ;
 
     const char *entry_name = directory_get_entry_name(dir_entry);
     char *full_path = build_path(context->directory_path, entry_name);
     t_file_entry *entry = file_entry_create(entry_name);
     t_file_stats *entry_stats = file_stats_get_without_following_symlinks(full_path);
-    char *failed_file = NULL;
 
     if (entry_stats == NULL)
-        failed_file = ft_safe_strdup(full_path);
-    else
-        file_entry_set_file_type(entry, file_stats_get_file_type(entry_stats));
+    {
+        free(context->failed_file);
+        context->failed_file = ft_safe_strdup(full_path);
+    }
+
+    file_entry_set_file_type(entry, file_stats_get_file_type(entry_stats));
 
     free(full_path);
     file_stats_destroy(&entry_stats);
     file_entry_array_push(file_entry_array, entry);
-    return failed_file;
 }
 
 static int scan_directory_entries(t_scan_context *context, t_file_entry_array *file_entry_array)
@@ -42,13 +43,7 @@ static int scan_directory_entries(t_scan_context *context, t_file_entry_array *f
 
     while (!directory_is_entry_empty(dir_entry))
     {
-        char *entry_error = push_entry(context, dir_entry, file_entry_array);
-
-        if (entry_error != NULL)
-        {
-            free(context->failed_file);
-            context->failed_file = entry_error;
-        }
+        push_entry(context, dir_entry, file_entry_array);
 
         directory_destroy_entry(&dir_entry);
         dir_entry = directory_get_next_entry(context->dir_stream);
