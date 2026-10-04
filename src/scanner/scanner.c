@@ -72,9 +72,10 @@ t_result *scan(const char *path)
     if (!ft_is_valid_path(path))
         return result_create_failed(NULL, NULL);
 
-    t_scan_context context = {0};
-    context.directory_path = path;
-    context.dir_stream = directory_open(path);
+    t_scan_context context = {
+        .directory_path = path,
+        .dir_stream = directory_open(path),
+    };
     if (context.dir_stream == NULL)
         return result_create_failed(NULL, path);
 
