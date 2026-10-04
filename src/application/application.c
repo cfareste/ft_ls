@@ -48,13 +48,14 @@ static void record_directory_error(t_application_context *context, const t_resul
         context->error_code = FT_LS_APPLICATION_MINOR_ERROR;
 }
 
-static t_file_entry_array *scan_directory(t_application_context *context, const char *directory_path)
+static t_file_entry_array *get_file_entry_array(t_application_context *context, const char *directory_path)
 {
     t_result *result = scan(directory_path);
-    record_directory_error(context, result);
 
+    record_directory_error(context, result);
     t_file_entry_array *file_entry_array = result_get_value(result);
     file_entry_array_sort(file_entry_array);
+
     result_destroy(&result);
     return file_entry_array;
 }
@@ -76,9 +77,9 @@ static void process_subdirectories(t_application_context *context, const char *d
 
 static void process_directory(t_application_context *context, const char *directory_path)
 {
-    t_file_entry_array *file_entry_array = scan_directory(context, directory_path);
-    render_directory(context->render_context, directory_path, file_entry_array);
+    t_file_entry_array *file_entry_array = get_file_entry_array(context, directory_path);
 
+    render_directory(context->render_context, directory_path, file_entry_array);
     if (parsed_arguments_is_option_active(context->parsed_arguments, OPTIONS_RECURSIVE))
         process_subdirectories(context, directory_path, file_entry_array);
 
