@@ -1,6 +1,4 @@
 TODO:
-1. Refactor del código espagueti (list_changes...)
-2. Asegurarse de que los cambios metidos y la implementación estén bien probados
 
 
 TODO En algún momento:
@@ -198,7 +196,7 @@ parámetros y probarán directamente el comportamiento de ese parámetro (es dec
        * stat + directorio
        * directorio + directorio
    - X fallos, minor y major
-       * Minor y luego major
+       * Minor y luego major (mismo dir / diferente dir)
          Falla primero al hacer lstat del contenido de un directorio u operar (abrir, leer, cerrar) un subdirectorio, y luego:
            · Falla al abrir un directorio pasado como operand
            · Falla al leer un directorio pasado como operand
