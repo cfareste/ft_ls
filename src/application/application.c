@@ -49,9 +49,10 @@ static t_ft_ls_error_code get_scan_error(const t_application_context *context, c
     if (result_has_succeed(scan_result))
         return FT_LS_APPLICATION_SUCCESS;
 
-    return parsed_arguments_is_file_operand(context->parsed_arguments, result_get_error_context(scan_result))
-           ? FT_LS_APPLICATION_MAJOR_ERROR
-           : FT_LS_APPLICATION_MINOR_ERROR;
+    const char *failed_file = result_get_error_context(scan_result);
+    const int is_file_operand = parsed_arguments_is_file_operand(context->parsed_arguments, failed_file);
+
+    return is_file_operand ? FT_LS_APPLICATION_MAJOR_ERROR : FT_LS_APPLICATION_MINOR_ERROR;
 }
 
 static t_file_entry_array *get_directory_content(t_application_context *context, const char *directory_path)
