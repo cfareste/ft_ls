@@ -55,19 +55,6 @@ static t_ft_ls_error_code get_scan_error(const t_application_context *context, c
     return is_file_operand ? FT_LS_APPLICATION_MAJOR_ERROR : FT_LS_APPLICATION_MINOR_ERROR;
 }
 
-static t_file_entry_array *get_directory_content(t_application_context *context, const char *directory_path)
-{
-    t_result *scan_result = scan(directory_path);
-    const t_ft_ls_error_code scan_error = get_scan_error(context, scan_result);
-
-    update_error_code(context, scan_error);
-    t_file_entry_array *file_entry_array = result_get_value(scan_result);
-    file_entry_array_sort(file_entry_array);
-
-    result_destroy(&scan_result);
-    return file_entry_array;
-}
-
 static void process_subdirectories(t_application_context *context, const char *directory_path, const t_file_entry_array *file_entry_array)
 {
     const unsigned int entries_amount = file_entry_array_get_length(file_entry_array);
@@ -85,13 +72,19 @@ static void process_subdirectories(t_application_context *context, const char *d
 
 static void process_directory(t_application_context *context, const char *directory_path)
 {
-    t_file_entry_array *file_entry_array = get_directory_content(context, directory_path);
+    t_result *scan_result = scan(directory_path);
+    const t_ft_ls_error_code scan_error = get_scan_error(context, scan_result);
+    t_file_entry_array *file_entry_array = result_get_value(scan_result);
 
+    update_error_code(context, scan_error);
+    file_entry_array_sort(file_entry_array);
     render_directory(context->render_context, directory_path, file_entry_array);
+
     if (parsed_arguments_is_option_active(context->parsed_arguments, OPTIONS_RECURSIVE))
         process_subdirectories(context, directory_path, file_entry_array);
 
     file_entry_array_destroy(&file_entry_array);
+    result_destroy(&scan_result);
 }
 
 static void process_directory_file_operands(t_application_context *context)
