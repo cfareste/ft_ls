@@ -7,6 +7,9 @@
 
 static char *scan_entry(const char *path, const t_dir_entry *dir_entry, t_file_entry_array *file_entry_array)
 {
+    if (directory_is_entry_hidden_file(dir_entry))
+        return NULL;
+
     const char *entry_name = directory_get_entry_name(dir_entry);
     char *full_path = build_path(path, entry_name);
     t_file_entry *entry = file_entry_create(entry_name);
@@ -31,15 +34,12 @@ static int scan_directory_entries(const char *path, const t_dir_stream *dir_stre
 
     while (!directory_is_entry_empty(dir_entry))
     {
-        if (!directory_is_entry_hidden_file(dir_entry))
-        {
-            char *entry_error = scan_entry(path, dir_entry, file_entry_array);
+        char *entry_error = scan_entry(path, dir_entry, file_entry_array);
 
-            if (entry_error != NULL)
-            {
-                free(*failed_file);
-                *failed_file = entry_error;
-            }
+        if (entry_error != NULL)
+        {
+            free(*failed_file);
+            *failed_file = entry_error;
         }
 
         directory_destroy_entry(&dir_entry);
