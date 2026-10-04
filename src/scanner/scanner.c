@@ -9,11 +9,10 @@ typedef struct s_scan_context
 {
     const char *directory_path;
     t_dir_stream *dir_stream;
-    t_file_entry_array *file_entry_array;
     char *failed_file;
 } t_scan_context;
 
-static char *push_entry(const t_scan_context *context, const t_dir_entry *dir_entry)
+static char *push_entry(const t_scan_context *context, const t_dir_entry *dir_entry, t_file_entry_array *file_entry_array)
 {
     if (directory_is_entry_hidden_file(dir_entry))
         return NULL;
@@ -31,17 +30,17 @@ static char *push_entry(const t_scan_context *context, const t_dir_entry *dir_en
 
     free(full_path);
     file_stats_destroy(&entry_stats);
-    file_entry_array_push(context->file_entry_array, entry);
+    file_entry_array_push(file_entry_array, entry);
     return failed_file;
 }
 
-static int scan_directory_entries(t_scan_context *context)
+static int scan_directory_entries(t_scan_context *context, t_file_entry_array *file_entry_array)
 {
     t_dir_entry *dir_entry = directory_get_next_entry(context->dir_stream);
 
     while (!directory_is_entry_empty(dir_entry))
     {
-        char *entry_error = push_entry(context, dir_entry);
+        char *entry_error = push_entry(context, dir_entry, file_entry_array);
 
         if (entry_error != NULL)
         {
@@ -58,13 +57,13 @@ static int scan_directory_entries(t_scan_context *context)
     return read_failed;
 }
 
-static t_result *create_scan_result(const t_scan_context *context, const int directory_operation_failed)
+static t_result *create_scan_result(const t_scan_context *context, t_file_entry_array *file_entry_array, const int directory_operation_failed)
 {
     if (context->failed_file != NULL)
-        return result_create_failed(context->file_entry_array, context->failed_file);
+        return result_create_failed(file_entry_array, context->failed_file);
     if (directory_operation_failed)
-        return result_create_failed(context->file_entry_array, context->directory_path);
-    return result_create_successful(context->file_entry_array);
+        return result_create_failed(file_entry_array, context->directory_path);
+    return result_create_successful(file_entry_array);
 }
 
 t_result *scan(const char *path)
@@ -74,17 +73,17 @@ t_result *scan(const char *path)
 
     t_scan_context context = {
         .directory_path = path,
-        .dir_stream = directory_open(path),
+        .dir_stream = directory_open(path)
     };
     if (context.dir_stream == NULL)
         return result_create_failed(NULL, path);
 
-    context.file_entry_array = file_entry_array_create();
-    const int read_failed = scan_directory_entries(&context);
+    t_file_entry_array *file_entry_array = file_entry_array_create();
+    const int read_failed = scan_directory_entries(&context, file_entry_array);
     const int close_failed = directory_close(&context.dir_stream) == -1;
 
     const int directory_operation_failed = read_failed || close_failed;
-    t_result *result = create_scan_result(&context, directory_operation_failed);
+    t_result *result = create_scan_result(&context, file_entry_array, directory_operation_failed);
     free(context.failed_file);
 
     return result;
