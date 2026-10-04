@@ -37,7 +37,7 @@ static void process_non_directory_file_operands(const t_parsed_arguments *parsed
 }
 
 // Rename
-static void record_directory_error(t_application_context *context, const t_ft_ls_error_code error_code)
+static void update_error_code(t_application_context *context, const t_ft_ls_error_code error_code)
 {
     if (context->error_code == FT_LS_APPLICATION_MAJOR_ERROR)
         return ;
@@ -60,12 +60,12 @@ static t_ft_ls_error_code get_scan_error(const t_application_context *context, c
 }
 
 // Rename get directory content
-static t_file_entry_array *get_file_entry_array(t_application_context *context, const char *directory_path)
+static t_file_entry_array *get_directory_content(t_application_context *context, const char *directory_path)
 {
     t_result *result = scan(directory_path);
     const t_ft_ls_error_code scan_error = get_scan_error(context, result);
 
-    record_directory_error(context, scan_error);
+    update_error_code(context, scan_error);
     t_file_entry_array *file_entry_array = result_get_value(result);
     file_entry_array_sort(file_entry_array);
 
@@ -90,7 +90,7 @@ static void process_subdirectories(t_application_context *context, const char *d
 
 static void process_directory(t_application_context *context, const char *directory_path)
 {
-    t_file_entry_array *file_entry_array = get_file_entry_array(context, directory_path);
+    t_file_entry_array *file_entry_array = get_directory_content(context, directory_path);
 
     render_directory(context->render_context, directory_path, file_entry_array);
     if (parsed_arguments_is_option_active(context->parsed_arguments, OPTIONS_RECURSIVE))
