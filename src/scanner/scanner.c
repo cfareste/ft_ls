@@ -5,13 +5,13 @@
 #include "libft.h"
 #include "path_builder.h"
 
-static char *scan_entry(const char *path, const t_dir_entry *dir_entry, t_file_entry_array *file_entry_array)
+static char *push_entry(const t_dir_entry *dir_entry, t_file_entry_array *file_entry_array, const char *parent_path)
 {
     if (directory_is_entry_hidden_file(dir_entry))
         return NULL;
 
     const char *entry_name = directory_get_entry_name(dir_entry);
-    char *full_path = build_path(path, entry_name);
+    char *full_path = build_path(parent_path, entry_name);
     t_file_entry *entry = file_entry_create(entry_name);
     t_file_stats *entry_stats = file_stats_get_without_following_symlinks(full_path);
     char *failed_file = NULL;
@@ -27,14 +27,14 @@ static char *scan_entry(const char *path, const t_dir_entry *dir_entry, t_file_e
     return failed_file;
 }
 
-static int scan_directory_entries(const char *path, const t_dir_stream *dir_stream,
-                                  t_file_entry_array *file_entry_array, char **failed_file)
+static int scan_directory_entries(const t_dir_stream *dir_stream, t_file_entry_array *file_entry_array,
+                                  const char *parent_path, char **failed_file)
 {
     t_dir_entry *dir_entry = directory_get_next_entry(dir_stream);
 
     while (!directory_is_entry_empty(dir_entry))
     {
-        char *entry_error = scan_entry(path, dir_entry, file_entry_array);
+        char *entry_error = push_entry(dir_entry, file_entry_array, parent_path);
 
         if (entry_error != NULL)
         {
@@ -73,11 +73,12 @@ t_result *scan(const char *path)
     char *failed_file = NULL;
     t_file_entry_array *file_entry_array = file_entry_array_create();
 
-    const int read_failed = scan_directory_entries(path, dir_stream, file_entry_array, &failed_file);
+    const int read_failed = scan_directory_entries(dir_stream, file_entry_array, path, &failed_file);
     const int close_error = directory_close(&dir_stream);
+
     const int directory_operation_failed = read_failed || close_error == -1;
     t_result *result = create_scan_result(file_entry_array, path, failed_file, directory_operation_failed);
-
     free(failed_file);
+
     return result;
 }
