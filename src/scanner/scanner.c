@@ -7,7 +7,7 @@
 
 typedef struct s_scan_context
 {
-    const char *path;
+    const char *directory_path;
     t_dir_stream *dir_stream;
     t_file_entry_array *file_entry_array;
     char *failed_file;
@@ -19,7 +19,7 @@ static char *push_entry(const t_scan_context *context, const t_dir_entry *dir_en
         return NULL;
 
     const char *entry_name = directory_get_entry_name(dir_entry);
-    char *full_path = build_path(context->path, entry_name);
+    char *full_path = build_path(context->directory_path, entry_name);
     t_file_entry *entry = file_entry_create(entry_name);
     t_file_stats *entry_stats = file_stats_get_without_following_symlinks(full_path);
     char *failed_file = NULL;
@@ -63,7 +63,7 @@ static t_result *create_scan_result(const t_scan_context *context, const int dir
     if (context->failed_file != NULL)
         return result_create_failed(context->file_entry_array, context->failed_file);
     if (directory_operation_failed)
-        return result_create_failed(context->file_entry_array, context->path);
+        return result_create_failed(context->file_entry_array, context->directory_path);
     return result_create_successful(context->file_entry_array);
 }
 
@@ -73,7 +73,7 @@ t_result *scan(const char *path)
         return result_create_failed(NULL, NULL);
 
     t_scan_context context = {0};
-    context.path = path;
+    context.directory_path = path;
     context.dir_stream = directory_open(path);
     if (context.dir_stream == NULL)
         return result_create_failed(NULL, path);
