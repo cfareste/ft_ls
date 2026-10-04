@@ -102,14 +102,6 @@ static void process_file_operands(t_application_context *context)
     process_directory_file_operands(context);
 }
 
-static t_ft_ls_error_code get_ft_ls_error_code(const t_result *parsing_arguments_result, const t_ft_ls_error_code file_operands_code)
-{
-    if (result_has_failed(parsing_arguments_result))
-        return FT_LS_APPLICATION_MAJOR_ERROR;
-
-    return file_operands_code;
-}
-
 t_ft_ls_error_code application_run(const t_result *parsing_arguments_result)
 {
     if (parsing_arguments_result == NULL)
@@ -121,10 +113,10 @@ t_ft_ls_error_code application_run(const t_result *parsing_arguments_result)
     t_application_context context = {
         .parsed_arguments = parsed_arguments,
         .render_context = render_context,
-        .error_code = FT_LS_APPLICATION_SUCCESS
+        .error_code = result_has_failed(parsing_arguments_result) ? FT_LS_APPLICATION_MAJOR_ERROR : FT_LS_APPLICATION_SUCCESS
     };
     process_file_operands(&context);
 
     render_context_destroy(&render_context);
-    return get_ft_ls_error_code(parsing_arguments_result, context.error_code);
+    return context.error_code;
 }
