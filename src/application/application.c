@@ -52,11 +52,9 @@ static t_ft_ls_error_code get_scan_error(const t_application_context *context, c
     if (result_has_succeed(scan_result))
         return FT_LS_APPLICATION_SUCCESS;
 
-    const char *failed_file = result_get_error_context(scan_result);
-    if (parsed_arguments_is_file_operand(context->parsed_arguments, failed_file))
-        return FT_LS_APPLICATION_MAJOR_ERROR;
-
-    return FT_LS_APPLICATION_MINOR_ERROR;
+    return parsed_arguments_is_file_operand(context->parsed_arguments, result_get_error_context(scan_result))
+           ? FT_LS_APPLICATION_MAJOR_ERROR
+           : FT_LS_APPLICATION_MINOR_ERROR;
 }
 
 // Rename get directory content
