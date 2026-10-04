@@ -5,62 +5,79 @@
 #include "libft.h"
 #include "path_builder.h"
 
-#define ENTRY_PUSH_SUCCESS 1
-#define ENTRY_PUSH_FAILURE 0
-
-// REFACTOR!
-t_result *scan(const char *path)
+static char *scan_entry(const char *path, const t_dir_entry *dir_entry, t_file_entry_array *file_entry_array)
 {
-    if (!ft_is_valid_path(path))
-        return result_create_failed(NULL, NULL);
-
+    const char *entry_name = directory_get_entry_name(dir_entry);
+    char *full_path = build_path(path, entry_name);
+    t_file_entry *entry = file_entry_create(entry_name);
+    t_file_stats *entry_stats = file_stats_get_without_following_symlinks(full_path);
     char *failed_file = NULL;
 
-    t_dir_stream *dir_stream = directory_open(path);
-    if (dir_stream == NULL)
-        return result_create_failed(NULL, path);
+    if (entry_stats == NULL)
+        failed_file = ft_safe_strdup(full_path);
+    else
+        file_entry_set_file_type(entry, file_stats_get_file_type(entry_stats));
 
-    t_file_entry_array *file_entry_array = file_entry_array_create();
+    free(full_path);
+    file_stats_destroy(&entry_stats);
+    file_entry_array_push(file_entry_array, entry);
+    return failed_file;
+}
+
+static int scan_directory_entries(const char *path, const t_dir_stream *dir_stream,
+                                  t_file_entry_array *file_entry_array, char **failed_file)
+{
     t_dir_entry *dir_entry = directory_get_next_entry(dir_stream);
+
     while (!directory_is_entry_empty(dir_entry))
     {
         if (!directory_is_entry_hidden_file(dir_entry))
         {
-            const char *entry_name = directory_get_entry_name(dir_entry);
-            char *full_path = build_path(path, entry_name);
+            char *entry_error = scan_entry(path, dir_entry, file_entry_array);
 
-            t_file_entry *entry = file_entry_create(entry_name);
-            t_file_stats *entry_stats = file_stats_get_without_following_symlinks(full_path);
-            if (entry_stats == NULL)
+            if (entry_error != NULL)
             {
-                free(failed_file);
-                failed_file = ft_safe_strdup(full_path);
+                free(*failed_file);
+                *failed_file = entry_error;
             }
-            else
-            {
-                file_entry_set_file_type(entry, file_stats_get_file_type(entry_stats));
-            }
-
-            free(full_path);
-            file_stats_destroy(&entry_stats);
-            file_entry_array_push(file_entry_array, entry);
         }
 
         directory_destroy_entry(&dir_entry);
         dir_entry = directory_get_next_entry(dir_stream);
     }
-    const int close_directory_error = directory_close(&dir_stream);
-    const int directory_operation_failed = dir_entry == NULL || close_directory_error == -1;
 
-    t_result *result = NULL;
+    const int read_failed = dir_entry == NULL;
+    directory_destroy_entry(&dir_entry);
+    return read_failed;
+}
+
+static t_result *create_scan_result(t_file_entry_array *file_entry_array, const char *path,
+                                    const char *failed_file, const int directory_operation_failed)
+{
     if (failed_file != NULL)
-        result = result_create_failed(file_entry_array, failed_file);
-    else if (directory_operation_failed)
-        result = result_create_failed(file_entry_array, path);
-    else
-        result = result_create_successful(file_entry_array);
+        return result_create_failed(file_entry_array, failed_file);
+    if (directory_operation_failed)
+        return result_create_failed(file_entry_array, path);
+    return result_create_successful(file_entry_array);
+}
+
+t_result *scan(const char *path)
+{
+    if (!ft_is_valid_path(path))
+        return result_create_failed(NULL, NULL);
+
+    t_dir_stream *dir_stream = directory_open(path);
+    if (dir_stream == NULL)
+        return result_create_failed(NULL, path);
+
+    char *failed_file = NULL;
+    t_file_entry_array *file_entry_array = file_entry_array_create();
+
+    const int read_failed = scan_directory_entries(path, dir_stream, file_entry_array, &failed_file);
+    const int close_error = directory_close(&dir_stream);
+    const int directory_operation_failed = read_failed || close_error == -1;
+    t_result *result = create_scan_result(file_entry_array, path, failed_file, directory_operation_failed);
 
     free(failed_file);
-    directory_destroy_entry(&dir_entry);
     return result;
 }
