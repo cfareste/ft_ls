@@ -36,15 +36,12 @@ static void process_non_directory_file_operands(const t_parsed_arguments *parsed
     }
 }
 
-// Rename
 static void update_error_code(t_application_context *context, const t_ft_ls_error_code error_code)
 {
-    if (context->error_code == FT_LS_APPLICATION_MAJOR_ERROR)
+    if (context->error_code >= error_code)
         return ;
 
-    if ((context->error_code == FT_LS_APPLICATION_MINOR_ERROR && error_code != FT_LS_APPLICATION_SUCCESS)
-        || context->error_code == FT_LS_APPLICATION_SUCCESS)
-        context->error_code = error_code;
+    context->error_code = error_code;
 }
 
 static t_ft_ls_error_code get_scan_error(const t_application_context *context, const t_result *scan_result)
@@ -57,7 +54,6 @@ static t_ft_ls_error_code get_scan_error(const t_application_context *context, c
            : FT_LS_APPLICATION_MINOR_ERROR;
 }
 
-// Rename get directory content
 static t_file_entry_array *get_directory_content(t_application_context *context, const char *directory_path)
 {
     t_result *result = scan(directory_path);
