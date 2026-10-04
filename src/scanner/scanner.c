@@ -74,9 +74,9 @@ t_result *scan(const char *path)
     t_file_entry_array *file_entry_array = file_entry_array_create();
 
     const int read_failed = scan_directory_entries(dir_stream, file_entry_array, path, &failed_file);
-    const int close_error = directory_close(&dir_stream);
+    const int close_failed = directory_close(&dir_stream) == -1;
 
-    const int directory_operation_failed = read_failed || close_error == -1;
+    const int directory_operation_failed = read_failed || close_failed;
     t_result *result = create_scan_result(file_entry_array, path, failed_file, directory_operation_failed);
     free(failed_file);
 
