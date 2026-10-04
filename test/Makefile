@@ -63,12 +63,14 @@ vpath %.c	$(SRC):\
 			$(MOCKS_DIR):\
 			$(ROOT_SRC)/application:\
 			$(ROOT_SRC)/parsed_arguments:\
+			$(ROOT_SRC)/parsed_arguments/options:\
 			$(ROOT_SRC)/parsed_arguments/file_operands:\
 			$(ROOT_SRC)/filesystem:\
 			$(ROOT_SRC)/file_entry:\
 			$(ROOT_SRC)/scanner:\
 			$(ROOT_SRC)/renderer:\
 			$(ROOT_SRC)/sorter:\
+			$(ROOT_SRC)/path_builder:\
 			$(ROOT_SRC)/error_reporter:\
 			$(ROOT_SRC)/result
 
@@ -77,6 +79,7 @@ vpath %.c	$(SRC):\
 #----SHARED----#
 ROOT_SRCS = application.c \
 			parsed_arguments.c \
+			options.c \
 			file_operands.c \
 			directory.c \
 			file_stats.c \
@@ -84,6 +87,7 @@ ROOT_SRCS = application.c \
 			scanner.c \
 			renderer.c \
 			sorter.c \
+			path_builder.c \
 			error_reporter.c \
 			result.c
 
@@ -98,6 +102,7 @@ SRCS = main.c \
 		scanner_suite.c \
 		file_stats_suite.c \
 		sorter_suite.c \
+		path_builder_suite.c \
 		parsed_arguments_suite.c \
 		application_suite.c \
 		error_reporter_suite.c \

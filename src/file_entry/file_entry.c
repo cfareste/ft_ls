@@ -8,6 +8,7 @@
 struct s_file_entry
 {
     char *name;
+    t_file_type type;
 };
 
 struct s_file_entry_array
@@ -43,6 +44,7 @@ t_file_entry *file_entry_create(const char *file_name)
 
     t_file_entry *file_entry = ft_safe_calloc(1, sizeof(t_file_entry));
     file_entry_set_name(file_entry, file_name);
+    file_entry->type = FILE_TYPE_UNKNOWN;
 
     return file_entry;
 }
@@ -73,6 +75,22 @@ void file_entry_set_name(t_file_entry *entry, const char *name)
 
     free(entry->name);
     entry->name = ft_safe_strdup(name);
+}
+
+t_file_type file_entry_get_file_type(const t_file_entry *entry)
+{
+    if (entry == NULL)
+        return FILE_TYPE_UNKNOWN;
+
+    return entry->type;
+}
+
+void file_entry_set_file_type(t_file_entry *entry, const t_file_type file_type)
+{
+    if (entry == NULL || file_type == FILE_TYPE_NONE)
+        return ;
+
+    entry->type = file_type;
 }
 
 const t_file_entry *file_entry_array_get_at(const t_file_entry_array *file_entry_array, const unsigned int index)

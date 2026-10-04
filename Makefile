@@ -45,12 +45,14 @@ export GNL_BUFFER_SIZE := 50000
 vpath %.c	$(SRC):\
 			$(SRC)/application:\
 			$(SRC)/parsed_arguments:\
+			$(SRC)/parsed_arguments/options:\
 			$(SRC)/parsed_arguments/file_operands:\
 			$(SRC)/filesystem:\
 			$(SRC)/file_entry:\
 			$(SRC)/scanner:\
 			$(SRC)/renderer:\
 			$(SRC)/sorter:\
+			$(SRC)/path_builder:\
 			$(SRC)/error_reporter:\
 			$(SRC)/result
 
@@ -58,6 +60,7 @@ vpath %.c	$(SRC):\
 SRCS = ft_ls.c \
 		application.c \
 		parsed_arguments.c \
+		options.c \
 		file_operands.c \
 		directory.c \
 		file_stats.c \
@@ -65,6 +68,7 @@ SRCS = ft_ls.c \
 		scanner.c \
 		renderer.c \
 		sorter.c \
+		path_builder.c \
 		error_reporter.c \
 		result.c
 

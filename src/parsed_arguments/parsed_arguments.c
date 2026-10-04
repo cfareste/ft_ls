@@ -6,6 +6,7 @@
 
 struct s_parsed_arguments
 {
+    t_options options;
     char **file_operands;
     t_file_type *file_operand_types;
     char **non_directory_file_operands;
@@ -33,7 +34,7 @@ static int has_failed_to_access_a_file_operand(const t_file_type *file_operands_
 static t_result *create_parsing_arguments_result(t_parsed_arguments *parsed_arguments)
 {
     if (has_failed_to_access_a_file_operand(parsed_arguments->file_operand_types))
-        return result_create_failed(parsed_arguments);
+        return result_create_failed(parsed_arguments, NULL);
 
     return result_create_successful(parsed_arguments);
 }
@@ -44,9 +45,11 @@ t_result *parse_arguments(const int num_of_arguments, const char **arguments)
         return NULL;
 
     t_parsed_arguments *parsed_arguments = ft_safe_calloc(1, sizeof(t_parsed_arguments));
+    const int num_of_file_operands = num_of_arguments - options_get_amount(arguments);
 
-    parsed_arguments->file_operands = file_operands_get(num_of_arguments, arguments);
-    parsed_arguments->file_operand_types = file_operands_get_types(num_of_arguments, parsed_arguments->file_operands);
+    parsed_arguments->options = options_get(arguments);
+    parsed_arguments->file_operands = file_operands_get(num_of_file_operands, arguments);
+    parsed_arguments->file_operand_types = file_operands_get_types(num_of_file_operands, parsed_arguments->file_operands);
     parsed_arguments->non_directory_file_operands = file_operands_get_non_directory(parsed_arguments->file_operands, parsed_arguments->file_operand_types);
     parsed_arguments->directory_file_operands = file_operands_get_directory(parsed_arguments->file_operands, parsed_arguments->file_operand_types);
     sort_pointer_array((void **) parsed_arguments->non_directory_file_operands, compare_by_name);
@@ -69,6 +72,38 @@ const char * const *parsed_arguments_get_directory_file_operands(const t_parsed_
         return NULL;
 
     return (const char * const *) parsed_arguments->directory_file_operands;
+}
+
+int parsed_arguments_has_any_option_active(const t_parsed_arguments *parsed_arguments)
+{
+    if (parsed_arguments == NULL)
+        return 0;
+
+    return parsed_arguments->options != OPTIONS_NONE;
+}
+
+int parsed_arguments_is_option_active(const t_parsed_arguments *parsed_arguments, const t_options option)
+{
+    if (parsed_arguments == NULL)
+        return 0;
+
+    return (parsed_arguments->options & option) != OPTIONS_NONE;
+}
+
+int parsed_arguments_is_file_operand(const t_parsed_arguments *parsed_arguments, const char *file)
+{
+    if (parsed_arguments == NULL || !ft_is_valid_path(file))
+        return 0;
+
+    for (unsigned int i = 0; parsed_arguments->file_operands[i] != NULL; i++)
+    {
+        if (ft_are_string_equals(parsed_arguments->file_operands[i], file))
+        {
+            return 1;
+        }
+    }
+
+    return 0;
 }
 
 int parsed_arguments_has_multiple_file_operands(const t_parsed_arguments *parsed_arguments)

@@ -49,3 +49,10 @@ nopermdir src src                                                               
 .hiddir .hiddir src                                                                     ::       .hiddir .hiddir src
 .hidden linkdir nonExistent nopermdir src nopermdir Makefile nopermdir/file empty       ::       .hidden linkdir nonExistent nopermdir src nopermdir Makefile nopermdir/file empty
 linklinkDir firstDir loop2 noTarget linkfile file linklinkFile linkdir loop1 linkfile/  ::       linklinkDir firstDir loop2 noTarget linkfile file linklinkFile linkdir loop1 linkfile/
+-R                                                                                      ::       -R
+Makefile -R                                                                             ::       Makefile -R
+-R src                                                                                  ::       -R src
+Makefile -R .hidden src -R .hiddir                                                      ::       Makefile -R .hidden src -R .hiddir
+. . -R                                                                                  ::       . . -R
+. nonExistent -R                                                                        ::       . nonExistent -R
+nonExistent . -R                                                                        ::       . nonExistent -R

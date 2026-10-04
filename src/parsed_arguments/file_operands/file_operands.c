@@ -6,6 +6,11 @@
 #define DEFAULT_FILE_OPERAND "."
 #define DEFAULT_FILE_OPERAND_TYPE FILE_TYPE_DIRECTORY
 
+static int argument_is_an_option(const char *argument)
+{
+    return argument[0] == '-';
+}
+
 static char **get_default_file_operands(void)
 {
     char **file_operands = ft_safe_calloc(DEFAULT_NUM_OF_OPERANDS + 1, sizeof(char *));
@@ -15,13 +20,20 @@ static char **get_default_file_operands(void)
     return file_operands;
 }
 
-static char **get_file_operands_from_arguments(const int num_of_arguments, const char **arguments)
+static char **get_file_operands_from_arguments(const int num_of_file_operands, const char **arguments)
 {
-    char **file_operands = ft_safe_calloc(num_of_arguments + 1, sizeof(char *));
+    char **file_operands = ft_safe_calloc(num_of_file_operands + 1, sizeof(char *));
 
-    for (int i = 0; i < num_of_arguments; i++)
+    int operands_i = 0;
+    int arguments_i = 0;
+    while (arguments[arguments_i] != NULL)
     {
-        file_operands[i] = ft_safe_strdup(arguments[i]);
+        if (!argument_is_an_option(arguments[arguments_i]))
+        {
+            file_operands[operands_i] = ft_safe_strdup(arguments[arguments_i]);
+            operands_i++;
+        }
+        arguments_i++;
     }
 
     return file_operands;
@@ -37,12 +49,11 @@ static t_file_type *get_default_file_operand_type(void)
     return file_operands_types;
 }
 
-static t_file_type *get_file_operands_types_from_arguments(char **file_operands)
+static t_file_type *get_operands_types_from_file_operands(const int num_of_file_operands, char **file_operands)
 {
-    const unsigned int num_of_operands = ft_str_matrix_length(file_operands);
-    t_file_type *file_operands_types = ft_safe_calloc(num_of_operands + 1, sizeof(t_file_type));
+    t_file_type *file_operands_types = ft_safe_calloc(num_of_file_operands + 1, sizeof(t_file_type));
 
-    for (unsigned int i = 0; i < num_of_operands; i++)
+    for (int i = 0; i < num_of_file_operands; i++)
     {
         t_file_stats *file_operand_stats = file_stats_get(file_operands[i]);
 
@@ -51,7 +62,7 @@ static t_file_type *get_file_operands_types_from_arguments(char **file_operands)
         file_stats_destroy(&file_operand_stats);
     }
 
-    file_operands_types[num_of_operands] = FILE_TYPE_NONE;
+    file_operands_types[num_of_file_operands] = FILE_TYPE_NONE;
     return file_operands_types;
 }
 
@@ -85,20 +96,20 @@ static unsigned int get_num_of_directory_file_operands(const t_file_type *file_o
     return num_of_directory_file_operands;
 }
 
-char **file_operands_get(const int num_of_arguments, const char **arguments)
+char **file_operands_get(const int num_of_file_operands, const char **arguments)
 {
-    if (num_of_arguments == 0 || *arguments == NULL)
+    if (num_of_file_operands == 0)
         return get_default_file_operands();
 
-    return get_file_operands_from_arguments(num_of_arguments, arguments);
+    return get_file_operands_from_arguments(num_of_file_operands, arguments);
 }
 
-t_file_type *file_operands_get_types(const int num_of_arguments, char **file_operands)
+t_file_type *file_operands_get_types(const int num_of_file_operands, char **file_operands)
 {
-    if (num_of_arguments == 0)
+    if (num_of_file_operands == 0)
         return get_default_file_operand_type();
 
-    return get_file_operands_types_from_arguments(file_operands);
+    return get_operands_types_from_file_operands(num_of_file_operands, file_operands);
 }
 
 char **file_operands_get_non_directory(char **file_operands, const t_file_type *file_operands_types)

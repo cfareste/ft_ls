@@ -1,3 +1,4 @@
+#include "suites.h"
 #include "CUnit/CUnit.h"
 #include "CUnit/Basic.h"
 #include "mocks.h"
@@ -42,10 +43,10 @@ static void should_successfully_print_the_contents_of_the_current_directory_one_
 {
     const t_vfs_mock_entry vfs[] = {
         MOCK_DIR(".", ".", "..", "file1", "subdir1", "symlink", "zz"),
-        MOCK_FILE("./file1"),
-        MOCK_DIR("./subdir1", ".", ".."),
-        MOCK_SYMLINK("./symlink", "file1"),
-        MOCK_FILE("./zz"),
+        MOCK_FILE("file1"),
+        MOCK_DIR("subdir1", ".", ".."),
+        MOCK_SYMLINK("symlink", "file1"),
+        MOCK_FILE("zz"),
         MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
@@ -70,10 +71,10 @@ static void should_successfully_print_the_contents_of_the_current_directory(void
 {
     const t_vfs_mock_entry vfs[] = {
         MOCK_DIR(".", ".", "..", "file1", "subdir1", "symlink", "zz"),
-        MOCK_FILE("./file1"),
-        MOCK_DIR("./subdir1", ".", ".."),
-        MOCK_SYMLINK("./symlink", "file1"),
-        MOCK_FILE("./zz"),
+        MOCK_FILE("file1"),
+        MOCK_DIR("subdir1", ".", ".."),
+        MOCK_SYMLINK("symlink", "file1"),
+        MOCK_FILE("zz"),
         MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
@@ -222,6 +223,10 @@ static void should_successfully_print_the_contents_of_the_mixed_types_specified_
         MOCK_SOCKET("socket"),
         MOCK_FILE("dir/file"),
         MOCK_DIR("dir/dir2", ".", ".."),
+        MOCK_FILE("linkdir/file"),
+        MOCK_DIR("linkdir/dir2", ".", ".."),
+        MOCK_FILE("linklink/file"),
+        MOCK_DIR("linklink/dir2", ".", ".."),
         MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
@@ -535,15 +540,15 @@ static void should_successfully_print_the_contents_of_the_current_directory_sort
 {
     const t_vfs_mock_entry vfs[] = {
         MOCK_DIR(".", "a", "2file", "..", "_DIR", ".hiddir", "_file", "f", "dir", ".hidden_file", ".", "FILE"),
-        MOCK_FILE("./a"),
-        MOCK_FILE("./2file"),
-        MOCK_DIR("./_DIR", ".", ".."),
-        MOCK_DIR("./.hiddir", ".", ".."),
-        MOCK_FILE("./_file"),
-        MOCK_FILE("./f"),
-        MOCK_DIR("./dir", ".", ".."),
-        MOCK_FILE("./.hidden_file"),
-        MOCK_FILE("./FILE"),
+        MOCK_FILE("a"),
+        MOCK_FILE("2file"),
+        MOCK_DIR("_DIR", ".", ".."),
+        MOCK_DIR(".hiddir", ".", ".."),
+        MOCK_FILE("_file"),
+        MOCK_FILE("f"),
+        MOCK_DIR("dir", ".", ".."),
+        MOCK_FILE(".hidden_file"),
+        MOCK_FILE("FILE"),
         MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
@@ -753,14 +758,14 @@ static void should_successfully_print_the_contents_of_the_current_directory_with
 {
     const t_vfs_mock_entry vfs[] = {
         MOCK_DIR(".", ".", "..", "1_file", "2_subdir", "3_linkfile", "4_linkdir", "5_chardevice", "6_blockdevice", "7_fifo", "8_socket"),
-        MOCK_FILE("./1_file"),
-        MOCK_DIR("./2_subdir", ".", ".."),
-        MOCK_SYMLINK("./3_linkfile", "1_file"),
-        MOCK_SYMLINK("./4_linkdir", "2_subdir"),
-        MOCK_CHAR_DEVICE("./5_chardevice"),
-        MOCK_BLOCK_DEVICE("./6_blockdevice"),
-        MOCK_FIFO("./7_fifo"),
-        MOCK_SOCKET("./8_socket"),
+        MOCK_FILE("1_file"),
+        MOCK_DIR("2_subdir", ".", ".."),
+        MOCK_SYMLINK("3_linkfile", "1_file"),
+        MOCK_SYMLINK("4_linkdir", "2_subdir"),
+        MOCK_CHAR_DEVICE("5_chardevice"),
+        MOCK_BLOCK_DEVICE("6_blockdevice"),
+        MOCK_FIFO("7_fifo"),
+        MOCK_SOCKET("8_socket"),
         MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
@@ -816,6 +821,10 @@ static void should_successfully_print_the_contents_of_the_directory_pointed_by_t
         MOCK_CHAR_DEVICE("dir/char_device"),
         MOCK_FILE("dir/file"),
         MOCK_DIR("dir/subdir", ".", ".."),
+        MOCK_BLOCK_DEVICE("linkdir/block_device"),
+        MOCK_CHAR_DEVICE("linkdir/char_device"),
+        MOCK_FILE("linkdir/file"),
+        MOCK_DIR("linkdir/subdir", ".", ".."),
         MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
@@ -850,6 +859,14 @@ static void should_successfully_print_the_contents_of_the_symlinks_to_different_
         MOCK_BROKEN_LINK("brokenLink"),
         MOCK_LOOP_LINK("loopLink"),
         MOCK_FILE_ACCESS_ERROR(ENOENT, "nonExistent"),
+        MOCK_FILE("dir/dirFile"),
+        MOCK_DIR("dir/symDir", ".", ".."),
+        MOCK_FILE("dirLink/dirFile"),
+        MOCK_SYMLINK("dirLink/symlink", "dirLink/dirFile"),
+        MOCK_DIR("dirLink/symDir", ".", ".."),
+        MOCK_FILE("multihopDir/dirFile"),
+        MOCK_SYMLINK("multihopDir/symlink", "multihopDir/dirFile"),
+        MOCK_DIR("multihopDir/symDir", ".", ".."),
         MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
@@ -890,6 +907,230 @@ static void should_successfully_print_the_contents_of_the_symlinks_to_different_
     ));
     CU_ASSERT(verify_that_the_error_printed_is("ft_ls: cannot access '%s': %s\n", arguments[8], strerror(ENOENT)));
     CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MAJOR_ERROR);
+}
+
+static void should_successfully_print_the_contents_of_the_current_directory_recursively(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", ".", "..", "file", "subdir", "file2", "subdir2", "symlink"),
+        MOCK_FILE("file"),
+        MOCK_FILE("file2"),
+        MOCK_SYMLINK("symlink", "subdir"),
+        MOCK_DIR("subdir", ".", "..", "sbd_file1", "sbd_dir1"),
+        MOCK_DIR("subdir2", ".", "..", "sbd_dir2"),
+        MOCK_DIR("./subdir", ".", "..", "sbd_file1", "sbd_dir1"),
+        MOCK_DIR("./subdir2", ".", "..", "sbd_dir2"),
+        MOCK_FILE("./subdir/sbd_file1"),
+        MOCK_DIR("./subdir/sbd_dir1", ".", ".."),
+        MOCK_DIR("./subdir2/sbd_dir2", ".", "..", "char", "block"),
+        MOCK_CHAR_DEVICE("./subdir2/sbd_dir2/char"),
+        MOCK_BLOCK_DEVICE("./subdir2/sbd_dir2/block"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-R", NULL };
+    const char *expected_file_names[] = { "file", "file2", "symlink", "sbd_file1", "block", "char" };
+    const char *expected_dir_headers[] = { ".", "./subdir", "./subdir/sbd_dir1", "./subdir2", "./subdir2/sbd_dir2" };
+    const char *expected_subdirs[] = { "subdir", "subdir2", "sbd_dir1", "sbd_dir2" };
+    get_parsed_arguments_result(1, arguments);
+
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "%s:\n"
+        "%s\n%s\n%s\n%s\n%s\n"
+        "\n%s:\n"
+        "%s\n%s\n"
+        "\n%s:\n"
+        "\n%s:\n"
+        "%s\n"
+        "\n%s:\n"
+        "%s\n%s\n",
+        expected_dir_headers[0],
+        expected_file_names[0],
+        expected_file_names[1],
+        expected_subdirs[0],
+        expected_subdirs[1],
+        expected_file_names[2],
+        expected_dir_headers[1],
+        expected_subdirs[2],
+        expected_file_names[3],
+        expected_dir_headers[2],
+        expected_dir_headers[3],
+        expected_subdirs[3],
+        expected_dir_headers[4],
+        expected_file_names[4],
+        expected_file_names[5]
+    ));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
+static void should_successfully_print_the_contents_of_the_specified_non_directory_even_with_recursive_option(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("file"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "file", "-R", NULL };
+    get_parsed_arguments_result(2, arguments);
+
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "%s\n",
+        arguments[0]
+    ));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
+static void should_successfully_print_the_contents_of_the_specified_directory_recursively(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("dir", ".", "..", "file", "subdir", "file2", "subdir2", "symlink"),
+        MOCK_FILE("dir/file"),
+        MOCK_FILE("dir/file2"),
+        MOCK_SYMLINK("dir/symlink", "dir/subdir"),
+        MOCK_DIR("dir/subdir", ".", "..", "sbd_file1", "sbd_dir1"),
+        MOCK_DIR("dir/subdir2", ".", "..", "sbd_dir2"),
+        MOCK_FILE("dir/subdir/sbd_file1"),
+        MOCK_DIR("dir/subdir/sbd_dir1", ".", ".."),
+        MOCK_DIR("dir/subdir2/sbd_dir2", ".", "..", "char", "block"),
+        MOCK_CHAR_DEVICE("dir/subdir2/sbd_dir2/char"),
+        MOCK_BLOCK_DEVICE("dir/subdir2/sbd_dir2/block"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-R", "dir", NULL };
+    const char *expected_file_names[] = { "file", "file2", "symlink", "sbd_file1", "block", "char" };
+    const char *expected_dir_headers[] = { "dir", "dir/subdir", "dir/subdir/sbd_dir1", "dir/subdir2", "dir/subdir2/sbd_dir2" };
+    const char *expected_subdirs[] = { "subdir", "subdir2", "sbd_dir1", "sbd_dir2" };
+    get_parsed_arguments_result(2, arguments);
+
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "%s:\n"
+        "%s\n%s\n%s\n%s\n%s\n"
+        "\n%s:\n"
+        "%s\n%s\n"
+        "\n%s:\n"
+        "\n%s:\n"
+        "%s\n"
+        "\n%s:\n"
+        "%s\n%s\n",
+        expected_dir_headers[0],
+        expected_file_names[0],
+        expected_file_names[1],
+        expected_subdirs[0],
+        expected_subdirs[1],
+        expected_file_names[2],
+        expected_dir_headers[1],
+        expected_subdirs[2],
+        expected_file_names[3],
+        expected_dir_headers[2],
+        expected_dir_headers[3],
+        expected_subdirs[3],
+        expected_dir_headers[4],
+        expected_file_names[4],
+        expected_file_names[5]
+    ));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
+static void should_successfully_print_the_contents_of_the_specified_operands_recursively(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("nonDir"),
+        MOCK_FILE("nonDir2"),
+        MOCK_DIR("dir", ".", "..", "file", "subdir", "file2", "subdir2", "symlink"),
+        MOCK_FILE("dir/file"),
+        MOCK_FILE("dir/file2"),
+        MOCK_SYMLINK("dir/symlink", "dir/subdir"),
+        MOCK_DIR("dir/subdir", ".", "..", "sbd_file1", "sbd_dir1"),
+        MOCK_DIR("dir/subdir2", ".", "..", "sbd_dir2"),
+        MOCK_FILE("dir/subdir/sbd_file1"),
+        MOCK_DIR("dir/subdir/sbd_dir1", ".", ".."),
+        MOCK_DIR("dir/subdir2/sbd_dir2", ".", "..", "char", "block"),
+        MOCK_CHAR_DEVICE("dir/subdir2/sbd_dir2/char"),
+        MOCK_BLOCK_DEVICE("dir/subdir2/sbd_dir2/block"),
+        MOCK_DIR("dir2/", ".", "..", "file", "subdirDir2"),
+        MOCK_FILE("dir2/file"),
+        MOCK_DIR("dir2/subdirDir2", ".", "..", "file2"),
+        MOCK_FILE("dir2/subdirDir2/file2"),
+        MOCK_SYMLINK("symlink", "dir2/"),
+        MOCK_FILE("symlink/file"),
+        MOCK_DIR("symlink/subdirDir2", ".", "..", "file2"),
+        MOCK_FILE("symlink/subdirDir2/file2"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "nonDir", "dir2/", "nonDir2", "-R", "dir", "symlink", NULL };
+    const char *expected_file_names[] = { "file", "file2", "symlink", "sbd_file1", "block", "char" };
+    const char *expected_dir_headers[] = { "dir", "dir/subdir", "dir/subdir/sbd_dir1", "dir/subdir2", "dir/subdir2/sbd_dir2", "dir2/", "dir2/subdirDir2" };
+    const char *expected_symlink_headers[] = { "symlink", "symlink/subdirDir2" };
+    const char *expected_subdirs[] = { "subdir", "subdir2", "sbd_dir1", "sbd_dir2", "subdirDir2" };
+    const char *expected_symlink_subdirs[] = { "subdirDir2" };
+    get_parsed_arguments_result(6, arguments);
+
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n%s\n%s\n%s\n%s\n"
+        "\n%s:\n"
+        "%s\n%s\n"
+        "\n%s:\n"
+        "\n%s:\n"
+        "%s\n"
+        "\n%s:\n"
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n"
+        "\n%s:\n"
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n",
+        arguments[0],
+        arguments[2],
+        expected_dir_headers[0],
+        expected_file_names[0],
+        expected_file_names[1],
+        expected_subdirs[0],
+        expected_subdirs[1],
+        expected_file_names[2],
+        expected_dir_headers[1],
+        expected_subdirs[2],
+        expected_file_names[3],
+        expected_dir_headers[2],
+        expected_dir_headers[3],
+        expected_subdirs[3],
+        expected_dir_headers[4],
+        expected_file_names[4],
+        expected_file_names[5],
+        expected_dir_headers[5],
+        expected_file_names[0],
+        expected_subdirs[4],
+        expected_dir_headers[6],
+        expected_file_names[1],
+        expected_symlink_headers[0],
+        expected_file_names[0],
+        expected_symlink_subdirs[0],
+        expected_symlink_headers[1],
+        expected_file_names[1]
+    ));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
 }
 
 static void should_fail_with_a_major_error_and_not_print_anything_if_fails_to_open_the_directory(void)
@@ -1029,6 +1270,7 @@ static void should_fail_with_a_major_error_and_print_only_the_working_directory_
     const t_vfs_mock_entry vfs[] = {
         MOCK_DIR_OPEN_ERROR(EACCES, "noPermDir", ".", "..", "file1", "subdir1", "symlink", "zz"),
         MOCK_DIR("workingDir", ".", "..", "fileDir"),
+        MOCK_FILE("workingDir/fileDir"),
         MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
@@ -1057,6 +1299,8 @@ static void should_fail_with_a_major_error_and_print_only_the_working_file_opera
         MOCK_FILE("zFile"),
         MOCK_DIR("workingDir", ".", "..", "fileDir"),
         MOCK_DIR("zWorkingDir", ".", "..", "zFileDir"),
+        MOCK_FILE("workingDir/fileDir"),
+        MOCK_FILE("zWorkingDir/zFileDir"),
         MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
@@ -1091,6 +1335,8 @@ static void should_fail_with_a_major_error_and_not_print_anything_if_all_directo
     const t_vfs_mock_entry vfs[] = {
         MOCK_DIR_OPEN_ERROR(EACCES, "dir", ".", "..", "file1", "subdir1", "symlink", "zz"),
         MOCK_DIR_READ_ERROR("zdir/", 4, ".", "..", "file1", "subdir1", "symlink", "zz"),
+        MOCK_FILE("zdir/file1"),
+        MOCK_DIR("zdir/subdir1", ".", ".."),
         MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
@@ -1126,6 +1372,10 @@ static void should_fail_with_a_major_error_and_print_only_the_working_file_opera
         MOCK_FILE("zFile"),
         MOCK_DIR("workingDir", ".", "..", "fileDir"),
         MOCK_DIR("zWorkingDir", ".", "..", "zFileDir"),
+        MOCK_FILE("zdir/file1"),
+        MOCK_DIR("zdir/subdir1", ".", ".."),
+        MOCK_FILE("workingDir/fileDir"),
+        MOCK_FILE("zWorkingDir/zFileDir"),
         MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
@@ -1210,6 +1460,7 @@ static void should_fail_with_a_major_error_and_print_the_working_operand_if_one_
     const t_vfs_mock_entry vfs[] = {
         MOCK_FILE_ACCESS_ERROR(EACCES, "no/perms"),
         MOCK_DIR("dir", ".", "..", "file"),
+        MOCK_FILE("dir/file"),
         MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
@@ -1238,6 +1489,8 @@ static void should_fail_with_a_major_error_and_print_only_the_working_operands_i
         MOCK_FILE("zFile"),
         MOCK_DIR("workingDir", ".", "..", "fileDir"),
         MOCK_DIR("zWorkingDir", ".", "..", "zFileDir"),
+        MOCK_FILE("workingDir/fileDir"),
+        MOCK_FILE("zWorkingDir/zFileDir"),
         MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
@@ -1246,7 +1499,7 @@ static void should_fail_with_a_major_error_and_print_only_the_working_operands_i
     const char *expected_file_names[] = { "file", "zFile" };
     const char *expected_first_dir_file_name = "fileDir";
     const char *expected_second_dir_file_name = "zFileDir";
-    get_parsed_arguments_result(6, arguments);
+    get_parsed_arguments_result(5, arguments);
 
     const int result = application_run(parsed_arguments_result);
 
@@ -1304,6 +1557,8 @@ static void should_fail_with_a_major_error_and_print_only_the_working_operands_i
         MOCK_FILE("zFile"),
         MOCK_DIR("workingDir", ".", "..", "fileDir"),
         MOCK_DIR("zWorkingDir", ".", "..", "zFileDir"),
+        MOCK_FILE("workingDir/fileDir"),
+        MOCK_FILE("zWorkingDir/zFileDir"),
         MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
@@ -1364,6 +1619,1049 @@ static void should_fail_with_a_major_error_and_not_print_anything_if_fails_to_ac
     CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MAJOR_ERROR);
 }
 
+static void should_fail_with_a_minor_error_and_print_the_non_failing_files_if_fails_to_access_a_child_file_of_a_directory_operand(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", ".", "..", "file", "subdir", "file2", "subdir2", "symlink"),
+        MOCK_FILE("file"),
+        MOCK_FILE("file2"),
+        MOCK_SYMLINK("symlink", "subdir"),
+        MOCK_DIR("subdir", ".", "..", "sbd_file1", "sbd_dir1"),
+        MOCK_DIR("subdir2", ".", "..", "sbd_dir2"),
+        MOCK_DIR("./subdir", ".", "..", "sbd_file1", "sbd_dir1"),
+        MOCK_DIR("./subdir2", ".", "..", "sbd_dir2"),
+        MOCK_FILE_ACCESS_ERROR(ENOTDIR, "./subdir/sbd_file1"),
+        MOCK_DIR("./subdir/sbd_dir1", ".", ".."),
+        MOCK_DIR("./subdir2/sbd_dir2", ".", "..", "char", "block"),
+        MOCK_CHAR_DEVICE("./subdir2/sbd_dir2/char"),
+        MOCK_BLOCK_DEVICE("./subdir2/sbd_dir2/block"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-R", NULL };
+    const char *expected_file_names[] = { "file", "file2", "symlink", "sbd_file1", "block", "char" };
+    const char *expected_dir_headers[] = { ".", "./subdir", "./subdir/sbd_dir1", "./subdir2", "./subdir2/sbd_dir2" };
+    const char *expected_subdirs[] = { "subdir", "subdir2", "sbd_dir1", "sbd_dir2" };
+    get_parsed_arguments_result(1, arguments);
+
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "%s:\n"
+        "%s\n%s\n%s\n%s\n%s\n"
+        "\n%s:\n"
+        "%s\n%s\n"
+        "\n%s:\n"
+        "\n%s:\n"
+        "%s\n"
+        "\n%s:\n"
+        "%s\n%s\n",
+        expected_dir_headers[0],
+        expected_file_names[0],
+        expected_file_names[1],
+        expected_subdirs[0],
+        expected_subdirs[1],
+        expected_file_names[2],
+        expected_dir_headers[1],
+        expected_subdirs[2],
+        expected_file_names[3],
+        expected_dir_headers[2],
+        expected_dir_headers[3],
+        expected_subdirs[3],
+        expected_dir_headers[4],
+        expected_file_names[4],
+        expected_file_names[5]
+    ));
+    CU_ASSERT(verify_that_the_error_printed_is("ft_ls: cannot access '%s': %s\n", "./subdir/sbd_file1", strerror(ENOTDIR)));
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MINOR_ERROR);
+}
+
+static void should_fail_with_a_minor_error_and_print_the_non_failing_files_if_fails_to_open_a_subdirectory(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("dir", ".", "..", "file", "subdir", "file2", "subdir2", "symlink"),
+        MOCK_FILE("dir/file"),
+        MOCK_FILE("dir/file2"),
+        MOCK_SYMLINK("dir/symlink", "dir/subdir"),
+        MOCK_DIR("subdir", ".", "..", "sbd_file1", "sbd_dir1"),
+        MOCK_DIR("subdir2", ".", "..", "sbd_dir2"),
+        MOCK_DIR("dir/subdir", ".", "..", "sbd_file1", "sbd_dir1"),
+        MOCK_DIR("dir/subdir2", ".", "..", "sbd_dir2"),
+        MOCK_FILE("dir/subdir/sbd_file1"),
+        MOCK_DIR_OPEN_ERROR(EACCES, "dir/subdir/sbd_dir1", ".", ".."),
+        MOCK_DIR("dir/subdir2/sbd_dir2", ".", "..", "char", "block"),
+        MOCK_CHAR_DEVICE("dir/subdir2/sbd_dir2/char"),
+        MOCK_BLOCK_DEVICE("dir/subdir2/sbd_dir2/block"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-R", "dir", NULL };
+    const char *expected_file_names[] = { "file", "file2", "symlink", "sbd_file1", "block", "char" };
+    const char *expected_dir_headers[] = { "dir", "dir/subdir", "dir/subdir2", "dir/subdir2/sbd_dir2" };
+    const char *expected_subdirs[] = { "subdir", "subdir2", "sbd_dir1", "sbd_dir2" };
+    get_parsed_arguments_result(2, arguments);
+
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "%s:\n"
+        "%s\n%s\n%s\n%s\n%s\n"
+        "\n%s:\n"
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n"
+        "\n%s:\n"
+        "%s\n%s\n",
+        expected_dir_headers[0],
+        expected_file_names[0],
+        expected_file_names[1],
+        expected_subdirs[0],
+        expected_subdirs[1],
+        expected_file_names[2],
+        expected_dir_headers[1],
+        expected_subdirs[2],
+        expected_file_names[3],
+        expected_dir_headers[2],
+        expected_subdirs[3],
+        expected_dir_headers[3],
+        expected_file_names[4],
+        expected_file_names[5]
+    ));
+    CU_ASSERT(verify_that_the_error_printed_is("ft_ls: cannot open directory '%s': %s\n", "dir/subdir/sbd_dir1", strerror(EACCES)));
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MINOR_ERROR);
+}
+
+static void should_fail_with_a_minor_error_and_print_the_non_failing_files_if_fails_to_read_a_subdirectory(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("dir", ".", "..", "file", "subdir", "file2", "subdir2", "symlink"),
+        MOCK_FILE("dir/file"),
+        MOCK_FILE("dir/file2"),
+        MOCK_SYMLINK("dir/symlink", "dir/subdir"),
+        MOCK_DIR("subdir", ".", "..", "sbd_file1", "sbd_dir1"),
+        MOCK_DIR("subdir2", ".", "..", "sbd_dir2"),
+        MOCK_DIR("dir/subdir", ".", "..", "sbd_file1", "sbd_dir1"),
+        MOCK_DIR("dir/subdir2", ".", "..", "sbd_dir2"),
+        MOCK_FILE("dir/subdir/sbd_file1"),
+        MOCK_DIR_READ_ERROR("dir/subdir/sbd_dir1", 4, ".", "..", "failedFile1", "failedDir1", "failedFile2", "failedDir2"),
+        MOCK_FILE("dir/subdir/sbd_dir1/failedFile1"),
+        MOCK_DIR("dir/subdir/sbd_dir1/failedDir1", ".", "..", "sock", "fifo"),
+        MOCK_FILE("dir/subdir/sbd_dir1/failedDir1/sock"),
+        MOCK_FILE("dir/subdir/sbd_dir1/failedDir1/fifo"),
+        MOCK_FILE("dir/subdir/sbd_dir1/failedFile2"),
+        MOCK_DIR("dir/subdir/sbd_dir1/failedDir2", ".", ".."),
+        MOCK_FILE("dir/subdir/sbd_file1"),
+        MOCK_DIR("dir/subdir2/sbd_dir2", ".", "..", "char", "block"),
+        MOCK_CHAR_DEVICE("dir/subdir2/sbd_dir2/char"),
+        MOCK_BLOCK_DEVICE("dir/subdir2/sbd_dir2/block"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "dir", "-R", NULL };
+    const char *expected_file_names[] = { "file", "file2", "symlink", "sbd_file1", "failedFile1", "fifo", "sock", "block", "char" };
+    const char *expected_dir_headers[] = { "dir", "dir/subdir", "dir/subdir/sbd_dir1", "dir/subdir/sbd_dir1/failedDir1", "dir/subdir2", "dir/subdir2/sbd_dir2" };
+    const char *expected_subdirs[] = { "subdir", "subdir2", "sbd_dir1", "failedDir1", "sbd_dir2" };
+    get_parsed_arguments_result(2, arguments);
+
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "%s:\n"
+        "%s\n%s\n%s\n%s\n%s\n"
+        "\n%s:\n"
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n"
+        "\n%s:\n"
+        "%s\n%s\n",
+        expected_dir_headers[0],
+        expected_file_names[0],
+        expected_file_names[1],
+        expected_subdirs[0],
+        expected_subdirs[1],
+        expected_file_names[2],
+        expected_dir_headers[1],
+        expected_subdirs[2],
+        expected_file_names[3],
+        expected_dir_headers[2],
+        expected_subdirs[3],
+        expected_file_names[4],
+        expected_dir_headers[3],
+        expected_file_names[5],
+        expected_file_names[6],
+        expected_dir_headers[4],
+        expected_subdirs[4],
+        expected_dir_headers[5],
+        expected_file_names[7],
+        expected_file_names[8]
+    ));
+    CU_ASSERT(verify_that_the_error_printed_is("ft_ls: reading directory '%s': %s\n", "dir/subdir/sbd_dir1", strerror(EBADF)));
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MINOR_ERROR);
+}
+
+static void should_fail_with_a_minor_error_and_print_the_non_failing_files_if_fails_to_close_a_subdirectory(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", ".", "..", "file", "subdir", "file2", "subdir2"),
+        MOCK_FILE("file"),
+        MOCK_FILE("file2"),
+        MOCK_DIR("subdir", ".", "..", "sbd_file1", "sbd_dir1"),
+        MOCK_DIR("subdir2", ".", "..", "sbd_dir2"),
+        MOCK_FILE("subdir/sbd_file1"),
+        MOCK_DIR_CLOSE_ERROR("subdir/sbd_dir1", ".", "..", "failedFile1", "failedDir1", "failedFile2", "failedDir2"),
+        MOCK_FILE("subdir/sbd_dir1/failedFile1"),
+        MOCK_DIR("subdir/sbd_dir1/failedDir1", ".", "..", "sock", "fifo"),
+        MOCK_FILE("subdir/sbd_dir1/failedDir1/sock"),
+        MOCK_FILE("subdir/sbd_dir1/failedDir1/fifo"),
+        MOCK_FILE("subdir/sbd_dir1/failedFile2"),
+        MOCK_DIR("subdir/sbd_dir1/failedDir2", ".", ".."),
+        MOCK_FILE("subdir/sbd_file1"),
+        MOCK_DIR("subdir2/sbd_dir2", ".", "..", "char", "block"),
+        MOCK_CHAR_DEVICE("subdir2/sbd_dir2/char"),
+        MOCK_BLOCK_DEVICE("subdir2/sbd_dir2/block"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "file", "subdir", "file2", "subdir2", "-R", NULL };
+    const char *expected_file_names[] = { "file", "file2", "sbd_file1", "failedFile1", "failedFile2", "fifo", "sock", "block", "char" };
+    const char *expected_dir_headers[] = { "subdir", "subdir/sbd_dir1", "subdir/sbd_dir1/failedDir1", "subdir/sbd_dir1/failedDir2", "subdir2", "subdir2/sbd_dir2" };
+    const char *expected_subdirs[] = { "subdir", "subdir2", "sbd_dir1", "failedDir1", "failedDir2", "sbd_dir2" };
+    get_parsed_arguments_result(5, arguments);
+
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n%s\n%s\n%s\n"
+        "\n%s:\n"
+        "%s\n%s\n"
+        "\n%s:\n"
+        "\n%s:\n"
+        "%s\n"
+        "\n%s:\n"
+        "%s\n%s\n",
+        expected_file_names[0],
+        expected_file_names[1],
+        expected_dir_headers[0],
+        expected_subdirs[2],
+        expected_file_names[2],
+        expected_dir_headers[1],
+        expected_subdirs[3],
+        expected_subdirs[4],
+        expected_file_names[3],
+        expected_file_names[4],
+        expected_dir_headers[2],
+        expected_file_names[5],
+        expected_file_names[6],
+        expected_dir_headers[3],
+        expected_dir_headers[4],
+        expected_subdirs[5],
+        expected_dir_headers[5],
+        expected_file_names[7],
+        expected_file_names[8]
+    ));
+    CU_ASSERT(verify_that_the_error_printed_is("ft_ls: closing directory '%s': %s\n", "subdir/sbd_dir1", strerror(EBADF)));
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MINOR_ERROR);
+}
+
+static void should_fail_with_a_minor_error_and_print_the_non_failing_files_if_fails_to_access_content_of_a_directory(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", ".", "..", "file", "subdir", "file2", "subdir2"),
+        MOCK_FILE("file"),
+        MOCK_FILE("file2"),
+        MOCK_DIR("subdir", ".", "..", "sbd_file1", "sbd_dir1"),
+        MOCK_DIR("subdir2", ".", "..", "sbd_dir2"),
+        MOCK_FILE("subdir/sbd_file1"),
+        MOCK_DIR("subdir/sbd_dir1", ".", "..", "sbdFile1", "sbdDir1", "sbdFile2", "sbdDir2"),
+        MOCK_FILE_ACCESS_ERROR(ENAMETOOLONG, "subdir/sbd_dir1/sbdFile1"),
+        MOCK_DIR_ACCESS_ERROR(ENOTDIR, "subdir/sbd_dir1/sbdDir1", ".", "..", "sock", "fifo"),
+        MOCK_FILE("subdir/sbd_dir1/sbdDir1/sock"),
+        MOCK_FILE("subdir/sbd_dir1/sbdDir1/fifo"),
+        MOCK_FILE("subdir/sbd_dir1/sbdFile2"),
+        MOCK_DIR("subdir/sbd_dir1/sbdDir2", ".", ".."),
+        MOCK_DIR("subdir2/sbd_dir2", ".", "..", "char", "block"),
+        MOCK_CHAR_DEVICE("subdir2/sbd_dir2/char"),
+        MOCK_BLOCK_DEVICE("subdir2/sbd_dir2/block"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-R", "file", "subdir", "file2", "subdir2", NULL };
+    const char *expected_non_dir_operands[] = { "file", "file2" };
+    const char *expected_dir_headers[] = { "subdir", "subdir/sbd_dir1", "subdir/sbd_dir1/sbdDir2", "subdir2", "subdir2/sbd_dir2" };
+    const char *expected_subdir_content[] = { "sbd_dir1", "sbd_file1" };
+    const char *expected_subdir2_content[] = { "sbd_dir2" };
+    const char *expected_sbdDir1_content[] = { "sbdDir1", "sbdDir2", "sbdFile1", "sbdFile2" };
+    const char *expected_sbdDir2_content[] = { "block", "char" };
+    get_parsed_arguments_result(5, arguments);
+
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n%s\n%s\n%s\n"
+        "\n%s:\n"
+        "\n%s:\n"
+        "%s\n"
+        "\n%s:\n"
+        "%s\n%s\n",
+        expected_non_dir_operands[0],
+        expected_non_dir_operands[1],
+        expected_dir_headers[0],
+        expected_subdir_content[0],
+        expected_subdir_content[1],
+        expected_dir_headers[1],
+        expected_sbdDir1_content[0],
+        expected_sbdDir1_content[1],
+        expected_sbdDir1_content[2],
+        expected_sbdDir1_content[3],
+        expected_dir_headers[2],
+        expected_dir_headers[3],
+        expected_subdir2_content[0],
+        expected_dir_headers[4],
+        expected_sbdDir2_content[0],
+        expected_sbdDir2_content[1]
+    ));
+    CU_ASSERT(verify_that_the_error_printed_is(
+        "ft_ls: cannot access '%s': %s\n"
+        "ft_ls: cannot access '%s': %s\n",
+        "subdir/sbd_dir1/sbdFile1", strerror(ENAMETOOLONG),
+        "subdir/sbd_dir1/sbdDir1", strerror(ENOTDIR)
+    ));
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MINOR_ERROR);
+}
+
+static void should_fail_with_a_minor_error_and_print_the_non_failing_files_if_fails_to_access_content_of_different_directories(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", ".", "..", "file", "subdir", "file2", "subdir2"),
+        MOCK_FILE("file"),
+        MOCK_FILE("file2"),
+        MOCK_DIR("subdir", ".", "..", "sbd_file1", "sbd_dir1"),
+        MOCK_DIR("subdir2", ".", "..", "sbd_dir2"),
+        MOCK_FILE("subdir/sbd_file1"),
+        MOCK_DIR("subdir/sbd_dir1", ".", "..", "sbdFile1", "sbdDir1", "sbdFile2", "sbdDir2"),
+        MOCK_FILE("subdir/sbd_dir1/sbdFile1"),
+        MOCK_DIR_ACCESS_ERROR(ENOTDIR, "subdir/sbd_dir1/sbdDir1", ".", "..", "sock", "fifo"),
+        MOCK_FILE("subdir/sbd_dir1/sbdDir1/sock"),
+        MOCK_FILE("subdir/sbd_dir1/sbdDir1/fifo"),
+        MOCK_FILE("subdir/sbd_dir1/sbdFile2"),
+        MOCK_DIR("subdir/sbd_dir1/sbdDir2", ".", ".."),
+        MOCK_DIR_ACCESS_ERROR(ENAMETOOLONG, "subdir2/sbd_dir2", ".", "..", "char", "block"),
+        MOCK_CHAR_DEVICE("subdir2/sbd_dir2/char"),
+        MOCK_BLOCK_DEVICE("subdir2/sbd_dir2/block"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-R", "file", "subdir", "file2", "subdir2", NULL };
+    const char *expected_non_dir_operands[] = { "file", "file2" };
+    const char *expected_dir_headers[] = { "subdir", "subdir/sbd_dir1", "subdir/sbd_dir1/sbdDir2", "subdir2" };
+    const char *expected_subdir_content[] = { "sbd_dir1", "sbd_file1" };
+    const char *expected_subdir2_content[] = { "sbd_dir2" };
+    const char *expected_sbdDir1_content[] = { "sbdDir1", "sbdDir2", "sbdFile1", "sbdFile2" };
+    get_parsed_arguments_result(5, arguments);
+
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n%s\n%s\n%s\n"
+        "\n%s:\n"
+        "\n%s:\n"
+        "%s\n",
+        expected_non_dir_operands[0],
+        expected_non_dir_operands[1],
+        expected_dir_headers[0],
+        expected_subdir_content[0],
+        expected_subdir_content[1],
+        expected_dir_headers[1],
+        expected_sbdDir1_content[0],
+        expected_sbdDir1_content[1],
+        expected_sbdDir1_content[2],
+        expected_sbdDir1_content[3],
+        expected_dir_headers[2],
+        expected_dir_headers[3],
+        expected_subdir2_content[0]
+    ));
+    CU_ASSERT(verify_that_the_error_printed_is(
+        "ft_ls: cannot access '%s': %s\n"
+        "ft_ls: cannot access '%s': %s\n",
+        "subdir/sbd_dir1/sbdDir1", strerror(ENOTDIR),
+        "subdir2/sbd_dir2", strerror(ENAMETOOLONG)
+    ));
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MINOR_ERROR);
+}
+
+static void should_fail_with_a_minor_error_and_print_the_non_failing_files_if_fails_to_access_and_open_content_of_different_directories(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", ".", "..", "file", "subdir", "file2", "subdir2"),
+        MOCK_FILE("file"),
+        MOCK_FILE("file2"),
+        MOCK_DIR("subdir", ".", "..", "sbd_file1", "sbd_dir1"),
+        MOCK_DIR("subdir2", ".", "..", "sbd_dir2"),
+        MOCK_FILE("subdir/sbd_file1"),
+        MOCK_DIR("subdir/sbd_dir1", ".", "..", "sbdFile1", "sbdDir1", "sbdFile2", "sbdDir2"),
+        MOCK_FILE("subdir/sbd_dir1/sbdFile1"),
+        MOCK_DIR_ACCESS_ERROR(ENOTDIR, "subdir/sbd_dir1/sbdDir1", ".", "..", "sock", "fifo"),
+        MOCK_FILE("subdir/sbd_dir1/sbdDir1/sock"),
+        MOCK_FILE("subdir/sbd_dir1/sbdDir1/fifo"),
+        MOCK_FILE("subdir/sbd_dir1/sbdFile2"),
+        MOCK_DIR("subdir/sbd_dir1/sbdDir2", ".", ".."),
+        MOCK_DIR_OPEN_ERROR(EACCES, "subdir2/sbd_dir2", ".", "..", "char", "block"),
+        MOCK_CHAR_DEVICE("subdir2/sbd_dir2/char"),
+        MOCK_BLOCK_DEVICE("subdir2/sbd_dir2/block"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-R", "file", "subdir", "file2", "subdir2", NULL };
+    const char *expected_non_dir_operands[] = { "file", "file2" };
+    const char *expected_dir_headers[] = { "subdir", "subdir/sbd_dir1", "subdir/sbd_dir1/sbdDir2", "subdir2" };
+    const char *expected_subdir_content[] = { "sbd_dir1", "sbd_file1" };
+    const char *expected_subdir2_content[] = { "sbd_dir2" };
+    const char *expected_sbdDir1_content[] = { "sbdDir1", "sbdDir2", "sbdFile1", "sbdFile2" };
+    get_parsed_arguments_result(5, arguments);
+
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n%s\n%s\n%s\n"
+        "\n%s:\n"
+        "\n%s:\n"
+        "%s\n",
+        expected_non_dir_operands[0],
+        expected_non_dir_operands[1],
+        expected_dir_headers[0],
+        expected_subdir_content[0],
+        expected_subdir_content[1],
+        expected_dir_headers[1],
+        expected_sbdDir1_content[0],
+        expected_sbdDir1_content[1],
+        expected_sbdDir1_content[2],
+        expected_sbdDir1_content[3],
+        expected_dir_headers[2],
+        expected_dir_headers[3],
+        expected_subdir2_content[0]
+    ));
+    CU_ASSERT(verify_that_the_error_printed_is(
+        "ft_ls: cannot access '%s': %s\n"
+        "ft_ls: cannot open directory '%s': %s\n",
+        "subdir/sbd_dir1/sbdDir1", strerror(ENOTDIR),
+        "subdir2/sbd_dir2", strerror(EACCES)
+    ));
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MINOR_ERROR);
+}
+
+static void should_fail_with_a_minor_error_and_print_the_non_failing_files_if_fails_to_access_and_read_content_of_a_directory(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", ".", "..", "file", "subdir", "file2", "subdir2"),
+        MOCK_FILE("file"),
+        MOCK_FILE("file2"),
+        MOCK_DIR("subdir", ".", "..", "sbd_file1", "sbd_dir1"),
+        MOCK_DIR("subdir2", ".", "..", "sbd_dir2"),
+        MOCK_FILE("subdir/sbd_file1"),
+        MOCK_DIR_READ_ERROR("subdir/sbd_dir1", 4, ".", "..", "sbdFile1", "sbdDir1", "sbdFile2", "sbdDir2"),
+        MOCK_FILE_ACCESS_ERROR(ENAMETOOLONG, "subdir/sbd_dir1/sbdFile1"),
+        MOCK_DIR("subdir/sbd_dir1/sbdDir1", ".", "..", "sock", "fifo"),
+        MOCK_FILE("subdir/sbd_dir1/sbdDir1/sock"),
+        MOCK_FILE("subdir/sbd_dir1/sbdDir1/fifo"),
+        MOCK_FILE("subdir/sbd_dir1/sbdFile2"),
+        MOCK_DIR("subdir/sbd_dir1/sbdDir2", ".", ".."),
+        MOCK_DIR("subdir2/sbd_dir2", ".", "..", "char", "block"),
+        MOCK_CHAR_DEVICE("subdir2/sbd_dir2/char"),
+        MOCK_BLOCK_DEVICE("subdir2/sbd_dir2/block"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-R", "file", "subdir", "file2", "subdir2", NULL };
+    const char *expected_non_dir_operands[] = { "file", "file2" };
+    const char *expected_dir_headers[] = { "subdir", "subdir/sbd_dir1", "subdir/sbd_dir1/sbdDir1", "subdir2", "subdir2/sbd_dir2" };
+    const char *expected_subdir_content[] = { "sbd_dir1", "sbd_file1" };
+    const char *expected_subdir2_content[] = { "sbd_dir2" };
+    const char *expected_sbd_dir1_content[] = { "sbdDir1", "sbdFile1" };
+    const char *expected_sbdDir1_content[] = { "fifo", "sock" };
+    const char *expected_sbdDir2_content[] = { "block", "char" };
+    get_parsed_arguments_result(5, arguments);
+
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n"
+        "\n%s:\n"
+        "%s\n%s\n",
+        expected_non_dir_operands[0],
+        expected_non_dir_operands[1],
+        expected_dir_headers[0],
+        expected_subdir_content[0],
+        expected_subdir_content[1],
+        expected_dir_headers[1],
+        expected_sbd_dir1_content[0],
+        expected_sbd_dir1_content[1],
+        expected_dir_headers[2],
+        expected_sbdDir1_content[0],
+        expected_sbdDir1_content[1],
+        expected_dir_headers[3],
+        expected_subdir2_content[0],
+        expected_dir_headers[4],
+        expected_sbdDir2_content[0],
+        expected_sbdDir2_content[1]
+    ));
+    CU_ASSERT(verify_that_the_error_printed_is(
+        "ft_ls: cannot access '%s': %s\n"
+        "ft_ls: reading directory '%s': %s\n",
+        "subdir/sbd_dir1/sbdFile1", strerror(ENAMETOOLONG),
+        "subdir/sbd_dir1", strerror(EBADF)
+    ));
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MINOR_ERROR);
+}
+
+static void should_fail_with_a_minor_error_and_print_the_non_failing_files_if_fails_to_access_and_close_content_of_a_directory(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", ".", "..", "file", "subdir", "file2", "subdir2"),
+        MOCK_FILE("file"),
+        MOCK_FILE("file2"),
+        MOCK_DIR("subdir", ".", "..", "sbd_file1", "sbd_dir1"),
+        MOCK_DIR("subdir2", ".", "..", "sbd_dir2"),
+        MOCK_FILE("subdir/sbd_file1"),
+        MOCK_DIR_CLOSE_ERROR("subdir/sbd_dir1", ".", "..", "sbdFile1", "sbdDir1", "sbdFile2", "sbdDir2"),
+        MOCK_FILE_ACCESS_ERROR(ENAMETOOLONG, "subdir/sbd_dir1/sbdFile1"),
+        MOCK_DIR("subdir/sbd_dir1/sbdDir1", ".", "..", "sock", "fifo"),
+        MOCK_FILE("subdir/sbd_dir1/sbdDir1/sock"),
+        MOCK_FILE("subdir/sbd_dir1/sbdDir1/fifo"),
+        MOCK_FILE("subdir/sbd_dir1/sbdFile2"),
+        MOCK_DIR("subdir/sbd_dir1/sbdDir2", ".", ".."),
+        MOCK_DIR("subdir2/sbd_dir2", ".", "..", "char", "block"),
+        MOCK_CHAR_DEVICE("subdir2/sbd_dir2/char"),
+        MOCK_BLOCK_DEVICE("subdir2/sbd_dir2/block"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-R", "file", "subdir", "file2", "subdir2", NULL };
+    const char *expected_non_dir_operands[] = { "file", "file2" };
+    const char *expected_dir_headers[] = { "subdir", "subdir/sbd_dir1", "subdir/sbd_dir1/sbdDir1", "subdir/sbd_dir1/sbdDir2", "subdir2", "subdir2/sbd_dir2" };
+    const char *expected_subdir_content[] = { "sbd_dir1", "sbd_file1" };
+    const char *expected_subdir2_content[] = { "sbd_dir2" };
+    const char *expected_sbd_dir1_content[] = { "sbdDir1", "sbdDir2", "sbdFile1", "sbdFile2" };
+    const char *expected_sbd_dir2_content[] = { "block", "char" };
+    const char *expected_sbdDir1_content[] = { "fifo", "sock" };
+    get_parsed_arguments_result(5, arguments);
+
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n%s\n%s\n%s\n"
+        "\n%s:\n"
+        "%s\n%s\n"
+        "\n%s:\n"
+        "\n%s:\n"
+        "%s\n"
+        "\n%s:\n"
+        "%s\n%s\n",
+        expected_non_dir_operands[0],
+        expected_non_dir_operands[1],
+        expected_dir_headers[0],
+        expected_subdir_content[0],
+        expected_subdir_content[1],
+        expected_dir_headers[1],
+        expected_sbd_dir1_content[0],
+        expected_sbd_dir1_content[1],
+        expected_sbd_dir1_content[2],
+        expected_sbd_dir1_content[3],
+        expected_dir_headers[2],
+        expected_sbdDir1_content[0],
+        expected_sbdDir1_content[1],
+        expected_dir_headers[3],
+        expected_dir_headers[4],
+        expected_subdir2_content[0],
+        expected_dir_headers[5],
+        expected_sbd_dir2_content[0],
+        expected_sbd_dir2_content[1]
+    ));
+    CU_ASSERT(verify_that_the_error_printed_is(
+        "ft_ls: cannot access '%s': %s\n"
+        "ft_ls: closing directory '%s': %s\n",
+        "subdir/sbd_dir1/sbdFile1", strerror(ENAMETOOLONG),
+        "subdir/sbd_dir1", strerror(EBADF)
+    ));
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MINOR_ERROR);
+}
+
+static void should_fail_with_a_minor_error_and_print_the_non_failing_files_if_fails_to_operate_multiple_subdirectories(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", ".", "..", "file", "subdir", "file2", "subdir2"),
+        MOCK_FILE("file"),
+        MOCK_FILE("file2"),
+        MOCK_DIR("subdir", ".", "..", "sbd_file1", "sbd_dir1"),
+        MOCK_DIR("subdir2", ".", "..", "sbd_dir2"),
+        MOCK_FILE("subdir/sbd_file1"),
+        MOCK_DIR_OPEN_ERROR(EACCES, "subdir/sbd_dir1", ".", "..", "sbdFile1", "sbdDir1", "sbdFile2", "sbdDir2"),
+        MOCK_DIR_OPEN_ERROR(EACCES, "subdir2/sbd_dir2", ".", "..", "char", "block"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-R", "file", "subdir", "file2", "subdir2", NULL };
+    const char *expected_non_dir_operands[] = { "file", "file2" };
+    const char *expected_dir_headers[] = { "subdir", "subdir2" };
+    const char *expected_subdir_content[] = { "sbd_dir1", "sbd_file1" };
+    const char *expected_subdir2_content[] = { "sbd_dir2" };
+    get_parsed_arguments_result(5, arguments);
+
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n",
+        expected_non_dir_operands[0],
+        expected_non_dir_operands[1],
+        expected_dir_headers[0],
+        expected_subdir_content[0],
+        expected_subdir_content[1],
+        expected_dir_headers[1],
+        expected_subdir2_content[0]
+    ));
+    CU_ASSERT(verify_that_the_error_printed_is(
+        "ft_ls: cannot open directory '%s': %s\n"
+        "ft_ls: cannot open directory '%s': %s\n",
+        "subdir/sbd_dir1", strerror(EACCES),
+        "subdir2/sbd_dir2", strerror(EACCES)
+    ));
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MINOR_ERROR);
+}
+
+static void should_fail_with_a_major_error_and_print_the_non_failing_files_if_fails_to_access_subdir_content_and_to_open_directory_operand(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", ".", "..", "file", "subdir", "file2", "subdir2"),
+        MOCK_FILE("file"),
+        MOCK_FILE("file2"),
+        MOCK_DIR("subdir", ".", "..", "sbd_file1", "sbd_dir1"),
+        MOCK_FILE("subdir/sbd_file1"),
+        MOCK_DIR_ACCESS_ERROR(ENOTDIR, "subdir/sbd_dir1", ".", ".."),
+        MOCK_DIR_OPEN_ERROR(EACCES, "subdir2", ".", "..", "sbd_dir2"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-R", "file", "subdir", "file2", "subdir2", NULL };
+    const char *expected_non_dir_operands[] = { "file", "file2" };
+    const char *expected_dir_headers[] = { "subdir" };
+    const char *expected_subdir_content[] = { "sbd_dir1", "sbd_file1" };
+    get_parsed_arguments_result(5, arguments);
+
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n%s\n",
+        expected_non_dir_operands[0],
+        expected_non_dir_operands[1],
+        expected_dir_headers[0],
+        expected_subdir_content[0],
+        expected_subdir_content[1]
+    ));
+    CU_ASSERT(verify_that_the_error_printed_is(
+        "ft_ls: cannot access '%s': %s\n"
+        "ft_ls: cannot open directory '%s': %s\n",
+        "subdir/sbd_dir1", strerror(ENOTDIR),
+        "subdir2", strerror(EACCES)
+    ));
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MAJOR_ERROR);
+}
+
+static void should_fail_with_a_major_error_and_print_the_non_failing_files_if_fails_to_read_subdir_content_and_directory_operand(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", ".", "..", "file", "subdir", "file2", "subdir2"),
+        MOCK_FILE("file"),
+        MOCK_FILE("file2"),
+        MOCK_DIR("subdir", ".", "..", "sbd_file1", "sbd_dir1"),
+        MOCK_FILE("subdir/sbd_file1"),
+        MOCK_DIR_READ_ERROR("subdir/sbd_dir1", 3, ".", "..", "sbdFile1", "sbdDir1", "sbdFile2", "sbdDir2"),
+        MOCK_FILE("subdir/sbd_dir1/sbdFile1"),
+        MOCK_DIR_READ_ERROR("subdir2", 2, ".", "..", "sbd_dir2", "sbd_file2"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-R", "file", "subdir", "file2", "subdir2", NULL };
+    const char *expected_non_dir_operands[] = { "file", "file2" };
+    const char *expected_dir_headers[] = { "subdir", "subdir/sbd_dir1", "subdir2" };
+    const char *expected_subdir_content[] = { "sbd_dir1", "sbd_file1" };
+    const char *expected_sbd_dir1_content[] = { "sbdFile1" };
+    get_parsed_arguments_result(5, arguments);
+
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n"
+        "\n%s:\n",
+        expected_non_dir_operands[0],
+        expected_non_dir_operands[1],
+        expected_dir_headers[0],
+        expected_subdir_content[0],
+        expected_subdir_content[1],
+        expected_dir_headers[1],
+        expected_sbd_dir1_content[0],
+        expected_dir_headers[2]
+    ));
+    CU_ASSERT(verify_that_the_error_printed_is(
+        "ft_ls: reading directory '%s': %s\n"
+        "ft_ls: reading directory '%s': %s\n",
+        "subdir/sbd_dir1", strerror(EBADF),
+        "subdir2", strerror(EBADF)
+    ));
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MAJOR_ERROR);
+}
+
+static void should_fail_with_a_major_error_and_print_the_non_failing_files_if_fails_to_dir_operand_content_and_read_directory_operand(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", ".", "..", "file", "subdir", "file2"),
+        MOCK_FILE("file"),
+        MOCK_FILE("file2"),
+        MOCK_DIR_READ_ERROR("subdir", 3, ".", "..", "sbd_file1", "sbd_dir1"),
+        MOCK_FILE_ACCESS_ERROR(ENOTDIR, "subdir/sbd_file1"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-R", "file", "subdir", "file2", NULL };
+    const char *expected_non_dir_operands[] = { "file", "file2" };
+    const char *expected_dir_headers[] = { "subdir" };
+    const char *expected_subdir_content[] = { "sbd_file1" };
+    get_parsed_arguments_result(4, arguments);
+
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n",
+        expected_non_dir_operands[0],
+        expected_non_dir_operands[1],
+        expected_dir_headers[0],
+        expected_subdir_content[0]
+    ));
+    CU_ASSERT(verify_that_the_error_printed_is(
+        "ft_ls: cannot access '%s': %s\n"
+        "ft_ls: reading directory '%s': %s\n",
+        "subdir/sbd_file1", strerror(ENOTDIR),
+        "subdir", strerror(EBADF)
+    ));
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MAJOR_ERROR);
+}
+
+static void should_fail_with_a_major_error_and_print_the_non_failing_files_if_fails_to_open_subdir_content_and_close_operand(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", ".", "..", "file", "subdir", "file2", "subdir2"),
+        MOCK_FILE("file"),
+        MOCK_FILE("file2"),
+        MOCK_DIR("subdir", ".", "..", "sbd_file1", "sbd_dir1"),
+        MOCK_FILE("subdir/sbd_file1"),
+        MOCK_DIR_OPEN_ERROR(EACCES, "subdir/sbd_dir1", ".", ".."),
+        MOCK_DIR_CLOSE_ERROR("subdir2", ".", "..", "sbd_dir2", "sbd_file2"),
+        MOCK_DIR("subdir2/sbd_dir2", ".", "..", "symlink"),
+        MOCK_SYMLINK("subdir2/sbd_dir2/symlink", "subdir"),
+        MOCK_FILE("subdir2/sbd_file2"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-R", "file", "subdir", "file2", "subdir2", NULL };
+    const char *expected_non_dir_operands[] = { "file", "file2" };
+    const char *expected_dir_headers[] = { "subdir", "subdir2", "subdir2/sbd_dir2" };
+    const char *expected_subdir_content[] = { "sbd_dir1", "sbd_file1" };
+    const char *expected_subdir2_content[] = { "sbd_dir2", "sbd_file2" };
+    const char *expected_sbd_dir2_content[] = { "symlink" };
+    get_parsed_arguments_result(5, arguments);
+
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n",
+        expected_non_dir_operands[0],
+        expected_non_dir_operands[1],
+        expected_dir_headers[0],
+        expected_subdir_content[0],
+        expected_subdir_content[1],
+        expected_dir_headers[1],
+        expected_subdir2_content[0],
+        expected_subdir2_content[1],
+        expected_dir_headers[2],
+        expected_sbd_dir2_content[0]
+    ));
+    CU_ASSERT(verify_that_the_error_printed_is(
+        "ft_ls: cannot open directory '%s': %s\n"
+        "ft_ls: closing directory '%s': %s\n",
+        "subdir/sbd_dir1", strerror(EACCES),
+        "subdir2", strerror(EBADF)
+    ));
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MAJOR_ERROR);
+}
+
+static void should_fail_with_a_major_error_and_print_the_non_failing_files_if_fails_to_access_an_operand_and_open_subdirectory(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", ".", "..", "file", "subdir", "file2", "subdir2"),
+        MOCK_FILE("file"),
+        MOCK_FILE("file2"),
+        MOCK_DIR_ACCESS_ERROR(ENOTDIR, "subdir", ".", "..", "sbd_file1", "sbd_dir1"),
+        MOCK_DIR("subdir2", ".", "..", "sbd_dir2", "sbd_file2"),
+        MOCK_DIR("subdir2/sbd_dir2", ".", "..", "symlink"),
+        MOCK_SYMLINK("subdir2/sbd_dir2/symlink", "subdir"),
+        MOCK_DIR_OPEN_ERROR(EACCES, "subdir2/sbd_file2", ".", ".."),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-R", "file", "subdir", "file2", "subdir2", NULL };
+    const char *expected_non_dir_operands[] = { "file", "file2" };
+    const char *expected_dir_headers[] = { "subdir2", "subdir2/sbd_dir2" };
+    const char *expected_subdir2_content[] = { "sbd_dir2", "sbd_file2" };
+    const char *expected_sbd_dir2_content[] = { "symlink" };
+    get_parsed_arguments_result(5, arguments);
+
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n",
+        expected_non_dir_operands[0],
+        expected_non_dir_operands[1],
+        expected_dir_headers[0],
+        expected_subdir2_content[0],
+        expected_subdir2_content[1],
+        expected_dir_headers[1],
+        expected_sbd_dir2_content[0]
+    ));
+    CU_ASSERT(verify_that_the_error_printed_is(
+        "ft_ls: cannot access '%s': %s\n"
+        "ft_ls: cannot open directory '%s': %s\n",
+        "subdir", strerror(ENOTDIR),
+        "subdir2/sbd_file2", strerror(EACCES)
+    ));
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MAJOR_ERROR);
+}
+
+static void should_fail_with_a_major_error_and_print_the_non_failing_files_if_fails_to_open_a_directory_operand_and_to_read_subdirectory_content(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", ".", "..", "file", "subdir", "file2", "subdir2"),
+        MOCK_FILE("file"),
+        MOCK_FILE("file2"),
+        MOCK_DIR_OPEN_ERROR(EACCES, "subdir", ".", "..", "sbd_file1", "sbd_dir1"),
+        MOCK_DIR("subdir2", ".", "..", "sbd_dir2", "sbd_file2"),
+        MOCK_DIR_READ_ERROR("subdir2/sbd_dir2", 3, ".", "..", "finalFile", "finalDir"),
+        MOCK_FILE("subdir2/sbd_dir2/finalFile"),
+        MOCK_FILE("subdir2/sbd_file2"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-R", "file", "subdir", "file2", "subdir2", NULL };
+    const char *expected_non_dir_operands[] = { "file", "file2" };
+    const char *expected_dir_headers[] = { "subdir2", "subdir2/sbd_dir2" };
+    const char *expected_subdir2_content[] = { "sbd_dir2", "sbd_file2" };
+    const char *expected_sbd_dir2_content[] = { "finalFile" };
+    get_parsed_arguments_result(5, arguments);
+
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n",
+        expected_non_dir_operands[0],
+        expected_non_dir_operands[1],
+        expected_dir_headers[0],
+        expected_subdir2_content[0],
+        expected_subdir2_content[1],
+        expected_dir_headers[1],
+        expected_sbd_dir2_content[0]
+    ));
+    CU_ASSERT(verify_that_the_error_printed_is(
+        "ft_ls: cannot open directory '%s': %s\n"
+        "ft_ls: reading directory '%s': %s\n",
+        "subdir", strerror(EACCES),
+        "subdir2/sbd_dir2", strerror(EBADF)
+    ));
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MAJOR_ERROR);
+}
+
+static void should_fail_with_a_major_error_and_print_the_non_failing_files_if_fails_to_read_a_directory_operand_and_to_close_subdirectory(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", ".", "..", "file", "subdir", "file2", "subdir2"),
+        MOCK_FILE("file"),
+        MOCK_FILE("file2"),
+        MOCK_DIR_READ_ERROR("subdir", 3, ".", "..", "sbd_file1", "sbd_dir1"),
+        MOCK_FILE("subdir/sbd_file1"),
+        MOCK_DIR("subdir2", ".", "..", "sbd_dir2", "sbd_file2"),
+        MOCK_DIR_CLOSE_ERROR("subdir2/sbd_dir2", ".", "..", "finalFile", "finalDir"),
+        MOCK_FILE("subdir2/sbd_dir2/finalFile"),
+        MOCK_DIR("subdir2/sbd_dir2/finalDir", ".", ".."),
+        MOCK_FILE("subdir2/sbd_file2"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-R", "file", "subdir", "file2", "subdir2", NULL };
+    const char *expected_non_dir_operands[] = { "file", "file2" };
+    const char *expected_dir_headers[] = { "subdir", "subdir2", "subdir2/sbd_dir2", "subdir2/sbd_dir2/finalDir" };
+    const char *expected_subdir_content[] = { "sbd_file1" };
+    const char *expected_subdir2_content[] = { "sbd_dir2", "sbd_file2" };
+    const char *expected_sbd_dir2_content[] = { "finalDir", "finalFile" };
+    get_parsed_arguments_result(5, arguments);
+
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n"
+        "\n%s:\n"
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n%s\n"
+        "\n%s:\n",
+        expected_non_dir_operands[0],
+        expected_non_dir_operands[1],
+        expected_dir_headers[0],
+        expected_subdir_content[0],
+        expected_dir_headers[1],
+        expected_subdir2_content[0],
+        expected_subdir2_content[1],
+        expected_dir_headers[2],
+        expected_sbd_dir2_content[0],
+        expected_sbd_dir2_content[1],
+        expected_dir_headers[3]
+    ));
+    CU_ASSERT(verify_that_the_error_printed_is(
+        "ft_ls: reading directory '%s': %s\n"
+        "ft_ls: closing directory '%s': %s\n",
+        "subdir", strerror(EBADF),
+        "subdir2/sbd_dir2", strerror(EBADF)
+    ));
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MAJOR_ERROR);
+}
+
+static void should_fail_with_a_major_error_and_print_the_non_failing_files_if_fails_to_close_a_directory_operand_and_to_access_subdirectory_contents(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", ".", "..", "file", "subdir", "file2", "subdir2"),
+        MOCK_FILE("file"),
+        MOCK_FILE("file2"),
+        MOCK_DIR_CLOSE_ERROR("subdir", ".", "..", "sbd_file1", "sbd_dir1"),
+        MOCK_FILE("subdir/sbd_file1"),
+        MOCK_DIR("subdir/sbd_dir1", ".", "..", "file1"),
+        MOCK_FILE("subdir/sbd_dir1/file1"),
+        MOCK_DIR("subdir2", ".", "..", "sbd_dir2", "sbd_file2"),
+        MOCK_DIR_ACCESS_ERROR(ENOTDIR, "subdir2/sbd_dir2", ".", "..", "finalFile", "finalDir"),
+        MOCK_FILE("subdir2/sbd_file2"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-R", "file", "subdir", "file2", "subdir2", NULL };
+    const char *expected_non_dir_operands[] = { "file", "file2" };
+    const char *expected_dir_headers[] = { "subdir", "subdir/sbd_dir1", "subdir2" };
+    const char *expected_subdir_content[] = { "sbd_dir1", "sbd_file1" };
+    const char *expected_sbd_dir1_content[] = { "file1" };
+    const char *expected_subdir2_content[] = { "sbd_dir2", "sbd_file2" };
+    get_parsed_arguments_result(5, arguments);
+
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n%s\n"
+        "\n%s:\n"
+        "%s\n"
+        "\n%s:\n"
+        "%s\n%s\n",
+        expected_non_dir_operands[0],
+        expected_non_dir_operands[1],
+        expected_dir_headers[0],
+        expected_subdir_content[0],
+        expected_subdir_content[1],
+        expected_dir_headers[1],
+        expected_sbd_dir1_content[0],
+        expected_dir_headers[2],
+        expected_subdir2_content[0],
+        expected_subdir2_content[1]
+    ));
+    CU_ASSERT(verify_that_the_error_printed_is(
+        "ft_ls: closing directory '%s': %s\n"
+        "ft_ls: cannot access '%s': %s\n",
+        "subdir", strerror(EBADF),
+        "subdir2/sbd_dir2", strerror(ENOTDIR)
+    ));
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MAJOR_ERROR);
+}
+
 void register_application_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, test_teardown);
@@ -1396,6 +2694,10 @@ void register_application_suite(void)
         CU_add_test(suite, "should_successfully_print_the_name_of_the_specified_symlink_pointing_to_a_non_directory_file", should_successfully_print_the_name_of_the_specified_symlink_pointing_to_a_non_directory_file);
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_directory_pointed_by_the_specified_symlink", should_successfully_print_the_contents_of_the_directory_pointed_by_the_specified_symlink);
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_symlinks_to_different_file_types", should_successfully_print_the_contents_of_the_symlinks_to_different_file_types);
+        CU_add_test(suite, "should_successfully_print_the_contents_of_the_current_directory_recursively", should_successfully_print_the_contents_of_the_current_directory_recursively);
+        CU_add_test(suite, "should_successfully_print_the_contents_of_the_specified_non_directory_even_with_recursive_option", should_successfully_print_the_contents_of_the_specified_non_directory_even_with_recursive_option);
+        CU_add_test(suite, "should_successfully_print_the_contents_of_the_specified_directory_recursively", should_successfully_print_the_contents_of_the_specified_directory_recursively);
+        CU_add_test(suite, "should_successfully_print_the_contents_of_the_specified_operands_recursively", should_successfully_print_the_contents_of_the_specified_operands_recursively);
         CU_add_test(suite, "should_fail_with_a_major_error_and_not_print_anything_if_fails_to_open_the_directory", should_fail_with_a_major_error_and_not_print_anything_if_fails_to_open_the_directory);
         CU_add_test(suite, "should_fail_with_a_major_error_and_not_print_anything_if_fails_to_open_the_current_directory_without_arguments", should_fail_with_a_major_error_and_not_print_anything_if_fails_to_open_the_current_directory_without_arguments);
         CU_add_test(suite, "should_fail_with_a_major_error_and_not_print_anything_if_fails_to_read_the_first_entry_of_the_directory", should_fail_with_a_major_error_and_not_print_anything_if_fails_to_read_the_first_entry_of_the_directory);
@@ -1413,5 +2715,23 @@ void register_application_suite(void)
         CU_add_test(suite, "should_fail_with_a_major_error_and_not_print_anything_if_the_specified_file_operands_fail_to_be_accessed", should_fail_with_a_major_error_and_not_print_anything_if_the_specified_file_operands_fail_to_be_accessed);
         CU_add_test(suite, "should_fail_with_a_major_error_and_print_only_the_working_operands_if_some_file_operands_fail_to_be_accessed", should_fail_with_a_major_error_and_print_only_the_working_operands_if_some_file_operands_fail_to_be_accessed);
         CU_add_test(suite, "should_fail_with_a_major_error_and_not_print_anything_if_fails_to_access_an_operand_and_process_a_directory", should_fail_with_a_major_error_and_not_print_anything_if_fails_to_access_an_operand_and_process_a_directory);
+        CU_add_test(suite, "should_fail_with_a_minor_error_and_print_the_non_failing_files_if_fails_to_access_a_child_file_of_a_directory_operand", should_fail_with_a_minor_error_and_print_the_non_failing_files_if_fails_to_access_a_child_file_of_a_directory_operand);
+        CU_add_test(suite, "should_fail_with_a_minor_error_and_print_the_non_failing_files_if_fails_to_open_a_subdirectory", should_fail_with_a_minor_error_and_print_the_non_failing_files_if_fails_to_open_a_subdirectory);
+        CU_add_test(suite, "should_fail_with_a_minor_error_and_print_the_non_failing_files_if_fails_to_read_a_subdirectory", should_fail_with_a_minor_error_and_print_the_non_failing_files_if_fails_to_read_a_subdirectory);
+        CU_add_test(suite, "should_fail_with_a_minor_error_and_print_the_non_failing_files_if_fails_to_close_a_subdirectory", should_fail_with_a_minor_error_and_print_the_non_failing_files_if_fails_to_close_a_subdirectory);
+        CU_add_test(suite, "should_fail_with_a_minor_error_and_print_the_non_failing_files_if_fails_to_access_content_of_a_directory", should_fail_with_a_minor_error_and_print_the_non_failing_files_if_fails_to_access_content_of_a_directory);
+        CU_add_test(suite, "should_fail_with_a_minor_error_and_print_the_non_failing_files_if_fails_to_access_content_of_different_directories", should_fail_with_a_minor_error_and_print_the_non_failing_files_if_fails_to_access_content_of_different_directories);
+        CU_add_test(suite, "should_fail_with_a_minor_error_and_print_the_non_failing_files_if_fails_to_access_and_open_content_of_different_directories", should_fail_with_a_minor_error_and_print_the_non_failing_files_if_fails_to_access_and_open_content_of_different_directories);
+        CU_add_test(suite, "should_fail_with_a_minor_error_and_print_the_non_failing_files_if_fails_to_access_and_read_content_of_a_directory", should_fail_with_a_minor_error_and_print_the_non_failing_files_if_fails_to_access_and_read_content_of_a_directory);
+        CU_add_test(suite, "should_fail_with_a_minor_error_and_print_the_non_failing_files_if_fails_to_access_and_close_content_of_a_directory", should_fail_with_a_minor_error_and_print_the_non_failing_files_if_fails_to_access_and_close_content_of_a_directory);
+        CU_add_test(suite, "should_fail_with_a_minor_error_and_print_the_non_failing_files_if_fails_to_operate_multiple_subdirectories", should_fail_with_a_minor_error_and_print_the_non_failing_files_if_fails_to_operate_multiple_subdirectories);
+        CU_add_test(suite, "should_fail_with_a_major_error_and_print_the_non_failing_files_if_fails_to_access_subdir_content_and_to_open_directory_operand", should_fail_with_a_major_error_and_print_the_non_failing_files_if_fails_to_access_subdir_content_and_to_open_directory_operand);
+        CU_add_test(suite, "should_fail_with_a_major_error_and_print_the_non_failing_files_if_fails_to_read_subdir_content_and_directory_operand", should_fail_with_a_major_error_and_print_the_non_failing_files_if_fails_to_read_subdir_content_and_directory_operand);
+        CU_add_test(suite, "should_fail_with_a_major_error_and_print_the_non_failing_files_if_fails_to_dir_operand_content_and_read_directory_operand", should_fail_with_a_major_error_and_print_the_non_failing_files_if_fails_to_dir_operand_content_and_read_directory_operand);
+        CU_add_test(suite, "should_fail_with_a_major_error_and_print_the_non_failing_files_if_fails_to_open_subdir_content_and_close_operand", should_fail_with_a_major_error_and_print_the_non_failing_files_if_fails_to_open_subdir_content_and_close_operand);
+        CU_add_test(suite, "should_fail_with_a_major_error_and_print_the_non_failing_files_if_fails_to_access_an_operand_and_open_subdirectory", should_fail_with_a_major_error_and_print_the_non_failing_files_if_fails_to_access_an_operand_and_open_subdirectory);
+        CU_add_test(suite, "should_fail_with_a_major_error_and_print_the_non_failing_files_if_fails_to_open_a_directory_operand_and_to_read_subdirectory_content", should_fail_with_a_major_error_and_print_the_non_failing_files_if_fails_to_open_a_directory_operand_and_to_read_subdirectory_content);
+        CU_add_test(suite, "should_fail_with_a_major_error_and_print_the_non_failing_files_if_fails_to_read_a_directory_operand_and_to_close_subdirectory", should_fail_with_a_major_error_and_print_the_non_failing_files_if_fails_to_read_a_directory_operand_and_to_close_subdirectory);
+        CU_add_test(suite, "should_fail_with_a_major_error_and_print_the_non_failing_files_if_fails_to_close_a_directory_operand_and_to_access_subdirectory_contents", should_fail_with_a_major_error_and_print_the_non_failing_files_if_fails_to_close_a_directory_operand_and_to_access_subdirectory_contents);
     }
 }

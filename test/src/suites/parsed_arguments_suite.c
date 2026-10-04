@@ -1,3 +1,4 @@
+#include "suites.h"
 #include "CUnit/CUnit.h"
 #include "CUnit/Basic.h"
 #include "mocks.h"
@@ -41,10 +42,12 @@ static void should_be_created_correctly(void)
     const char * const *directory_file_operands = parsed_arguments_get_directory_file_operands(sut);
 
     CU_ASSERT_PTR_NOT_NULL(sut);
+    CU_ASSERT_FALSE(parsed_arguments_has_any_option_active(sut));
     CU_ASSERT_PTR_NULL(non_directory_file_operands[0]);
     CU_ASSERT_STRING_EQUAL(directory_file_operands[0], ".");
     CU_ASSERT_PTR_NULL(directory_file_operands[1]);
     CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
+    CU_ASSERT_PTR_NULL(result_get_error_context(parsed_arguments_result));
     CU_ASSERT(verify_that_no_error_was_printed());
 }
 
@@ -113,6 +116,7 @@ static void should_return_default_values_if_arguments_are_NULL(void)
     const char * const *directory_file_operands = parsed_arguments_get_directory_file_operands(sut);
 
     CU_ASSERT_PTR_NOT_NULL(sut);
+    CU_ASSERT_FALSE(parsed_arguments_has_any_option_active(sut));
     CU_ASSERT_PTR_NULL(non_directory_file_operands[0]);
     CU_ASSERT_STRING_EQUAL(directory_file_operands[0], ".");
     CU_ASSERT_PTR_NULL(directory_file_operands[1]);
@@ -147,6 +151,7 @@ static void should_return_the_non_directory_file_operands(void)
 
     const char * const *non_directory_file_operands = parsed_arguments_get_non_directory_file_operands(sut);
 
+    CU_ASSERT_FALSE(parsed_arguments_has_any_option_active(sut));
     CU_ASSERT_STRING_EQUAL(non_directory_file_operands[0], args[0]);
     CU_ASSERT_STRING_EQUAL(non_directory_file_operands[1], args[1]);
     CU_ASSERT_STRING_EQUAL(non_directory_file_operands[2], args[2]);
@@ -186,6 +191,7 @@ static void should_return_the_directory_file_operands(void)
 
     const char * const *directory_file_operands = parsed_arguments_get_directory_file_operands(sut);
 
+    CU_ASSERT_FALSE(parsed_arguments_has_any_option_active(sut));
     CU_ASSERT_STRING_EQUAL(directory_file_operands[0], args[2]);
     CU_ASSERT_STRING_EQUAL(directory_file_operands[1], args[6]);
     CU_ASSERT_PTR_NULL(directory_file_operands[2]);
@@ -197,7 +203,7 @@ static void should_return_false_for_multiple_file_operands_if_NULL_parsed_argume
 {
     const int has_multiple_file_operands = parsed_arguments_has_multiple_file_operands(NULL);
 
-    CU_ASSERT_EQUAL(has_multiple_file_operands, 0);
+    CU_ASSERT_FALSE(has_multiple_file_operands);
     CU_ASSERT(verify_that_no_error_was_printed());
 }
 
@@ -214,7 +220,7 @@ static void should_return_false_for_multiple_file_operands_if_has_less_than_two(
 
     const int has_multiple_file_operands = parsed_arguments_has_multiple_file_operands(sut);
 
-    CU_ASSERT_EQUAL(has_multiple_file_operands, 0);
+    CU_ASSERT_FALSE(has_multiple_file_operands);
     CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
     CU_ASSERT(verify_that_no_error_was_printed());
 }
@@ -233,7 +239,7 @@ static void should_return_true_for_multiple_file_operands_if_has_equal_or_more_t
 
     const int has_multiple_file_operands = parsed_arguments_has_multiple_file_operands(sut);
 
-    CU_ASSERT_EQUAL(has_multiple_file_operands, 1);
+    CU_ASSERT_TRUE(has_multiple_file_operands);
     CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
     CU_ASSERT(verify_that_no_error_was_printed());
 }
@@ -242,7 +248,7 @@ static void should_return_false_for_has_directory_file_operands_if_NULL_parsed_a
 {
     const int has_directory_file_operands = parsed_arguments_has_directory_file_operands(NULL);
 
-    CU_ASSERT_EQUAL(has_directory_file_operands, 0);
+    CU_ASSERT_FALSE(has_directory_file_operands);
     CU_ASSERT(verify_that_no_error_was_printed());
 }
 
@@ -261,7 +267,7 @@ static void should_return_false_for_has_directory_file_operands_if_it_does_not_h
 
     const int has_directory_file_operands = parsed_arguments_has_directory_file_operands(sut);
 
-    CU_ASSERT_EQUAL(has_directory_file_operands, 0);
+    CU_ASSERT_FALSE(has_directory_file_operands);
     CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
     CU_ASSERT(verify_that_no_error_was_printed());
 }
@@ -279,14 +285,14 @@ static void should_return_true_for_has_directory_file_operands_if_it_has_at_leas
 
     const int has_directory_file_operands = parsed_arguments_has_directory_file_operands(sut);
 
-    CU_ASSERT_EQUAL(has_directory_file_operands, 1);
+    CU_ASSERT_TRUE(has_directory_file_operands);
     CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
     CU_ASSERT(verify_that_no_error_was_printed());
 }
 
 static void should_return_false_for_has_mixed_types_file_operands_if_it_null_parsed_arguments_are_specified(void)
 {
-    CU_ASSERT_EQUAL(parsed_arguments_has_mixed_types_file_operands(NULL), 0);
+    CU_ASSERT_FALSE(parsed_arguments_has_mixed_types_file_operands(NULL));
     CU_ASSERT(verify_that_no_error_was_printed());
 }
 
@@ -304,7 +310,7 @@ static void should_return_false_for_has_mixed_types_file_operands_if_it_does_not
 
     const int has_mixed_types_file_operands = parsed_arguments_has_mixed_types_file_operands(sut);
 
-    CU_ASSERT_EQUAL(has_mixed_types_file_operands, 0);
+    CU_ASSERT_FALSE(has_mixed_types_file_operands);
     CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
     CU_ASSERT(verify_that_no_error_was_printed());
 }
@@ -323,7 +329,7 @@ static void should_return_true_for_has_mixed_types_file_operands_if_it_does_have
 
     const int has_mixed_types_file_operands = parsed_arguments_has_mixed_types_file_operands(sut);
 
-    CU_ASSERT_EQUAL(has_mixed_types_file_operands, 1);
+    CU_ASSERT_TRUE(has_mixed_types_file_operands);
     CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
     CU_ASSERT(verify_that_no_error_was_printed());
 }
@@ -333,7 +339,7 @@ static void should_sort_the_non_directory_file_operands_by_ascii_by_default(void
     const t_vfs_mock_entry vfs[] = {
         MOCK_FILE("a"),
         MOCK_FILE("2file"),
-        MOCK_FILE("_file"),
+        MOCK_FILE("_Reg"),
         MOCK_FILE("f"),
         MOCK_FILE(".hidden_file"),
         MOCK_FILE("FILE"),
@@ -352,11 +358,12 @@ static void should_sort_the_non_directory_file_operands_by_ascii_by_default(void
     };
     vfs_mock_setup(vfs);
 
-    const char *args[] = { "a", "2file", "_DIR", ".hiddir", "_file", "f", "dir", ".hidden_file", "FILE", NULL };
+    const char *args[] = { "a", "2file", "_DIR", ".hiddir", "_Reg", "f", "dir", ".hidden_file", "FILE", NULL };
     get_parsed_arguments_result(9, args);
 
     const char * const *non_directory_file_operands = parsed_arguments_get_non_directory_file_operands(sut);
 
+    CU_ASSERT_FALSE(parsed_arguments_has_any_option_active(sut));
     CU_ASSERT_STRING_EQUAL(non_directory_file_operands[0], args[7]);
     CU_ASSERT_STRING_EQUAL(non_directory_file_operands[1], args[1]);
     CU_ASSERT_STRING_EQUAL(non_directory_file_operands[2], args[8]);
@@ -373,7 +380,7 @@ static void should_sort_the_directory_file_operands_by_ascii_by_default(void)
     const t_vfs_mock_entry vfs[] = {
         MOCK_FILE("a"),
         MOCK_FILE("2file"),
-        MOCK_FILE("_file"),
+        MOCK_FILE("_Reg"),
         MOCK_FILE("f"),
         MOCK_FILE(".hidden_file"),
         MOCK_FILE("FILE"),
@@ -392,15 +399,252 @@ static void should_sort_the_directory_file_operands_by_ascii_by_default(void)
     };
     vfs_mock_setup(vfs);
 
-    const char *args[] = { "a", "2file", "_DIR", ".hiddir", "_file", "f", "dir", ".hidden_file", "FILE", NULL };
+    const char *args[] = { "a", "2file", "_DIR", ".hiddir", "_Reg", "f", "dir", ".hidden_file", "FILE", NULL };
     get_parsed_arguments_result(9, args);
 
     const char * const *directory_file_operands = parsed_arguments_get_directory_file_operands(sut);
 
+    CU_ASSERT_FALSE(parsed_arguments_has_any_option_active(sut));
     CU_ASSERT_STRING_EQUAL(directory_file_operands[0], args[3]);
     CU_ASSERT_STRING_EQUAL(directory_file_operands[1], args[2]);
     CU_ASSERT_STRING_EQUAL(directory_file_operands[2], args[6]);
     CU_ASSERT_PTR_NULL(directory_file_operands[3]);
+    CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
+    CU_ASSERT(verify_that_no_error_was_printed());
+}
+
+static void should_parse_the_option_and_file_operands_if_the_option_was_the_first_specified_argument(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("file"),
+        MOCK_FILE("file2"),
+        MOCK_DIR("dir", ".", ".."),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-R", "file", "file2", "dir", NULL };
+
+    get_parsed_arguments_result(4, arguments);
+    const char * const *non_directory_file_operands = parsed_arguments_get_non_directory_file_operands(sut);
+    const char * const *directory_file_operands = parsed_arguments_get_directory_file_operands(sut);
+
+    CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
+    CU_ASSERT_TRUE(parsed_arguments_is_option_active(sut, OPTIONS_RECURSIVE));
+    CU_ASSERT_STRING_EQUAL(non_directory_file_operands[0], "file");
+    CU_ASSERT_STRING_EQUAL(non_directory_file_operands[1], "file2");
+    CU_ASSERT_PTR_NULL(non_directory_file_operands[2]);
+    CU_ASSERT_STRING_EQUAL(directory_file_operands[0], "dir");
+    CU_ASSERT_PTR_NULL(directory_file_operands[1]);
+    CU_ASSERT(verify_that_no_error_was_printed());
+}
+
+static void should_parse_the_option_and_file_operands_if_the_option_was_a_middle_specified_argument(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("file"),
+        MOCK_FILE("file2"),
+        MOCK_DIR("dir", ".", ".."),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "file", "file2", "-R", "dir", NULL };
+
+    get_parsed_arguments_result(4, arguments);
+    const char * const *non_directory_file_operands = parsed_arguments_get_non_directory_file_operands(sut);
+    const char * const *directory_file_operands = parsed_arguments_get_directory_file_operands(sut);
+
+    CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
+    CU_ASSERT_TRUE(parsed_arguments_is_option_active(sut, OPTIONS_RECURSIVE));
+    CU_ASSERT_STRING_EQUAL(non_directory_file_operands[0], "file");
+    CU_ASSERT_STRING_EQUAL(non_directory_file_operands[1], "file2");
+    CU_ASSERT_PTR_NULL(non_directory_file_operands[2]);
+    CU_ASSERT_STRING_EQUAL(directory_file_operands[0], "dir");
+    CU_ASSERT_PTR_NULL(directory_file_operands[1]);
+    CU_ASSERT(verify_that_no_error_was_printed());
+}
+
+static void should_parse_the_option_and_file_operands_if_the_option_was_the_last_specified_argument(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("file"),
+        MOCK_FILE("file2"),
+        MOCK_DIR("dir", ".", ".."),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "file", "file2", "dir", "-R", NULL };
+
+    get_parsed_arguments_result(4, arguments);
+    const char * const *non_directory_file_operands = parsed_arguments_get_non_directory_file_operands(sut);
+    const char * const *directory_file_operands = parsed_arguments_get_directory_file_operands(sut);
+
+    CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
+    CU_ASSERT_TRUE(parsed_arguments_is_option_active(sut, OPTIONS_RECURSIVE));
+    CU_ASSERT_STRING_EQUAL(non_directory_file_operands[0], "file");
+    CU_ASSERT_STRING_EQUAL(non_directory_file_operands[1], "file2");
+    CU_ASSERT_PTR_NULL(non_directory_file_operands[2]);
+    CU_ASSERT_STRING_EQUAL(directory_file_operands[0], "dir");
+    CU_ASSERT_PTR_NULL(directory_file_operands[1]);
+    CU_ASSERT(verify_that_no_error_was_printed());
+}
+
+static void should_parse_the_recursive_option(void)
+{
+    const char *arguments[] = { "-R", NULL };
+
+    get_parsed_arguments_result(1, arguments);
+    const char * const *non_directory_file_operands = parsed_arguments_get_non_directory_file_operands(sut);
+    const char * const *directory_file_operands = parsed_arguments_get_directory_file_operands(sut);
+
+    CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
+    CU_ASSERT_TRUE(parsed_arguments_is_option_active(sut, OPTIONS_RECURSIVE));
+    CU_ASSERT_PTR_NULL(non_directory_file_operands[0]);
+    CU_ASSERT_STRING_EQUAL(directory_file_operands[0], ".");
+    CU_ASSERT_PTR_NULL(directory_file_operands[1]);
+    CU_ASSERT(verify_that_no_error_was_printed());
+}
+
+static void should_return_false_for_has_any_option_if_NULL_parsed_arguments_are_passed(void)
+{
+    const int has_any_option = parsed_arguments_has_any_option_active(NULL);
+
+    CU_ASSERT_FALSE(has_any_option);
+    CU_ASSERT(verify_that_no_error_was_printed());
+}
+
+static void should_return_false_for_has_any_option_if_at_no_option_was_specified(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("dir", ".", ".."),
+        MOCK_FILE("file"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *args[] = { "file", "dir", NULL };
+    get_parsed_arguments_result(2, args);
+
+    const int has_any_option = parsed_arguments_has_any_option_active(sut);
+
+    CU_ASSERT_FALSE(has_any_option);
+    CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
+    CU_ASSERT(verify_that_no_error_was_printed());
+}
+
+static void should_return_true_for_has_any_option_if_at_least_one_option_was_specified(void)
+{
+    const char *args[] = { "-R", NULL };
+    get_parsed_arguments_result(1, args);
+
+    const int has_any_option = parsed_arguments_has_any_option_active(sut);
+
+    CU_ASSERT_TRUE(has_any_option);
+    CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
+    CU_ASSERT(verify_that_no_error_was_printed());
+}
+
+static void should_return_false_for_has_option_if_NULL_parsed_arguments_are_passed(void)
+{
+    const int has_option = parsed_arguments_is_option_active(NULL, OPTIONS_RECURSIVE);
+
+    CU_ASSERT_FALSE(has_option);
+    CU_ASSERT(verify_that_no_error_was_printed());
+}
+
+static void should_return_false_for_has_option_if_the_specified_option_was_NOT_parsed(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("dir", ".", ".."),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *args[] = { "dir", "-l", NULL };
+    get_parsed_arguments_result(2, args);
+
+    const int has_option = parsed_arguments_is_option_active(sut, OPTIONS_RECURSIVE);
+
+    CU_ASSERT_FALSE(has_option);
+    CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
+    CU_ASSERT(verify_that_no_error_was_printed());
+}
+
+static void should_return_true_for_has_option_if_the_specified_option_was_parsed(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("file"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *args[] = { "file", "-R", NULL };
+    get_parsed_arguments_result(2, args);
+
+    const int has_option = parsed_arguments_is_option_active(sut, OPTIONS_RECURSIVE);
+
+    CU_ASSERT_TRUE(has_option);
+    CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
+    CU_ASSERT(verify_that_no_error_was_printed());
+}
+
+static void should_return_false_for_is_file_operand_if_NULL_parsed_arguments_are_specified(void)
+{
+    CU_ASSERT_FALSE(parsed_arguments_is_file_operand(NULL, "file"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+}
+
+static void should_return_false_for_is_file_operand_if_invalid_file_is_specified(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", ".", ".."),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *args[] = { NULL };
+    get_parsed_arguments_result(0, args);
+
+    CU_ASSERT_FALSE(parsed_arguments_is_file_operand(sut, NULL));
+    CU_ASSERT_FALSE(parsed_arguments_is_file_operand(sut, ""));
+    CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
+    CU_ASSERT(verify_that_no_error_was_printed());
+}
+
+static void should_return_false_for_is_file_operand_if_the_specified_file_was_not_passed_as_an_operand(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("file"),
+        MOCK_DIR("directory", ".", "..", "inside"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *args[] = { "file", "directory", NULL };
+    get_parsed_arguments_result(2, args);
+
+    CU_ASSERT_FALSE(parsed_arguments_is_file_operand(sut, "notPassed"));
+    CU_ASSERT_FALSE(parsed_arguments_is_file_operand(sut, "directory/inside"));
+    CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
+    CU_ASSERT(verify_that_no_error_was_printed());
+}
+
+static void should_return_true_for_is_file_operand_if_the_specified_file_was_passed_as_an_operand(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("file"),
+        MOCK_DIR("directory", ".", ".."),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *args[] = { "file", "directory", NULL };
+    get_parsed_arguments_result(2, args);
+
+    CU_ASSERT_TRUE(parsed_arguments_is_file_operand(sut, "file"));
+    CU_ASSERT_TRUE(parsed_arguments_is_file_operand(sut, "directory"));
     CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
     CU_ASSERT(verify_that_no_error_was_printed());
 }
@@ -421,6 +665,7 @@ static void should_be_created_correctly_even_if_current_directory_is_invalid_if_
 
     CU_ASSERT_PTR_NOT_NULL(sut);
     CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
+    CU_ASSERT_FALSE(parsed_arguments_has_any_option_active(sut));
     CU_ASSERT_PTR_NULL(non_directory_file_operands[0]);
     CU_ASSERT_STRING_EQUAL(directory_file_operands[0], ".");
     CU_ASSERT_PTR_NULL(directory_file_operands[1]);
@@ -443,6 +688,8 @@ static void should_be_created_correctly_even_if_current_directory_is_invalid_and
 
     CU_ASSERT_PTR_NOT_NULL(sut);
     CU_ASSERT_TRUE(result_has_failed(parsed_arguments_result));
+    CU_ASSERT_PTR_NULL(result_get_error_context(parsed_arguments_result));
+    CU_ASSERT_FALSE(parsed_arguments_has_any_option_active(sut));
     CU_ASSERT_PTR_NULL(non_directory_file_operands[0]);
     CU_ASSERT_PTR_NULL(directory_file_operands[0]);
     CU_ASSERT(verify_that_the_error_printed_is("ft_ls: cannot access '%s': %s\n", valid_args[0], strerror(EACCES)));
@@ -466,9 +713,11 @@ static void should_be_created_correctly_even_if_the_specified_argument_cannot_be
         "ft_ls: cannot access '%s': %s\n",
         "notExistent", strerror(ENOENT)
     ));
+    CU_ASSERT_FALSE(parsed_arguments_has_any_option_active(sut));
     CU_ASSERT_PTR_NULL(non_directory_file_operands[0]);
     CU_ASSERT_PTR_NULL(directory_file_operands[0]);
     CU_ASSERT_FALSE(result_has_succeed(parsed_arguments_result));
+    CU_ASSERT_PTR_NULL(result_get_error_context(parsed_arguments_result));
     CU_ASSERT_PTR_NOT_NULL(sut);
 }
 
@@ -491,10 +740,12 @@ static void should_be_created_correctly_even_if_one_argument_cannot_be_accessed(
         "ft_ls: cannot access '%s': %s\n",
         "notExistent", strerror(ENOENT)
     ));
+    CU_ASSERT_FALSE(parsed_arguments_has_any_option_active(sut));
     CU_ASSERT_STRING_EQUAL(non_directory_file_operands[0], "file");
     CU_ASSERT_PTR_NULL(non_directory_file_operands[1]);
     CU_ASSERT_PTR_NULL(directory_file_operands[0]);
     CU_ASSERT_FALSE(result_has_succeed(parsed_arguments_result));
+    CU_ASSERT_PTR_NULL(result_get_error_context(parsed_arguments_result));
     CU_ASSERT_PTR_NOT_NULL(sut);
 }
 
@@ -521,6 +772,7 @@ static void should_be_created_correctly_even_if_one_argument_cannot_be_accessed_
         "ft_ls: cannot access '%s': %s\n",
         "linkloop", strerror(ELOOP)
     ));
+    CU_ASSERT_FALSE(parsed_arguments_has_any_option_active(sut));
     CU_ASSERT_STRING_EQUAL(non_directory_file_operands[0], "file");
     CU_ASSERT_STRING_EQUAL(non_directory_file_operands[1], "filelink");
     CU_ASSERT_PTR_NULL(non_directory_file_operands[2]);
@@ -529,6 +781,7 @@ static void should_be_created_correctly_even_if_one_argument_cannot_be_accessed_
     CU_ASSERT_STRING_EQUAL(directory_file_operands[2], "empty");
     CU_ASSERT_PTR_NULL(directory_file_operands[3]);
     CU_ASSERT_FALSE(result_has_succeed(parsed_arguments_result));
+    CU_ASSERT_PTR_NULL(result_get_error_context(parsed_arguments_result));
     CU_ASSERT_PTR_NOT_NULL(sut);
 }
 
@@ -553,9 +806,11 @@ static void should_be_created_correctly_even_if_the_specified_arguments_cannot_b
         "notExistent", strerror(ENOENT),
         "notADir/", strerror(ENOTDIR)
     ));
+    CU_ASSERT_FALSE(parsed_arguments_has_any_option_active(sut));
     CU_ASSERT_PTR_NULL(non_directory_file_operands[0]);
     CU_ASSERT_PTR_NULL(directory_file_operands[0]);
     CU_ASSERT_FALSE(result_has_succeed(parsed_arguments_result));
+    CU_ASSERT_PTR_NULL(result_get_error_context(parsed_arguments_result));
     CU_ASSERT_PTR_NOT_NULL(sut);
 }
 
@@ -588,6 +843,7 @@ static void should_be_created_correctly_even_if_some_arguments_cannot_be_accesse
         "badAddress", strerror(EFAULT),
         "noMem", strerror(ENOMEM)
     ));
+    CU_ASSERT_FALSE(parsed_arguments_has_any_option_active(sut));
     CU_ASSERT_STRING_EQUAL(non_directory_file_operands[0], "file");
     CU_ASSERT_STRING_EQUAL(non_directory_file_operands[1], "filelink");
     CU_ASSERT_PTR_NULL(non_directory_file_operands[2]);
@@ -596,6 +852,7 @@ static void should_be_created_correctly_even_if_some_arguments_cannot_be_accesse
     CU_ASSERT_STRING_EQUAL(directory_file_operands[2], "empty");
     CU_ASSERT_PTR_NULL(directory_file_operands[3]);
     CU_ASSERT_FALSE(result_has_succeed(parsed_arguments_result));
+    CU_ASSERT_PTR_NULL(result_get_error_context(parsed_arguments_result));
     CU_ASSERT_PTR_NOT_NULL(sut);
 }
 
@@ -627,6 +884,20 @@ void register_parsed_arguments_suite(void)
         CU_add_test(suite, "should_return_true_for_has_mixed_types_file_operands_if_it_does_have_at_least_one_non_dir_and_one_dir", should_return_true_for_has_mixed_types_file_operands_if_it_does_have_at_least_one_non_dir_and_one_dir);
         CU_add_test(suite, "should_sort_the_non_directory_file_operands_by_ascii_by_default", should_sort_the_non_directory_file_operands_by_ascii_by_default);
         CU_add_test(suite, "should_sort_the_directory_file_operands_by_ascii_by_default", should_sort_the_directory_file_operands_by_ascii_by_default);
+        CU_add_test(suite, "should_parse_the_option_and_file_operands_if_the_option_was_the_first_specified_argument", should_parse_the_option_and_file_operands_if_the_option_was_the_first_specified_argument);
+        CU_add_test(suite, "should_parse_the_option_and_file_operands_if_the_option_was_a_middle_specified_argument", should_parse_the_option_and_file_operands_if_the_option_was_a_middle_specified_argument);
+        CU_add_test(suite, "should_parse_the_option_and_file_operands_if_the_option_was_the_last_specified_argument", should_parse_the_option_and_file_operands_if_the_option_was_the_last_specified_argument);
+        CU_add_test(suite, "should_parse_the_recursive_option", should_parse_the_recursive_option);
+        CU_add_test(suite, "should_return_false_for_has_any_option_if_NULL_parsed_arguments_are_passed", should_return_false_for_has_any_option_if_NULL_parsed_arguments_are_passed);
+        CU_add_test(suite, "should_return_false_for_has_any_option_if_at_no_option_was_specified", should_return_false_for_has_any_option_if_at_no_option_was_specified);
+        CU_add_test(suite, "should_return_true_for_has_any_option_if_at_least_one_option_was_specified", should_return_true_for_has_any_option_if_at_least_one_option_was_specified);
+        CU_add_test(suite, "should_return_false_for_has_option_if_NULL_parsed_arguments_are_passed", should_return_false_for_has_option_if_NULL_parsed_arguments_are_passed);
+        CU_add_test(suite, "should_return_false_for_has_option_if_the_specified_option_was_NOT_parsed", should_return_false_for_has_option_if_the_specified_option_was_NOT_parsed);
+        CU_add_test(suite, "should_return_true_for_has_option_if_the_specified_option_was_parsed", should_return_true_for_has_option_if_the_specified_option_was_parsed);
+        CU_add_test(suite, "should_return_false_for_is_file_operand_if_NULL_parsed_arguments_are_specified", should_return_false_for_is_file_operand_if_NULL_parsed_arguments_are_specified);
+        CU_add_test(suite, "should_return_false_for_is_file_operand_if_invalid_file_is_specified", should_return_false_for_is_file_operand_if_invalid_file_is_specified);
+        CU_add_test(suite, "should_return_false_for_is_file_operand_if_the_specified_file_was_not_passed_as_an_operand", should_return_false_for_is_file_operand_if_the_specified_file_was_not_passed_as_an_operand);
+        CU_add_test(suite, "should_return_true_for_is_file_operand_if_the_specified_file_was_passed_as_an_operand", should_return_true_for_is_file_operand_if_the_specified_file_was_passed_as_an_operand);
         CU_add_test(suite, "should_be_created_correctly_even_if_current_directory_is_invalid_if_no_parameters_were_specified", should_be_created_correctly_even_if_current_directory_is_invalid_if_no_parameters_were_specified);
         CU_add_test(suite, "should_be_created_correctly_even_if_current_directory_is_invalid_and_was_specified", should_be_created_correctly_even_if_current_directory_is_invalid_and_was_specified);
         CU_add_test(suite, "should_be_created_correctly_even_if_the_specified_argument_cannot_be_accessed", should_be_created_correctly_even_if_the_specified_argument_cannot_be_accessed);
