@@ -57,14 +57,14 @@ static t_ft_ls_error_code get_scan_error(const t_application_context *context, c
 
 static t_file_entry_array *get_directory_content(t_application_context *context, const char *directory_path)
 {
-    t_result *result = scan(directory_path);
-    const t_ft_ls_error_code scan_error = get_scan_error(context, result);
+    t_result *scan_result = scan(directory_path);
+    const t_ft_ls_error_code scan_error = get_scan_error(context, scan_result);
 
     update_error_code(context, scan_error);
-    t_file_entry_array *file_entry_array = result_get_value(result);
+    t_file_entry_array *file_entry_array = result_get_value(scan_result);
     file_entry_array_sort(file_entry_array);
 
-    result_destroy(&result);
+    result_destroy(&scan_result);
     return file_entry_array;
 }
 
