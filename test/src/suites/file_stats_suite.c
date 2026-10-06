@@ -318,6 +318,21 @@ static void should_return_NULL_for_the_target_pointed_by_a_symlink_if_NULL_stats
     CU_ASSERT_PTR_NULL(file_stats_get_target_pointed_by_link(NULL));
 }
 
+static void should_return_NULL_for_the_target_pointed_by_a_symlink_if_stats_of_a_non_link_file_are_passed(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("noLink"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    t_file_stats *stats = file_stats_get_without_following_symlinks("noLink");
+
+    CU_ASSERT_PTR_NULL(file_stats_get_target_pointed_by_link(stats));
+
+    file_stats_destroy(&stats);
+}
+
 static void should_return_the_target_pointed_by_a_symlink(void)
 {
     char long_target[LINK_BUFFER_SIZE + 1];
@@ -434,6 +449,7 @@ void register_file_stats_suite(void)
         CU_add_test(suite, "should_return_the_correct_file_stats_if_the_specified_files_are_multi_hop_symlinks", should_return_the_correct_file_stats_if_the_specified_files_are_multi_hop_symlinks);
         CU_add_test(suite, "should_always_return_link_file_stats_when_retrieving_stats_without_following_symlinks", should_always_return_link_file_stats_when_retrieving_stats_without_following_symlinks);
         CU_add_test(suite, "should_return_NULL_for_the_target_pointed_by_a_symlink_if_NULL_stats_are_passed", should_return_NULL_for_the_target_pointed_by_a_symlink_if_NULL_stats_are_passed);
+        CU_add_test(suite, "should_return_NULL_for_the_target_pointed_by_a_symlink_if_stats_of_a_non_link_file_are_passed", should_return_NULL_for_the_target_pointed_by_a_symlink_if_stats_of_a_non_link_file_are_passed);
         CU_add_test(suite, "should_return_the_target_pointed_by_a_symlink", should_return_the_target_pointed_by_a_symlink);
         CU_add_test(suite, "should_return_NULL_when_an_error_accessing_a_file_occurs", should_return_NULL_when_an_error_accessing_a_file_occurs);
         CU_add_test(suite, "should_return_NULL_when_an_error_accessing_a_file_without_following_symlinks_occurs", should_return_NULL_when_an_error_accessing_a_file_without_following_symlinks_occurs);
