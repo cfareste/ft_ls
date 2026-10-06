@@ -329,8 +329,6 @@ static void should_return_the_target_pointed_by_a_symlink(void)
 
     t_file_stats *stats = file_stats_get_without_following_symlinks("link");
 
-    file_stats_set_target_pointed_by_link(stats);
-
     CU_ASSERT_STRING_EQUAL(file_stats_get_target_pointed_by_link(stats), long_target);
 
     file_stats_destroy(&stats);

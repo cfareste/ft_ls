@@ -76,6 +76,30 @@ static t_file_type get_file_type(const mode_t mode)
     return file_type;
 }
 
+static void retrieve_target_pointed_by_link(t_file_stats *stats)
+{
+    size_t target_buffer_size = DEFAULT_TARGET_BUFFER_SIZE;
+    char *target = ft_safe_calloc(target_buffer_size + 1, sizeof(char));
+
+    while (target_buffer_size <= MAX_SAFE_TARGET_BUFFER_SIZE)
+    {
+        const ssize_t target_length = readlink(stats->file_name, target, target_buffer_size);
+
+        if ((size_t)target_length < target_buffer_size)
+        {
+            free(stats->target_pointed_by_link);
+            stats->target_pointed_by_link = target;
+            return ;
+        }
+
+        const size_t new_buffer_size = target_buffer_size * 2;
+        target = ft_safe_realloc(target, target_buffer_size + 1, new_buffer_size + 1);
+        target_buffer_size = new_buffer_size;
+    }
+
+    free(target);
+}
+
 t_file_stats *file_stats_get(const char *file_path)
 {
     if (!ft_is_valid_path(file_path))
@@ -116,32 +140,11 @@ t_file_type file_stats_get_file_type(const t_file_stats *file_stats)
     return file_stats->type;
 }
 
-void file_stats_set_target_pointed_by_link(t_file_stats *stats)
+const char *file_stats_get_target_pointed_by_link(t_file_stats *stats)
 {
-    size_t target_buffer_size = DEFAULT_TARGET_BUFFER_SIZE;
-    char *target = ft_safe_calloc(target_buffer_size + 1, sizeof(char));
+    if (stats->target_pointed_by_link == NULL)
+        retrieve_target_pointed_by_link(stats);
 
-    while (target_buffer_size <= MAX_SAFE_TARGET_BUFFER_SIZE)
-    {
-        const ssize_t target_length = readlink(stats->file_name, target, target_buffer_size);
-
-        if ((size_t)target_length < target_buffer_size)
-        {
-            free(stats->target_pointed_by_link);
-            stats->target_pointed_by_link = target;
-            return ;
-        }
-
-        const size_t new_buffer_size = target_buffer_size * 2;
-        target = ft_safe_realloc(target, target_buffer_size + 1, new_buffer_size + 1);
-        target_buffer_size = new_buffer_size;
-    }
-
-    free(target);
-}
-
-const char *file_stats_get_target_pointed_by_link(const t_file_stats *stats)
-{
     return stats->target_pointed_by_link;
 }
 
