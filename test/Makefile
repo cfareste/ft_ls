@@ -19,6 +19,7 @@ CC = cc
 CCFLAGS += -g -Wall -Wextra -Werror -Wpedantic -fsanitize=address \
 		   -Dopendir=mock_opendir -Dreaddir=mock_readdir -Dclosedir=mock_closedir \
 		   -Dstat=stat_mock -Dlstat=lstat_mock \
+		   -Dreadlink=readlink_mock \
 		   -Dft_printf=printf_mock -Dft_fprintf=fprintf_mock
 COVERAGE_FLAGS = -fprofile-arcs -ftest-coverage
 
@@ -96,6 +97,7 @@ SRCS = main.c \
 		directory_mock.c \
 		print_mock.c \
 		stat_mock.c \
+		readlink_mock.c \
 		directory_suite.c \
 		file_entry_suite.c \
 		renderer_suite.c \
