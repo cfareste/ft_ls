@@ -9,6 +9,7 @@
 #define READ_DIRECTORY_ERROR_PREFIX "ft_ls: reading directory"
 #define CLOSE_DIRECTORY_ERROR_PREFIX "ft_ls: closing directory"
 #define ACCESS_FILE_ERROR_PREFIX "ft_ls: cannot access"
+#define READ_SYMBOLIC_LINK_ERROR_PREFIX "ft_ls: cannot read symbolic link"
 
 static void test_setup(void)
 {
@@ -128,6 +129,34 @@ static void should_print_the_access_file_error_with_the_specified_file_path(void
     CU_ASSERT(verify_that_the_error_printed_is("%s '%s': %s\n", ACCESS_FILE_ERROR_PREFIX, directory_path, strerror(errno)));
 }
 
+static void should_only_print_the_read_symbolic_link_error_if_a_NULL_file_path_is_specified(void)
+{
+    errno = EINVAL;
+
+    report_read_symbolic_link_error(NULL);
+
+    CU_ASSERT(verify_that_the_error_printed_is("%s: %s\n", READ_SYMBOLIC_LINK_ERROR_PREFIX, strerror(errno)));
+}
+
+static void should_only_print_the_read_symbolic_link_error_if_an_empty_file_path_is_specified(void)
+{
+    errno = EINVAL;
+
+    report_read_symbolic_link_error("");
+
+    CU_ASSERT(verify_that_the_error_printed_is("%s: %s\n", READ_SYMBOLIC_LINK_ERROR_PREFIX, strerror(errno)));
+}
+
+static void should_print_the_read_symbolic_link_error_with_the_specified_file_path(void)
+{
+    errno = EINVAL;
+    const char *link_path = "not_existing_file";
+
+    report_read_symbolic_link_error(link_path);
+
+    CU_ASSERT(verify_that_the_error_printed_is("%s '%s': %s\n", READ_SYMBOLIC_LINK_ERROR_PREFIX, link_path, strerror(errno)));
+}
+
 void register_error_reporter_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, NULL);
@@ -146,5 +175,8 @@ void register_error_reporter_suite(void)
         CU_add_test(suite, "should_only_print_the_access_file_error_if_a_NULL_file_path_is_specified", should_only_print_the_access_file_error_if_a_NULL_file_path_is_specified);
         CU_add_test(suite, "should_only_print_the_access_file_error_if_an_empty_file_path_is_specified", should_only_print_the_access_file_error_if_an_empty_file_path_is_specified);
         CU_add_test(suite, "should_print_the_access_file_error_with_the_specified_file_path", should_print_the_access_file_error_with_the_specified_file_path);
+        CU_add_test(suite, "should_only_print_the_read_symbolic_link_error_if_a_NULL_file_path_is_specified", should_only_print_the_read_symbolic_link_error_if_a_NULL_file_path_is_specified);
+        CU_add_test(suite, "should_only_print_the_read_symbolic_link_error_if_an_empty_file_path_is_specified", should_only_print_the_read_symbolic_link_error_if_an_empty_file_path_is_specified);
+        CU_add_test(suite, "should_print_the_read_symbolic_link_error_with_the_specified_file_path", should_print_the_read_symbolic_link_error_with_the_specified_file_path);
     }
 }
