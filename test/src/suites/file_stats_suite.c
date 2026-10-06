@@ -428,6 +428,27 @@ static void should_return_NULL_when_an_error_accessing_a_file_without_following_
     ));
 }
 
+static void should_return_NULL_when_an_error_reading_symbolic_links_occurs(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_READ_SYM_LINK_ERROR(EACCES, "failingLink", "target"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    t_file_stats *stats = file_stats_get_without_following_symlinks("failingLink");
+
+    const char *target = file_stats_get_target_pointed_by_link(stats);
+
+    CU_ASSERT_PTR_NULL(target);
+    CU_ASSERT(verify_that_the_error_printed_is(
+        "ft_ls: cannot read symbolic link '%s': %s\n",
+        "failingLink", strerror(EACCES)
+    ));
+
+    file_stats_destroy(&stats);
+}
+
 void register_file_stats_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, NULL);
@@ -453,5 +474,6 @@ void register_file_stats_suite(void)
         CU_add_test(suite, "should_return_the_target_pointed_by_a_symlink", should_return_the_target_pointed_by_a_symlink);
         CU_add_test(suite, "should_return_NULL_when_an_error_accessing_a_file_occurs", should_return_NULL_when_an_error_accessing_a_file_occurs);
         CU_add_test(suite, "should_return_NULL_when_an_error_accessing_a_file_without_following_symlinks_occurs", should_return_NULL_when_an_error_accessing_a_file_without_following_symlinks_occurs);
+        CU_add_test(suite, "should_return_NULL_when_an_error_reading_symbolic_links_occurs", should_return_NULL_when_an_error_reading_symbolic_links_occurs);
     }
 }

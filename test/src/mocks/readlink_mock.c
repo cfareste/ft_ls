@@ -25,11 +25,11 @@ ssize_t readlink_mock(const char *symlink_path, char *target_buff, size_t buff_l
         return (-1);
     }
 
-    // if (entry->errno_on_stat != 0)
-    // {
-    //     errno = entry->errno_on_stat;
-    //     return (-1);
-    // }
+    if (entry->errors.readlink_errno != 0)
+    {
+        errno = entry->errors.readlink_errno;
+        return (-1);
+    }
 
     if (!S_ISLNK(entry->mode) || entry->target == NULL)
     {

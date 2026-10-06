@@ -85,6 +85,13 @@ static void retrieve_target_pointed_by_link(t_file_stats *stats)
     {
         const ssize_t target_length = readlink(stats->file_name, target, target_buffer_size);
 
+        if (target_length == -1)
+        {
+            report_read_symbolic_link_error(stats->file_name);
+            free(target);
+            return ;
+        }
+
         if ((size_t)target_length < target_buffer_size)
         {
             free(stats->target_pointed_by_link);
