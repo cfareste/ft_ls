@@ -16,7 +16,7 @@ struct s_file_stats
 {
     char *file_name;
     t_file_type type;
-    char *target_pointed_by_link;
+    char *target;
 };
 
 static int should_retrieve_file_stats_without_following_symlinks(const int retrieve_error, const struct stat *stats)
@@ -79,17 +79,17 @@ static t_file_type get_file_type(const mode_t mode)
 static void retrieve_target_pointed_by_link(t_file_stats *stats)
 {
     size_t target_buffer_size = DEFAULT_TARGET_BUFFER_SIZE;
-    stats->target_pointed_by_link = ft_safe_calloc(target_buffer_size + 1, sizeof(char));
+    stats->target = ft_safe_calloc(target_buffer_size + 1, sizeof(char));
 
     while (target_buffer_size <= MAX_SAFE_TARGET_BUFFER_SIZE)
     {
-        const ssize_t target_length = readlink(stats->file_name, stats->target_pointed_by_link, target_buffer_size);
+        const ssize_t target_length = readlink(stats->file_name, stats->target, target_buffer_size);
 
         if (target_length == -1)
         {
             report_read_symbolic_link_error(stats->file_name);
-            free(stats->target_pointed_by_link);
-            stats->target_pointed_by_link = NULL;
+            free(stats->target);
+            stats->target = NULL;
             return ;
         }
 
@@ -97,12 +97,12 @@ static void retrieve_target_pointed_by_link(t_file_stats *stats)
             return ;
 
         const size_t new_buffer_size = target_buffer_size * 2;
-        stats->target_pointed_by_link = ft_safe_realloc(stats->target_pointed_by_link, target_buffer_size + 1, new_buffer_size + 1);
+        stats->target = ft_safe_realloc(stats->target, target_buffer_size + 1, new_buffer_size + 1);
         target_buffer_size = new_buffer_size;
     }
 
-    free(stats->target_pointed_by_link);
-    stats->target_pointed_by_link = NULL;
+    free(stats->target);
+    stats->target = NULL;
 }
 
 t_file_stats *file_stats_get(const char *file_path)
@@ -150,10 +150,10 @@ const char *file_stats_get_target_pointed_by_link(t_file_stats *stats)
     if (stats == NULL || stats->type != FILE_TYPE_SYMLINK)
         return NULL;
 
-    if (stats->target_pointed_by_link == NULL)
+    if (stats->target == NULL)
         retrieve_target_pointed_by_link(stats);
 
-    return stats->target_pointed_by_link;
+    return stats->target;
 }
 
 void file_stats_destroy(t_file_stats **file_stats)
@@ -162,7 +162,7 @@ void file_stats_destroy(t_file_stats **file_stats)
         return ;
 
     free((*file_stats)->file_name);
-    free((*file_stats)->target_pointed_by_link);
+    free((*file_stats)->target);
     free(*file_stats);
     *file_stats = NULL;
 }
