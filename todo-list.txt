@@ -1,6 +1,10 @@
 TODO:
 1. Implementar opción -l
 2. Refactor renderer, donde render llama a render_strategy o lo que sea basado en options
+3. Retrieve las stats necesarias de cada columna
+4. Calcular el ancho de cada columna
+5. Pintar el total del directorio
+6. Pintar los campos que tocan
 
 
 TODO En algún momento:

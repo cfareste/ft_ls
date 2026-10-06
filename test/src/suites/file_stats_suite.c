@@ -5,6 +5,7 @@
 #include "file_stats.h"
 
 #define SUITE_NAME "file_stats"
+#define LINK_BUFFER_SIZE 300
 
 static void test_setup(void)
 {
@@ -312,6 +313,29 @@ static void should_always_return_link_file_stats_when_retrieving_stats_without_f
     file_stats_destroy(&multiDir_stats);
 }
 
+static void should_return_the_target_pointed_by_a_symlink(void)
+{
+    char long_target[LINK_BUFFER_SIZE + 1];
+    for (size_t i = 0; i < LINK_BUFFER_SIZE; i++)
+        long_target[i] = 'a';
+    long_target[LINK_BUFFER_SIZE] = '\0';
+
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE(long_target),
+        MOCK_SYMLINK("link", long_target),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    t_file_stats *stats = file_stats_get_without_following_symlinks("link");
+
+    file_stats_set_target_pointed_by_link(stats);
+
+    CU_ASSERT_STRING_EQUAL(file_stats_get_target_pointed_by_link(stats), long_target);
+
+    file_stats_destroy(&stats);
+}
+
 static void should_return_NULL_when_an_error_accessing_a_file_occurs(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -406,6 +430,7 @@ void register_file_stats_suite(void)
         CU_add_test(suite, "should_return_link_file_stats_if_the_specified_file_is_a_looped_symlink", should_return_link_file_stats_if_the_specified_file_is_a_looped_symlink);
         CU_add_test(suite, "should_return_the_correct_file_stats_if_the_specified_files_are_multi_hop_symlinks", should_return_the_correct_file_stats_if_the_specified_files_are_multi_hop_symlinks);
         CU_add_test(suite, "should_always_return_link_file_stats_when_retrieving_stats_without_following_symlinks", should_always_return_link_file_stats_when_retrieving_stats_without_following_symlinks);
+        CU_add_test(suite, "should_return_the_target_pointed_by_a_symlink", should_return_the_target_pointed_by_a_symlink);
         CU_add_test(suite, "should_return_NULL_when_an_error_accessing_a_file_occurs", should_return_NULL_when_an_error_accessing_a_file_occurs);
         CU_add_test(suite, "should_return_NULL_when_an_error_accessing_a_file_without_following_symlinks_occurs", should_return_NULL_when_an_error_accessing_a_file_without_following_symlinks_occurs);
     }

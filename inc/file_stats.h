@@ -18,4 +18,6 @@ typedef struct s_file_stats t_file_stats;
 t_file_stats *file_stats_get(const char *file_path);
 t_file_stats *file_stats_get_without_following_symlinks(const char *file_path);
 t_file_type file_stats_get_file_type(const t_file_stats *file_stats);
+void file_stats_set_target_pointed_by_link(t_file_stats *stats);
+const char *file_stats_get_target_pointed_by_link(const t_file_stats *stats);
 void file_stats_destroy(t_file_stats **file_stats);

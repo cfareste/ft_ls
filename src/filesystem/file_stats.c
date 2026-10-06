@@ -1,16 +1,22 @@
 #include <errno.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <sys/stat.h>
+#include <unistd.h>
 #include "libft.h"
 #include "file_stats.h"
 #include "error_reporter.h"
 
 #define STATS_RETRIEVAL_ERROR (-1)
 #define STATS_RETRIEVAL_SUCCESS 0
+#define DEFAULT_TARGET_BUFFER_SIZE 128
+#define MAX_SAFE_TARGET_BUFFER_SIZE ((SIZE_MAX - 1) / 2)
 
 struct s_file_stats
 {
+    char *file_name;
     t_file_type type;
+    char *target_pointed_by_link;
 };
 
 static int should_retrieve_file_stats_without_following_symlinks(const int retrieve_error, const struct stat *stats)
@@ -81,6 +87,7 @@ t_file_stats *file_stats_get(const char *file_path)
 
     t_file_stats *file_stats = ft_safe_calloc(1, sizeof(t_file_stats));
     file_stats->type = get_file_type(stats.st_mode);
+    file_stats->file_name = ft_safe_strdup(file_path);
 
     return file_stats;
 }
@@ -96,6 +103,7 @@ t_file_stats *file_stats_get_without_following_symlinks(const char *file_path)
 
     t_file_stats *file_stats = ft_safe_calloc(1, sizeof(t_file_stats));
     file_stats->type = get_file_type(stats.st_mode);
+    file_stats->file_name = ft_safe_strdup(file_path);
 
     return file_stats;
 }
@@ -108,11 +116,42 @@ t_file_type file_stats_get_file_type(const t_file_stats *file_stats)
     return file_stats->type;
 }
 
+void file_stats_set_target_pointed_by_link(t_file_stats *stats)
+{
+    size_t target_buffer_size = DEFAULT_TARGET_BUFFER_SIZE;
+    char *target = ft_safe_calloc(target_buffer_size + 1, sizeof(char));
+
+    while (target_buffer_size <= MAX_SAFE_TARGET_BUFFER_SIZE)
+    {
+        const ssize_t target_length = readlink(stats->file_name, target, target_buffer_size);
+
+        if ((size_t)target_length < target_buffer_size)
+        {
+            free(stats->target_pointed_by_link);
+            stats->target_pointed_by_link = target;
+            return ;
+        }
+
+        const size_t new_buffer_size = target_buffer_size * 2;
+        target = ft_safe_realloc(target, target_buffer_size + 1, new_buffer_size + 1);
+        target_buffer_size = new_buffer_size;
+    }
+
+    free(target);
+}
+
+const char *file_stats_get_target_pointed_by_link(const t_file_stats *stats)
+{
+    return stats->target_pointed_by_link;
+}
+
 void file_stats_destroy(t_file_stats **file_stats)
 {
     if (file_stats == NULL || *file_stats == NULL)
         return ;
 
+    free((*file_stats)->file_name);
+    free((*file_stats)->target_pointed_by_link);
     free(*file_stats);
     *file_stats = NULL;
 }
