@@ -142,6 +142,9 @@ t_file_type file_stats_get_file_type(const t_file_stats *file_stats)
 
 const char *file_stats_get_target_pointed_by_link(t_file_stats *stats)
 {
+    if (stats == NULL)
+        return NULL;
+
     if (stats->target_pointed_by_link == NULL)
         retrieve_target_pointed_by_link(stats);
 
