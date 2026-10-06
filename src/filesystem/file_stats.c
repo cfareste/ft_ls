@@ -79,32 +79,30 @@ static t_file_type get_file_type(const mode_t mode)
 static void retrieve_target_pointed_by_link(t_file_stats *stats)
 {
     size_t target_buffer_size = DEFAULT_TARGET_BUFFER_SIZE;
-    char *target = ft_safe_calloc(target_buffer_size + 1, sizeof(char));
+    stats->target_pointed_by_link = ft_safe_calloc(target_buffer_size + 1, sizeof(char));
 
     while (target_buffer_size <= MAX_SAFE_TARGET_BUFFER_SIZE)
     {
-        const ssize_t target_length = readlink(stats->file_name, target, target_buffer_size);
+        const ssize_t target_length = readlink(stats->file_name, stats->target_pointed_by_link, target_buffer_size);
 
         if (target_length == -1)
         {
             report_read_symbolic_link_error(stats->file_name);
-            free(target);
+            free(stats->target_pointed_by_link);
+            stats->target_pointed_by_link = NULL;
             return ;
         }
 
         if ((size_t)target_length < target_buffer_size)
-        {
-            free(stats->target_pointed_by_link);
-            stats->target_pointed_by_link = target;
             return ;
-        }
 
         const size_t new_buffer_size = target_buffer_size * 2;
-        target = ft_safe_realloc(target, target_buffer_size + 1, new_buffer_size + 1);
+        stats->target_pointed_by_link = ft_safe_realloc(stats->target_pointed_by_link, target_buffer_size + 1, new_buffer_size + 1);
         target_buffer_size = new_buffer_size;
     }
 
-    free(target);
+    free(stats->target_pointed_by_link);
+    stats->target_pointed_by_link = NULL;
 }
 
 t_file_stats *file_stats_get(const char *file_path)
