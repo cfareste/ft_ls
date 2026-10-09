@@ -70,6 +70,7 @@ vpath %.c	$(SRC):\
 			$(ROOT_SRC)/file_entry:\
 			$(ROOT_SRC)/scanner:\
 			$(ROOT_SRC)/renderer:\
+			$(ROOT_SRC)/renderer/strategies:\
 			$(ROOT_SRC)/sorter:\
 			$(ROOT_SRC)/path_builder:\
 			$(ROOT_SRC)/error_reporter:\
@@ -87,6 +88,7 @@ ROOT_SRCS = application.c \
 			file_entry.c \
 			scanner.c \
 			renderer.c \
+			single_column_strategy.c \
 			sorter.c \
 			path_builder.c \
 			error_reporter.c \

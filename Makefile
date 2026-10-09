@@ -51,6 +51,7 @@ vpath %.c	$(SRC):\
 			$(SRC)/file_entry:\
 			$(SRC)/scanner:\
 			$(SRC)/renderer:\
+			$(SRC)/renderer/strategies:\
 			$(SRC)/sorter:\
 			$(SRC)/path_builder:\
 			$(SRC)/error_reporter:\
@@ -67,6 +68,7 @@ SRCS = ft_ls.c \
 		file_entry.c \
 		scanner.c \
 		renderer.c \
+		single_column_strategy.c \
 		sorter.c \
 		path_builder.c \
 		error_reporter.c \

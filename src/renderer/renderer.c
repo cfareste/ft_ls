@@ -1,12 +1,16 @@
 #include <stdlib.h>
 #include "libft.h"
 #include "renderer.h"
+#include "render_strategies.h"
+
+typedef void (*t_render_strategy)(const t_file_entry_array *file_entry_array);
 
 struct s_render_context
 {
     int is_first_directory_render;
     int should_print_types_separator;
     int should_print_directory_header;
+    t_render_strategy render_strategy;
 };
 
 static int check_if_should_print_directory_header(const t_parsed_arguments *parsed_arguments)
@@ -40,6 +44,7 @@ t_render_context *render_context_create(const t_parsed_arguments *parsed_argumen
     context->is_first_directory_render = 1;
     context->should_print_directory_header = check_if_should_print_directory_header(parsed_arguments);
     context->should_print_types_separator = parsed_arguments_has_mixed_types_file_operands(parsed_arguments);
+    context->render_strategy = single_column_strategy;
 
     return context;
 }
@@ -55,15 +60,10 @@ void render_context_destroy(t_render_context **context)
 
 void render_entries(const t_render_context *context, const t_file_entry_array *file_entry_array)
 {
-    if (file_entry_array == NULL || context == NULL)
+    if (context == NULL || file_entry_array == NULL)
         return;
 
-    const unsigned int count = file_entry_array_get_length(file_entry_array);
-    for (unsigned int i = 0; i < count; i++)
-    {
-        const t_file_entry *file_entry = file_entry_array_get_at(file_entry_array, i);
-        ft_printf("%s\n", file_entry_get_name(file_entry));
-    }
+    context->render_strategy(file_entry_array);
 }
 
 void render_directory(t_render_context *context, const char *directory_header, const t_file_entry_array *file_entry_array)
