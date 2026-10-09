@@ -96,8 +96,6 @@ int vfs_mock_resolve_author(const char *author, uid_t *uid);
 int vfs_mock_resolve_group(const char *group, gid_t *gid);
 time_t vfs_mock_make_timestamp(int day, int month, int year, int hour, int minute, int second);
 void vfs_mock_reset(void);
-int stat_mock(const char *restrict pathname, struct stat *restrict statbuf);
-int lstat_mock(const char *restrict pathname, struct stat *restrict statbuf);
 
 int verify_that_the_output_printed_is(const char *str, ...);
 int verify_that_the_error_printed_is(const char *str, ...);
