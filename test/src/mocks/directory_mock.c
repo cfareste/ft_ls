@@ -28,14 +28,14 @@ DIR *mock_opendir(const char *path)
         return NULL;
     }
 
-    while (S_ISLNK(dir_entry->mode))
+    while (S_ISLNK(dir_entry->stats.st_mode))
     {
         dir_entry = find_vfs_entry(dir_entry->target);
         if (dir_entry == NULL)
             return NULL;
     }
 
-    if (!S_ISDIR(dir_entry->mode))
+    if (!S_ISDIR(dir_entry->stats.st_mode))
         return NULL;
 
     t_mock_dir *dir = ft_safe_calloc(1, sizeof(t_mock_dir));

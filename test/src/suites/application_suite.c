@@ -1156,7 +1156,7 @@ static void should_fail_with_a_major_error_and_not_print_anything_if_fails_to_op
     const t_vfs_mock_entry vfs[] = {
         {
             .path = ".",
-            .mode = S_IFDIR | 0755,
+            .stats = { .st_mode = S_IFDIR | 0755 },
             .entries = (const char *[]){ ".", "..", "file", NULL },
             .target = NULL,
             .errors ={

@@ -19,7 +19,7 @@ int stat_mock(const char *restrict pathname, struct stat *restrict statbuf)
         return -1;
     }
 
-    while (S_ISLNK(entry->mode))
+    while (S_ISLNK(entry->stats.st_mode))
     {
         entry = find_vfs_entry(entry->target);
         if (entry == NULL)
@@ -29,8 +29,7 @@ int stat_mock(const char *restrict pathname, struct stat *restrict statbuf)
         }
     }
 
-    ft_bzero(statbuf, sizeof(struct stat));
-    statbuf->st_mode = entry->mode;
+    *statbuf = entry->stats;
     return 0;
 }
 
@@ -50,7 +49,6 @@ int lstat_mock(const char *restrict pathname, struct stat *restrict statbuf)
         return (-1);
     }
 
-    ft_bzero(statbuf, sizeof(struct stat));
-    statbuf->st_mode = entry->mode;
+    *statbuf = entry->stats;
     return (0);
 }
