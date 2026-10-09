@@ -89,6 +89,7 @@ ROOT_SRCS = application.c \
 			scanner.c \
 			renderer.c \
 			single_column_strategy.c \
+			long_format_strategy.c \
 			sorter.c \
 			path_builder.c \
 			error_reporter.c \
