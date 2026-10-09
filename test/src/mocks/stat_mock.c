@@ -9,6 +9,23 @@ static void apply_stat_defaults(struct stat *stats)
     (void) stats;
 }
 
+static int copy_entry_stats(const t_vfs_mock_entry *entry, struct stat *statbuf)
+{
+    *statbuf = entry->stats;
+    if (entry->author != NULL && vfs_mock_resolve_author(entry->author, &statbuf->st_uid) != 0)
+    {
+        errno = EINVAL;
+        return -1;
+    }
+    if (entry->group != NULL && vfs_mock_resolve_group(entry->group, &statbuf->st_gid) != 0)
+    {
+        errno = EINVAL;
+        return -1;
+    }
+    apply_stat_defaults(statbuf);
+    return 0;
+}
+
 int stat_mock(const char *restrict pathname, struct stat *restrict statbuf)
 {
     const t_vfs_mock_entry *entry = find_vfs_entry(pathname);
@@ -35,9 +52,7 @@ int stat_mock(const char *restrict pathname, struct stat *restrict statbuf)
         }
     }
 
-    *statbuf = entry->stats;
-    apply_stat_defaults(statbuf);
-    return 0;
+    return copy_entry_stats(entry, statbuf);
 }
 
 int lstat_mock(const char *restrict pathname, struct stat *restrict statbuf)
@@ -56,7 +71,5 @@ int lstat_mock(const char *restrict pathname, struct stat *restrict statbuf)
         return (-1);
     }
 
-    *statbuf = entry->stats;
-    apply_stat_defaults(statbuf);
-    return (0);
+    return copy_entry_stats(entry, statbuf);
 }
