@@ -5,8 +5,16 @@
 
 static void apply_stat_defaults(struct stat *stats)
 {
-    // Set stat default values if they are equal to 0 
-    (void) stats;
+    if (stats->st_nlink == 0)
+        stats->st_nlink = DEFAULT_HARDLINK_COUNT;
+    if (stats->st_uid == 0)
+        stats->st_uid = DEFAULT_UID;
+    if (stats->st_gid == 0)
+        stats->st_gid = DEFAULT_GID;
+    if (stats->st_size == 0)
+        stats->st_size = DEFAULT_SIZE;
+    if (stats->st_mtim.tv_sec == 0)
+        stats->st_mtim.tv_sec = DEFAULT_MODIFICATION_TIME;
 }
 
 static int copy_entry_stats(const t_vfs_mock_entry *entry, struct stat *statbuf)

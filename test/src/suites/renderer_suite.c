@@ -447,7 +447,6 @@ static void should_render_one_entry_with_long_format(void)
 {
     const t_vfs_mock_entry vfs[] = {
         MOCK_FILE_WITH_STATS("file",
-            DEFAULT_FILE_MODE,
             MOCK_HARDLINK_COUNT(2),
             MOCK_AUTHOR("bob"),
             MOCK_GROUP("developers"),
