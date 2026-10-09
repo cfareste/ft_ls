@@ -1,5 +1,6 @@
 #include <errno.h>
 #include <stddef.h>
+#include <time.h>
 #include "libft.h"
 #include "mocks.h"
 
@@ -28,6 +29,21 @@ static const t_mock_identity mock_groups[] = {
     { "developers", 1000 },
     { "nogroup", 65534 }
 };
+
+time_t vfs_mock_make_timestamp(int day, int month, int year, int hour, int minute, int second)
+{
+    struct tm date = {
+        .tm_sec = second,
+        .tm_min = minute,
+        .tm_hour = hour,
+        .tm_mday = day,
+        .tm_mon = month - 1,
+        .tm_year = year - 1900,
+        .tm_isdst = -1
+    };
+
+    return mktime(&date);
+}
 
 static int resolve_identity(const char *name, const t_mock_identity *identities,
     size_t identity_count, unsigned int *id)

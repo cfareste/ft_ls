@@ -1,6 +1,7 @@
 #pragma once
 
 #include <sys/stat.h>
+#include <time.h>
 
 typedef struct s_vfs_mock_errors
 {
@@ -31,11 +32,11 @@ typedef struct s_vfs_mock_entry
 #define DEFAULT_CHAR_MODE       (S_IFCHR | 0660)
 #define DEFAULT_SOCKET_MODE     (S_IFSOCK | 0777)
 #define DEFAULT_FIFO_MODE       (S_IFIFO | 0664)
-#define MOCK_HARDLINK_COUNT(value)      .stats.st_nlink = (value)
-#define MOCK_AUTHOR(name)               .author = (name)
-#define MOCK_GROUP(name)                .group = (name)
-#define MOCK_SIZE(value)                .stats.st_size = (value)
-#define MOCK_MODIFICATION_TIME(value)   .stats.st_mtim = { .tv_sec = (value) }
+#define MOCK_HARDLINK_COUNT(value)                                      .stats.st_nlink = (value)
+#define MOCK_AUTHOR(name)                                               .author = (name)
+#define MOCK_GROUP(name)                                                .group = (name)
+#define MOCK_SIZE(value)                                                .stats.st_size = (value)
+#define MOCK_MODIFICATION_TIME(day, month, year, hour, minute, second)  .stats.st_mtim.tv_sec = vfs_mock_make_timestamp((day), (month), (year), (hour), (minute), (second))
 
 #define NO_ERRORS ((t_vfs_mock_errors){ 0 })
 #define MOCK_ENTRY(path_value, mode_value, entries_value, target_value, errors_value) \
@@ -87,6 +88,7 @@ void vfs_mock_setup(const t_vfs_mock_entry *entries);
 const t_vfs_mock_entry *find_vfs_entry(const char *path);
 int vfs_mock_resolve_author(const char *author, uid_t *uid);
 int vfs_mock_resolve_group(const char *group, gid_t *gid);
+time_t vfs_mock_make_timestamp(int day, int month, int year, int hour, int minute, int second);
 void vfs_mock_reset(void);
 
 int verify_that_the_output_printed_is(const char *str, ...);
