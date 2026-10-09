@@ -34,6 +34,14 @@ static void render_directory_header(t_render_context *context, const char *direc
     context->is_first_directory_render = 0;
 }
 
+static t_render_strategy select_render_strategy(const t_parsed_arguments *parsed_arguments)
+{
+    if (parsed_arguments_is_option_active(parsed_arguments, OPTIONS_LONG_FORMAT))
+        return long_format_strategy;
+
+    return single_column_strategy;
+}
+
 t_render_context *render_context_create(const t_parsed_arguments *parsed_arguments)
 {
     if (parsed_arguments == NULL)
@@ -44,7 +52,7 @@ t_render_context *render_context_create(const t_parsed_arguments *parsed_argumen
     context->is_first_directory_render = 1;
     context->should_print_directory_header = check_if_should_print_directory_header(parsed_arguments);
     context->should_print_types_separator = parsed_arguments_has_mixed_types_file_operands(parsed_arguments);
-    context->render_strategy = single_column_strategy;
+    context->render_strategy = select_render_strategy(parsed_arguments);
 
     return context;
 }

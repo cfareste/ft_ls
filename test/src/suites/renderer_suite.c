@@ -443,6 +443,42 @@ static void should_not_render_the_types_separator_if_doesnt_have_at_least_one_no
     render_context_destroy(&context);
 }
 
+static void should_render_one_entry_with_long_format(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE_WITH_STATS("file",
+            DEFAULT_FILE_MODE,
+            MOCK_HARDLINK_COUNT(2),
+            MOCK_AUTHOR("bob"),
+            MOCK_GROUP("developers"),
+            MOCK_SIZE(1024),
+            MOCK_MODIFICATION_TIME(12, 12, 2025, 12, 30, 00)
+        ),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *args[] = { "-l", "file", NULL };
+    get_parsed_arguments_result(2, args);
+    t_file_entry_array *file_entry_array = file_entry_array_create();
+    file_entry_array_push(file_entry_array, file_entry_create("file"));
+    t_render_context *context = render_context_create(parsed_arguments);
+
+    render_entries(context, file_entry_array);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "%s %u %s %s %u %s %s\n",
+        "-rw-rw-r--", 2,
+        "bob", "developers",
+        1024, "dec 12 12:30",
+        "file"
+    ));
+
+    file_entry_array_destroy(&file_entry_array);
+    parsed_arguments_destroy(&parsed_arguments);
+    render_context_destroy(&context);
+}
+
 /*static void should_render_the_name_of_every_entry_with_a_file_entry_array_of_various_elements_separated_by_two_spaces(void)
 {
     const char *expected_file_name[] = { "file", "file2", "file3", "file4", "file5" };
@@ -495,6 +531,7 @@ void register_renderer_suite(void)
         CU_add_test(suite, "should_not_render_the_types_separator_if_NULL_context_is_passed", should_not_render_the_types_separator_if_NULL_context_is_passed);
         CU_add_test(suite, "should_render_the_types_separator_if_has_at_least_one_non_dir_and_one_dir", should_render_the_types_separator_if_has_at_least_one_non_dir_and_one_dir);
         CU_add_test(suite, "should_not_render_the_types_separator_if_doesnt_have_at_least_one_non_dir_and_one_dir", should_not_render_the_types_separator_if_doesnt_have_at_least_one_non_dir_and_one_dir);
+        CU_add_test(suite, "should_render_one_entry_with_long_format", should_render_one_entry_with_long_format);
         // CU_add_test(suite, "should_render_the_name_of_every_entry_with_a_file_entry_array_of_various_elements_separated_by_two_spaces", should_render_the_name_of_every_entry_with_a_file_entry_array_of_various_elements_separated_by_two_spaces);
     }
 }
