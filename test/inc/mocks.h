@@ -22,24 +22,35 @@ typedef struct s_vfs_mock_entry
     t_vfs_mock_errors errors;
 } t_vfs_mock_entry;
 
+#define DEFAULT_FILE_MODE       (S_IFREG | 0644)
+#define DEFAULT_DIR_MODE        (S_IFDIR | 0755)
+#define DEFAULT_SYMLINK_MODE    (S_IFLNK | 0777)
+#define DEFAULT_BLOCK_MODE      (S_IFBLK | 0660)
+#define DEFAULT_CHAR_MODE       (S_IFCHR | 0660)
+#define DEFAULT_SOCKET_MODE     (S_IFSOCK | 0777)
+#define DEFAULT_FIFO_MODE       (S_IFIFO | 0664)
+
 #define NO_ERRORS ((t_vfs_mock_errors){ 0 })
 #define MOCK_ENTRY(path_value, mode_value, entries_value, target_value, errors_value) \
     { \
         .path = (path_value), \
-        .stats = { .st_mode = (mode_value), .st_nlink = 1 }, \
+        .stats = { .st_mode = (mode_value) }, \
         .entries = (entries_value), \
         .target = (target_value), \
         .errors = errors_value \
     }
 
-#define MOCK_FILE(p)                    MOCK_ENTRY((p), S_IFREG | 0644, NULL, NULL, NO_ERRORS)
-#define MOCK_DIR(p, ...)                MOCK_ENTRY((p), S_IFDIR | 0755, ((const char *[]){ __VA_ARGS__, NULL }), NULL, NO_ERRORS)
-#define MOCK_SYMLINK(p, link_target)    MOCK_ENTRY((p), S_IFLNK | 0777, NULL, (link_target), NO_ERRORS)
-#define MOCK_BLOCK_DEVICE(p)            MOCK_ENTRY((p), S_IFBLK | 0660, NULL, NULL, NO_ERRORS)
-#define MOCK_CHAR_DEVICE(p)             MOCK_ENTRY((p), S_IFCHR | 0660, NULL, NULL, NO_ERRORS)
-#define MOCK_SOCKET(p)                  MOCK_ENTRY((p), S_IFSOCK | 0777, NULL, NULL, NO_ERRORS)
-#define MOCK_FIFO(p)                    MOCK_ENTRY((p), S_IFIFO | 0664, NULL, NULL, NO_ERRORS)
+#define MOCK_FILE(p)                    MOCK_ENTRY((p), DEFAULT_FILE_MODE, NULL, NULL, NO_ERRORS)
+#define MOCK_DIR(p, ...)                MOCK_ENTRY((p), DEFAULT_DIR_MODE, ((const char *[]){ __VA_ARGS__, NULL }), NULL, NO_ERRORS)
+#define MOCK_SYMLINK(p, link_target)    MOCK_ENTRY((p), DEFAULT_SYMLINK_MODE, NULL, (link_target), NO_ERRORS)
+#define MOCK_BLOCK_DEVICE(p)            MOCK_ENTRY((p), DEFAULT_BLOCK_MODE, NULL, NULL, NO_ERRORS)
+#define MOCK_CHAR_DEVICE(p)             MOCK_ENTRY((p), DEFAULT_CHAR_MODE, NULL, NULL, NO_ERRORS)
+#define MOCK_SOCKET(p)                  MOCK_ENTRY((p), DEFAULT_SOCKET_MODE, NULL, NULL, NO_ERRORS)
+#define MOCK_FIFO(p)                    MOCK_ENTRY((p), DEFAULT_FIFO_MODE, NULL, NULL, NO_ERRORS)
 #define MOCK_NULL_TERMINATOR()          MOCK_ENTRY(NULL, 0, NULL, NULL, NO_ERRORS)
+
+#define MOCK_FILE_WITH_STATS(p, ...)                { .path = (p), .stats = { .st_mode = DEFAULT_FILE_MODE, __VA_ARGS__ }, .errors = NO_ERRORS }
+#define MOCK_DIR_WITH_STATS(p, dir_entries, ...)    { .path = (p), .stats = { .st_mode = DEFAULT_DIR_MODE, __VA_ARGS__ }, .entries = (dir_entries), .errors = NO_ERRORS }
 
 #define MOCK_FILE_ACCESS_ERROR(err, p)                  MOCK_ENTRY((p), S_IFREG | 0644, NULL, NULL, ((t_vfs_mock_errors){ .stat_errno = (err), .lstat_errno = (err) }))
 #define MOCK_DIR_ACCESS_ERROR(err, p, ...)              MOCK_ENTRY((p), S_IFDIR | 0755, ((const char *[]){ __VA_ARGS__, NULL }), NULL, ((t_vfs_mock_errors){ .stat_errno = (err), .lstat_errno = (err) }))
