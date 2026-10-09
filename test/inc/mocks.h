@@ -4,14 +4,11 @@
 
 typedef struct s_vfs_mock_errors
 {
+    unsigned int entry_idx;
     int stat_errno;
     int lstat_errno;
     int opendir_errno;
-    struct
-    {
-        unsigned int entry_idx;
-        int code;
-    } readdir_error;
+    int readdir_errno;
     int closedir_errno;
     int readlink_errno;
 } t_vfs_mock_errors;
@@ -49,7 +46,7 @@ typedef struct s_vfs_mock_entry
 #define MOCK_BROKEN_LINK(p)                             MOCK_ENTRY((p), S_IFLNK | 0755, NULL, NULL, ((t_vfs_mock_errors){ .stat_errno = ENOENT }))
 #define MOCK_LOOP_LINK(p)                               MOCK_ENTRY((p), S_IFLNK | 0755, NULL, NULL, ((t_vfs_mock_errors){ .stat_errno = ELOOP }))
 #define MOCK_DIR_OPEN_ERROR(err, p, ...)                MOCK_ENTRY((p), S_IFDIR | 0755, ((const char *[]){ __VA_ARGS__, NULL }), NULL, ((t_vfs_mock_errors){ .opendir_errno = (err) }))
-#define MOCK_DIR_READ_ERROR(p, entry_error_idx, ...)    MOCK_ENTRY((p), S_IFDIR | 0755, ((const char *[]){ __VA_ARGS__, NULL }), NULL, ((t_vfs_mock_errors){ .readdir_error = { (entry_error_idx), EBADF } }))
+#define MOCK_DIR_READ_ERROR(p, entry_error_idx, ...)    MOCK_ENTRY((p), S_IFDIR | 0755, ((const char *[]){ __VA_ARGS__, NULL }), NULL, ((t_vfs_mock_errors){ .entry_idx = (entry_error_idx), .readdir_errno = EBADF }))
 #define MOCK_DIR_CLOSE_ERROR(p, ...)                    MOCK_ENTRY((p), S_IFDIR | 0755, ((const char *[]){ __VA_ARGS__, NULL }), NULL, ((t_vfs_mock_errors){ .closedir_errno = EBADF }))
 #define MOCK_READ_SYM_LINK_ERROR(err, p, link_target)   MOCK_ENTRY((p), S_IFLNK | 0777, NULL, (link_target), ((t_vfs_mock_errors){ .readlink_errno = (err) }))
 

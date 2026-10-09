@@ -1163,7 +1163,6 @@ static void should_fail_with_a_major_error_and_not_print_anything_if_fails_to_op
                 .stat_errno = EACCES,
                 .lstat_errno =EACCES,
                 .opendir_errno =EACCES,
-                .readdir_error = { 0, 0 },
                 .closedir_errno = 0
             }
         },
