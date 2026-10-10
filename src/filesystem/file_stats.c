@@ -21,6 +21,7 @@ struct s_file_stats
     char *target;
     uid_t author_id;
     gid_t group_id;
+    nlink_t link_count;
     char *author;
     char *group;
 };
@@ -125,6 +126,7 @@ t_file_stats *file_stats_get(const char *file_path)
     file_stats->file_name = ft_safe_strdup(file_path);
     file_stats->author_id = stats.st_uid;
     file_stats->group_id = stats.st_gid;
+    file_stats->link_count = stats.st_nlink;
 
     return file_stats;
 }
@@ -143,6 +145,7 @@ t_file_stats *file_stats_get_without_following_symlinks(const char *file_path)
     file_stats->file_name = ft_safe_strdup(file_path);
     file_stats->author_id = stats.st_uid;
     file_stats->group_id = stats.st_gid;
+    file_stats->link_count = stats.st_nlink;
 
     return file_stats;
 }
@@ -153,6 +156,14 @@ t_file_type file_stats_get_file_type(const t_file_stats *file_stats)
         return FILE_TYPE_UNKNOWN;
 
     return file_stats->type;
+}
+
+nlink_t file_stats_get_link_count(const t_file_stats *file_stats)
+{
+    if (file_stats == NULL)
+        return 0;
+
+    return file_stats->link_count;
 }
 
 const char *file_stats_get_target_pointed_by_link(t_file_stats *stats)

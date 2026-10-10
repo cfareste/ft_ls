@@ -313,6 +313,31 @@ static void should_always_return_link_file_stats_when_retrieving_stats_without_f
     file_stats_destroy(&multiDir_stats);
 }
 
+static void should_return_zero_link_count_when_a_NULL_file_stats_are_specified(void)
+{
+    CU_ASSERT_EQUAL(file_stats_get_link_count(NULL), 0);
+}
+
+static void should_return_the_link_count_for_a_file_and_directory(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE_WITH_STATS("file", MOCK_HARDLINK_COUNT(3)),
+        MOCK_DIR_WITH_STATS("dir", NULL, MOCK_HARDLINK_COUNT(4)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    t_file_stats *file_stats = file_stats_get("file");
+    t_file_stats *directory_stats = file_stats_get("dir");
+
+    CU_ASSERT_EQUAL(file_stats_get_link_count(file_stats), 3);
+    CU_ASSERT_EQUAL(file_stats_get_link_count(directory_stats), 4);
+    CU_ASSERT(verify_that_no_error_was_printed());
+
+    file_stats_destroy(&file_stats);
+    file_stats_destroy(&directory_stats);
+}
+
 static void should_return_NULL_for_the_target_pointed_by_a_symlink_if_NULL_stats_are_passed(void)
 {
     CU_ASSERT_PTR_NULL(file_stats_get_target_pointed_by_link(NULL));
@@ -541,6 +566,8 @@ void register_file_stats_suite(void)
         CU_add_test(suite, "should_return_link_file_stats_if_the_specified_file_is_a_looped_symlink", should_return_link_file_stats_if_the_specified_file_is_a_looped_symlink);
         CU_add_test(suite, "should_return_the_correct_file_stats_if_the_specified_files_are_multi_hop_symlinks", should_return_the_correct_file_stats_if_the_specified_files_are_multi_hop_symlinks);
         CU_add_test(suite, "should_always_return_link_file_stats_when_retrieving_stats_without_following_symlinks", should_always_return_link_file_stats_when_retrieving_stats_without_following_symlinks);
+        CU_add_test(suite, "should_return_zero_link_count_when_a_NULL_file_stats_are_specified", should_return_zero_link_count_when_a_NULL_file_stats_are_specified);
+        CU_add_test(suite, "should_return_the_link_count_for_a_file_and_directory", should_return_the_link_count_for_a_file_and_directory);
         CU_add_test(suite, "should_return_NULL_for_the_target_pointed_by_a_symlink_if_NULL_stats_are_passed", should_return_NULL_for_the_target_pointed_by_a_symlink_if_NULL_stats_are_passed);
         CU_add_test(suite, "should_return_NULL_for_the_target_pointed_by_a_symlink_if_stats_of_a_non_link_file_are_passed", should_return_NULL_for_the_target_pointed_by_a_symlink_if_stats_of_a_non_link_file_are_passed);
         CU_add_test(suite, "should_return_the_target_pointed_by_a_symlink", should_return_the_target_pointed_by_a_symlink);
