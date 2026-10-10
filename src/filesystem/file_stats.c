@@ -165,17 +165,6 @@ nlink_t file_stats_get_link_count(const t_file_stats *file_stats)
     return file_stats->link_count;
 }
 
-const char *file_stats_get_target_pointed_by_link(t_file_stats *stats)
-{
-    if (stats == NULL || stats->type != FILE_TYPE_SYMLINK)
-        return NULL;
-
-    if (stats->target == NULL)
-        retrieve_target_pointed_by_link(stats);
-
-    return stats->target;
-}
-
 const char *file_stats_get_author(t_file_stats *stats)
 {
     if (stats == NULL)
@@ -210,6 +199,17 @@ const char *file_stats_get_group(t_file_stats *stats)
         stats->group = ft_safe_strdup(group->gr_name);
 
     return stats->group;
+}
+
+const char *file_stats_get_target_pointed_by_link(t_file_stats *stats)
+{
+    if (stats == NULL || stats->type != FILE_TYPE_SYMLINK)
+        return NULL;
+
+    if (stats->target == NULL)
+        retrieve_target_pointed_by_link(stats);
+
+    return stats->target;
 }
 
 void file_stats_destroy(t_file_stats **file_stats)
