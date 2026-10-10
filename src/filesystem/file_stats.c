@@ -17,13 +17,14 @@
 struct s_file_stats
 {
     char *file_name;
+    mode_t permissions;
     t_file_type type;
-    char *target;
+    nlink_t link_count;
     uid_t author_id;
     gid_t group_id;
-    nlink_t link_count;
     char *author;
     char *group;
+    char *target;
 };
 
 static int should_retrieve_file_stats_without_following_symlinks(const int retrieve_error, const struct stat *stats)
@@ -85,11 +86,12 @@ static t_file_type get_file_type(const mode_t mode)
 
 static void initialize_stats(t_file_stats *file_stats, const char *file_path, const struct stat *stats)
 {
-    file_stats->type = get_file_type(stats->st_mode);
     file_stats->file_name = ft_safe_strdup(file_path);
+    file_stats->permissions = stats->st_mode & (S_IRWXU | S_IRWXG | S_IRWXO | S_ISUID | S_ISGID | S_ISVTX);
+    file_stats->type = get_file_type(stats->st_mode);
+    file_stats->link_count = stats->st_nlink;
     file_stats->author_id = stats->st_uid;
     file_stats->group_id = stats->st_gid;
-    file_stats->link_count = stats->st_nlink;
 }
 
 static void retrieve_target_pointed_by_link(t_file_stats *stats)
@@ -147,6 +149,14 @@ t_file_stats *file_stats_get_without_following_symlinks(const char *file_path)
     t_file_stats *file_stats = ft_safe_calloc(1, sizeof(t_file_stats));
     initialize_stats(file_stats, file_path, &stats);
     return file_stats;
+}
+
+mode_t file_stats_get_permissions(const t_file_stats *file_stats)
+{
+    if (file_stats == NULL)
+        return 0;
+
+    return file_stats->permissions;
 }
 
 t_file_type file_stats_get_file_type(const t_file_stats *file_stats)

@@ -81,6 +81,59 @@ static void should_not_fail_to_destroy_file_stats_if_a_NULL_file_stats_is_passed
     CU_ASSERT(verify_that_no_error_was_printed());
 }
 
+static void should_return_zero_permissions_when_a_NULL_file_stats_are_specified(void)
+{
+    CU_ASSERT_EQUAL(file_stats_get_permissions(NULL), 0);
+}
+
+static void should_return_permissions_for_a_file_and_directory(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_ENTRY("file", S_IFREG | 0640, NULL, NULL, NO_ERRORS),
+        MOCK_ENTRY("dir", S_IFDIR | 0751, NULL, NULL, NO_ERRORS),
+        MOCK_ENTRY("setuid", S_IFREG | S_ISUID | 0640, NULL, NULL, NO_ERRORS),
+        MOCK_ENTRY("setgid", S_IFREG | S_ISGID | 0640, NULL, NULL, NO_ERRORS),
+        MOCK_ENTRY("sticky", S_IFDIR | S_ISVTX | 0755, NULL, NULL, NO_ERRORS),
+        MOCK_ENTRY("setuid_setgid", S_IFREG | S_ISUID | S_ISGID | 0750, NULL, NULL, NO_ERRORS),
+        MOCK_ENTRY("setgid_sticky", S_IFDIR | S_ISGID | S_ISVTX | 0770, NULL, NULL, NO_ERRORS),
+        MOCK_ENTRY("setuid_sticky", S_IFREG | S_ISUID | S_ISVTX | 0750, NULL, NULL, NO_ERRORS),
+        MOCK_ENTRY("all_special_bits", S_IFDIR | S_ISUID | S_ISGID | S_ISVTX | 0751, NULL, NULL, NO_ERRORS),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    t_file_stats *file_stats = file_stats_get("file");
+    t_file_stats *directory_stats = file_stats_get("dir");
+    t_file_stats *setuid_stats = file_stats_get("setuid");
+    t_file_stats *setgid_stats = file_stats_get("setgid");
+    t_file_stats *sticky_stats = file_stats_get("sticky");
+    t_file_stats *setuid_setgid_stats = file_stats_get("setuid_setgid");
+    t_file_stats *setgid_sticky_stats = file_stats_get("setgid_sticky");
+    t_file_stats *setuid_sticky_stats = file_stats_get("setuid_sticky");
+    t_file_stats *all_special_bits_stats = file_stats_get("all_special_bits");
+
+    CU_ASSERT_EQUAL(file_stats_get_permissions(file_stats), 0640);
+    CU_ASSERT_EQUAL(file_stats_get_permissions(directory_stats), 0751);
+    CU_ASSERT_EQUAL(file_stats_get_permissions(setuid_stats), 0640 | S_ISUID);
+    CU_ASSERT_EQUAL(file_stats_get_permissions(setgid_stats), 0640 | S_ISGID);
+    CU_ASSERT_EQUAL(file_stats_get_permissions(sticky_stats), 0755 | S_ISVTX);
+    CU_ASSERT_EQUAL(file_stats_get_permissions(setuid_setgid_stats), 0750 | S_ISUID | S_ISGID);
+    CU_ASSERT_EQUAL(file_stats_get_permissions(setgid_sticky_stats), 0770 | S_ISGID | S_ISVTX);
+    CU_ASSERT_EQUAL(file_stats_get_permissions(setuid_sticky_stats), 0750 | S_ISUID | S_ISVTX);
+    CU_ASSERT_EQUAL(file_stats_get_permissions(all_special_bits_stats), 0751 | S_ISUID | S_ISGID | S_ISVTX);
+    CU_ASSERT(verify_that_no_error_was_printed());
+
+    file_stats_destroy(&file_stats);
+    file_stats_destroy(&directory_stats);
+    file_stats_destroy(&setuid_stats);
+    file_stats_destroy(&setgid_stats);
+    file_stats_destroy(&sticky_stats);
+    file_stats_destroy(&setuid_setgid_stats);
+    file_stats_destroy(&setgid_sticky_stats);
+    file_stats_destroy(&setuid_sticky_stats);
+    file_stats_destroy(&all_special_bits_stats);
+}
+
 static void should_return_unknown_file_type_when_a_NULL_file_stats_are_specified(void)
 {
     const t_file_type invalid = file_stats_get_file_type(NULL);
@@ -558,6 +611,8 @@ void register_file_stats_suite(void)
         CU_add_test(suite, "should_destroy_file_stats_correctly", should_destroy_file_stats_correctly);
         CU_add_test(suite, "should_not_fail_to_destroy_file_stats_if_a_NULL_pointer_is_passed", should_not_fail_to_destroy_file_stats_if_a_NULL_pointer_is_passed);
         CU_add_test(suite, "should_not_fail_to_destroy_file_stats_if_a_NULL_file_stats_is_passed", should_not_fail_to_destroy_file_stats_if_a_NULL_file_stats_is_passed);
+        CU_add_test(suite, "should_return_zero_permissions_when_a_NULL_file_stats_are_specified", should_return_zero_permissions_when_a_NULL_file_stats_are_specified);
+        CU_add_test(suite, "should_return_permissions_for_a_file_and_directory", should_return_permissions_for_a_file_and_directory);
         CU_add_test(suite, "should_return_unknown_file_type_when_a_NULL_file_stats_are_specified", should_return_unknown_file_type_when_a_NULL_file_stats_are_specified);
         CU_add_test(suite, "should_return_the_file_stats_of_the_specified_non_link_files", should_return_the_file_stats_of_the_specified_non_link_files);
         CU_add_test(suite, "should_return_link_file_stats_if_the_specified_files_are_symlinks_to_non_directories", should_return_link_file_stats_if_the_specified_files_are_symlinks_to_non_directories);

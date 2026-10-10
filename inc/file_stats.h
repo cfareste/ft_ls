@@ -17,6 +17,7 @@ typedef struct s_file_stats t_file_stats;
 
 t_file_stats *file_stats_get(const char *file_path);
 t_file_stats *file_stats_get_without_following_symlinks(const char *file_path);
+unsigned int file_stats_get_permissions(const t_file_stats *file_stats);
 t_file_type file_stats_get_file_type(const t_file_stats *file_stats);
 unsigned long file_stats_get_link_count(const t_file_stats *file_stats);
 const char *file_stats_get_author(t_file_stats *stats);
