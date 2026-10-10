@@ -30,6 +30,8 @@ static const t_mock_identity mock_groups[] = {
     { "nogroup", 65534 }
 };
 
+static const size_t identity_size = sizeof(mock_authors) / sizeof(mock_authors[0]);
+
 time_t vfs_mock_make_timestamp(int day, int month, int year, int hour, int minute, int second)
 {
     struct tm date = {
@@ -45,43 +47,61 @@ time_t vfs_mock_make_timestamp(int day, int month, int year, int hour, int minut
     return mktime(&date);
 }
 
-static int resolve_identity(const char *name, const t_mock_identity *identities,
-    size_t identity_count, unsigned int *id)
+static const t_mock_identity *find_identity(unsigned int id, const t_mock_identity *identities)
 {
-    if (name == NULL || id == NULL)
-        return -1;
+    for (size_t i = 0; i < identity_size; i++)
+    {
+        if (identities[i].id == id)
+            return &identities[i];
+    }
+    return NULL;
+}
 
-    for (size_t i = 0; i < identity_count; i++)
+static const t_mock_identity *find_identity_by_name(const char *name,
+    const t_mock_identity *identities)
+{
+    if (name == NULL)
+        return NULL;
+    for (size_t i = 0; i < identity_size; i++)
     {
         if (ft_strcmp(name, identities[i].name) == EQUAL_STRINGS)
-        {
-            *id = identities[i].id;
-            return 0;
-        }
+            return &identities[i];
     }
-    return -1;
+    return NULL;
 }
 
 int vfs_mock_resolve_author(const char *author, uid_t *uid)
 {
-    unsigned int id;
+    const t_mock_identity *identity = find_identity_by_name(author, mock_authors);
 
-    if (uid == NULL || resolve_identity(author, mock_authors,
-            sizeof(mock_authors) / sizeof(mock_authors[0]), &id) != 0)
+    if (uid == NULL || identity == NULL)
         return -1;
-    *uid = (uid_t)id;
+    *uid = (uid_t)identity->id;
     return 0;
 }
 
 int vfs_mock_resolve_group(const char *group, gid_t *gid)
 {
-    unsigned int id;
+    const t_mock_identity *identity = find_identity_by_name(group, mock_groups);
 
-    if (gid == NULL || resolve_identity(group, mock_groups,
-            sizeof(mock_groups) / sizeof(mock_groups[0]), &id) != 0)
+    if (gid == NULL || identity == NULL)
         return -1;
-    *gid = (gid_t)id;
+    *gid = (gid_t)identity->id;
     return 0;
+}
+
+const char *vfs_mock_author_name(uid_t uid)
+{
+    const t_mock_identity *identity = find_identity((unsigned int)uid, mock_authors);
+
+    return identity == NULL ? NULL : identity->name;
+}
+
+const char *vfs_mock_group_name(gid_t gid)
+{
+    const t_mock_identity *identity = find_identity((unsigned int)gid, mock_groups);
+
+    return identity == NULL ? NULL : identity->name;
 }
 
 void vfs_mock_setup(const t_vfs_mock_entry *entries)

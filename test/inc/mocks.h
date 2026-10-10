@@ -94,6 +94,8 @@ void vfs_mock_setup(const t_vfs_mock_entry *entries);
 const t_vfs_mock_entry *find_vfs_entry(const char *path);
 int vfs_mock_resolve_author(const char *author, uid_t *uid);
 int vfs_mock_resolve_group(const char *group, gid_t *gid);
+const char *vfs_mock_author_name(uid_t uid);
+const char *vfs_mock_group_name(gid_t gid);
 time_t vfs_mock_make_timestamp(int day, int month, int year, int hour, int minute, int second);
 void vfs_mock_reset(void);
 
