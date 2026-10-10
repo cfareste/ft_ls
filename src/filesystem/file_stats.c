@@ -177,8 +177,9 @@ const char *file_stats_get_author(t_file_stats *stats)
     const struct passwd *author = getpwuid(stats->author_id);
 
     if (author == NULL || author->pw_name == NULL)
-        return NULL;
-    stats->author = ft_safe_strdup(author->pw_name);
+        stats->author = ft_safe_itoa((int)stats->author_id);
+    else
+        stats->author = ft_safe_strdup(author->pw_name);
 
     return stats->author;
 }
@@ -194,8 +195,9 @@ const char *file_stats_get_group(t_file_stats *stats)
     const struct group *group = getgrgid(stats->group_id);
 
     if (group == NULL || group->gr_name == NULL)
-        return NULL;
-    stats->group = ft_safe_strdup(group->gr_name);
+        stats->group = ft_safe_itoa((int)stats->group_id);
+    else
+        stats->group = ft_safe_strdup(group->gr_name);
 
     return stats->group;
 }
