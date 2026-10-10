@@ -1,3 +1,5 @@
+#include <grp.h>
+#include <pwd.h>
 #include <errno.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -17,6 +19,10 @@ struct s_file_stats
     char *file_name;
     t_file_type type;
     char *target;
+    uid_t author_id;
+    gid_t group_id;
+    char *author;
+    char *group;
 };
 
 static int should_retrieve_file_stats_without_following_symlinks(const int retrieve_error, const struct stat *stats)
@@ -117,6 +123,8 @@ t_file_stats *file_stats_get(const char *file_path)
     t_file_stats *file_stats = ft_safe_calloc(1, sizeof(t_file_stats));
     file_stats->type = get_file_type(stats.st_mode);
     file_stats->file_name = ft_safe_strdup(file_path);
+    file_stats->author_id = stats.st_uid;
+    file_stats->group_id = stats.st_gid;
 
     return file_stats;
 }
@@ -133,6 +141,8 @@ t_file_stats *file_stats_get_without_following_symlinks(const char *file_path)
     t_file_stats *file_stats = ft_safe_calloc(1, sizeof(t_file_stats));
     file_stats->type = get_file_type(stats.st_mode);
     file_stats->file_name = ft_safe_strdup(file_path);
+    file_stats->author_id = stats.st_uid;
+    file_stats->group_id = stats.st_gid;
 
     return file_stats;
 }
@@ -156,6 +166,40 @@ const char *file_stats_get_target_pointed_by_link(t_file_stats *stats)
     return stats->target;
 }
 
+const char *file_stats_get_author(t_file_stats *stats)
+{
+    if (stats == NULL)
+        return NULL;
+
+    if (stats->author != NULL)
+        return stats->author;
+
+    const struct passwd *author = getpwuid(stats->author_id);
+
+    if (author == NULL || author->pw_name == NULL)
+        return NULL;
+    stats->author = ft_safe_strdup(author->pw_name);
+
+    return stats->author;
+}
+
+const char *file_stats_get_group(t_file_stats *stats)
+{
+    if (stats == NULL)
+        return NULL;
+
+    if (stats->group != NULL)
+        return stats->group;
+
+    const struct group *group = getgrgid(stats->group_id);
+
+    if (group == NULL || group->gr_name == NULL)
+        return NULL;
+    stats->group = ft_safe_strdup(group->gr_name);
+
+    return stats->group;
+}
+
 void file_stats_destroy(t_file_stats **file_stats)
 {
     if (file_stats == NULL || *file_stats == NULL)
@@ -163,6 +207,8 @@ void file_stats_destroy(t_file_stats **file_stats)
 
     free((*file_stats)->file_name);
     free((*file_stats)->target);
+    free((*file_stats)->author);
+    free((*file_stats)->group);
     free(*file_stats);
     *file_stats = NULL;
 }

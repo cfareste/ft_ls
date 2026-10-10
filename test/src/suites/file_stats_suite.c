@@ -354,6 +354,48 @@ static void should_return_the_target_pointed_by_a_symlink(void)
     file_stats_destroy(&stats);
 }
 
+static void should_return_NULL_for_the_author_if_NULL_stats_are_passed(void)
+{
+    CU_ASSERT_PTR_NULL(file_stats_get_author(NULL));
+}
+
+static void should_return_the_author_of_a_file(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE_WITH_STATS("file", MOCK_AUTHOR("alice")),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    t_file_stats *stats = file_stats_get("file");
+
+    CU_ASSERT_STRING_EQUAL(file_stats_get_author(stats), "alice");
+    CU_ASSERT(verify_that_no_error_was_printed());
+
+    file_stats_destroy(&stats);
+}
+
+static void should_return_NULL_for_the_group_if_NULL_stats_are_passed(void)
+{
+    CU_ASSERT_PTR_NULL(file_stats_get_group(NULL));
+}
+
+static void should_return_the_group_of_a_file(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE_WITH_STATS("file", MOCK_GROUP("developers")),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    t_file_stats *stats = file_stats_get_without_following_symlinks("file");
+
+    CU_ASSERT_STRING_EQUAL(file_stats_get_group(stats), "developers");
+    CU_ASSERT(verify_that_no_error_was_printed());
+
+    file_stats_destroy(&stats);
+}
+
 static void should_return_NULL_when_an_error_accessing_a_file_occurs(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -472,6 +514,10 @@ void register_file_stats_suite(void)
         CU_add_test(suite, "should_return_NULL_for_the_target_pointed_by_a_symlink_if_NULL_stats_are_passed", should_return_NULL_for_the_target_pointed_by_a_symlink_if_NULL_stats_are_passed);
         CU_add_test(suite, "should_return_NULL_for_the_target_pointed_by_a_symlink_if_stats_of_a_non_link_file_are_passed", should_return_NULL_for_the_target_pointed_by_a_symlink_if_stats_of_a_non_link_file_are_passed);
         CU_add_test(suite, "should_return_the_target_pointed_by_a_symlink", should_return_the_target_pointed_by_a_symlink);
+        CU_add_test(suite, "should_return_NULL_for_the_author_if_NULL_stats_are_passed", should_return_NULL_for_the_author_if_NULL_stats_are_passed);
+        CU_add_test(suite, "should_return_the_author_of_a_file", should_return_the_author_of_a_file);
+        CU_add_test(suite, "should_return_NULL_for_the_group_if_NULL_stats_are_passed", should_return_NULL_for_the_group_if_NULL_stats_are_passed);
+        CU_add_test(suite, "should_return_the_group_of_a_file", should_return_the_group_of_a_file);
         CU_add_test(suite, "should_return_NULL_when_an_error_accessing_a_file_occurs", should_return_NULL_when_an_error_accessing_a_file_occurs);
         CU_add_test(suite, "should_return_NULL_when_an_error_accessing_a_file_without_following_symlinks_occurs", should_return_NULL_when_an_error_accessing_a_file_without_following_symlinks_occurs);
         CU_add_test(suite, "should_return_NULL_when_an_error_reading_symbolic_links_occurs", should_return_NULL_when_an_error_reading_symbolic_links_occurs);
