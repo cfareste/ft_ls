@@ -83,6 +83,15 @@ static t_file_type get_file_type(const mode_t mode)
     return file_type;
 }
 
+static void initialize_stats(t_file_stats *file_stats, const char *file_path, const struct stat *stats)
+{
+    file_stats->type = get_file_type(stats->st_mode);
+    file_stats->file_name = ft_safe_strdup(file_path);
+    file_stats->author_id = stats->st_uid;
+    file_stats->group_id = stats->st_gid;
+    file_stats->link_count = stats->st_nlink;
+}
+
 static void retrieve_target_pointed_by_link(t_file_stats *stats)
 {
     size_t target_buffer_size = DEFAULT_TARGET_BUFFER_SIZE;
@@ -122,12 +131,7 @@ t_file_stats *file_stats_get(const char *file_path)
         return NULL;
 
     t_file_stats *file_stats = ft_safe_calloc(1, sizeof(t_file_stats));
-    file_stats->type = get_file_type(stats.st_mode);
-    file_stats->file_name = ft_safe_strdup(file_path);
-    file_stats->author_id = stats.st_uid;
-    file_stats->group_id = stats.st_gid;
-    file_stats->link_count = stats.st_nlink;
-
+    initialize_stats(file_stats, file_path, &stats);
     return file_stats;
 }
 
@@ -141,12 +145,7 @@ t_file_stats *file_stats_get_without_following_symlinks(const char *file_path)
         return NULL;
 
     t_file_stats *file_stats = ft_safe_calloc(1, sizeof(t_file_stats));
-    file_stats->type = get_file_type(stats.st_mode);
-    file_stats->file_name = ft_safe_strdup(file_path);
-    file_stats->author_id = stats.st_uid;
-    file_stats->group_id = stats.st_gid;
-    file_stats->link_count = stats.st_nlink;
-
+    initialize_stats(file_stats, file_path, &stats);
     return file_stats;
 }
 
