@@ -68,6 +68,7 @@ vpath %.c	$(SRC):\
 			$(ROOT_SRC)/parsed_arguments/options:\
 			$(ROOT_SRC)/parsed_arguments/file_operands:\
 			$(ROOT_SRC)/filesystem:\
+			$(ROOT_SRC)/utils:\
 			$(ROOT_SRC)/file_entry:\
 			$(ROOT_SRC)/scanner:\
 			$(ROOT_SRC)/renderer:\
@@ -85,6 +86,7 @@ ROOT_SRCS = application.c \
 			options.c \
 			file_operands.c \
 			directory.c \
+			date.c \
 			file_stats.c \
 			file_entry.c \
 			scanner.c \

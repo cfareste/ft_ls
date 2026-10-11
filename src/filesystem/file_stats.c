@@ -24,6 +24,7 @@ struct s_file_stats
     gid_t group_id;
     char *author;
     char *group;
+    t_date modification_date;
     char *target;
 };
 
@@ -92,6 +93,7 @@ static void initialize_stats(t_file_stats *file_stats, const char *file_path, co
     file_stats->link_count = stats->st_nlink;
     file_stats->author_id = stats->st_uid;
     file_stats->group_id = stats->st_gid;
+    file_stats->modification_date = date_from_time(stats->st_mtime);
 }
 
 static void retrieve_target_pointed_by_link(t_file_stats *stats)
@@ -173,6 +175,14 @@ nlink_t file_stats_get_link_count(const t_file_stats *file_stats)
         return 0;
 
     return file_stats->link_count;
+}
+
+t_date file_stats_get_modification_date(const t_file_stats *file_stats)
+{
+    if (file_stats == NULL)
+        return (t_date){0};
+
+    return file_stats->modification_date;
 }
 
 const char *file_stats_get_author(t_file_stats *stats)

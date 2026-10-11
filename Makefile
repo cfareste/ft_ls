@@ -48,6 +48,7 @@ vpath %.c	$(SRC):\
 			$(SRC)/parsed_arguments/options:\
 			$(SRC)/parsed_arguments/file_operands:\
 			$(SRC)/filesystem:\
+			$(SRC)/utils:\
 			$(SRC)/file_entry:\
 			$(SRC)/scanner:\
 			$(SRC)/renderer:\
@@ -64,6 +65,7 @@ SRCS = ft_ls.c \
 		options.c \
 		file_operands.c \
 		directory.c \
+		date.c \
 		file_stats.c \
 		file_entry.c \
 		scanner.c \
