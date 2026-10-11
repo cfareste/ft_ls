@@ -11,22 +11,20 @@
 
 static char *original_timezone;
 static int had_original_timezone;
-static int timezone_ready;
 
-static void set_up_utc_timezone(void)
+static int set_up_utc_timezone(void)
 {
-    const char *timezone = getenv("TZ");
+    const char *timezone_local = getenv("TZ");
 
-    had_original_timezone = timezone != NULL;
+    had_original_timezone = timezone_local != NULL;
     original_timezone = NULL;
-    timezone_ready = 0;
     if (had_original_timezone)
     {
-        original_timezone = strdup(timezone);
+        original_timezone = strdup(timezone_local);
         if (original_timezone == NULL)
         {
             CU_FAIL("Could not save the current timezone");
-            return ;
+            return -1;
         }
     }
     if (setenv("TZ", UTC_TIMEZONE, 1) != 0)
@@ -34,13 +32,13 @@ static void set_up_utc_timezone(void)
         free(original_timezone);
         original_timezone = NULL;
         CU_FAIL("Could not set the test timezone");
-        return ;
+        return -1;
     }
     tzset();
-    timezone_ready = 1;
+    return 0;
 }
 
-static void restore_timezone(void)
+static int restore_timezone(void)
 {
     int result;
 
@@ -52,8 +50,8 @@ static void restore_timezone(void)
     free(original_timezone);
     original_timezone = NULL;
     had_original_timezone = 0;
-    timezone_ready = 0;
     CU_ASSERT_EQUAL(result, 0);
+    return 0;
 }
 
 static void should_convert_unix_epoch(void)
