@@ -9,6 +9,7 @@ int	main(void)
 
 	register_file_entry_suite();
 	register_directory_suite();
+	register_date_suite();
 	register_renderer_suite();
 	register_scanner_suite();
 	register_sorter_suite();

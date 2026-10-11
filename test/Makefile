@@ -105,6 +105,7 @@ SRCS = main.c \
 		stat_mock.c \
 		readlink_mock.c \
 		identity_mock.c \
+		date_suite.c \
 		directory_suite.c \
 		file_entry_suite.c \
 		renderer_suite.c \
