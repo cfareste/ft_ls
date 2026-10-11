@@ -24,6 +24,7 @@ struct s_file_stats
     gid_t group_id;
     char *author;
     char *group;
+    off_t size;
     t_date modification_date;
     char *target;
 };
@@ -93,6 +94,7 @@ static void initialize_stats(t_file_stats *file_stats, const char *file_path, co
     file_stats->link_count = stats->st_nlink;
     file_stats->author_id = stats->st_uid;
     file_stats->group_id = stats->st_gid;
+    file_stats->size = stats->st_size;
     file_stats->modification_date = date_from_time(stats->st_mtime);
 }
 
@@ -177,14 +179,6 @@ nlink_t file_stats_get_link_count(const t_file_stats *file_stats)
     return file_stats->link_count;
 }
 
-t_date file_stats_get_modification_date(const t_file_stats *file_stats)
-{
-    if (file_stats == NULL)
-        return (t_date){0};
-
-    return file_stats->modification_date;
-}
-
 const char *file_stats_get_author(t_file_stats *stats)
 {
     if (stats == NULL)
@@ -219,6 +213,22 @@ const char *file_stats_get_group(t_file_stats *stats)
         stats->group = ft_safe_strdup(group->gr_name);
 
     return stats->group;
+}
+
+off_t file_stats_get_size(const t_file_stats *file_stats)
+{
+    if (file_stats == NULL)
+        return 0;
+
+    return file_stats->size;
+}
+
+t_date file_stats_get_modification_date(const t_file_stats *file_stats)
+{
+    if (file_stats == NULL)
+        return (t_date){0};
+
+    return file_stats->modification_date;
 }
 
 const char *file_stats_get_target_pointed_by_link(t_file_stats *stats)

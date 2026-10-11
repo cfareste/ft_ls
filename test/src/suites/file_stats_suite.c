@@ -548,6 +548,31 @@ static void should_return_the_group_id_if_the_group_is_not_found(void)
     file_stats_destroy(&stats);
 }
 
+static void should_return_zero_size_when_a_NULL_file_stats_are_specified(void)
+{
+    CU_ASSERT_EQUAL(file_stats_get_size(NULL), 0);
+}
+
+static void should_return_the_size_for_a_file_and_directory(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE_WITH_STATS("file", MOCK_SIZE(12345)),
+        MOCK_DIR_WITH_STATS("dir", NULL, MOCK_SIZE(67890)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    t_file_stats *file_stats = file_stats_get("file");
+    t_file_stats *directory_stats = file_stats_get_without_following_symlinks("dir");
+
+    CU_ASSERT_EQUAL(file_stats_get_size(file_stats), 12345);
+    CU_ASSERT_EQUAL(file_stats_get_size(directory_stats), 67890);
+    CU_ASSERT(verify_that_no_error_was_printed());
+
+    file_stats_destroy(&file_stats);
+    file_stats_destroy(&directory_stats);
+}
+
 static void should_return_NULL_when_an_error_accessing_a_file_occurs(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -678,6 +703,8 @@ void register_file_stats_suite(void)
         CU_add_test(suite, "should_return_NULL_for_the_group_if_NULL_stats_are_passed", should_return_NULL_for_the_group_if_NULL_stats_are_passed);
         CU_add_test(suite, "should_return_the_group_of_a_file", should_return_the_group_of_a_file);
         CU_add_test(suite, "should_return_the_group_id_if_the_group_is_not_found", should_return_the_group_id_if_the_group_is_not_found);
+        CU_add_test(suite, "should_return_zero_size_when_a_NULL_file_stats_are_specified", should_return_zero_size_when_a_NULL_file_stats_are_specified);
+        CU_add_test(suite, "should_return_the_size_for_a_file_and_directory", should_return_the_size_for_a_file_and_directory);
         CU_add_test(suite, "should_return_NULL_when_an_error_accessing_a_file_occurs", should_return_NULL_when_an_error_accessing_a_file_occurs);
         CU_add_test(suite, "should_return_NULL_when_an_error_accessing_a_file_without_following_symlinks_occurs", should_return_NULL_when_an_error_accessing_a_file_without_following_symlinks_occurs);
         CU_add_test(suite, "should_return_NULL_when_an_error_reading_symbolic_links_occurs", should_return_NULL_when_an_error_reading_symbolic_links_occurs);
