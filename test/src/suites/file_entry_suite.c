@@ -265,6 +265,49 @@ static void should_not_fail_setting_the_entry_group_if_a_NULL_entry_is_passed(vo
     file_entry_set_group(NULL, "developers");
 }
 
+static void should_return_zero_size_when_a_NULL_entry_is_passed(void)
+{
+    CU_ASSERT_EQUAL(file_entry_get_size(NULL), 0);
+}
+
+static void should_return_the_entry_size_correctly(void)
+{
+    file_entry_set_size(entry_sut, 12345);
+
+    CU_ASSERT_EQUAL(file_entry_get_size(entry_sut), 12345);
+}
+
+static void should_not_fail_setting_entry_size_if_a_NULL_entry_is_passed(void)
+{
+    file_entry_set_size(NULL, 12345);
+}
+
+static void should_return_an_empty_device_when_a_NULL_entry_is_passed(void)
+{
+    const t_device device = file_entry_get_device(NULL);
+
+    CU_ASSERT_EQUAL(device.major, 0);
+    CU_ASSERT_EQUAL(device.minor, 0);
+}
+
+static void should_return_the_entry_device_correctly(void)
+{
+    const t_device device = { .major = 12, .minor = 34 };
+
+    file_entry_set_device(entry_sut, device);
+
+    const t_device entry_device = file_entry_get_device(entry_sut);
+    CU_ASSERT_EQUAL(entry_device.major, 12);
+    CU_ASSERT_EQUAL(entry_device.minor, 34);
+}
+
+static void should_not_fail_setting_entry_device_if_a_NULL_entry_is_passed(void)
+{
+    const t_device device = { .major = 12, .minor = 34 };
+
+    file_entry_set_device(NULL, device);
+}
+
 static void should_return_a_length_of_zero_when_passed_a_NULL_file_entry_array(void)
 {
     const unsigned int length = file_entry_array_get_length(NULL);
@@ -425,6 +468,12 @@ void register_file_entry_suite(void)
         CU_add_test(suite, "should_return_the_entry_group_correctly", should_return_the_entry_group_correctly);
         CU_add_test(suite, "should_not_set_the_entry_group_if_a_NULL_group_is_passed", should_not_set_the_entry_group_if_a_NULL_group_is_passed);
         CU_add_test(suite, "should_not_fail_setting_the_entry_group_if_a_NULL_entry_is_passed", should_not_fail_setting_the_entry_group_if_a_NULL_entry_is_passed);
+        CU_add_test(suite, "should_return_zero_size_when_a_NULL_entry_is_passed", should_return_zero_size_when_a_NULL_entry_is_passed);
+        CU_add_test(suite, "should_return_the_entry_size_correctly", should_return_the_entry_size_correctly);
+        CU_add_test(suite, "should_not_fail_setting_entry_size_if_a_NULL_entry_is_passed", should_not_fail_setting_entry_size_if_a_NULL_entry_is_passed);
+        CU_add_test(suite, "should_return_an_empty_device_when_a_NULL_entry_is_passed", should_return_an_empty_device_when_a_NULL_entry_is_passed);
+        CU_add_test(suite, "should_return_the_entry_device_correctly", should_return_the_entry_device_correctly);
+        CU_add_test(suite, "should_not_fail_setting_entry_device_if_a_NULL_entry_is_passed", should_not_fail_setting_entry_device_if_a_NULL_entry_is_passed);
         CU_add_test(suite, "should_return_a_length_of_zero_when_passed_a_NULL_file_entry_array", should_return_a_length_of_zero_when_passed_a_NULL_file_entry_array);
         CU_add_test(suite, "should_return_the_correct_length", should_return_the_correct_length);
         CU_add_test(suite, "should_return_NULL_for_an_entry_if_a_NULL_array_is_passed", should_return_NULL_for_an_entry_if_a_NULL_array_is_passed);

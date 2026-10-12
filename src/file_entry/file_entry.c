@@ -14,6 +14,8 @@ struct s_file_entry
     unsigned long link_count;
     char *author;
     char *group;
+    long size;
+    t_device device;
 };
 
 struct s_file_entry_array
@@ -181,6 +183,38 @@ void file_entry_set_group(t_file_entry *entry, const char *group)
 
     free(entry->group);
     entry->group = ft_safe_strdup(group);
+}
+
+long file_entry_get_size(const t_file_entry *entry)
+{
+    if (entry == NULL)
+        return 0;
+
+    return entry->size;
+}
+
+void file_entry_set_size(t_file_entry *entry, const long size)
+{
+    if (entry == NULL)
+        return ;
+
+    entry->size = size;
+}
+
+t_device file_entry_get_device(const t_file_entry *entry)
+{
+    if (entry == NULL)
+        return (t_device){0};
+
+    return entry->device;
+}
+
+void file_entry_set_device(t_file_entry *entry, const t_device device)
+{
+    if (entry == NULL)
+        return ;
+
+    entry->device = device;
 }
 
 const t_file_entry *file_entry_array_get_at(const t_file_entry_array *file_entry_array, const unsigned int index)
