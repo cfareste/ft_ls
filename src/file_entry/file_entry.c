@@ -17,6 +17,7 @@ struct s_file_entry
     long size;
     t_device device;
     t_date modification_date;
+    char *target;
 };
 
 struct s_file_entry_array
@@ -234,6 +235,23 @@ void file_entry_set_modification_date(t_file_entry *entry, const t_date modifica
     entry->modification_date = modification_date;
 }
 
+const char *file_entry_get_link_target(const t_file_entry *entry)
+{
+    if (entry == NULL)
+        return NULL;
+
+    return entry->target;
+}
+
+void file_entry_set_link_target(t_file_entry *entry, const char *target)
+{
+    if (entry == NULL || !ft_is_valid_path(target))
+        return ;
+
+    free(entry->target);
+    entry->target = ft_safe_strdup(target);
+}
+
 const t_file_entry *file_entry_array_get_at(const t_file_entry_array *file_entry_array, const unsigned int index)
 {
     if (file_entry_array == NULL || index >= file_entry_array->count)
@@ -277,6 +295,7 @@ void file_entry_destroy(t_file_entry **file_entry)
     free((*file_entry)->name);
     free((*file_entry)->author);
     free((*file_entry)->group);
+    free((*file_entry)->target);
     free((*file_entry));
     *file_entry = NULL;
 }

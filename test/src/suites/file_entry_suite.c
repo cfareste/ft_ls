@@ -352,6 +352,39 @@ static void should_not_fail_setting_entry_modification_date_if_a_NULL_entry_is_p
     file_entry_set_modification_date(NULL, modification_date);
 }
 
+static void should_return_NULL_for_the_entry_link_target_if_a_NULL_entry_is_passed(void)
+{
+    CU_ASSERT_PTR_NULL(file_entry_get_link_target(NULL));
+}
+
+static void should_return_the_entry_link_target_correctly(void)
+{
+    file_entry_set_link_target(entry_sut, "target");
+
+    CU_ASSERT_STRING_EQUAL(file_entry_get_link_target(entry_sut), "target");
+}
+
+static void should_not_set_the_entry_link_target_if_a_NULL_target_is_passed(void)
+{
+    file_entry_set_link_target(entry_sut, "target");
+    file_entry_set_link_target(entry_sut, NULL);
+
+    CU_ASSERT_STRING_EQUAL(file_entry_get_link_target(entry_sut), "target");
+}
+
+static void should_not_set_the_entry_link_target_if_an_empty_target_is_passed(void)
+{
+    file_entry_set_link_target(entry_sut, "target");
+    file_entry_set_link_target(entry_sut, "");
+
+    CU_ASSERT_STRING_EQUAL(file_entry_get_link_target(entry_sut), "target");
+}
+
+static void should_not_fail_setting_the_entry_link_target_if_a_NULL_entry_is_passed(void)
+{
+    file_entry_set_link_target(NULL, "target");
+}
+
 static void should_return_a_length_of_zero_when_passed_a_NULL_file_entry_array(void)
 {
     const unsigned int length = file_entry_array_get_length(NULL);
@@ -521,6 +554,11 @@ void register_file_entry_suite(void)
         CU_add_test(suite, "should_return_an_empty_modification_date_when_a_NULL_entry_is_passed", should_return_an_empty_modification_date_when_a_NULL_entry_is_passed);
         CU_add_test(suite, "should_return_the_entry_modification_date_correctly", should_return_the_entry_modification_date_correctly);
         CU_add_test(suite, "should_not_fail_setting_entry_modification_date_if_a_NULL_entry_is_passed", should_not_fail_setting_entry_modification_date_if_a_NULL_entry_is_passed);
+        CU_add_test(suite, "should_return_NULL_for_the_entry_link_target_if_a_NULL_entry_is_passed", should_return_NULL_for_the_entry_link_target_if_a_NULL_entry_is_passed);
+        CU_add_test(suite, "should_return_the_entry_link_target_correctly", should_return_the_entry_link_target_correctly);
+        CU_add_test(suite, "should_not_set_the_entry_link_target_if_a_NULL_target_is_passed", should_not_set_the_entry_link_target_if_a_NULL_target_is_passed);
+        CU_add_test(suite, "should_not_set_the_entry_link_target_if_an_empty_target_is_passed", should_not_set_the_entry_link_target_if_an_empty_target_is_passed);
+        CU_add_test(suite, "should_not_fail_setting_the_entry_link_target_if_a_NULL_entry_is_passed", should_not_fail_setting_the_entry_link_target_if_a_NULL_entry_is_passed);
         CU_add_test(suite, "should_return_a_length_of_zero_when_passed_a_NULL_file_entry_array", should_return_a_length_of_zero_when_passed_a_NULL_file_entry_array);
         CU_add_test(suite, "should_return_the_correct_length", should_return_the_correct_length);
         CU_add_test(suite, "should_return_NULL_for_an_entry_if_a_NULL_array_is_passed", should_return_NULL_for_an_entry_if_a_NULL_array_is_passed);
