@@ -18,7 +18,7 @@ struct s_file_stats
 {
     char *file_name;
     blkcnt_t blocks;
-    mode_t permissions;
+    t_permissions permissions;
     t_file_type type;
     nlink_t link_count;
     uid_t author_id;
@@ -87,11 +87,42 @@ static t_file_type get_file_type(const mode_t mode)
     return file_type;
 }
 
+static t_permissions get_file_permissions(const mode_t mode)
+{
+    t_permissions permissions = PERM_NONE;
+
+    if (mode & S_IRUSR)
+        permissions |= PERM_OWNER_READ;
+    if (mode & S_IWUSR)
+        permissions |= PERM_OWNER_WRITE;
+    if (mode & S_IXUSR)
+        permissions |= PERM_OWNER_EXECUTE;
+    if (mode & S_IRGRP)
+        permissions |= PERM_GROUP_READ;
+    if (mode & S_IWGRP)
+        permissions |= PERM_GROUP_WRITE;
+    if (mode & S_IXGRP)
+        permissions |= PERM_GROUP_EXECUTE;
+    if (mode & S_IROTH)
+        permissions |= PERM_OTHER_READ;
+    if (mode & S_IWOTH)
+        permissions |= PERM_OTHER_WRITE;
+    if (mode & S_IXOTH)
+        permissions |= PERM_OTHER_EXECUTE;
+    if (mode & S_ISUID)
+        permissions |= PERM_SETUID;
+    if (mode & S_ISGID)
+        permissions |= PERM_SETGID;
+    if (mode & S_ISVTX)
+        permissions |= PERM_STICKY;
+    return permissions;
+}
+
 static void initialize_stats(t_file_stats *file_stats, const char *file_path, const struct stat *stats)
 {
     file_stats->file_name = ft_safe_strdup(file_path);
     file_stats->blocks = stats->st_blocks;
-    file_stats->permissions = stats->st_mode & (S_IRWXU | S_IRWXG | S_IRWXO | S_ISUID | S_ISGID | S_ISVTX);
+    file_stats->permissions = get_file_permissions(stats->st_mode);
     file_stats->type = get_file_type(stats->st_mode);
     file_stats->link_count = stats->st_nlink;
     file_stats->author_id = stats->st_uid;
@@ -165,10 +196,10 @@ blkcnt_t file_stats_get_blocks(const t_file_stats *file_stats)
     return file_stats->blocks;
 }
 
-mode_t file_stats_get_permissions(const t_file_stats *file_stats)
+t_permissions file_stats_get_permissions(const t_file_stats *file_stats)
 {
     if (file_stats == NULL)
-        return 0;
+        return PERM_NONE;
 
     return file_stats->permissions;
 }
