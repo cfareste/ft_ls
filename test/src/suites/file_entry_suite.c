@@ -215,6 +215,56 @@ static void should_not_fail_setting_entry_link_count_if_a_NULL_entry_is_passed(v
     file_entry_set_link_count(NULL, 17);
 }
 
+static void should_return_NULL_for_the_entry_author_if_a_NULL_entry_is_passed(void)
+{
+    CU_ASSERT_PTR_NULL(file_entry_get_author(NULL));
+}
+
+static void should_return_the_entry_author_correctly(void)
+{
+    file_entry_set_author(entry_sut, "alice");
+
+    CU_ASSERT_STRING_EQUAL(file_entry_get_author(entry_sut), "alice");
+}
+
+static void should_not_set_the_entry_author_if_a_NULL_author_is_passed(void)
+{
+    file_entry_set_author(entry_sut, "alice");
+    file_entry_set_author(entry_sut, NULL);
+
+    CU_ASSERT_STRING_EQUAL(file_entry_get_author(entry_sut), "alice");
+}
+
+static void should_not_fail_setting_the_entry_author_if_a_NULL_entry_is_passed(void)
+{
+    file_entry_set_author(NULL, "alice");
+}
+
+static void should_return_NULL_for_the_entry_group_if_a_NULL_entry_is_passed(void)
+{
+    CU_ASSERT_PTR_NULL(file_entry_get_group(NULL));
+}
+
+static void should_return_the_entry_group_correctly(void)
+{
+    file_entry_set_group(entry_sut, "developers");
+
+    CU_ASSERT_STRING_EQUAL(file_entry_get_group(entry_sut), "developers");
+}
+
+static void should_not_set_the_entry_group_if_a_NULL_group_is_passed(void)
+{
+    file_entry_set_group(entry_sut, "developers");
+    file_entry_set_group(entry_sut, NULL);
+
+    CU_ASSERT_STRING_EQUAL(file_entry_get_group(entry_sut), "developers");
+}
+
+static void should_not_fail_setting_the_entry_group_if_a_NULL_entry_is_passed(void)
+{
+    file_entry_set_group(NULL, "developers");
+}
+
 static void should_return_a_length_of_zero_when_passed_a_NULL_file_entry_array(void)
 {
     const unsigned int length = file_entry_array_get_length(NULL);
@@ -367,6 +417,14 @@ void register_file_entry_suite(void)
         CU_add_test(suite, "should_return_zero_link_count_when_a_NULL_entry_is_passed", should_return_zero_link_count_when_a_NULL_entry_is_passed);
         CU_add_test(suite, "should_return_the_entry_link_count_correctly", should_return_the_entry_link_count_correctly);
         CU_add_test(suite, "should_not_fail_setting_entry_link_count_if_a_NULL_entry_is_passed", should_not_fail_setting_entry_link_count_if_a_NULL_entry_is_passed);
+        CU_add_test(suite, "should_return_NULL_for_the_entry_author_if_a_NULL_entry_is_passed", should_return_NULL_for_the_entry_author_if_a_NULL_entry_is_passed);
+        CU_add_test(suite, "should_return_the_entry_author_correctly", should_return_the_entry_author_correctly);
+        CU_add_test(suite, "should_not_set_the_entry_author_if_a_NULL_author_is_passed", should_not_set_the_entry_author_if_a_NULL_author_is_passed);
+        CU_add_test(suite, "should_not_fail_setting_the_entry_author_if_a_NULL_entry_is_passed", should_not_fail_setting_the_entry_author_if_a_NULL_entry_is_passed);
+        CU_add_test(suite, "should_return_NULL_for_the_entry_group_if_a_NULL_entry_is_passed", should_return_NULL_for_the_entry_group_if_a_NULL_entry_is_passed);
+        CU_add_test(suite, "should_return_the_entry_group_correctly", should_return_the_entry_group_correctly);
+        CU_add_test(suite, "should_not_set_the_entry_group_if_a_NULL_group_is_passed", should_not_set_the_entry_group_if_a_NULL_group_is_passed);
+        CU_add_test(suite, "should_not_fail_setting_the_entry_group_if_a_NULL_entry_is_passed", should_not_fail_setting_the_entry_group_if_a_NULL_entry_is_passed);
         CU_add_test(suite, "should_return_a_length_of_zero_when_passed_a_NULL_file_entry_array", should_return_a_length_of_zero_when_passed_a_NULL_file_entry_array);
         CU_add_test(suite, "should_return_the_correct_length", should_return_the_correct_length);
         CU_add_test(suite, "should_return_NULL_for_an_entry_if_a_NULL_array_is_passed", should_return_NULL_for_an_entry_if_a_NULL_array_is_passed);

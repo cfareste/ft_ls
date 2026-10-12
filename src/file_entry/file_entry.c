@@ -12,6 +12,8 @@ struct s_file_entry
     t_permissions permissions;
     t_file_type type;
     unsigned long link_count;
+    char *author;
+    char *group;
 };
 
 struct s_file_entry_array
@@ -147,6 +149,40 @@ void file_entry_set_link_count(t_file_entry *entry, const unsigned long link_cou
     entry->link_count = link_count;
 }
 
+const char *file_entry_get_author(const t_file_entry *entry)
+{
+    if (entry == NULL)
+        return NULL;
+
+    return entry->author;
+}
+
+void file_entry_set_author(t_file_entry *entry, const char *author)
+{
+    if (entry == NULL || author == NULL)
+        return ;
+
+    free(entry->author);
+    entry->author = ft_safe_strdup(author);
+}
+
+const char *file_entry_get_group(const t_file_entry *entry)
+{
+    if (entry == NULL)
+        return NULL;
+
+    return entry->group;
+}
+
+void file_entry_set_group(t_file_entry *entry, const char *group)
+{
+    if (entry == NULL || group == NULL)
+        return ;
+
+    free(entry->group);
+    entry->group = ft_safe_strdup(group);
+}
+
 const t_file_entry *file_entry_array_get_at(const t_file_entry_array *file_entry_array, const unsigned int index)
 {
     if (file_entry_array == NULL || index >= file_entry_array->count)
@@ -188,6 +224,8 @@ void file_entry_destroy(t_file_entry **file_entry)
         return;
 
     free((*file_entry)->name);
+    free((*file_entry)->author);
+    free((*file_entry)->group);
     free((*file_entry));
     *file_entry = NULL;
 }
