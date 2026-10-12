@@ -16,6 +16,7 @@ struct s_file_entry
     char *group;
     long size;
     t_device device;
+    t_date modification_date;
 };
 
 struct s_file_entry_array
@@ -215,6 +216,22 @@ void file_entry_set_device(t_file_entry *entry, const t_device device)
         return ;
 
     entry->device = device;
+}
+
+t_date file_entry_get_modification_date(const t_file_entry *entry)
+{
+    if (entry == NULL)
+        return (t_date){0};
+
+    return entry->modification_date;
+}
+
+void file_entry_set_modification_date(t_file_entry *entry, const t_date modification_date)
+{
+    if (entry == NULL)
+        return ;
+
+    entry->modification_date = modification_date;
 }
 
 const t_file_entry *file_entry_array_get_at(const t_file_entry_array *file_entry_array, const unsigned int index)

@@ -308,6 +308,50 @@ static void should_not_fail_setting_entry_device_if_a_NULL_entry_is_passed(void)
     file_entry_set_device(NULL, device);
 }
 
+static void should_return_an_empty_modification_date_when_a_NULL_entry_is_passed(void)
+{
+    const t_date modification_date = file_entry_get_modification_date(NULL);
+
+    CU_ASSERT_EQUAL(modification_date.day, 0);
+    CU_ASSERT_EQUAL(modification_date.month, 0);
+    CU_ASSERT_EQUAL(modification_date.year, 0);
+    CU_ASSERT_EQUAL(modification_date.hour, 0);
+    CU_ASSERT_EQUAL(modification_date.minute, 0);
+    CU_ASSERT_EQUAL(modification_date.second, 0);
+    CU_ASSERT_EQUAL(modification_date.timestamp, 0);
+}
+
+static void should_return_the_entry_modification_date_correctly(void)
+{
+    const t_date modification_date = {
+        .day = 12,
+        .month = 10,
+        .year = 2026,
+        .hour = 14,
+        .minute = 10,
+        .second = 42,
+        .timestamp = 1791814242
+    };
+
+    file_entry_set_modification_date(entry_sut, modification_date);
+
+    const t_date entry_modification_date = file_entry_get_modification_date(entry_sut);
+    CU_ASSERT_EQUAL(entry_modification_date.day, modification_date.day);
+    CU_ASSERT_EQUAL(entry_modification_date.month, modification_date.month);
+    CU_ASSERT_EQUAL(entry_modification_date.year, modification_date.year);
+    CU_ASSERT_EQUAL(entry_modification_date.hour, modification_date.hour);
+    CU_ASSERT_EQUAL(entry_modification_date.minute, modification_date.minute);
+    CU_ASSERT_EQUAL(entry_modification_date.second, modification_date.second);
+    CU_ASSERT_EQUAL(entry_modification_date.timestamp, modification_date.timestamp);
+}
+
+static void should_not_fail_setting_entry_modification_date_if_a_NULL_entry_is_passed(void)
+{
+    const t_date modification_date = { .year = 2026 };
+
+    file_entry_set_modification_date(NULL, modification_date);
+}
+
 static void should_return_a_length_of_zero_when_passed_a_NULL_file_entry_array(void)
 {
     const unsigned int length = file_entry_array_get_length(NULL);
@@ -474,6 +518,9 @@ void register_file_entry_suite(void)
         CU_add_test(suite, "should_return_an_empty_device_when_a_NULL_entry_is_passed", should_return_an_empty_device_when_a_NULL_entry_is_passed);
         CU_add_test(suite, "should_return_the_entry_device_correctly", should_return_the_entry_device_correctly);
         CU_add_test(suite, "should_not_fail_setting_entry_device_if_a_NULL_entry_is_passed", should_not_fail_setting_entry_device_if_a_NULL_entry_is_passed);
+        CU_add_test(suite, "should_return_an_empty_modification_date_when_a_NULL_entry_is_passed", should_return_an_empty_modification_date_when_a_NULL_entry_is_passed);
+        CU_add_test(suite, "should_return_the_entry_modification_date_correctly", should_return_the_entry_modification_date_correctly);
+        CU_add_test(suite, "should_not_fail_setting_entry_modification_date_if_a_NULL_entry_is_passed", should_not_fail_setting_entry_modification_date_if_a_NULL_entry_is_passed);
         CU_add_test(suite, "should_return_a_length_of_zero_when_passed_a_NULL_file_entry_array", should_return_a_length_of_zero_when_passed_a_NULL_file_entry_array);
         CU_add_test(suite, "should_return_the_correct_length", should_return_the_correct_length);
         CU_add_test(suite, "should_return_NULL_for_an_entry_if_a_NULL_array_is_passed", should_return_NULL_for_an_entry_if_a_NULL_array_is_passed);

@@ -25,6 +25,8 @@ long file_entry_get_size(const t_file_entry *entry);
 void file_entry_set_size(t_file_entry *entry, long size);
 t_device file_entry_get_device(const t_file_entry *entry);
 void file_entry_set_device(t_file_entry *entry, t_device device);
+t_date file_entry_get_modification_date(const t_file_entry *entry);
+void file_entry_set_modification_date(t_file_entry *entry, t_date modification_date);
 const t_file_entry *file_entry_array_get_at(const t_file_entry_array *file_entry_array, unsigned int index);
 void file_entry_array_push(t_file_entry_array *array, t_file_entry *entry);
 unsigned int file_entry_array_get_length(const t_file_entry_array *file_entry_array);
