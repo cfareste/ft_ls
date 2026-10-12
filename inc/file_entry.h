@@ -15,6 +15,8 @@ t_permissions file_entry_get_permissions(const t_file_entry *entry);
 void file_entry_set_permissions(t_file_entry *entry, t_permissions permissions);
 t_file_type file_entry_get_file_type(const t_file_entry *entry);
 void file_entry_set_file_type(t_file_entry *entry, t_file_type file_type);
+unsigned long file_entry_get_link_count(const t_file_entry *entry);
+void file_entry_set_link_count(t_file_entry *entry, unsigned long link_count);
 const t_file_entry *file_entry_array_get_at(const t_file_entry_array *file_entry_array, unsigned int index);
 void file_entry_array_push(t_file_entry_array *array, t_file_entry *entry);
 unsigned int file_entry_array_get_length(const t_file_entry_array *file_entry_array);

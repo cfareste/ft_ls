@@ -198,6 +198,23 @@ static void should_not_set_the_entry_file_type_if_none_file_type_is_passed(void)
     CU_ASSERT_EQUAL(file_type, FILE_TYPE_UNKNOWN);
 }
 
+static void should_return_zero_link_count_when_a_NULL_entry_is_passed(void)
+{
+    CU_ASSERT_EQUAL(file_entry_get_link_count(NULL), 0);
+}
+
+static void should_return_the_entry_link_count_correctly(void)
+{
+    file_entry_set_link_count(entry_sut, 17);
+
+    CU_ASSERT_EQUAL(file_entry_get_link_count(entry_sut), 17);
+}
+
+static void should_not_fail_setting_entry_link_count_if_a_NULL_entry_is_passed(void)
+{
+    file_entry_set_link_count(NULL, 17);
+}
+
 static void should_return_a_length_of_zero_when_passed_a_NULL_file_entry_array(void)
 {
     const unsigned int length = file_entry_array_get_length(NULL);
@@ -347,6 +364,9 @@ void register_file_entry_suite(void)
         CU_add_test(suite, "should_return_the_entry_file_type_correctly", should_return_the_entry_file_type_correctly);
         CU_add_test(suite, "should_not_fail_setting_the_entry_file_type_if_a_NULL_file_entry_is_passed", should_not_fail_setting_the_entry_file_type_if_a_NULL_file_entry_is_passed);
         CU_add_test(suite, "should_not_set_the_entry_file_type_if_none_file_type_is_passed", should_not_set_the_entry_file_type_if_none_file_type_is_passed);
+        CU_add_test(suite, "should_return_zero_link_count_when_a_NULL_entry_is_passed", should_return_zero_link_count_when_a_NULL_entry_is_passed);
+        CU_add_test(suite, "should_return_the_entry_link_count_correctly", should_return_the_entry_link_count_correctly);
+        CU_add_test(suite, "should_not_fail_setting_entry_link_count_if_a_NULL_entry_is_passed", should_not_fail_setting_entry_link_count_if_a_NULL_entry_is_passed);
         CU_add_test(suite, "should_return_a_length_of_zero_when_passed_a_NULL_file_entry_array", should_return_a_length_of_zero_when_passed_a_NULL_file_entry_array);
         CU_add_test(suite, "should_return_the_correct_length", should_return_the_correct_length);
         CU_add_test(suite, "should_return_NULL_for_an_entry_if_a_NULL_array_is_passed", should_return_NULL_for_an_entry_if_a_NULL_array_is_passed);

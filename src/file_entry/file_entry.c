@@ -11,6 +11,7 @@ struct s_file_entry
     long blocks;
     t_permissions permissions;
     t_file_type type;
+    unsigned long link_count;
 };
 
 struct s_file_entry_array
@@ -49,6 +50,7 @@ t_file_entry *file_entry_create(const char *file_name)
     file_entry->blocks = 0;
     file_entry->permissions = PERM_NONE;
     file_entry->type = FILE_TYPE_UNKNOWN;
+    file_entry->link_count = 0;
 
     return file_entry;
 }
@@ -127,6 +129,22 @@ void file_entry_set_file_type(t_file_entry *entry, const t_file_type file_type)
         return ;
 
     entry->type = file_type;
+}
+
+unsigned long file_entry_get_link_count(const t_file_entry *entry)
+{
+    if (entry == NULL)
+        return 0;
+
+    return entry->link_count;
+}
+
+void file_entry_set_link_count(t_file_entry *entry, const unsigned long link_count)
+{
+    if (entry == NULL)
+        return ;
+
+    entry->link_count = link_count;
 }
 
 const t_file_entry *file_entry_array_get_at(const t_file_entry_array *file_entry_array, const unsigned int index)
