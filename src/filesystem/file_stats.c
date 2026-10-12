@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <sys/stat.h>
+#include <sys/sysmacros.h>
 #include <unistd.h>
 #include "libft.h"
 #include "file_stats.h"
@@ -26,6 +27,7 @@ struct s_file_stats
     char *author;
     char *group;
     off_t size;
+    t_device device;
     t_date modification_date;
     char *target;
 };
@@ -128,6 +130,11 @@ static void initialize_stats(t_file_stats *file_stats, const char *file_path, co
     file_stats->author_id = stats->st_uid;
     file_stats->group_id = stats->st_gid;
     file_stats->size = stats->st_size;
+    if (S_ISCHR(stats->st_mode) || S_ISBLK(stats->st_mode))
+    {
+        file_stats->device.major = major(stats->st_rdev);
+        file_stats->device.minor = minor(stats->st_rdev);
+    }
     file_stats->modification_date = date_from_time(stats->st_mtime);
 }
 
@@ -262,6 +269,14 @@ off_t file_stats_get_size(const t_file_stats *file_stats)
         return 0;
 
     return file_stats->size;
+}
+
+t_device file_stats_get_device(const t_file_stats *file_stats)
+{
+    if (file_stats == NULL)
+        return (t_device){0};
+
+    return file_stats->device;
 }
 
 t_date file_stats_get_modification_date(const t_file_stats *file_stats)

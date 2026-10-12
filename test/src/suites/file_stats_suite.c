@@ -3,6 +3,7 @@
 #include "CUnit/Basic.h"
 #include "mocks.h"
 #include "file_stats.h"
+#include <sys/sysmacros.h>
 
 #define SUITE_NAME "file_stats"
 #define LINK_BUFFER_SIZE 300
@@ -449,6 +450,44 @@ static void should_return_the_allocated_blocks_for_a_file(void)
     file_stats_destroy(&stats);
 }
 
+static void should_return_zero_device_numbers_for_NULL_stats(void)
+{
+    const t_device device = file_stats_get_device(NULL);
+
+    CU_ASSERT_EQUAL(device.major, 0);
+    CU_ASSERT_EQUAL(device.minor, 0);
+}
+
+static void should_return_major_and_minor_device_numbers(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_CHAR_DEVICE_WITH_STATS("char", .stats.st_rdev = makedev(12, 34)),
+        MOCK_BLOCK_DEVICE_WITH_STATS("block", .stats.st_rdev = makedev(56, 78)),
+        MOCK_FILE("regular"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    t_file_stats *char_stats = file_stats_get("char");
+    t_file_stats *block_stats = file_stats_get("block");
+    t_file_stats *regular_stats = file_stats_get("regular");
+    const t_device char_device = file_stats_get_device(char_stats);
+    const t_device block_device = file_stats_get_device(block_stats);
+    const t_device regular_device = file_stats_get_device(regular_stats);
+
+    CU_ASSERT_EQUAL(char_device.major, 12);
+    CU_ASSERT_EQUAL(char_device.minor, 34);
+    CU_ASSERT_EQUAL(block_device.major, 56);
+    CU_ASSERT_EQUAL(block_device.minor, 78);
+    CU_ASSERT_EQUAL(regular_device.major, 0);
+    CU_ASSERT_EQUAL(regular_device.minor, 0);
+    CU_ASSERT(verify_that_no_error_was_printed());
+
+    file_stats_destroy(&char_stats);
+    file_stats_destroy(&block_stats);
+    file_stats_destroy(&regular_stats);
+}
+
 static void should_return_zero_link_count_when_a_NULL_file_stats_are_specified(void)
 {
     CU_ASSERT_EQUAL(file_stats_get_link_count(NULL), 0);
@@ -733,6 +772,8 @@ void register_file_stats_suite(void)
         CU_add_test(suite, "should_return_the_modification_date_for_a_file_and_directory", should_return_the_modification_date_for_a_file_and_directory);
         CU_add_test(suite, "should_return_zero_blocks_when_a_NULL_file_stats_are_specified", should_return_zero_blocks_when_a_NULL_file_stats_are_specified);
         CU_add_test(suite, "should_return_the_allocated_blocks_for_a_file", should_return_the_allocated_blocks_for_a_file);
+        CU_add_test(suite, "should_return_zero_device_numbers_for_NULL_stats", should_return_zero_device_numbers_for_NULL_stats);
+        CU_add_test(suite, "should_return_major_and_minor_device_numbers", should_return_major_and_minor_device_numbers);
         CU_add_test(suite, "should_return_zero_link_count_when_a_NULL_file_stats_are_specified", should_return_zero_link_count_when_a_NULL_file_stats_are_specified);
         CU_add_test(suite, "should_return_the_link_count_for_a_file_and_directory", should_return_the_link_count_for_a_file_and_directory);
         CU_add_test(suite, "should_return_NULL_for_the_target_pointed_by_a_symlink_if_NULL_stats_are_passed", should_return_NULL_for_the_target_pointed_by_a_symlink_if_NULL_stats_are_passed);
