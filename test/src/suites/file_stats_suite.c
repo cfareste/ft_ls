@@ -418,7 +418,7 @@ static void should_return_zero_blocks_when_a_NULL_file_stats_are_specified(void)
 static void should_return_the_allocated_blocks_for_a_file(void)
 {
     const t_vfs_mock_entry vfs[] = {
-        MOCK_FILE_WITH_STATS("file", .stats.st_blocks = 17),
+        MOCK_FILE_WITH_STATS("file", MOCK_BLOCKS(17)),
         MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
@@ -521,7 +521,7 @@ static void should_return_the_author_of_a_file(void)
 static void should_return_the_author_id_if_the_author_is_not_found(void)
 {
     const t_vfs_mock_entry vfs[] = {
-        MOCK_FILE_WITH_STATS("file", .stats.st_uid = 12345),
+        MOCK_FILE_WITH_STATS("file", MOCK_UID(12345)),
         MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
@@ -557,7 +557,7 @@ static void should_return_the_group_of_a_file(void)
 static void should_return_the_group_id_if_the_group_is_not_found(void)
 {
     const t_vfs_mock_entry vfs[] = {
-        MOCK_FILE_WITH_STATS("file", .stats.st_gid = 12345),
+        MOCK_FILE_WITH_STATS("file", MOCK_GID(12345)),
         MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);

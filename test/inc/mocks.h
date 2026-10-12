@@ -38,7 +38,10 @@ typedef struct s_vfs_mock_entry
 #define DEFAULT_SIZE            1024
 #define DEFAULT_MODIFICATION_TIME 0
 
+#define MOCK_BLOCKS(value)                                              .stats.st_blocks = (value)
 #define MOCK_HARDLINK_COUNT(value)                                      .stats.st_nlink = (value)
+#define MOCK_UID(value)                                                 .stats.st_uid = (value)
+#define MOCK_GID(value)                                                 .stats.st_gid = (value)
 #define MOCK_AUTHOR(name)                                               .author = (name)
 #define MOCK_GROUP(name)                                                .group = (name)
 #define MOCK_SIZE(value)                                                .stats.st_size = (value)
