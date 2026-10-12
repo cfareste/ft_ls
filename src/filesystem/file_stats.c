@@ -17,6 +17,7 @@
 struct s_file_stats
 {
     char *file_name;
+    blkcnt_t blocks;
     mode_t permissions;
     t_file_type type;
     nlink_t link_count;
@@ -89,6 +90,7 @@ static t_file_type get_file_type(const mode_t mode)
 static void initialize_stats(t_file_stats *file_stats, const char *file_path, const struct stat *stats)
 {
     file_stats->file_name = ft_safe_strdup(file_path);
+    file_stats->blocks = stats->st_blocks;
     file_stats->permissions = stats->st_mode & (S_IRWXU | S_IRWXG | S_IRWXO | S_ISUID | S_ISGID | S_ISVTX);
     file_stats->type = get_file_type(stats->st_mode);
     file_stats->link_count = stats->st_nlink;
@@ -153,6 +155,14 @@ t_file_stats *file_stats_get_without_following_symlinks(const char *file_path)
     t_file_stats *file_stats = ft_safe_calloc(1, sizeof(t_file_stats));
     initialize_stats(file_stats, file_path, &stats);
     return file_stats;
+}
+
+blkcnt_t file_stats_get_blocks(const t_file_stats *file_stats)
+{
+    if (file_stats == NULL)
+        return 0;
+
+    return file_stats->blocks;
 }
 
 mode_t file_stats_get_permissions(const t_file_stats *file_stats)
