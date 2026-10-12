@@ -86,50 +86,6 @@ static void should_return_zero_permissions_when_a_NULL_file_stats_are_specified(
     CU_ASSERT_EQUAL(file_stats_get_permissions(NULL), 0);
 }
 
-static void should_return_zero_modification_date_when_a_NULL_file_stats_are_specified(void)
-{
-    const t_date date = file_stats_get_modification_date(NULL);
-
-    CU_ASSERT_EQUAL(date.day, 0);
-    CU_ASSERT_EQUAL(date.month, 0);
-    CU_ASSERT_EQUAL(date.year, 0);
-    CU_ASSERT_EQUAL(date.hour, 0);
-    CU_ASSERT_EQUAL(date.minute, 0);
-    CU_ASSERT_EQUAL(date.second, 0);
-}
-
-static void should_return_the_modification_date_for_a_file_and_directory(void)
-{
-    const t_vfs_mock_entry vfs[] = {
-        MOCK_FILE_WITH_STATS("file", MOCK_MODIFICATION_TIME(10, 5, 2024, 8, 9, 10)),
-        MOCK_DIR_WITH_STATS("dir", NULL, MOCK_MODIFICATION_TIME(21, 11, 2023, 18, 19, 20)),
-        MOCK_NULL_TERMINATOR()
-    };
-    vfs_mock_setup(vfs);
-
-    t_file_stats *file_stats = file_stats_get("file");
-    t_file_stats *directory_stats = file_stats_get_without_following_symlinks("dir");
-    const t_date file_date = file_stats_get_modification_date(file_stats);
-    const t_date directory_date = file_stats_get_modification_date(directory_stats);
-
-    CU_ASSERT_EQUAL(file_date.day, 10);
-    CU_ASSERT_EQUAL(file_date.month, 5);
-    CU_ASSERT_EQUAL(file_date.year, 2024);
-    CU_ASSERT_EQUAL(file_date.hour, 8);
-    CU_ASSERT_EQUAL(file_date.minute, 9);
-    CU_ASSERT_EQUAL(file_date.second, 10);
-    CU_ASSERT_EQUAL(directory_date.day, 21);
-    CU_ASSERT_EQUAL(directory_date.month, 11);
-    CU_ASSERT_EQUAL(directory_date.year, 2023);
-    CU_ASSERT_EQUAL(directory_date.hour, 18);
-    CU_ASSERT_EQUAL(directory_date.minute, 19);
-    CU_ASSERT_EQUAL(directory_date.second, 20);
-    CU_ASSERT(verify_that_no_error_was_printed());
-
-    file_stats_destroy(&file_stats);
-    file_stats_destroy(&directory_stats);
-}
-
 static void should_return_permissions_for_a_file_and_directory(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -408,6 +364,50 @@ static void should_always_return_link_file_stats_when_retrieving_stats_without_f
     file_stats_destroy(&looped_link_stats);
     file_stats_destroy(&multiReg_stats);
     file_stats_destroy(&multiDir_stats);
+}
+
+static void should_return_zero_modification_date_when_a_NULL_file_stats_are_specified(void)
+{
+    const t_date date = file_stats_get_modification_date(NULL);
+
+    CU_ASSERT_EQUAL(date.day, 0);
+    CU_ASSERT_EQUAL(date.month, 0);
+    CU_ASSERT_EQUAL(date.year, 0);
+    CU_ASSERT_EQUAL(date.hour, 0);
+    CU_ASSERT_EQUAL(date.minute, 0);
+    CU_ASSERT_EQUAL(date.second, 0);
+}
+
+static void should_return_the_modification_date_for_a_file_and_directory(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE_WITH_STATS("file", MOCK_MODIFICATION_TIME(10, 5, 2024, 8, 9, 10)),
+        MOCK_DIR_WITH_STATS("dir", NULL, MOCK_MODIFICATION_TIME(21, 11, 2023, 18, 19, 20)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    t_file_stats *file_stats = file_stats_get("file");
+    t_file_stats *directory_stats = file_stats_get_without_following_symlinks("dir");
+    const t_date file_date = file_stats_get_modification_date(file_stats);
+    const t_date directory_date = file_stats_get_modification_date(directory_stats);
+
+    CU_ASSERT_EQUAL(file_date.day, 10);
+    CU_ASSERT_EQUAL(file_date.month, 5);
+    CU_ASSERT_EQUAL(file_date.year, 2024);
+    CU_ASSERT_EQUAL(file_date.hour, 8);
+    CU_ASSERT_EQUAL(file_date.minute, 9);
+    CU_ASSERT_EQUAL(file_date.second, 10);
+    CU_ASSERT_EQUAL(directory_date.day, 21);
+    CU_ASSERT_EQUAL(directory_date.month, 11);
+    CU_ASSERT_EQUAL(directory_date.year, 2023);
+    CU_ASSERT_EQUAL(directory_date.hour, 18);
+    CU_ASSERT_EQUAL(directory_date.minute, 19);
+    CU_ASSERT_EQUAL(directory_date.second, 20);
+    CU_ASSERT(verify_that_no_error_was_printed());
+
+    file_stats_destroy(&file_stats);
+    file_stats_destroy(&directory_stats);
 }
 
 static void should_return_zero_blocks_when_a_NULL_file_stats_are_specified(void)
@@ -701,8 +701,6 @@ void register_file_stats_suite(void)
         CU_add_test(suite, "should_destroy_file_stats_correctly", should_destroy_file_stats_correctly);
         CU_add_test(suite, "should_not_fail_to_destroy_file_stats_if_a_NULL_pointer_is_passed", should_not_fail_to_destroy_file_stats_if_a_NULL_pointer_is_passed);
         CU_add_test(suite, "should_not_fail_to_destroy_file_stats_if_a_NULL_file_stats_is_passed", should_not_fail_to_destroy_file_stats_if_a_NULL_file_stats_is_passed);
-        CU_add_test(suite, "should_return_zero_modification_date_when_a_NULL_file_stats_are_specified", should_return_zero_modification_date_when_a_NULL_file_stats_are_specified);
-        CU_add_test(suite, "should_return_the_modification_date_for_a_file_and_directory", should_return_the_modification_date_for_a_file_and_directory);
         CU_add_test(suite, "should_return_zero_permissions_when_a_NULL_file_stats_are_specified", should_return_zero_permissions_when_a_NULL_file_stats_are_specified);
         CU_add_test(suite, "should_return_permissions_for_a_file_and_directory", should_return_permissions_for_a_file_and_directory);
         CU_add_test(suite, "should_return_unknown_file_type_when_a_NULL_file_stats_are_specified", should_return_unknown_file_type_when_a_NULL_file_stats_are_specified);
@@ -713,6 +711,8 @@ void register_file_stats_suite(void)
         CU_add_test(suite, "should_return_link_file_stats_if_the_specified_file_is_a_looped_symlink", should_return_link_file_stats_if_the_specified_file_is_a_looped_symlink);
         CU_add_test(suite, "should_return_the_correct_file_stats_if_the_specified_files_are_multi_hop_symlinks", should_return_the_correct_file_stats_if_the_specified_files_are_multi_hop_symlinks);
         CU_add_test(suite, "should_always_return_link_file_stats_when_retrieving_stats_without_following_symlinks", should_always_return_link_file_stats_when_retrieving_stats_without_following_symlinks);
+        CU_add_test(suite, "should_return_zero_modification_date_when_a_NULL_file_stats_are_specified", should_return_zero_modification_date_when_a_NULL_file_stats_are_specified);
+        CU_add_test(suite, "should_return_the_modification_date_for_a_file_and_directory", should_return_the_modification_date_for_a_file_and_directory);
         CU_add_test(suite, "should_return_zero_blocks_when_a_NULL_file_stats_are_specified", should_return_zero_blocks_when_a_NULL_file_stats_are_specified);
         CU_add_test(suite, "should_return_the_allocated_blocks_for_a_file", should_return_the_allocated_blocks_for_a_file);
         CU_add_test(suite, "should_return_zero_link_count_when_a_NULL_file_stats_are_specified", should_return_zero_link_count_when_a_NULL_file_stats_are_specified);
