@@ -8,6 +8,7 @@
 struct s_file_entry
 {
     char *name;
+    long blocks;
     t_file_type type;
 };
 
@@ -75,6 +76,22 @@ void file_entry_set_name(t_file_entry *entry, const char *name)
 
     free(entry->name);
     entry->name = ft_safe_strdup(name);
+}
+
+long file_entry_get_blocks(const t_file_entry *entry)
+{
+    if (entry == NULL)
+        return 0;
+
+    return entry->blocks;
+}
+
+void file_entry_set_blocks(t_file_entry *entry, const long blocks)
+{
+    if (entry == NULL)
+        return ;
+
+    entry->blocks = blocks;
 }
 
 t_file_type file_entry_get_file_type(const t_file_entry *entry)

@@ -9,6 +9,8 @@ t_file_entry *file_entry_create(const char *file_name);
 t_file_entry_array *file_entry_array_create(void);
 const char *file_entry_get_name(const t_file_entry *file_entry);
 void file_entry_set_name(t_file_entry *entry, const char *name);
+long file_entry_get_blocks(const t_file_entry *entry);
+void file_entry_set_blocks(t_file_entry *entry, long blocks);
 t_file_type file_entry_get_file_type(const t_file_entry *entry);
 void file_entry_set_file_type(t_file_entry *entry, t_file_type file_type);
 const t_file_entry *file_entry_array_get_at(const t_file_entry_array *file_entry_array, unsigned int index);

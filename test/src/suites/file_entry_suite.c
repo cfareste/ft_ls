@@ -132,6 +132,23 @@ static void should_not_set_the_entry_name_if_an_empty_file_name_is_passed(void)
     CU_ASSERT_STRING_EQUAL(entry_name, DEFAULT_NAME);
 }
 
+static void should_return_zero_blocks_when_a_NULL_entry_is_passed(void)
+{
+    CU_ASSERT_EQUAL(file_entry_get_blocks(NULL), 0);
+}
+
+static void should_return_the_entry_blocks_correctly(void)
+{
+    file_entry_set_blocks(entry_sut, 17);
+
+    CU_ASSERT_EQUAL(file_entry_get_blocks(entry_sut), 17);
+}
+
+static void should_not_fail_setting_entry_blocks_if_a_NULL_entry_is_passed(void)
+{
+    file_entry_set_blocks(NULL, 17);
+}
+
 static void should_return_unknown_for_the_entry_file_type_if_a_NULL_entry_is_passed(void)
 {
     const t_file_type file_type = file_entry_get_file_type(NULL);
@@ -301,6 +318,9 @@ void register_file_entry_suite(void)
         CU_add_test(suite, "should_not_fail_setting_the_entry_name_if_a_NULL_file_entry_is_passed", should_not_fail_setting_the_entry_name_if_a_NULL_file_entry_is_passed);
         CU_add_test(suite, "should_not_set_the_entry_name_if_a_NULL_file_name_is_passed", should_not_set_the_entry_name_if_a_NULL_file_name_is_passed);
         CU_add_test(suite, "should_not_set_the_entry_name_if_an_empty_file_name_is_passed", should_not_set_the_entry_name_if_an_empty_file_name_is_passed);
+        CU_add_test(suite, "should_return_zero_blocks_when_a_NULL_entry_is_passed", should_return_zero_blocks_when_a_NULL_entry_is_passed);
+        CU_add_test(suite, "should_return_the_entry_blocks_correctly", should_return_the_entry_blocks_correctly);
+        CU_add_test(suite, "should_not_fail_setting_entry_blocks_if_a_NULL_entry_is_passed", should_not_fail_setting_entry_blocks_if_a_NULL_entry_is_passed);
         CU_add_test(suite, "should_return_unknown_for_the_entry_file_type_if_a_NULL_entry_is_passed", should_return_unknown_for_the_entry_file_type_if_a_NULL_entry_is_passed);
         CU_add_test(suite, "should_return_the_entry_file_type_correctly", should_return_the_entry_file_type_correctly);
         CU_add_test(suite, "should_not_fail_setting_the_entry_file_type_if_a_NULL_file_entry_is_passed", should_not_fail_setting_the_entry_file_type_if_a_NULL_file_entry_is_passed);
