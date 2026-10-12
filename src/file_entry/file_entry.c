@@ -9,6 +9,7 @@ struct s_file_entry
 {
     char *name;
     long blocks;
+    t_permissions permissions;
     t_file_type type;
 };
 
@@ -92,6 +93,22 @@ void file_entry_set_blocks(t_file_entry *entry, const long blocks)
         return ;
 
     entry->blocks = blocks;
+}
+
+t_permissions file_entry_get_permissions(const t_file_entry *entry)
+{
+    if (entry == NULL)
+        return PERM_NONE;
+
+    return entry->permissions;
+}
+
+void file_entry_set_permissions(t_file_entry *entry, const t_permissions permissions)
+{
+    if (entry == NULL)
+        return ;
+
+    entry->permissions = permissions;
 }
 
 t_file_type file_entry_get_file_type(const t_file_entry *entry)

@@ -149,6 +149,25 @@ static void should_not_fail_setting_entry_blocks_if_a_NULL_entry_is_passed(void)
     file_entry_set_blocks(NULL, 17);
 }
 
+static void should_return_no_permissions_when_a_NULL_entry_is_passed(void)
+{
+    CU_ASSERT_EQUAL(file_entry_get_permissions(NULL), PERM_NONE);
+}
+
+static void should_return_the_entry_permissions_correctly(void)
+{
+    const t_permissions permissions = PERM_OWNER_READ | PERM_GROUP_WRITE;
+
+    file_entry_set_permissions(entry_sut, permissions);
+
+    CU_ASSERT_EQUAL(file_entry_get_permissions(entry_sut), permissions);
+}
+
+static void should_not_fail_setting_entry_permissions_if_a_NULL_entry_is_passed(void)
+{
+    file_entry_set_permissions(NULL, PERM_OWNER_READ);
+}
+
 static void should_return_unknown_for_the_entry_file_type_if_a_NULL_entry_is_passed(void)
 {
     const t_file_type file_type = file_entry_get_file_type(NULL);
@@ -321,6 +340,9 @@ void register_file_entry_suite(void)
         CU_add_test(suite, "should_return_zero_blocks_when_a_NULL_entry_is_passed", should_return_zero_blocks_when_a_NULL_entry_is_passed);
         CU_add_test(suite, "should_return_the_entry_blocks_correctly", should_return_the_entry_blocks_correctly);
         CU_add_test(suite, "should_not_fail_setting_entry_blocks_if_a_NULL_entry_is_passed", should_not_fail_setting_entry_blocks_if_a_NULL_entry_is_passed);
+        CU_add_test(suite, "should_return_no_permissions_when_a_NULL_entry_is_passed", should_return_no_permissions_when_a_NULL_entry_is_passed);
+        CU_add_test(suite, "should_return_the_entry_permissions_correctly", should_return_the_entry_permissions_correctly);
+        CU_add_test(suite, "should_not_fail_setting_entry_permissions_if_a_NULL_entry_is_passed", should_not_fail_setting_entry_permissions_if_a_NULL_entry_is_passed);
         CU_add_test(suite, "should_return_unknown_for_the_entry_file_type_if_a_NULL_entry_is_passed", should_return_unknown_for_the_entry_file_type_if_a_NULL_entry_is_passed);
         CU_add_test(suite, "should_return_the_entry_file_type_correctly", should_return_the_entry_file_type_correctly);
         CU_add_test(suite, "should_not_fail_setting_the_entry_file_type_if_a_NULL_file_entry_is_passed", should_not_fail_setting_the_entry_file_type_if_a_NULL_file_entry_is_passed);
