@@ -3,7 +3,6 @@
 #include "CUnit/Basic.h"
 #include "mocks.h"
 #include "file_stats.h"
-#include <sys/sysmacros.h>
 
 #define SUITE_NAME "file_stats"
 #define LINK_BUFFER_SIZE 300
@@ -461,8 +460,8 @@ static void should_return_zero_device_numbers_for_NULL_stats(void)
 static void should_return_major_and_minor_device_numbers(void)
 {
     const t_vfs_mock_entry vfs[] = {
-        MOCK_CHAR_DEVICE_WITH_STATS("char", .stats.st_rdev = makedev(12, 34)),
-        MOCK_BLOCK_DEVICE_WITH_STATS("block", .stats.st_rdev = makedev(56, 78)),
+        MOCK_CHAR_DEVICE_WITH_STATS("char", MOCK_DEVICE(12, 34)),
+        MOCK_BLOCK_DEVICE_WITH_STATS("block", MOCK_DEVICE(56, 78)),
         MOCK_FILE("regular"),
         MOCK_NULL_TERMINATOR()
     };

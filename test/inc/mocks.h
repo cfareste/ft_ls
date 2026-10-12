@@ -1,6 +1,7 @@
 #pragma once
 
 #include <sys/stat.h>
+#include <sys/sysmacros.h>
 #include <time.h>
 
 typedef struct s_vfs_mock_errors
@@ -45,6 +46,7 @@ typedef struct s_vfs_mock_entry
 #define MOCK_AUTHOR(name)                                               .author = (name)
 #define MOCK_GROUP(name)                                                .group = (name)
 #define MOCK_SIZE(value)                                                .stats.st_size = (value)
+#define MOCK_DEVICE(major_value, minor_value)                           .stats.st_rdev = makedev((major_value), (minor_value))
 #define MOCK_MODIFICATION_TIME(day, month, year, hour, minute, second)  .stats.st_mtim.tv_sec = vfs_mock_make_timestamp((day), (month), (year), (hour), (minute), (second))
 
 #define NO_ERRORS ((t_vfs_mock_errors){ 0 })
