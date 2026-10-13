@@ -460,18 +460,20 @@ static void should_render_one_entry_with_long_format(void)
     const char *args[] = { "-l", "file", NULL };
     get_parsed_arguments_result(2, args);
     t_file_entry_array *file_entry_array = file_entry_array_create();
-    file_entry_array_push(file_entry_array, file_entry_create("file"));
+    t_file_entry *entry = file_entry_create("file");
+    file_entry_set_file_type(entry, FILE_TYPE_REGULAR);
+    file_entry_set_permissions(entry, PERM_OWNER_READ | PERM_OWNER_WRITE | PERM_GROUP_READ | PERM_OTHER_READ);
+    file_entry_set_link_count(entry, 2);
+    file_entry_set_author(entry, "bob");
+    file_entry_set_group(entry, "developers");
+    file_entry_set_size(entry, 1024);
+    file_entry_set_modification_date(entry, (t_date){ .day = 12, .month = 12, .hour = 12, .minute = 30 });
+    file_entry_array_push(file_entry_array, entry);
     t_render_context *context = render_context_create(parsed_arguments);
 
     render_entries(context, file_entry_array);
 
-    CU_ASSERT(verify_that_the_output_printed_is(
-        "%s %u %s %s %u %s %s\n",
-        "-rw-rw-r--", 2,
-        "bob", "developers",
-        1024, "dec 12 12:30",
-        "file"
-    ));
+    CU_ASSERT(verify_that_the_output_printed_is("%s\n", "-rw-r--r-- 2 bob developers 1024 Dec 12 12:30 file"));
 
     file_entry_array_destroy(&file_entry_array);
     parsed_arguments_destroy(&parsed_arguments);
