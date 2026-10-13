@@ -48,3 +48,8 @@ t_date date_from_time(const time_t timestamp)
 
     return date;
 }
+
+time_t date_get_current_time(void)
+{
+    return time(NULL);
+}

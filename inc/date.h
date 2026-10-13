@@ -14,3 +14,4 @@ typedef struct s_date
 } t_date;
 
 t_date date_from_time(time_t timestamp);
+time_t date_get_current_time(void);

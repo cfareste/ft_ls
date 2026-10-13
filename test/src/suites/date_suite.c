@@ -132,6 +132,15 @@ static void should_map_every_month_abbreviation(void)
     }
 }
 
+static void should_return_the_current_timestamp(void)
+{
+    const time_t time_before = time(NULL);
+    const time_t current_time = date_get_current_time();
+    const time_t time_after = time(NULL);
+
+    CU_ASSERT(current_time >= time_before && current_time <= time_after);
+}
+
 void register_date_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, set_up_utc_timezone, restore_timezone, NULL, NULL);
@@ -144,4 +153,5 @@ void register_date_suite(void)
     CU_add_test(suite, "should_convert_single_digit_day_and_month", should_convert_single_digit_day_and_month);
     CU_add_test(suite, "should_convert_year_boundary", should_convert_year_boundary);
     CU_add_test(suite, "should_map_every_month_abbreviation", should_map_every_month_abbreviation);
+    CU_add_test(suite, "should_return_the_current_timestamp", should_return_the_current_timestamp);
 }
