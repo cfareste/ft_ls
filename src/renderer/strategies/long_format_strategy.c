@@ -112,6 +112,7 @@ static void print_entry(const t_file_entry *entry)
     char mode[11];
     char link_count[sizeof(unsigned long) * 3 + 1];
     char size[sizeof(long) * 3 + 2];
+    const t_file_type file_type = file_entry_get_file_type(entry);
     const t_date modification_date = file_entry_get_modification_date(entry);
     const char *author = file_entry_get_author(entry);
     const char *group = file_entry_get_group(entry);
@@ -120,10 +121,16 @@ static void print_entry(const t_file_entry *entry)
     unsigned_long_to_string(file_entry_get_link_count(entry), link_count);
     long_to_string(file_entry_get_size(entry), size);
 
-    ft_printf("%s %s %s %s %s ", mode, link_count,
+    ft_printf("%s %s %s %s ", mode, link_count,
               author == NULL ? "" : author,
-              group == NULL ? "" : group,
-              size);
+              group == NULL ? "" : group);
+    if (file_type == FILE_TYPE_CHARDEVICE || file_type == FILE_TYPE_BLOCKDEVICE)
+    {
+        const t_device device = file_entry_get_device(entry);
+        ft_printf("%u, %u ", device.major, device.minor);
+    }
+    else
+        ft_printf("%s ", size);
     ft_printf("%s %2d %02d:%02d %s\n",
               get_month_abbreviation(modification_date.month),
               modification_date.day,

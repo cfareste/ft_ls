@@ -603,6 +603,43 @@ static void should_render_entries_with_sticky_bit_in_long_format(void)
     parsed_arguments_destroy(&parsed_arguments);
 }
 
+static void should_render_char_and_block_devices_in_long_format(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_CHAR_DEVICE("char-device"),
+        MOCK_BLOCK_DEVICE("block-device"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *args[] = { "-l", "char-device", "block-device", NULL };
+    get_parsed_arguments_result(3, args);
+    t_file_entry_array *file_entry_array = file_entry_array_create();
+    t_file_entry *char_device_entry = create_entry("char-device", FILE_TYPE_CHARDEVICE, PERM_NONE, 1,
+                                                   "user", "group", 1024,
+                                                   (t_date){ .day = 1, .month = 1 });
+    t_file_entry *block_device_entry = create_entry("block-device", FILE_TYPE_BLOCKDEVICE, PERM_NONE, 1,
+                                                    "user", "group", 2048,
+                                                    (t_date){ .day = 1, .month = 1 });
+    file_entry_set_device(char_device_entry, (t_device){ .major = 12, .minor = 34 });
+    file_entry_set_device(block_device_entry, (t_device){ .major = 56, .minor = 78 });
+    file_entry_array_push(file_entry_array, char_device_entry);
+    file_entry_array_push(file_entry_array, block_device_entry);
+    t_render_context *context = render_context_create(parsed_arguments);
+
+    render_entries(context, file_entry_array);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "%s\n%s\n",
+        "c--------- 1 user group 12, 34 Jan  1 00:00 char-device",
+        "b--------- 1 user group 56, 78 Jan  1 00:00 block-device"
+    ));
+
+    file_entry_array_destroy(&file_entry_array);
+    render_context_destroy(&context);
+    parsed_arguments_destroy(&parsed_arguments);
+}
+
 /*static void should_render_the_name_of_every_entry_with_a_file_entry_array_of_various_elements_separated_by_two_spaces(void)
 {
     const char *expected_file_name[] = { "file", "file2", "file3", "file4", "file5" };
@@ -659,6 +696,7 @@ void register_renderer_suite(void)
         CU_add_test(suite, "should_render_entries_with_setuid_in_long_format", should_render_entries_with_setuid_in_long_format);
         CU_add_test(suite, "should_render_entries_with_setgid_in_long_format", should_render_entries_with_setgid_in_long_format);
         CU_add_test(suite, "should_render_entries_with_sticky_bit_in_long_format", should_render_entries_with_sticky_bit_in_long_format);
+        CU_add_test(suite, "should_render_char_and_block_devices_in_long_format", should_render_char_and_block_devices_in_long_format);
         // CU_add_test(suite, "should_render_the_name_of_every_entry_with_a_file_entry_array_of_various_elements_separated_by_two_spaces", should_render_the_name_of_every_entry_with_a_file_entry_array_of_various_elements_separated_by_two_spaces);
     }
 }
