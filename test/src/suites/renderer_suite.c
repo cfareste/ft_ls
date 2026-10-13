@@ -485,7 +485,9 @@ static void should_render_one_entry_with_long_format(void)
     file_entry_set_author(entry, "bob");
     file_entry_set_group(entry, "developers");
     file_entry_set_size(entry, 1024);
-    file_entry_set_modification_date(entry, (t_date){ .day = 12, .month = 12, .hour = 12, .minute = 30 });
+    file_entry_set_modification_date(entry, (t_date){
+        .day = 12, .month = 12, .year = 2100, .hour = 12, .minute = 30, .timestamp = 4102444800
+    });
     file_entry_array_push(file_entry_array, entry);
     t_render_context *context = render_context_create(parsed_arguments);
 
@@ -496,6 +498,34 @@ static void should_render_one_entry_with_long_format(void)
     file_entry_array_destroy(&file_entry_array);
     parsed_arguments_destroy(&parsed_arguments);
     render_context_destroy(&context);
+}
+
+static void should_render_an_old_modification_file_in_long_format(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("file"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *args[] = { "-l", "file", NULL };
+    get_parsed_arguments_result(2, args);
+
+    t_file_entry_array *file_entry_array = file_entry_array_create();
+    file_entry_array_push(file_entry_array, create_entry("file", FILE_TYPE_REGULAR,
+                                                         PERM_OWNER_READ | PERM_OWNER_WRITE | PERM_GROUP_READ | PERM_OTHER_READ,
+                                                         2, "bob", "developers", 1024,
+                                                         (t_date){ .day = 12, .month = 12, .year = 2025,
+                                                                   .hour = 12, .minute = 30, .timestamp = 1 }));
+    t_render_context *context = render_context_create(parsed_arguments);
+
+    render_entries(context, file_entry_array);
+
+    CU_ASSERT(verify_that_the_output_printed_is("%s\n", "-rw-r--r-- 2 bob developers 1024 Dec 12  2025 file"));
+
+    file_entry_array_destroy(&file_entry_array);
+    render_context_destroy(&context);
+    parsed_arguments_destroy(&parsed_arguments);
 }
 
 static void should_render_entries_with_setuid_in_long_format(void)
@@ -514,10 +544,10 @@ static void should_render_entries_with_setuid_in_long_format(void)
     t_file_entry_array *file_entry_array = file_entry_array_create();
     file_entry_array_push(file_entry_array, create_entry("file", FILE_TYPE_REGULAR, permissions, 1,
                                                          "user", "group", 1,
-                                                         (t_date){ .day = 1, .month = 1 }));
+                                                         (t_date){ .day = 1, .month = 1, .year = 2100, .timestamp = 4102444800 }));
     file_entry_array_push(file_entry_array, create_entry("file2", FILE_TYPE_REGULAR, PERM_SETUID, 1,
                                                          "user", "group", 1,
-                                                         (t_date){ .day = 1, .month = 1 }));
+                                                         (t_date){ .day = 1, .month = 1, .year = 2100, .timestamp = 4102444800 }));
     t_render_context *context = render_context_create(parsed_arguments);
 
     render_entries(context, file_entry_array);
@@ -549,10 +579,10 @@ static void should_render_entries_with_setgid_in_long_format(void)
     t_file_entry_array *file_entry_array = file_entry_array_create();
     file_entry_array_push(file_entry_array, create_entry("file", FILE_TYPE_REGULAR, permissions, 1,
                                                          "user", "group", 1,
-                                                         (t_date){ .day = 1, .month = 1 }));
+                                                         (t_date){ .day = 1, .month = 1, .year = 2100, .timestamp = 4102444800 }));
     file_entry_array_push(file_entry_array, create_entry("file2", FILE_TYPE_REGULAR, PERM_SETGID, 1,
                                                          "user", "group", 1,
-                                                         (t_date){ .day = 1, .month = 1 }));
+                                                         (t_date){ .day = 1, .month = 1, .year = 2100, .timestamp = 4102444800 }));
     t_render_context *context = render_context_create(parsed_arguments);
 
     render_entries(context, file_entry_array);
@@ -584,10 +614,10 @@ static void should_render_entries_with_sticky_bit_in_long_format(void)
     t_file_entry_array *file_entry_array = file_entry_array_create();
     file_entry_array_push(file_entry_array, create_entry("file", FILE_TYPE_REGULAR, permissions, 1,
                                                          "user", "group", 1,
-                                                         (t_date){ .day = 1, .month = 1 }));
+                                                         (t_date){ .day = 1, .month = 1, .year = 2100, .timestamp = 4102444800 }));
     file_entry_array_push(file_entry_array, create_entry("file2", FILE_TYPE_REGULAR, PERM_STICKY, 1,
                                                          "user", "group", 1,
-                                                         (t_date){ .day = 1, .month = 1 }));
+                                                         (t_date){ .day = 1, .month = 1, .year = 2100, .timestamp = 4102444800 }));
     t_render_context *context = render_context_create(parsed_arguments);
 
     render_entries(context, file_entry_array);
@@ -617,10 +647,10 @@ static void should_render_char_and_block_devices_in_long_format(void)
     t_file_entry_array *file_entry_array = file_entry_array_create();
     t_file_entry *char_device_entry = create_entry("char-device", FILE_TYPE_CHARDEVICE, PERM_NONE, 1,
                                                    "user", "group", 1024,
-                                                   (t_date){ .day = 1, .month = 1 });
+                                                   (t_date){ .day = 1, .month = 1, .year = 2100, .timestamp = 4102444800 });
     t_file_entry *block_device_entry = create_entry("block-device", FILE_TYPE_BLOCKDEVICE, PERM_NONE, 1,
                                                     "user", "group", 2048,
-                                                    (t_date){ .day = 1, .month = 1 });
+                                                    (t_date){ .day = 1, .month = 1, .year = 2100, .timestamp = 4102444800 });
     file_entry_set_device(char_device_entry, (t_device){ .major = 12, .minor = 34 });
     file_entry_set_device(block_device_entry, (t_device){ .major = 56, .minor = 78 });
     file_entry_array_push(file_entry_array, char_device_entry);
@@ -697,6 +727,7 @@ void register_renderer_suite(void)
         CU_add_test(suite, "should_render_entries_with_setgid_in_long_format", should_render_entries_with_setgid_in_long_format);
         CU_add_test(suite, "should_render_entries_with_sticky_bit_in_long_format", should_render_entries_with_sticky_bit_in_long_format);
         CU_add_test(suite, "should_render_char_and_block_devices_in_long_format", should_render_char_and_block_devices_in_long_format);
+        CU_add_test(suite, "should_render_an_old_modification_file_in_long_format", should_render_an_old_modification_file_in_long_format);
         // CU_add_test(suite, "should_render_the_name_of_every_entry_with_a_file_entry_array_of_various_elements_separated_by_two_spaces", should_render_the_name_of_every_entry_with_a_file_entry_array_of_various_elements_separated_by_two_spaces);
     }
 }

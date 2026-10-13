@@ -1,6 +1,8 @@
 #include "render_strategies.h"
 #include "libft.h"
 
+#define SIX_MONTHS_IN_SECONDS (6 * 30 * 24 * 60 * 60)
+
 static char get_file_type_character(const t_file_type file_type)
 {
     if (file_type == FILE_TYPE_REGULAR)
@@ -107,6 +109,13 @@ static const char *get_month_abbreviation(const int month)
     return months[month - 1];
 }
 
+static int is_recent_modification(const t_date modification_date)
+{
+    const time_t current_time = date_get_current_time();
+
+    return modification_date.timestamp >= current_time - SIX_MONTHS_IN_SECONDS;
+}
+
 static void print_entry(const t_file_entry *entry)
 {
     char mode[11];
@@ -131,12 +140,23 @@ static void print_entry(const t_file_entry *entry)
     }
     else
         ft_printf("%s ", size);
-    ft_printf("%s %2d %02d:%02d %s\n",
-              get_month_abbreviation(modification_date.month),
-              modification_date.day,
-              modification_date.hour,
-              modification_date.minute,
-              file_entry_get_name(entry));
+    if (is_recent_modification(modification_date))
+    {
+        ft_printf("%s %2d %02d:%02d %s\n",
+                  get_month_abbreviation(modification_date.month),
+                  modification_date.day,
+                  modification_date.hour,
+                  modification_date.minute,
+                  file_entry_get_name(entry));
+    }
+    else
+    {
+        ft_printf("%s %2d  %d %s\n",
+                  get_month_abbreviation(modification_date.month),
+                  modification_date.day,
+                  modification_date.year,
+                  file_entry_get_name(entry));
+    }
 }
 
 void long_format_strategy(const t_file_entry_array *file_entry_array)
