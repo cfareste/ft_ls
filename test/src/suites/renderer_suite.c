@@ -9,12 +9,6 @@
 static t_result *parsed_arguments_result;
 static t_parsed_arguments *parsed_arguments;
 
-static void get_parsed_arguments_result(const int argc, const char **args)
-{
-    parsed_arguments_result = parse_arguments(argc, args);
-    parsed_arguments = result_get_value(parsed_arguments_result);
-}
-
 static void test_setup(void)
 {
     reset_printing_buffer();
@@ -25,6 +19,30 @@ static void test_teardown(void)
 {
     result_destroy(&parsed_arguments_result);
     parsed_arguments_destroy(&parsed_arguments);
+}
+
+static void get_parsed_arguments_result(const int argc, const char **args)
+{
+    parsed_arguments_result = parse_arguments(argc, args);
+    parsed_arguments = result_get_value(parsed_arguments_result);
+}
+
+static t_file_entry *create_entry(const char *name, const t_file_type file_type,
+                                              const t_permissions permissions, const unsigned long link_count,
+                                              const char *author, const char *group, const long size,
+                                              const t_date modification_date)
+{
+    t_file_entry *entry = file_entry_create(name);
+
+    file_entry_set_file_type(entry, file_type);
+    file_entry_set_permissions(entry, permissions);
+    file_entry_set_link_count(entry, link_count);
+    file_entry_set_author(entry, author);
+    file_entry_set_group(entry, group);
+    file_entry_set_size(entry, size);
+    file_entry_set_modification_date(entry, modification_date);
+
+    return entry;
 }
 
 static void should_create_a_context(void)
@@ -480,6 +498,111 @@ static void should_render_one_entry_with_long_format(void)
     render_context_destroy(&context);
 }
 
+static void should_render_entries_with_setuid_in_long_format(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("file"),
+        MOCK_FILE("file2"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *args[] = { "-l", "file", NULL };
+    get_parsed_arguments_result(2, args);
+
+    const t_permissions permissions = PERM_SETUID | PERM_OWNER_EXECUTE;
+    t_file_entry_array *file_entry_array = file_entry_array_create();
+    file_entry_array_push(file_entry_array, create_entry("file", FILE_TYPE_REGULAR, permissions, 1,
+                                                         "user", "group", 1,
+                                                         (t_date){ .day = 1, .month = 1 }));
+    file_entry_array_push(file_entry_array, create_entry("file2", FILE_TYPE_REGULAR, PERM_SETUID, 1,
+                                                         "user", "group", 1,
+                                                         (t_date){ .day = 1, .month = 1 }));
+    t_render_context *context = render_context_create(parsed_arguments);
+
+    render_entries(context, file_entry_array);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "%s\n%s\n",
+        "---s------ 1 user group 1 Jan  1 00:00 file",
+        "---S------ 1 user group 1 Jan  1 00:00 file2"
+    ));
+
+    file_entry_array_destroy(&file_entry_array);
+    render_context_destroy(&context);
+    parsed_arguments_destroy(&parsed_arguments);
+}
+
+static void should_render_entries_with_setgid_in_long_format(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("file"),
+        MOCK_FILE("file2"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *args[] = { "-l", "file", NULL };
+    get_parsed_arguments_result(2, args);
+
+    const t_permissions permissions = PERM_SETGID | PERM_GROUP_EXECUTE;
+    t_file_entry_array *file_entry_array = file_entry_array_create();
+    file_entry_array_push(file_entry_array, create_entry("file", FILE_TYPE_REGULAR, permissions, 1,
+                                                         "user", "group", 1,
+                                                         (t_date){ .day = 1, .month = 1 }));
+    file_entry_array_push(file_entry_array, create_entry("file2", FILE_TYPE_REGULAR, PERM_SETGID, 1,
+                                                         "user", "group", 1,
+                                                         (t_date){ .day = 1, .month = 1 }));
+    t_render_context *context = render_context_create(parsed_arguments);
+
+    render_entries(context, file_entry_array);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "%s\n%s\n",
+        "------s--- 1 user group 1 Jan  1 00:00 file",
+        "------S--- 1 user group 1 Jan  1 00:00 file2"
+    ));
+
+    file_entry_array_destroy(&file_entry_array);
+    render_context_destroy(&context);
+    parsed_arguments_destroy(&parsed_arguments);
+}
+
+static void should_render_entries_with_sticky_bit_in_long_format(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("file"),
+        MOCK_FILE("file2"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *args[] = { "-l", "file", NULL };
+    get_parsed_arguments_result(2, args);
+
+    const t_permissions permissions = PERM_STICKY | PERM_OTHER_EXECUTE;
+    t_file_entry_array *file_entry_array = file_entry_array_create();
+    file_entry_array_push(file_entry_array, create_entry("file", FILE_TYPE_REGULAR, permissions, 1,
+                                                         "user", "group", 1,
+                                                         (t_date){ .day = 1, .month = 1 }));
+    file_entry_array_push(file_entry_array, create_entry("file2", FILE_TYPE_REGULAR, PERM_STICKY, 1,
+                                                         "user", "group", 1,
+                                                         (t_date){ .day = 1, .month = 1 }));
+    t_render_context *context = render_context_create(parsed_arguments);
+
+    render_entries(context, file_entry_array);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "%s\n%s\n",
+        "---------t 1 user group 1 Jan  1 00:00 file",
+        "---------T 1 user group 1 Jan  1 00:00 file2"
+    ));
+
+    file_entry_array_destroy(&file_entry_array);
+    render_context_destroy(&context);
+    parsed_arguments_destroy(&parsed_arguments);
+}
+
 /*static void should_render_the_name_of_every_entry_with_a_file_entry_array_of_various_elements_separated_by_two_spaces(void)
 {
     const char *expected_file_name[] = { "file", "file2", "file3", "file4", "file5" };
@@ -533,6 +656,9 @@ void register_renderer_suite(void)
         CU_add_test(suite, "should_render_the_types_separator_if_has_at_least_one_non_dir_and_one_dir", should_render_the_types_separator_if_has_at_least_one_non_dir_and_one_dir);
         CU_add_test(suite, "should_not_render_the_types_separator_if_doesnt_have_at_least_one_non_dir_and_one_dir", should_not_render_the_types_separator_if_doesnt_have_at_least_one_non_dir_and_one_dir);
         CU_add_test(suite, "should_render_one_entry_with_long_format", should_render_one_entry_with_long_format);
+        CU_add_test(suite, "should_render_entries_with_setuid_in_long_format", should_render_entries_with_setuid_in_long_format);
+        CU_add_test(suite, "should_render_entries_with_setgid_in_long_format", should_render_entries_with_setgid_in_long_format);
+        CU_add_test(suite, "should_render_entries_with_sticky_bit_in_long_format", should_render_entries_with_sticky_bit_in_long_format);
         // CU_add_test(suite, "should_render_the_name_of_every_entry_with_a_file_entry_array_of_various_elements_separated_by_two_spaces", should_render_the_name_of_every_entry_with_a_file_entry_array_of_various_elements_separated_by_two_spaces);
     }
 }

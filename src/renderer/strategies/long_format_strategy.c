@@ -29,6 +29,22 @@ static char get_permission_character(const t_permissions file_permissions, const
     return '-';
 }
 
+static char get_execute_permission_character(const t_permissions file_permissions,
+                                            const t_permissions execute_permission,
+                                            const t_permissions special_permission,
+                                            const char special_character,
+                                            const char special_character_without_execute)
+{
+    if (file_permissions & special_permission)
+    {
+        if (file_permissions & execute_permission)
+            return special_character;
+        return special_character_without_execute;
+    }
+
+    return get_permission_character(file_permissions, execute_permission, 'x');
+}
+
 static void create_mode_string(const t_file_entry *entry, char *mode)
 {
     const t_permissions file_permissions = file_entry_get_permissions(entry);
@@ -37,13 +53,13 @@ static void create_mode_string(const t_file_entry *entry, char *mode)
     mode[0] = get_file_type_character(file_type);
     mode[1] = get_permission_character(file_permissions, PERM_OWNER_READ, 'r');
     mode[2] = get_permission_character(file_permissions, PERM_OWNER_WRITE, 'w');
-    mode[3] = get_permission_character(file_permissions, PERM_OWNER_EXECUTE, 'x');
+    mode[3] = get_execute_permission_character(file_permissions, PERM_OWNER_EXECUTE, PERM_SETUID, 's', 'S');
     mode[4] = get_permission_character(file_permissions, PERM_GROUP_READ, 'r');
     mode[5] = get_permission_character(file_permissions, PERM_GROUP_WRITE, 'w');
-    mode[6] = get_permission_character(file_permissions, PERM_GROUP_EXECUTE, 'x');
+    mode[6] = get_execute_permission_character(file_permissions, PERM_GROUP_EXECUTE, PERM_SETGID, 's', 'S');
     mode[7] = get_permission_character(file_permissions, PERM_OTHER_READ, 'r');
     mode[8] = get_permission_character(file_permissions, PERM_OTHER_WRITE, 'w');
-    mode[9] = get_permission_character(file_permissions, PERM_OTHER_EXECUTE, 'x');
+    mode[9] = get_execute_permission_character(file_permissions, PERM_OTHER_EXECUTE, PERM_STICKY, 't', 'T');
     mode[10] = '\0';
 }
 
