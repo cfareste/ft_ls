@@ -116,6 +116,20 @@ static int is_recent_modification(const t_date modification_date)
     return modification_date.timestamp >= current_time - SIX_MONTHS_IN_SECONDS;
 }
 
+static void print_entry_name(const t_file_entry *entry)
+{
+    const char *name = file_entry_get_name(entry);
+
+    if (file_entry_get_file_type(entry) == FILE_TYPE_SYMLINK)
+    {
+        const char *target = file_entry_get_link_target(entry);
+
+        ft_printf("%s -> %s", name, target == NULL ? "" : target);
+    }
+    else
+        ft_printf("%s", name);
+}
+
 static void print_entry(const t_file_entry *entry)
 {
     char mode[11];
@@ -142,21 +156,21 @@ static void print_entry(const t_file_entry *entry)
         ft_printf("%s ", size);
     if (is_recent_modification(modification_date))
     {
-        ft_printf("%s %2d %02d:%02d %s\n",
+        ft_printf("%s %2d %02d:%02d ",
                   get_month_abbreviation(modification_date.month),
                   modification_date.day,
                   modification_date.hour,
-                  modification_date.minute,
-                  file_entry_get_name(entry));
+                  modification_date.minute);
     }
     else
     {
-        ft_printf("%s %2d  %d %s\n",
+        ft_printf("%s %2d  %d ",
                   get_month_abbreviation(modification_date.month),
                   modification_date.day,
-                  modification_date.year,
-                  file_entry_get_name(entry));
+                  modification_date.year);
     }
+    print_entry_name(entry);
+    ft_printf("\n");
 }
 
 void long_format_strategy(const t_file_entry_array *file_entry_array)

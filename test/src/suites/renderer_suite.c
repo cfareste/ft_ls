@@ -500,34 +500,6 @@ static void should_render_one_entry_with_long_format(void)
     render_context_destroy(&context);
 }
 
-static void should_render_an_old_modification_file_in_long_format(void)
-{
-    const t_vfs_mock_entry vfs[] = {
-        MOCK_FILE("file"),
-        MOCK_NULL_TERMINATOR()
-    };
-    vfs_mock_setup(vfs);
-
-    const char *args[] = { "-l", "file", NULL };
-    get_parsed_arguments_result(2, args);
-
-    t_file_entry_array *file_entry_array = file_entry_array_create();
-    file_entry_array_push(file_entry_array, create_entry("file", FILE_TYPE_REGULAR,
-                                                         PERM_OWNER_READ | PERM_OWNER_WRITE | PERM_GROUP_READ | PERM_OTHER_READ,
-                                                         2, "bob", "developers", 1024,
-                                                         (t_date){ .day = 12, .month = 12, .year = 2025,
-                                                                   .hour = 12, .minute = 30, .timestamp = 1 }));
-    t_render_context *context = render_context_create(parsed_arguments);
-
-    render_entries(context, file_entry_array);
-
-    CU_ASSERT(verify_that_the_output_printed_is("%s\n", "-rw-r--r-- 2 bob developers 1024 Dec 12  2025 file"));
-
-    file_entry_array_destroy(&file_entry_array);
-    render_context_destroy(&context);
-    parsed_arguments_destroy(&parsed_arguments);
-}
-
 static void should_render_entries_with_setuid_in_long_format(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -670,6 +642,75 @@ static void should_render_char_and_block_devices_in_long_format(void)
     parsed_arguments_destroy(&parsed_arguments);
 }
 
+static void should_render_an_old_modification_file_in_long_format(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("file"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *args[] = { "-l", "file", NULL };
+    get_parsed_arguments_result(2, args);
+
+    t_file_entry_array *file_entry_array = file_entry_array_create();
+    file_entry_array_push(file_entry_array, create_entry("file", FILE_TYPE_REGULAR,
+                                                         PERM_OWNER_READ | PERM_OWNER_WRITE | PERM_GROUP_READ | PERM_OTHER_READ,
+                                                         2, "bob", "developers", 1024,
+                                                         (t_date){ .day = 12, .month = 12, .year = 2025,
+                                                                   .hour = 12, .minute = 30, .timestamp = 1 }));
+    t_render_context *context = render_context_create(parsed_arguments);
+
+    render_entries(context, file_entry_array);
+
+    CU_ASSERT(verify_that_the_output_printed_is("%s\n", "-rw-r--r-- 2 bob developers 1024 Dec 12  2025 file"));
+
+    file_entry_array_destroy(&file_entry_array);
+    render_context_destroy(&context);
+    parsed_arguments_destroy(&parsed_arguments);
+}
+
+static void should_render_a_symlink_name_with_its_target_in_long_format(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("file"),
+        MOCK_SYMLINK("link", "file"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *args[] = { "-l", "file", "link", NULL };
+    get_parsed_arguments_result(3, args);
+
+    const t_date modification_date = {
+        .day = 12, .month = 12, .year = 2100,
+        .hour = 12, .minute = 30, .timestamp = 4102444800
+    };
+    t_file_entry_array *file_entry_array = file_entry_array_create();
+    file_entry_array_push(file_entry_array, create_entry("file", FILE_TYPE_REGULAR,
+                                                         PERM_OWNER_READ | PERM_OWNER_WRITE | PERM_GROUP_READ | PERM_OTHER_READ,
+                                                         2, "bob", "developers", 6, modification_date));
+    t_file_entry *symlink_entry = create_entry("link", FILE_TYPE_SYMLINK,
+                                               PERM_OWNER_READ | PERM_OWNER_WRITE | PERM_OWNER_EXECUTE |
+                                                   PERM_GROUP_READ | PERM_GROUP_WRITE | PERM_GROUP_EXECUTE |
+                                                   PERM_OTHER_READ | PERM_OTHER_WRITE | PERM_OTHER_EXECUTE,
+                                               1, "bob", "developers", 8, modification_date);
+    file_entry_set_link_target(symlink_entry, "file");
+    file_entry_array_push(file_entry_array, symlink_entry);
+    t_render_context *context = render_context_create(parsed_arguments);
+
+    render_entries(context, file_entry_array);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "%s\n%s\n",
+        "-rw-r--r-- 2 bob developers 6 Dec 12 12:30 file",
+        "lrwxrwxrwx 1 bob developers 8 Dec 12 12:30 link -> file"));
+
+    file_entry_array_destroy(&file_entry_array);
+    parsed_arguments_destroy(&parsed_arguments);
+    render_context_destroy(&context);
+}
+
 /*static void should_render_the_name_of_every_entry_with_a_file_entry_array_of_various_elements_separated_by_two_spaces(void)
 {
     const char *expected_file_name[] = { "file", "file2", "file3", "file4", "file5" };
@@ -728,6 +769,7 @@ void register_renderer_suite(void)
         CU_add_test(suite, "should_render_entries_with_sticky_bit_in_long_format", should_render_entries_with_sticky_bit_in_long_format);
         CU_add_test(suite, "should_render_char_and_block_devices_in_long_format", should_render_char_and_block_devices_in_long_format);
         CU_add_test(suite, "should_render_an_old_modification_file_in_long_format", should_render_an_old_modification_file_in_long_format);
+        CU_add_test(suite, "should_render_a_symlink_name_with_its_target_in_long_format", should_render_a_symlink_name_with_its_target_in_long_format);
         // CU_add_test(suite, "should_render_the_name_of_every_entry_with_a_file_entry_array_of_various_elements_separated_by_two_spaces", should_render_the_name_of_every_entry_with_a_file_entry_array_of_various_elements_separated_by_two_spaces);
     }
 }
