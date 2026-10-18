@@ -237,7 +237,7 @@ void file_entry_set_modification_date(t_file_entry *entry, const t_date modifica
 
 const char *file_entry_get_link_target(const t_file_entry *entry)
 {
-    if (entry == NULL)
+    if (entry == NULL || entry->type == FILE_TYPE_SYMLINK)
         return NULL;
 
     return entry->target;

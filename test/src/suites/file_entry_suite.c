@@ -364,6 +364,14 @@ static void should_return_the_entry_link_target_correctly(void)
     CU_ASSERT_STRING_EQUAL(file_entry_get_link_target(entry_sut), "target");
 }
 
+static void should_return_NULL_for_a_symlink_entry_target(void)
+{
+    file_entry_set_file_type(entry_sut, FILE_TYPE_SYMLINK);
+    file_entry_set_link_target(entry_sut, "target");
+
+    CU_ASSERT_PTR_NULL(file_entry_get_link_target(entry_sut));
+}
+
 static void should_not_set_the_entry_link_target_if_a_NULL_target_is_passed(void)
 {
     file_entry_set_link_target(entry_sut, "target");
@@ -556,6 +564,7 @@ void register_file_entry_suite(void)
         CU_add_test(suite, "should_not_fail_setting_entry_modification_date_if_a_NULL_entry_is_passed", should_not_fail_setting_entry_modification_date_if_a_NULL_entry_is_passed);
         CU_add_test(suite, "should_return_NULL_for_the_entry_link_target_if_a_NULL_entry_is_passed", should_return_NULL_for_the_entry_link_target_if_a_NULL_entry_is_passed);
         CU_add_test(suite, "should_return_the_entry_link_target_correctly", should_return_the_entry_link_target_correctly);
+        CU_add_test(suite, "should_return_NULL_for_a_symlink_entry_target", should_return_NULL_for_a_symlink_entry_target);
         CU_add_test(suite, "should_not_set_the_entry_link_target_if_a_NULL_target_is_passed", should_not_set_the_entry_link_target_if_a_NULL_target_is_passed);
         CU_add_test(suite, "should_not_set_the_entry_link_target_if_an_empty_target_is_passed", should_not_set_the_entry_link_target_if_an_empty_target_is_passed);
         CU_add_test(suite, "should_not_fail_setting_the_entry_link_target_if_a_NULL_entry_is_passed", should_not_fail_setting_the_entry_link_target_if_a_NULL_entry_is_passed);
