@@ -66,20 +66,6 @@ static int is_recent_modification(const t_date modification_date)
     return modification_date.timestamp >= current_time - SIX_MONTHS_IN_SECONDS;
 }
 
-static void print_entry_name(const t_file_entry *entry)
-{
-    const char *name = file_entry_get_name(entry);
-
-    if (file_entry_get_file_type(entry) == FILE_TYPE_SYMLINK)
-    {
-        const char *target = file_entry_get_link_target(entry);
-
-        ft_printf("%s -> %s", name, target == NULL ? "" : target);
-    }
-    else
-        ft_printf("%s", name);
-}
-
 static void print_mode_string(const t_file_entry *entry)
 {
     const t_file_type file_type = file_entry_get_file_type(entry);
@@ -149,6 +135,20 @@ static void print_modification_date(const t_file_entry *entry)
                   modification_date.day,
                   modification_date.year);
     }
+}
+
+static void print_entry_name(const t_file_entry *entry)
+{
+    const char *name = file_entry_get_name(entry);
+
+    if (file_entry_get_file_type(entry) == FILE_TYPE_SYMLINK)
+    {
+        const char *target = file_entry_get_link_target(entry);
+
+        ft_printf("%s -> %s", name, target == NULL ? "" : target);
+    }
+    else
+        ft_printf("%s", name);
 }
 
 static void print_entry(const t_file_entry *entry)
