@@ -47,24 +47,6 @@ static char get_execute_permission_character(const t_permissions file_permission
     return get_permission_character(file_permissions, execute_permission, 'x');
 }
 
-static void create_mode_string(const t_file_entry *entry, char *mode)
-{
-    const t_permissions file_permissions = file_entry_get_permissions(entry);
-    const t_file_type file_type = file_entry_get_file_type(entry);
-
-    mode[0] = get_file_type_character(file_type);
-    mode[1] = get_permission_character(file_permissions, PERM_OWNER_READ, 'r');
-    mode[2] = get_permission_character(file_permissions, PERM_OWNER_WRITE, 'w');
-    mode[3] = get_execute_permission_character(file_permissions, PERM_OWNER_EXECUTE, PERM_SETUID, 's', 'S');
-    mode[4] = get_permission_character(file_permissions, PERM_GROUP_READ, 'r');
-    mode[5] = get_permission_character(file_permissions, PERM_GROUP_WRITE, 'w');
-    mode[6] = get_execute_permission_character(file_permissions, PERM_GROUP_EXECUTE, PERM_SETGID, 's', 'S');
-    mode[7] = get_permission_character(file_permissions, PERM_OTHER_READ, 'r');
-    mode[8] = get_permission_character(file_permissions, PERM_OTHER_WRITE, 'w');
-    mode[9] = get_execute_permission_character(file_permissions, PERM_OTHER_EXECUTE, PERM_STICKY, 't', 'T');
-    mode[10] = '\0';
-}
-
 static const char *get_month_abbreviation(const int month)
 {
     static const char *months[] = {
@@ -100,10 +82,20 @@ static void print_entry_name(const t_file_entry *entry)
 
 static void print_mode_string(const t_file_entry *entry)
 {
-    char mode[11];
+    const t_file_type file_type = file_entry_get_file_type(entry);
+    const t_permissions file_permissions = file_entry_get_permissions(entry);
 
-    create_mode_string(entry, mode);
-    ft_printf("%s ", mode);
+    ft_printf("%c%c%c%c%c%c%c%c%c%c ",
+                get_file_type_character(file_type),
+                get_permission_character(file_permissions, PERM_OWNER_READ, 'r'),
+                get_permission_character(file_permissions, PERM_OWNER_WRITE, 'w'),
+                get_execute_permission_character(file_permissions, PERM_OWNER_EXECUTE, PERM_SETUID, 's', 'S'),
+                get_permission_character(file_permissions, PERM_GROUP_READ, 'r'),
+                get_permission_character(file_permissions, PERM_GROUP_WRITE, 'w'),
+                get_execute_permission_character(file_permissions, PERM_GROUP_EXECUTE, PERM_SETGID, 's', 'S'),
+                get_permission_character(file_permissions, PERM_OTHER_READ, 'r'),
+                get_permission_character(file_permissions, PERM_OTHER_WRITE, 'w'),
+                get_execute_permission_character(file_permissions, PERM_OTHER_EXECUTE, PERM_STICKY, 't', 'T'));
 }
 
 static void print_link_count(const t_file_entry *entry)
