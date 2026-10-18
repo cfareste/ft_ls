@@ -41,17 +41,14 @@ static char get_write_permission_character(const t_permissions file_permissions,
     return get_permission_character(file_permissions, permission, 'w');
 }
 
-static char get_special_execute_character(const t_permissions special_permission,
-                                          const int execute_is_set)
+static char get_special_execute_character(const t_permissions special_permission, const int execute_is_set)
 {
     if (special_permission == PERM_STICKY)
         return execute_is_set ? 't' : 'T';
     return execute_is_set ? 's' : 'S';
 }
 
-static char get_special_execute_permission_character(const t_permissions file_permissions,
-                                                     const t_permissions execute_permission,
-                                                     const t_permissions special_permission)
+static char get_special_execute_permission_character(const t_permissions file_permissions, const t_permissions execute_permission, const t_permissions special_permission)
 {
     const int execute_is_set = file_permissions & execute_permission;
     const t_permissions displayed_permission = execute_is_set
@@ -63,9 +60,7 @@ static char get_special_execute_permission_character(const t_permissions file_pe
     return get_permission_character(file_permissions, displayed_permission, character);
 }
 
-static char get_execute_permission_character(const t_permissions file_permissions,
-                                             const t_permissions execute_permission,
-                                             const t_permissions special_permission)
+static char get_execute_permission_character(const t_permissions file_permissions, const t_permissions execute_permission, const t_permissions special_permission)
 {
     if (file_permissions & special_permission)
         return get_special_execute_permission_character(file_permissions,
@@ -167,15 +162,11 @@ static void print_modification_date(const t_file_entry *entry)
 static void print_entry_name(const t_file_entry *entry)
 {
     const char *name = file_entry_get_name(entry);
+    const char *target = file_entry_get_link_target(entry);
 
-    if (file_entry_get_file_type(entry) == FILE_TYPE_SYMLINK)
-    {
-        const char *target = file_entry_get_link_target(entry);
-
-        ft_printf("%s -> %s", name, target == NULL ? "" : target);
-    }
-    else
-        ft_printf("%s", name);
+    ft_printf("%s", name);
+    if (target != NULL)
+        ft_printf(" -> %s", target);
 }
 
 static void print_entry(const t_file_entry *entry)
