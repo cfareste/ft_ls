@@ -3,7 +3,7 @@
 #include "renderer.h"
 #include "render_strategies.h"
 
-typedef void (*t_render_prefix_strategy)(const t_file_entry_array *file_entry_array);
+typedef void (*t_directory_entries_prefix_strategy)(const t_file_entry_array *file_entry_array);
 typedef void (*t_render_strategy)(const t_file_entry_array *file_entry_array);
 
 struct s_render_context
@@ -11,7 +11,7 @@ struct s_render_context
     int is_first_directory_render;
     int should_print_types_separator;
     int should_print_directory_header;
-    t_render_prefix_strategy render_prefix_strategy;
+    t_directory_entries_prefix_strategy directory_entries_prefix_strategy;
     t_render_strategy render_strategy;
 };
 
@@ -24,12 +24,12 @@ static int check_if_should_print_directory_header(const t_parsed_arguments *pars
     return (has_multiple_file_operands && has_directory_file_operands) || has_recursive_option;
 }
 
-static t_render_prefix_strategy select_render_prefix_strategy(const t_parsed_arguments *parsed_arguments)
+static t_directory_entries_prefix_strategy select_directory_entries_prefix_strategy(const t_parsed_arguments *parsed_arguments)
 {
     if (parsed_arguments_is_option_active(parsed_arguments, OPTIONS_LONG_FORMAT))
-        return long_format_prefix_strategy;
+        return directory_entries_prefix_long_format_strategy;
 
-    return single_column_prefix_strategy;
+    return directory_entries_prefix_single_column_strategy;
 }
 
 static t_render_strategy select_render_strategy(const t_parsed_arguments *parsed_arguments)
@@ -62,7 +62,7 @@ t_render_context *render_context_create(const t_parsed_arguments *parsed_argumen
     context->is_first_directory_render = 1;
     context->should_print_directory_header = check_if_should_print_directory_header(parsed_arguments);
     context->should_print_types_separator = parsed_arguments_has_mixed_types_file_operands(parsed_arguments);
-    context->render_prefix_strategy = select_render_prefix_strategy(parsed_arguments);
+    context->directory_entries_prefix_strategy = select_directory_entries_prefix_strategy(parsed_arguments);
     context->render_strategy = select_render_strategy(parsed_arguments);
 
     return context;
@@ -91,7 +91,7 @@ void render_directory(t_render_context *context, const char *directory_header, c
         return ;
 
     render_directory_header(context, directory_header);
-    context->render_prefix_strategy(file_entry_array);
+    context->directory_entries_prefix_strategy(file_entry_array);
     render_entries(context, file_entry_array);
 }
 
