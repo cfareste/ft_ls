@@ -31,19 +31,46 @@ static char get_permission_character(const t_permissions file_permissions, const
     return '-';
 }
 
+static char get_read_permission_character(const t_permissions file_permissions, const t_permissions permission)
+{
+    return get_permission_character(file_permissions, permission, 'r');
+}
+
+static char get_write_permission_character(const t_permissions file_permissions, const t_permissions permission)
+{
+    return get_permission_character(file_permissions, permission, 'w');
+}
+
+static char get_special_execute_character(const t_permissions special_permission,
+                                          const int execute_is_set)
+{
+    if (special_permission == PERM_STICKY)
+        return execute_is_set ? 't' : 'T';
+    return execute_is_set ? 's' : 'S';
+}
+
+static char get_special_execute_permission_character(const t_permissions file_permissions,
+                                                     const t_permissions execute_permission,
+                                                     const t_permissions special_permission)
+{
+    const int execute_is_set = file_permissions & execute_permission;
+    const t_permissions displayed_permission = execute_is_set
+        ? execute_permission
+        : special_permission;
+    const char character = get_special_execute_character(special_permission,
+                                                         execute_is_set);
+
+    return get_permission_character(file_permissions, displayed_permission, character);
+}
+
 static char get_execute_permission_character(const t_permissions file_permissions,
-                                            const t_permissions execute_permission,
-                                            const t_permissions special_permission,
-                                            const char special_character,
-                                            const char special_character_without_execute)
+                                             const t_permissions execute_permission,
+                                             const t_permissions special_permission)
 {
     if (file_permissions & special_permission)
-    {
-        if (file_permissions & execute_permission)
-            return special_character;
-        return special_character_without_execute;
-    }
-
+        return get_special_execute_permission_character(file_permissions,
+                                                        execute_permission,
+                                                        special_permission);
     return get_permission_character(file_permissions, execute_permission, 'x');
 }
 
@@ -72,16 +99,16 @@ static void print_mode_string(const t_file_entry *entry)
     const t_permissions file_permissions = file_entry_get_permissions(entry);
 
     ft_printf("%c%c%c%c%c%c%c%c%c%c ",
-                get_file_type_character(file_type),
-                get_permission_character(file_permissions, PERM_OWNER_READ, 'r'),
-                get_permission_character(file_permissions, PERM_OWNER_WRITE, 'w'),
-                get_execute_permission_character(file_permissions, PERM_OWNER_EXECUTE, PERM_SETUID, 's', 'S'),
-                get_permission_character(file_permissions, PERM_GROUP_READ, 'r'),
-                get_permission_character(file_permissions, PERM_GROUP_WRITE, 'w'),
-                get_execute_permission_character(file_permissions, PERM_GROUP_EXECUTE, PERM_SETGID, 's', 'S'),
-                get_permission_character(file_permissions, PERM_OTHER_READ, 'r'),
-                get_permission_character(file_permissions, PERM_OTHER_WRITE, 'w'),
-                get_execute_permission_character(file_permissions, PERM_OTHER_EXECUTE, PERM_STICKY, 't', 'T'));
+              get_file_type_character(file_type),
+              get_read_permission_character(file_permissions, PERM_OWNER_READ),
+              get_write_permission_character(file_permissions, PERM_OWNER_WRITE),
+              get_execute_permission_character(file_permissions, PERM_OWNER_EXECUTE, PERM_SETUID),
+              get_read_permission_character(file_permissions, PERM_GROUP_READ),
+              get_write_permission_character(file_permissions, PERM_GROUP_WRITE),
+              get_execute_permission_character(file_permissions, PERM_GROUP_EXECUTE, PERM_SETGID),
+              get_read_permission_character(file_permissions, PERM_OTHER_READ),
+              get_write_permission_character(file_permissions, PERM_OTHER_WRITE),
+              get_execute_permission_character(file_permissions, PERM_OTHER_EXECUTE, PERM_STICKY));
 }
 
 static void print_link_count(const t_file_entry *entry)
