@@ -22,6 +22,14 @@ static int check_if_should_print_directory_header(const t_parsed_arguments *pars
     return (has_multiple_file_operands && has_directory_file_operands) || has_recursive_option;
 }
 
+static t_render_strategy select_render_strategy(const t_parsed_arguments *parsed_arguments)
+{
+    if (parsed_arguments_is_option_active(parsed_arguments, OPTIONS_LONG_FORMAT))
+        return long_format_strategy;
+
+    return single_column_strategy;
+}
+
 static void render_directory_header(t_render_context *context, const char *directory_header)
 {
     if (!context->should_print_directory_header)
@@ -32,14 +40,6 @@ static void render_directory_header(t_render_context *context, const char *direc
     ft_printf("%s:\n", directory_header);
 
     context->is_first_directory_render = 0;
-}
-
-static t_render_strategy select_render_strategy(const t_parsed_arguments *parsed_arguments)
-{
-    if (parsed_arguments_is_option_active(parsed_arguments, OPTIONS_LONG_FORMAT))
-        return long_format_strategy;
-
-    return single_column_strategy;
 }
 
 t_render_context *render_context_create(const t_parsed_arguments *parsed_arguments)
