@@ -402,6 +402,32 @@ static void should_return_a_length_of_zero_when_passed_a_NULL_file_entry_array(v
     CU_ASSERT_EQUAL(length, 0);
 }
 
+static void should_return_zero_as_the_biggest_link_count_for_a_NULL_array(void)
+{
+    CU_ASSERT_EQUAL(file_entry_array_get_biggest_link_count(NULL), 0);
+}
+
+static void should_return_zero_as_the_biggest_link_count_for_an_empty_array(void)
+{
+    CU_ASSERT_EQUAL(file_entry_array_get_biggest_link_count(array_sut), 0);
+}
+
+static void should_return_biggest_link_count(void)
+{
+    t_file_entry *first_entry = file_entry_create("first");
+    t_file_entry *second_entry = file_entry_create("second");
+    t_file_entry *third_entry = file_entry_create("third");
+
+    file_entry_set_link_count(first_entry, 3);
+    file_entry_set_link_count(second_entry, 10);
+    file_entry_set_link_count(third_entry, 5);
+    file_entry_array_push(array_sut, first_entry);
+    file_entry_array_push(array_sut, second_entry);
+    file_entry_array_push(array_sut, third_entry);
+
+    CU_ASSERT_EQUAL(file_entry_array_get_biggest_link_count(array_sut), 10);
+}
+
 static void should_return_the_correct_length(void)
 {
     file_entry_array_push(array_sut, file_entry_create(DEFAULT_NAME));
@@ -571,6 +597,9 @@ void register_file_entry_suite(void)
         CU_add_test(suite, "should_not_set_the_entry_link_target_if_an_empty_target_is_passed", should_not_set_the_entry_link_target_if_an_empty_target_is_passed);
         CU_add_test(suite, "should_not_fail_setting_the_entry_link_target_if_a_NULL_entry_is_passed", should_not_fail_setting_the_entry_link_target_if_a_NULL_entry_is_passed);
         CU_add_test(suite, "should_return_a_length_of_zero_when_passed_a_NULL_file_entry_array", should_return_a_length_of_zero_when_passed_a_NULL_file_entry_array);
+        CU_add_test(suite, "should_return_zero_as_the_biggest_link_count_for_a_NULL_array", should_return_zero_as_the_biggest_link_count_for_a_NULL_array);
+        CU_add_test(suite, "should_return_zero_as_the_biggest_link_count_for_an_empty_array", should_return_zero_as_the_biggest_link_count_for_an_empty_array);
+        CU_add_test(suite, "should_return_biggest_link_count", should_return_biggest_link_count);
         CU_add_test(suite, "should_return_the_correct_length", should_return_the_correct_length);
         CU_add_test(suite, "should_return_NULL_for_an_entry_if_a_NULL_array_is_passed", should_return_NULL_for_an_entry_if_a_NULL_array_is_passed);
         CU_add_test(suite, "should_return_NULL_for_an_entry_if_an_out_of_bounds_index_is_specified", should_return_NULL_for_an_entry_if_an_out_of_bounds_index_is_specified);

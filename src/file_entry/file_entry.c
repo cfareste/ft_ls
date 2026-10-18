@@ -25,6 +25,7 @@ struct s_file_entry_array
     t_file_entry **entries;
     unsigned int count;
     unsigned int max_capacity;
+    unsigned long biggest_link_count;
 };
 
 static int compare_by_entry_name(const void *first_entry, const void *second_entry)
@@ -269,6 +270,10 @@ void file_entry_array_push(t_file_entry_array *array, t_file_entry *entry)
         increase_entries_capacity(array);
     array->entries[array->count] = entry;
     array->count++;
+
+    const unsigned long link_count = entry->link_count;
+    if (link_count > array->biggest_link_count)
+        array->biggest_link_count = link_count;
 }
 
 unsigned int file_entry_array_get_length(const t_file_entry_array *file_entry_array)
@@ -277,6 +282,14 @@ unsigned int file_entry_array_get_length(const t_file_entry_array *file_entry_ar
         return 0;
 
     return file_entry_array->count;
+}
+
+unsigned long file_entry_array_get_biggest_link_count(const t_file_entry_array *file_entry_array)
+{
+    if (file_entry_array == NULL)
+        return 0;
+
+    return file_entry_array->biggest_link_count;
 }
 
 void file_entry_array_sort(const t_file_entry_array *file_entry_array)
