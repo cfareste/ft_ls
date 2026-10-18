@@ -55,7 +55,7 @@ static int	check_padding_difference(char *num_str, t_ft_printf_flags *flags)
 	return (padding);
 }
 
-int	print_precised_number(char *num_str, t_ft_printf_flags *flags, unsigned int n)
+int	print_precised_number(char *num_str, t_ft_printf_flags *flags, unsigned long n)
 {
 	int	i;
 	int	precision;
@@ -92,7 +92,7 @@ int	print_hex_prefix(int fd, unsigned int n, char specifier)
 		return (print_raw_string(fd, "0x"));
 }
 
-int	check_for_signs_flags(int n, t_ft_printf_flags *flags)
+int	check_for_signs_flags(long n, t_ft_printf_flags *flags)
 {
 	if (flags->plus && n >= 0 && print_raw_char(flags->fd, '+') == -1)
 		return (-1);
