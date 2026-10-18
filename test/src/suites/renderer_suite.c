@@ -500,6 +500,46 @@ static void should_render_one_entry_with_long_format(void)
     render_context_destroy(&context);
 }
 
+static void should_render_entries_in_long_format_aligned(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("alpha"),
+        MOCK_FILE("beta"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *args[] = { "-l", "alpha", "beta", NULL };
+    get_parsed_arguments_result(3, args);
+    t_file_entry_array *file_entry_array = file_entry_array_create();
+    const t_date modification_date = {
+        .day = 1, .month = 1, .year = 2100, .hour = 0, .minute = 0,
+        .timestamp = 4102444800
+    };
+    t_file_entry *first_entry = create_entry("alpha", FILE_TYPE_REGULAR,
+                                             PERM_NONE, 1, "alice", "staff", 10,
+                                             modification_date);
+    t_file_entry *second_entry = create_entry("beta", FILE_TYPE_REGULAR,
+                                              PERM_NONE, 12, "longer-author",
+                                              "longer-group", 124, modification_date);
+
+    file_entry_array_push(file_entry_array, first_entry);
+    file_entry_array_push(file_entry_array, second_entry);
+    t_render_context *context = render_context_create(parsed_arguments);
+
+    render_entries(context, file_entry_array);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "%s\n%s\n",
+        "----------  1 alice         staff         10 Jan  1 00:00 alpha",
+        "---------- 12 longer-author longer-group 124 Jan  1 00:00 beta"
+    ));
+
+    file_entry_array_destroy(&file_entry_array);
+    render_context_destroy(&context);
+    parsed_arguments_destroy(&parsed_arguments);
+}
+
 static void should_render_entries_with_setuid_in_long_format(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -608,15 +648,19 @@ static void should_render_entries_with_sticky_bit_in_long_format(void)
 static void should_render_char_and_block_devices_in_long_format(void)
 {
     const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("regular-file"),
         MOCK_CHAR_DEVICE("char-device"),
         MOCK_BLOCK_DEVICE("block-device"),
         MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
 
-    const char *args[] = { "-l", "char-device", "block-device", NULL };
-    get_parsed_arguments_result(3, args);
+    const char *args[] = { "-l", "regular-file", "char-device", "block-device", NULL };
+    get_parsed_arguments_result(4, args);
     t_file_entry_array *file_entry_array = file_entry_array_create();
+    t_file_entry *regular_entry = create_entry("regular-file", FILE_TYPE_REGULAR, PERM_NONE, 1,
+                                               "user", "group", 1024,
+                                               (t_date){ .day = 1, .month = 1, .year = 2100, .timestamp = 4102444800 });
     t_file_entry *char_device_entry = create_entry("char-device", FILE_TYPE_CHARDEVICE, PERM_NONE, 1,
                                                    "user", "group", 1024,
                                                    (t_date){ .day = 1, .month = 1, .year = 2100, .timestamp = 4102444800 });
@@ -625,6 +669,7 @@ static void should_render_char_and_block_devices_in_long_format(void)
                                                     (t_date){ .day = 1, .month = 1, .year = 2100, .timestamp = 4102444800 });
     file_entry_set_device(char_device_entry, (t_device){ .major = 12, .minor = 34 });
     file_entry_set_device(block_device_entry, (t_device){ .major = 56, .minor = 78 });
+    file_entry_array_push(file_entry_array, regular_entry);
     file_entry_array_push(file_entry_array, char_device_entry);
     file_entry_array_push(file_entry_array, block_device_entry);
     t_render_context *context = render_context_create(parsed_arguments);
@@ -632,7 +677,8 @@ static void should_render_char_and_block_devices_in_long_format(void)
     render_entries(context, file_entry_array);
 
     CU_ASSERT(verify_that_the_output_printed_is(
-        "%s\n%s\n",
+        "%s\n%s\n%s\n",
+        "---------- 1 user group   1024 Jan  1 00:00 regular-file",
         "c--------- 1 user group 12, 34 Jan  1 00:00 char-device",
         "b--------- 1 user group 56, 78 Jan  1 00:00 block-device"
     ));
@@ -764,6 +810,7 @@ void register_renderer_suite(void)
         CU_add_test(suite, "should_render_the_types_separator_if_has_at_least_one_non_dir_and_one_dir", should_render_the_types_separator_if_has_at_least_one_non_dir_and_one_dir);
         CU_add_test(suite, "should_not_render_the_types_separator_if_doesnt_have_at_least_one_non_dir_and_one_dir", should_not_render_the_types_separator_if_doesnt_have_at_least_one_non_dir_and_one_dir);
         CU_add_test(suite, "should_render_one_entry_with_long_format", should_render_one_entry_with_long_format);
+        CU_add_test(suite, "should_render_entries_in_long_format_aligned", should_render_entries_in_long_format_aligned);
         CU_add_test(suite, "should_render_entries_with_setuid_in_long_format", should_render_entries_with_setuid_in_long_format);
         CU_add_test(suite, "should_render_entries_with_setgid_in_long_format", should_render_entries_with_setgid_in_long_format);
         CU_add_test(suite, "should_render_entries_with_sticky_bit_in_long_format", should_render_entries_with_sticky_bit_in_long_format);
