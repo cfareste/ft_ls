@@ -412,7 +412,7 @@ static void should_return_zero_as_the_biggest_link_count_for_an_empty_array(void
     CU_ASSERT_EQUAL(file_entry_array_get_biggest_link_count(array_sut), 0);
 }
 
-static void should_return_biggest_link_count(void)
+static void should_return_biggest_link_count_width(void)
 {
     t_file_entry *first_entry = file_entry_create("first");
     t_file_entry *second_entry = file_entry_create("second");
@@ -425,7 +425,7 @@ static void should_return_biggest_link_count(void)
     file_entry_array_push(array_sut, second_entry);
     file_entry_array_push(array_sut, third_entry);
 
-    CU_ASSERT_EQUAL(file_entry_array_get_biggest_link_count(array_sut), 10);
+    CU_ASSERT_EQUAL(file_entry_array_get_biggest_link_count(array_sut), 2);
 }
 
 static void should_return_zero_author_width_for_a_NULL_array(void)
@@ -500,7 +500,7 @@ static void should_return_zero_biggest_device_width_for_an_empty_array(void)
     CU_ASSERT_EQUAL(file_entry_array_get_biggest_device_width(array_sut), 0);
 }
 
-static void should_return_biggest_size(void)
+static void should_return_biggest_size_width(void)
 {
     t_file_entry *first_entry = file_entry_create("first");
     t_file_entry *second_entry = file_entry_create("second");
@@ -513,7 +513,7 @@ static void should_return_biggest_size(void)
     file_entry_array_push(array_sut, second_entry);
     file_entry_array_push(array_sut, third_entry);
 
-    CU_ASSERT_EQUAL(file_entry_array_get_biggest_size(array_sut), 1024);
+    CU_ASSERT_EQUAL(file_entry_array_get_biggest_size(array_sut), 4);
 }
 
 static void should_return_biggest_device_width(void)
@@ -702,7 +702,7 @@ void register_file_entry_suite(void)
         CU_add_test(suite, "should_return_a_length_of_zero_when_passed_a_NULL_file_entry_array", should_return_a_length_of_zero_when_passed_a_NULL_file_entry_array);
         CU_add_test(suite, "should_return_zero_as_the_biggest_link_count_for_a_NULL_array", should_return_zero_as_the_biggest_link_count_for_a_NULL_array);
         CU_add_test(suite, "should_return_zero_as_the_biggest_link_count_for_an_empty_array", should_return_zero_as_the_biggest_link_count_for_an_empty_array);
-        CU_add_test(suite, "should_return_biggest_link_count", should_return_biggest_link_count);
+        CU_add_test(suite, "should_return_biggest_link_count_width", should_return_biggest_link_count_width);
         CU_add_test(suite, "should_return_zero_author_width_for_a_NULL_array", should_return_zero_author_width_for_a_NULL_array);
         CU_add_test(suite, "should_return_zero_group_width_for_a_NULL_array", should_return_zero_group_width_for_a_NULL_array);
         CU_add_test(suite, "should_return_zero_author_width_for_an_empty_array", should_return_zero_author_width_for_an_empty_array);
@@ -713,7 +713,7 @@ void register_file_entry_suite(void)
         CU_add_test(suite, "should_return_zero_biggest_device_width_for_a_NULL_array", should_return_zero_biggest_device_width_for_a_NULL_array);
         CU_add_test(suite, "should_return_zero_biggest_size_for_an_empty_array", should_return_zero_biggest_size_for_an_empty_array);
         CU_add_test(suite, "should_return_zero_biggest_device_width_for_an_empty_array", should_return_zero_biggest_device_width_for_an_empty_array);
-        CU_add_test(suite, "should_return_biggest_size", should_return_biggest_size);
+        CU_add_test(suite, "should_return_biggest_size_width", should_return_biggest_size_width);
         CU_add_test(suite, "should_return_biggest_device_width", should_return_biggest_device_width);
         CU_add_test(suite, "should_return_the_correct_length", should_return_the_correct_length);
         CU_add_test(suite, "should_return_NULL_for_an_entry_if_a_NULL_array_is_passed", should_return_NULL_for_an_entry_if_a_NULL_array_is_passed);

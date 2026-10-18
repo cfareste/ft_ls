@@ -32,7 +32,7 @@ struct s_file_entry_array
     size_t biggest_device_width;
 };
 
-static size_t count_unsigned_digits(unsigned int number)
+static size_t count_unsigned_digits(unsigned long number)
 {
     size_t digit_count = 1;
 
@@ -287,9 +287,8 @@ void file_entry_array_push(t_file_entry_array *array, t_file_entry *entry)
     array->entries[array->count] = entry;
     array->count++;
 
-    const unsigned long link_count = entry->link_count;
-    if (link_count > array->biggest_link_count)
-        array->biggest_link_count = link_count;
+    if (entry->link_count > array->biggest_link_count)
+        array->biggest_link_count = entry->link_count;
 
     const size_t author_width = entry->author != NULL ? ft_strlen(entry->author) : 0;
     if (author_width > array->biggest_author_width)
@@ -318,12 +317,12 @@ unsigned int file_entry_array_get_length(const t_file_entry_array *file_entry_ar
     return file_entry_array->count;
 }
 
-unsigned long file_entry_array_get_biggest_link_count(const t_file_entry_array *file_entry_array)
+size_t file_entry_array_get_biggest_link_count(const t_file_entry_array *file_entry_array)
 {
-    if (file_entry_array == NULL)
+    if (file_entry_array == NULL || file_entry_array->count == 0)
         return 0;
 
-    return file_entry_array->biggest_link_count;
+    return count_unsigned_digits(file_entry_array->biggest_link_count);
 }
 
 size_t file_entry_array_get_biggest_author_width(const t_file_entry_array *file_entry_array)
@@ -342,12 +341,12 @@ size_t file_entry_array_get_biggest_group_width(const t_file_entry_array *file_e
     return file_entry_array->biggest_group_width;
 }
 
-long file_entry_array_get_biggest_size(const t_file_entry_array *file_entry_array)
+size_t file_entry_array_get_biggest_size(const t_file_entry_array *file_entry_array)
 {
-    if (file_entry_array == NULL)
+    if (file_entry_array == NULL || file_entry_array->count == 0)
         return 0;
 
-    return file_entry_array->biggest_size;
+    return count_unsigned_digits((unsigned long)file_entry_array->biggest_size);
 }
 
 size_t file_entry_array_get_biggest_device_width(const t_file_entry_array *file_entry_array)
