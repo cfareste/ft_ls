@@ -223,6 +223,11 @@ static void print_entry(const t_file_entry *entry, const t_file_entry_array *ent
     ft_printf("\n");
 }
 
+void long_format_prefix_strategy(const t_file_entry_array *file_entry_array)
+{
+    ft_printf("total %lu\n", file_entry_array_get_total_blocks(file_entry_array));
+}
+
 void long_format_strategy(const t_file_entry_array *file_entry_array)
 {
     const unsigned int count = file_entry_array_get_length(file_entry_array);

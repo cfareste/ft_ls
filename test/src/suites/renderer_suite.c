@@ -540,6 +540,88 @@ static void should_render_entries_in_long_format_aligned(void)
     parsed_arguments_destroy(&parsed_arguments);
 }
 
+static void should_render_directory_prefix_and_aligned_long_format_entries(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("dir", ".", ".."),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *args[] = { "-l", "dir", NULL };
+    get_parsed_arguments_result(2, args);
+    t_file_entry_array *file_entry_array = file_entry_array_create();
+    const t_date modification_date = {
+        .day = 1, .month = 1, .year = 2100, .hour = 0, .minute = 0,
+        .timestamp = 4102444800
+    };
+    t_file_entry *regular_entry = create_entry("regular", FILE_TYPE_REGULAR,
+                                               PERM_OWNER_READ | PERM_OWNER_WRITE |
+                                                   PERM_GROUP_READ | PERM_OTHER_READ,
+                                               1, "a", "g", 10, modification_date);
+    t_file_entry *directory_entry = create_entry("directory", FILE_TYPE_DIRECTORY,
+                                                 PERM_OWNER_READ | PERM_OWNER_WRITE |
+                                                     PERM_OWNER_EXECUTE | PERM_GROUP_READ |
+                                                     PERM_GROUP_EXECUTE | PERM_OTHER_READ |
+                                                     PERM_OTHER_EXECUTE,
+                                                 12, "long-author", "long-group", 124,
+                                                 modification_date);
+    t_file_entry *char_device_entry = create_entry("char-device", FILE_TYPE_CHARDEVICE,
+                                                   PERM_NONE, 3, "alice", "ops", 0,
+                                                   modification_date);
+    t_file_entry *block_device_entry = create_entry("block-device", FILE_TYPE_BLOCKDEVICE,
+                                                    PERM_NONE, 4, NULL, NULL, 0,
+                                                    modification_date);
+    t_file_entry *fifo_entry = create_entry("fifo", FILE_TYPE_FIFO, PERM_NONE, 5,
+                                            "bob", "staff", 8, modification_date);
+    t_file_entry *symlink_entry = create_entry("symlink", FILE_TYPE_SYMLINK,
+                                               PERM_OWNER_READ | PERM_OWNER_WRITE |
+                                                   PERM_OWNER_EXECUTE | PERM_GROUP_READ |
+                                                   PERM_GROUP_WRITE | PERM_GROUP_EXECUTE |
+                                                   PERM_OTHER_READ | PERM_OTHER_WRITE |
+                                                   PERM_OTHER_EXECUTE,
+                                               6, "symlink-owner", "users", 6,
+                                               modification_date);
+    t_file_entry *socket_entry = create_entry("socket", FILE_TYPE_SOCKET, PERM_NONE, 7,
+                                              "x", "g", 0, modification_date);
+
+    file_entry_set_blocks(regular_entry, 1);
+    file_entry_set_blocks(directory_entry, 2);
+    file_entry_set_blocks(char_device_entry, 3);
+    file_entry_set_blocks(block_device_entry, 4);
+    file_entry_set_blocks(fifo_entry, 5);
+    file_entry_set_blocks(symlink_entry, 6);
+    file_entry_set_blocks(socket_entry, 7);
+    file_entry_set_device(char_device_entry, (t_device){ .major = 3, .minor = 4 });
+    file_entry_set_device(block_device_entry, (t_device){ .major = 1, .minor = 12 });
+    file_entry_set_link_target(symlink_entry, "regular");
+    file_entry_array_push(file_entry_array, regular_entry);
+    file_entry_array_push(file_entry_array, directory_entry);
+    file_entry_array_push(file_entry_array, char_device_entry);
+    file_entry_array_push(file_entry_array, block_device_entry);
+    file_entry_array_push(file_entry_array, fifo_entry);
+    file_entry_array_push(file_entry_array, symlink_entry);
+    file_entry_array_push(file_entry_array, socket_entry);
+    t_render_context *context = render_context_create(parsed_arguments);
+
+    render_directory(context, "dir", file_entry_array);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n",
+        "total 28",
+        "-rw-r--r--  1 a             g             10 Jan  1 00:00 regular",
+        "drwxr-xr-x 12 long-author   long-group   124 Jan  1 00:00 directory",
+        "c---------  3 alice         ops         3, 4 Jan  1 00:00 char-device",
+        "b---------  4                          1, 12 Jan  1 00:00 block-device",
+        "p---------  5 bob           staff          8 Jan  1 00:00 fifo",
+        "lrwxrwxrwx  6 symlink-owner users          6 Jan  1 00:00 symlink -> regular",
+        "s---------  7 x             g              0 Jan  1 00:00 socket"));
+
+    file_entry_array_destroy(&file_entry_array);
+    render_context_destroy(&context);
+    parsed_arguments_destroy(&parsed_arguments);
+}
+
 static void should_render_entries_with_setuid_in_long_format(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -811,6 +893,7 @@ void register_renderer_suite(void)
         CU_add_test(suite, "should_not_render_the_types_separator_if_doesnt_have_at_least_one_non_dir_and_one_dir", should_not_render_the_types_separator_if_doesnt_have_at_least_one_non_dir_and_one_dir);
         CU_add_test(suite, "should_render_one_entry_with_long_format", should_render_one_entry_with_long_format);
         CU_add_test(suite, "should_render_entries_in_long_format_aligned", should_render_entries_in_long_format_aligned);
+        CU_add_test(suite, "should_render_directory_prefix_and_aligned_long_format_entries", should_render_directory_prefix_and_aligned_long_format_entries);
         CU_add_test(suite, "should_render_entries_with_setuid_in_long_format", should_render_entries_with_setuid_in_long_format);
         CU_add_test(suite, "should_render_entries_with_setgid_in_long_format", should_render_entries_with_setgid_in_long_format);
         CU_add_test(suite, "should_render_entries_with_sticky_bit_in_long_format", should_render_entries_with_sticky_bit_in_long_format);
