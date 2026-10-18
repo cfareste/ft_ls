@@ -480,6 +480,57 @@ static void should_return_biggest_group_width(void)
     CU_ASSERT_EQUAL(file_entry_array_get_biggest_group_width(array_sut), 12);
 }
 
+static void should_return_zero_biggest_size_for_a_NULL_array(void)
+{
+    CU_ASSERT_EQUAL(file_entry_array_get_biggest_size(NULL), 0);
+}
+
+static void should_return_zero_biggest_device_width_for_a_NULL_array(void)
+{
+    CU_ASSERT_EQUAL(file_entry_array_get_biggest_device_width(NULL), 0);
+}
+
+static void should_return_zero_biggest_size_for_an_empty_array(void)
+{
+    CU_ASSERT_EQUAL(file_entry_array_get_biggest_size(array_sut), 0);
+}
+
+static void should_return_zero_biggest_device_width_for_an_empty_array(void)
+{
+    CU_ASSERT_EQUAL(file_entry_array_get_biggest_device_width(array_sut), 0);
+}
+
+static void should_return_biggest_size(void)
+{
+    t_file_entry *first_entry = file_entry_create("first");
+    t_file_entry *second_entry = file_entry_create("second");
+    t_file_entry *third_entry = file_entry_create("third");
+
+    file_entry_set_size(first_entry, 12);
+    file_entry_set_size(second_entry, 1024);
+    file_entry_set_size(third_entry, 512);
+    file_entry_array_push(array_sut, first_entry);
+    file_entry_array_push(array_sut, second_entry);
+    file_entry_array_push(array_sut, third_entry);
+
+    CU_ASSERT_EQUAL(file_entry_array_get_biggest_size(array_sut), 1024);
+}
+
+static void should_return_biggest_device_width(void)
+{
+    t_file_entry *first_entry = file_entry_create("first");
+    t_file_entry *second_entry = file_entry_create("second");
+
+    file_entry_set_file_type(first_entry, FILE_TYPE_CHARDEVICE);
+    file_entry_set_device(first_entry, (t_device){ .major = 3, .minor = 4 });
+    file_entry_set_file_type(second_entry, FILE_TYPE_BLOCKDEVICE);
+    file_entry_set_device(second_entry, (t_device){ .major = 1, .minor = 12 });
+    file_entry_array_push(array_sut, first_entry);
+    file_entry_array_push(array_sut, second_entry);
+
+    CU_ASSERT_EQUAL(file_entry_array_get_biggest_device_width(array_sut), 3);
+}
+
 static void should_return_the_correct_length(void)
 {
     file_entry_array_push(array_sut, file_entry_create(DEFAULT_NAME));
@@ -658,6 +709,12 @@ void register_file_entry_suite(void)
         CU_add_test(suite, "should_return_zero_group_width_for_an_empty_array", should_return_zero_group_width_for_an_empty_array);
         CU_add_test(suite, "should_return_biggest_author_width", should_return_biggest_author_width);
         CU_add_test(suite, "should_return_biggest_group_width", should_return_biggest_group_width);
+        CU_add_test(suite, "should_return_zero_biggest_size_for_a_NULL_array", should_return_zero_biggest_size_for_a_NULL_array);
+        CU_add_test(suite, "should_return_zero_biggest_device_width_for_a_NULL_array", should_return_zero_biggest_device_width_for_a_NULL_array);
+        CU_add_test(suite, "should_return_zero_biggest_size_for_an_empty_array", should_return_zero_biggest_size_for_an_empty_array);
+        CU_add_test(suite, "should_return_zero_biggest_device_width_for_an_empty_array", should_return_zero_biggest_device_width_for_an_empty_array);
+        CU_add_test(suite, "should_return_biggest_size", should_return_biggest_size);
+        CU_add_test(suite, "should_return_biggest_device_width", should_return_biggest_device_width);
         CU_add_test(suite, "should_return_the_correct_length", should_return_the_correct_length);
         CU_add_test(suite, "should_return_NULL_for_an_entry_if_a_NULL_array_is_passed", should_return_NULL_for_an_entry_if_a_NULL_array_is_passed);
         CU_add_test(suite, "should_return_NULL_for_an_entry_if_an_out_of_bounds_index_is_specified", should_return_NULL_for_an_entry_if_an_out_of_bounds_index_is_specified);

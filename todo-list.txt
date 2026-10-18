@@ -8,9 +8,8 @@ TODO:
      - Pasar parsed args a scan context y decidir que file_stats coger
    - Decidir que stats coger basándose en parsed args
 4. Pintar el total del directorio
-5. Pintar los campos que tocan
-6. Errores (major y minor) por cada función del sistema
-7. Mockear ctime
+5. Errores (major y minor) por cada función del sistema
+6. Mockear ctime
 
 
 TODO En algún momento:

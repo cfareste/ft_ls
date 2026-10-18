@@ -28,7 +28,21 @@ struct s_file_entry_array
     unsigned long biggest_link_count;
     size_t biggest_author_width;
     size_t biggest_group_width;
+    long biggest_size;
+    size_t biggest_device_width;
 };
+
+static size_t count_unsigned_digits(unsigned int number)
+{
+    size_t digit_count = 1;
+
+    while (number >= 10)
+    {
+        number /= 10;
+        digit_count++;
+    }
+    return digit_count;
+}
 
 static int compare_by_entry_name(const void *first_entry, const void *second_entry)
 {
@@ -284,6 +298,16 @@ void file_entry_array_push(t_file_entry_array *array, t_file_entry *entry)
     const size_t group_width = entry->group != NULL ? ft_strlen(entry->group) : 0;
     if (group_width > array->biggest_group_width)
         array->biggest_group_width = group_width;
+
+    if (entry->size > array->biggest_size)
+        array->biggest_size = entry->size;
+
+    if (entry->type == FILE_TYPE_CHARDEVICE || entry->type == FILE_TYPE_BLOCKDEVICE)
+    {
+        const size_t device_width = count_unsigned_digits(entry->device.major) + count_unsigned_digits(entry->device.minor);
+        if (device_width > array->biggest_device_width)
+            array->biggest_device_width = device_width;
+    }
 }
 
 unsigned int file_entry_array_get_length(const t_file_entry_array *file_entry_array)
@@ -316,6 +340,22 @@ size_t file_entry_array_get_biggest_group_width(const t_file_entry_array *file_e
         return 0;
 
     return file_entry_array->biggest_group_width;
+}
+
+long file_entry_array_get_biggest_size(const t_file_entry_array *file_entry_array)
+{
+    if (file_entry_array == NULL)
+        return 0;
+
+    return file_entry_array->biggest_size;
+}
+
+size_t file_entry_array_get_biggest_device_width(const t_file_entry_array *file_entry_array)
+{
+    if (file_entry_array == NULL)
+        return 0;
+
+    return file_entry_array->biggest_device_width;
 }
 
 void file_entry_array_sort(const t_file_entry_array *file_entry_array)

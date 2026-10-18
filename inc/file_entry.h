@@ -36,6 +36,8 @@ unsigned int file_entry_array_get_length(const t_file_entry_array *file_entry_ar
 unsigned long file_entry_array_get_biggest_link_count(const t_file_entry_array *file_entry_array);
 size_t file_entry_array_get_biggest_author_width(const t_file_entry_array *file_entry_array);
 size_t file_entry_array_get_biggest_group_width(const t_file_entry_array *file_entry_array);
+long file_entry_array_get_biggest_size(const t_file_entry_array *file_entry_array);
+size_t file_entry_array_get_biggest_device_width(const t_file_entry_array *file_entry_array);
 void file_entry_array_sort(const t_file_entry_array *file_entry_array);
 void file_entry_destroy(t_file_entry **file_entry);
 void file_entry_array_destroy(t_file_entry_array **file_entry_array);
