@@ -402,6 +402,32 @@ static void should_return_a_length_of_zero_when_passed_a_NULL_file_entry_array(v
     CU_ASSERT_EQUAL(length, 0);
 }
 
+static void should_return_zero_total_blocks_for_a_NULL_array(void)
+{
+    CU_ASSERT_EQUAL(file_entry_array_get_total_blocks(NULL), 0);
+}
+
+static void should_return_zero_total_blocks_for_an_empty_array(void)
+{
+    CU_ASSERT_EQUAL(file_entry_array_get_total_blocks(array_sut), 0);
+}
+
+static void should_return_the_sum_of_entry_blocks(void)
+{
+    t_file_entry *first_entry = file_entry_create("first");
+    t_file_entry *second_entry = file_entry_create("second");
+    t_file_entry *third_entry = file_entry_create("third");
+
+    file_entry_set_blocks(first_entry, 5);
+    file_entry_set_blocks(second_entry, 12);
+    file_entry_set_blocks(third_entry, 3);
+    file_entry_array_push(array_sut, first_entry);
+    file_entry_array_push(array_sut, second_entry);
+    file_entry_array_push(array_sut, third_entry);
+
+    CU_ASSERT_EQUAL(file_entry_array_get_total_blocks(array_sut), 20);
+}
+
 static void should_return_zero_as_the_biggest_link_count_for_a_NULL_array(void)
 {
     CU_ASSERT_EQUAL(file_entry_array_get_biggest_link_count(NULL), 0);
@@ -700,6 +726,9 @@ void register_file_entry_suite(void)
         CU_add_test(suite, "should_not_set_the_entry_link_target_if_an_empty_target_is_passed", should_not_set_the_entry_link_target_if_an_empty_target_is_passed);
         CU_add_test(suite, "should_not_fail_setting_the_entry_link_target_if_a_NULL_entry_is_passed", should_not_fail_setting_the_entry_link_target_if_a_NULL_entry_is_passed);
         CU_add_test(suite, "should_return_a_length_of_zero_when_passed_a_NULL_file_entry_array", should_return_a_length_of_zero_when_passed_a_NULL_file_entry_array);
+        CU_add_test(suite, "should_return_zero_total_blocks_for_a_NULL_array", should_return_zero_total_blocks_for_a_NULL_array);
+        CU_add_test(suite, "should_return_zero_total_blocks_for_an_empty_array", should_return_zero_total_blocks_for_an_empty_array);
+        CU_add_test(suite, "should_return_the_sum_of_entry_blocks", should_return_the_sum_of_entry_blocks);
         CU_add_test(suite, "should_return_zero_as_the_biggest_link_count_for_a_NULL_array", should_return_zero_as_the_biggest_link_count_for_a_NULL_array);
         CU_add_test(suite, "should_return_zero_as_the_biggest_link_count_for_an_empty_array", should_return_zero_as_the_biggest_link_count_for_an_empty_array);
         CU_add_test(suite, "should_return_biggest_link_count_width", should_return_biggest_link_count_width);

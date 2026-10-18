@@ -25,6 +25,7 @@ struct s_file_entry_array
     t_file_entry **entries;
     unsigned int count;
     unsigned int max_capacity;
+    long total_blocks;
     unsigned long biggest_link_count;
     size_t biggest_author_width;
     size_t biggest_group_width;
@@ -287,6 +288,8 @@ void file_entry_array_push(t_file_entry_array *array, t_file_entry *entry)
     array->entries[array->count] = entry;
     array->count++;
 
+    array->total_blocks += entry->blocks;
+
     if (entry->link_count > array->biggest_link_count)
         array->biggest_link_count = entry->link_count;
 
@@ -315,6 +318,14 @@ unsigned int file_entry_array_get_length(const t_file_entry_array *file_entry_ar
         return 0;
 
     return file_entry_array->count;
+}
+
+long file_entry_array_get_total_blocks(const t_file_entry_array *file_entry_array)
+{
+    if (file_entry_array == NULL)
+        return 0;
+
+    return file_entry_array->total_blocks;
 }
 
 size_t file_entry_array_get_biggest_link_count(const t_file_entry_array *file_entry_array)

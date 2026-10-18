@@ -33,6 +33,7 @@ void file_entry_set_link_target(t_file_entry *entry, const char *target);
 const t_file_entry *file_entry_array_get_at(const t_file_entry_array *file_entry_array, unsigned int index);
 void file_entry_array_push(t_file_entry_array *array, t_file_entry *entry);
 unsigned int file_entry_array_get_length(const t_file_entry_array *file_entry_array);
+long file_entry_array_get_total_blocks(const t_file_entry_array *file_entry_array);
 size_t file_entry_array_get_biggest_link_count(const t_file_entry_array *file_entry_array);
 size_t file_entry_array_get_biggest_author_width(const t_file_entry_array *file_entry_array);
 size_t file_entry_array_get_biggest_group_width(const t_file_entry_array *file_entry_array);
