@@ -130,30 +130,57 @@ static void print_entry_name(const t_file_entry *entry)
         ft_printf("%s", name);
 }
 
-static void print_entry(const t_file_entry *entry)
+static void print_mode_string(const t_file_entry *entry)
 {
     char mode[11];
-    char link_count[sizeof(unsigned long) * 3 + 1];
-    char size[sizeof(long) * 3 + 2];
-    const t_file_type file_type = file_entry_get_file_type(entry);
-    const t_date modification_date = file_entry_get_modification_date(entry);
-    const char *author = file_entry_get_author(entry);
-    const char *group = file_entry_get_group(entry);
 
     create_mode_string(entry, mode);
-    unsigned_long_to_string(file_entry_get_link_count(entry), link_count);
-    long_to_string(file_entry_get_size(entry), size);
+    ft_printf("%s ", mode);
+}
 
-    ft_printf("%s %s %s %s ", mode, link_count,
-              author == NULL ? "" : author,
-              group == NULL ? "" : group);
+static void print_link_count(const t_file_entry *entry)
+{
+    char link_count[sizeof(unsigned long) * 3 + 1];
+
+    unsigned_long_to_string(file_entry_get_link_count(entry), link_count);
+    ft_printf("%s ", link_count);
+}
+
+static void print_author(const t_file_entry *entry)
+{
+    const char *author = file_entry_get_author(entry);
+
+    ft_printf("%s ", author == NULL ? "" : author);
+}
+
+static void print_group(const t_file_entry *entry)
+{
+    const char *group = file_entry_get_group(entry);
+
+    ft_printf("%s ", group == NULL ? "" : group);
+}
+
+static void print_size_or_device(const t_file_entry *entry)
+{
+    char size[sizeof(long) * 3 + 2];
+    const t_file_type file_type = file_entry_get_file_type(entry);
+
     if (file_type == FILE_TYPE_CHARDEVICE || file_type == FILE_TYPE_BLOCKDEVICE)
     {
         const t_device device = file_entry_get_device(entry);
         ft_printf("%u, %u ", device.major, device.minor);
     }
     else
+    {
+        long_to_string(file_entry_get_size(entry), size);
         ft_printf("%s ", size);
+    }
+}
+
+static void print_modification_date(const t_file_entry *entry)
+{
+    const t_date modification_date = file_entry_get_modification_date(entry);
+
     if (is_recent_modification(modification_date))
     {
         ft_printf("%s %2d %02d:%02d ",
@@ -169,6 +196,16 @@ static void print_entry(const t_file_entry *entry)
                   modification_date.day,
                   modification_date.year);
     }
+}
+
+static void print_entry(const t_file_entry *entry)
+{
+    print_mode_string(entry);
+    print_link_count(entry);
+    print_author(entry);
+    print_group(entry);
+    print_size_or_device(entry);
+    print_modification_date(entry);
     print_entry_name(entry);
     ft_printf("\n");
 }
@@ -178,5 +215,9 @@ void long_format_strategy(const t_file_entry_array *file_entry_array)
     const unsigned int count = file_entry_array_get_length(file_entry_array);
 
     for (unsigned int i = 0; i < count; i++)
-        print_entry(file_entry_array_get_at(file_entry_array, i));
+    {
+        const t_file_entry *entry = file_entry_array_get_at(file_entry_array, i);
+
+        print_entry(entry);
+    }
 }
