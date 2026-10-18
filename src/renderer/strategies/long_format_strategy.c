@@ -65,38 +65,6 @@ static void create_mode_string(const t_file_entry *entry, char *mode)
     mode[10] = '\0';
 }
 
-static void unsigned_long_to_string(unsigned long value, char *string)
-{
-    char reversed[sizeof(unsigned long) * 3];
-    unsigned int length = 0;
-
-    do
-    {
-        reversed[length++] = (char) ('0' + value % 10);
-        value /= 10;
-    } while (value > 0);
-
-    unsigned int i = 0;
-    while (i < length)
-    {
-        string[i] = reversed[length - i - 1];
-        i++;
-    }
-    string[length] = '\0';
-}
-
-static void long_to_string(const long value, char *string)
-{
-    if (value < 0)
-    {
-        string[0] = '-';
-        unsigned_long_to_string((unsigned long)(-(value + 1)) + 1, string + 1);
-        return ;
-    }
-
-    unsigned_long_to_string((unsigned long)value, string);
-}
-
 static const char *get_month_abbreviation(const int month)
 {
     static const char *months[] = {
@@ -140,10 +108,7 @@ static void print_mode_string(const t_file_entry *entry)
 
 static void print_link_count(const t_file_entry *entry)
 {
-    char link_count[sizeof(unsigned long) * 3 + 1];
-
-    unsigned_long_to_string(file_entry_get_link_count(entry), link_count);
-    ft_printf("%s ", link_count);
+    ft_printf("%lu ", file_entry_get_link_count(entry));
 }
 
 static void print_author(const t_file_entry *entry)
@@ -162,7 +127,6 @@ static void print_group(const t_file_entry *entry)
 
 static void print_size_or_device(const t_file_entry *entry)
 {
-    char size[sizeof(long) * 3 + 2];
     const t_file_type file_type = file_entry_get_file_type(entry);
 
     if (file_type == FILE_TYPE_CHARDEVICE || file_type == FILE_TYPE_BLOCKDEVICE)
@@ -171,10 +135,7 @@ static void print_size_or_device(const t_file_entry *entry)
         ft_printf("%u, %u ", device.major, device.minor);
     }
     else
-    {
-        long_to_string(file_entry_get_size(entry), size);
-        ft_printf("%s ", size);
-    }
+        ft_printf("%ld ", file_entry_get_size(entry));
 }
 
 static void print_modification_date(const t_file_entry *entry)
