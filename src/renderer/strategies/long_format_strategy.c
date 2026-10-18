@@ -103,7 +103,7 @@ static void print_group(const t_file_entry *entry)
     ft_printf("%s ", group == NULL ? "" : group);
 }
 
-static void print_size_or_device(const t_file_entry *entry)
+static void print_size(const t_file_entry *entry)
 {
     const t_file_type file_type = file_entry_get_file_type(entry);
 
@@ -157,7 +157,7 @@ static void print_entry(const t_file_entry *entry)
     print_link_count(entry);
     print_author(entry);
     print_group(entry);
-    print_size_or_device(entry);
+    print_size(entry);
     print_modification_date(entry);
     print_entry_name(entry);
     ft_printf("\n");
