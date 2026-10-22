@@ -77,7 +77,7 @@ static const char *get_month_abbreviation(const int month)
     };
 
     if (month < 1 || month > 12)
-        return "???";
+        return "?";
     return months[month - 1];
 }
 
