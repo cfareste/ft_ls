@@ -3,6 +3,7 @@
 #include "CUnit/Basic.h"
 #include "mocks.h"
 #include "parsed_arguments.h"
+#include "file_stats.h"
 
 #define SUITE_NAME "parsed_arguments"
 
@@ -159,6 +160,36 @@ static void should_return_the_non_directory_file_operands(void)
     CU_ASSERT_STRING_EQUAL(non_directory_file_operands[4], args[4]);
     CU_ASSERT_STRING_EQUAL(non_directory_file_operands[5], args[6]);
     CU_ASSERT_PTR_NULL(non_directory_file_operands[6]);
+    CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
+    CU_ASSERT(verify_that_no_error_was_printed());
+}
+
+static void should_return_NULL_stats_if_NULL_parsed_arguments_are_passed(void)
+{
+    CU_ASSERT_PTR_NULL(parsed_arguments_get_non_directory_file_operands_stats(NULL));
+}
+
+static void should_return_stats_for_non_directory_file_operands_in_sorted_order(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_SOCKET("z_socket"),
+        MOCK_DIR("directory", ".", ".."),
+        MOCK_FILE("a_file"),
+        MOCK_FIFO("m_fifo"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *args[] = { "z_socket", "directory", "a_file", "m_fifo", NULL };
+    get_parsed_arguments_result(4, args);
+
+    t_file_stats * const *non_directory_stats = parsed_arguments_get_non_directory_file_operands_stats(sut);
+
+    CU_ASSERT_PTR_NOT_NULL(non_directory_stats);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(non_directory_stats[0]), FILE_TYPE_REGULAR);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(non_directory_stats[1]), FILE_TYPE_FIFO);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(non_directory_stats[2]), FILE_TYPE_SOCKET);
+    CU_ASSERT_PTR_NULL(non_directory_stats[3]);
     CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
     CU_ASSERT(verify_that_no_error_was_printed());
 }
@@ -887,6 +918,8 @@ void register_parsed_arguments_suite(void)
         CU_add_test(suite, "should_be_created_with_default_values_if_arguments_are_NULL", should_return_default_values_if_arguments_are_NULL);
         CU_add_test(suite, "should_return_NULL_non_directory_file_operands_if_NULL_parsed_arguments_are_passed", should_return_NULL_non_directory_file_operands_if_NULL_parsed_arguments_are_passed);
         CU_add_test(suite, "should_return_the_non_directory_file_operands", should_return_the_non_directory_file_operands);
+        CU_add_test(suite, "should_return_NULL_stats_if_NULL_parsed_arguments_are_passed", should_return_NULL_stats_if_NULL_parsed_arguments_are_passed);
+        CU_add_test(suite, "should_return_stats_for_non_directory_file_operands_in_sorted_order", should_return_stats_for_non_directory_file_operands_in_sorted_order);
         CU_add_test(suite, "should_return_NULL_directory_file_operands_if_NULL_parsed_arguments_are_passed", should_return_NULL_directory_file_operands_if_NULL_parsed_arguments_are_passed);
         CU_add_test(suite, "should_return_the_directory_file_operands", should_return_the_directory_file_operands);
         CU_add_test(suite, "should_return_false_for_multiple_file_operands_if_NULL_parsed_arguments_are_passed", should_return_false_for_multiple_file_operands_if_NULL_parsed_arguments_are_passed);
