@@ -557,6 +557,34 @@ static void should_return_biggest_device_width(void)
     CU_ASSERT_EQUAL(file_entry_array_get_biggest_device_width(array_sut), 3);
 }
 
+static void should_return_zero_biggest_date_width_for_a_NULL_array(void)
+{
+    CU_ASSERT_EQUAL(file_entry_array_get_biggest_date_width(NULL), 0);
+}
+
+static void should_return_one_as_biggest_date_width_for_an_empty_array(void)
+{
+    CU_ASSERT_EQUAL(file_entry_array_get_biggest_date_width(array_sut), 1);
+}
+
+static void should_return_one_as_biggest_date_width_when_all_entries_are_unknown(void)
+{
+    file_entry_array_push(array_sut, file_entry_create("failed"));
+
+    CU_ASSERT_EQUAL(file_entry_array_get_biggest_date_width(array_sut), 1);
+}
+
+static void should_return_twelve_as_biggest_date_width_when_a_valid_entry_is_added(void)
+{
+    t_file_entry *valid_entry = file_entry_create("valid");
+
+    file_entry_set_file_type(valid_entry, FILE_TYPE_REGULAR);
+    file_entry_array_push(array_sut, file_entry_create("failed"));
+    file_entry_array_push(array_sut, valid_entry);
+
+    CU_ASSERT_EQUAL(file_entry_array_get_biggest_date_width(array_sut), 12);
+}
+
 static void should_return_the_correct_length(void)
 {
     file_entry_array_push(array_sut, file_entry_create(DEFAULT_NAME));
@@ -744,6 +772,10 @@ void register_file_entry_suite(void)
         CU_add_test(suite, "should_return_zero_biggest_device_width_for_an_empty_array", should_return_zero_biggest_device_width_for_an_empty_array);
         CU_add_test(suite, "should_return_biggest_size_width", should_return_biggest_size_width);
         CU_add_test(suite, "should_return_biggest_device_width", should_return_biggest_device_width);
+        CU_add_test(suite, "should_return_zero_biggest_date_width_for_a_NULL_array", should_return_zero_biggest_date_width_for_a_NULL_array);
+        CU_add_test(suite, "should_return_one_as_biggest_date_width_for_an_empty_array", should_return_one_as_biggest_date_width_for_an_empty_array);
+        CU_add_test(suite, "should_return_one_as_biggest_date_width_when_all_entries_are_unknown", should_return_one_as_biggest_date_width_when_all_entries_are_unknown);
+        CU_add_test(suite, "should_return_twelve_as_biggest_date_width_when_a_valid_entry_is_added", should_return_twelve_as_biggest_date_width_when_a_valid_entry_is_added);
         CU_add_test(suite, "should_return_the_correct_length", should_return_the_correct_length);
         CU_add_test(suite, "should_return_NULL_for_an_entry_if_a_NULL_array_is_passed", should_return_NULL_for_an_entry_if_a_NULL_array_is_passed);
         CU_add_test(suite, "should_return_NULL_for_an_entry_if_an_out_of_bounds_index_is_specified", should_return_NULL_for_an_entry_if_an_out_of_bounds_index_is_specified);

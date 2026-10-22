@@ -6,11 +6,8 @@ TODO:
      - Crear scan context
      - Pasar parsed args a scan context y decidir que file_stats coger
    - Decidir que stats coger basándose en parsed args
-3. Pintar el total del directorio
-   - Si lo hago en render strategy, se imprimirá siempre aunque sea 1 fichero
-   - Si lo hago en render_directory, se imprimirá siempre anuque no sea long format
-4. Errores (major y minor) por cada función del sistema
-5. Mockear ctime
+3. Errores (major y minor) por cada función del sistema
+4. Mockear ctime
 
 
 TODO En algún momento:

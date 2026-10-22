@@ -31,6 +31,7 @@ struct s_file_entry_array
     size_t biggest_group_width;
     long biggest_size;
     size_t biggest_device_width;
+    size_t biggest_date_width;
 };
 
 static size_t count_unsigned_digits(unsigned long number)
@@ -85,6 +86,7 @@ t_file_entry_array *file_entry_array_create(void)
 
     file_entry_array->entries = ft_safe_calloc(DEFAULT_CAPACITY + 1, sizeof(t_file_entry *));
     file_entry_array->count = 0;
+    file_entry_array->biggest_date_width = 1;
     file_entry_array->max_capacity = DEFAULT_CAPACITY;
 
     return file_entry_array;
@@ -310,6 +312,9 @@ void file_entry_array_push(t_file_entry_array *array, t_file_entry *entry)
         if (device_width > array->biggest_device_width)
             array->biggest_device_width = device_width;
     }
+
+    if (entry->type != FILE_TYPE_UNKNOWN)
+        array->biggest_date_width = 12;
 }
 
 unsigned int file_entry_array_get_length(const t_file_entry_array *file_entry_array)
@@ -366,6 +371,14 @@ size_t file_entry_array_get_biggest_device_width(const t_file_entry_array *file_
         return 0;
 
     return file_entry_array->biggest_device_width;
+}
+
+size_t file_entry_array_get_biggest_date_width(const t_file_entry_array *file_entry_array)
+{
+    if (file_entry_array == NULL)
+        return 0;
+
+    return file_entry_array->biggest_date_width;
 }
 
 void file_entry_array_sort(const t_file_entry_array *file_entry_array)
