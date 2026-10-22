@@ -201,6 +201,31 @@ static void print_modification_date(const t_file_entry *entry)
     }
 }
 
+static void print_failed_entry(const t_file_entry *entry, const t_file_entry_array *entries)
+{
+    const size_t link_count_width = file_entry_array_get_biggest_link_count(entries);
+    const size_t author_width = file_entry_array_get_biggest_author_width(entries);
+    const size_t group_width = file_entry_array_get_biggest_group_width(entries);
+    const size_t size_width = file_entry_array_get_biggest_size(entries);
+    const size_t device_digits = file_entry_array_get_biggest_device_width(entries);
+    const size_t device_width = device_digits == 0 ? 0 : device_digits + 2;
+    const size_t column_width = size_width > device_width ? size_width : device_width;
+    const size_t date_width = file_entry_array_get_biggest_date_width(entries);
+
+    print_mode_string(entry);
+    print_padding(link_count_width > 1 ? link_count_width - 1 : 0);
+    ft_printf("? ");
+    ft_printf("? ");
+    print_padding(author_width > 1 ? author_width - 1 : 0);
+    ft_printf("? ");
+    print_padding(group_width > 1 ? group_width - 1 : 0);
+    print_padding(column_width > 1 ? column_width - 1 : 0);
+    ft_printf("? ");
+    ft_printf("?");
+    print_padding(date_width > 1 ? date_width - 1 : 0);
+    ft_printf(" %s\n", file_entry_get_name(entry));
+}
+
 static void print_entry_name(const t_file_entry *entry)
 {
     const char *name = file_entry_get_name(entry);
@@ -213,6 +238,12 @@ static void print_entry_name(const t_file_entry *entry)
 
 static void print_entry(const t_file_entry *entry, const t_file_entry_array *entries)
 {
+    if (file_entry_get_file_type(entry) == FILE_TYPE_UNKNOWN)
+    {
+        print_failed_entry(entry, entries);
+        return;
+    }
+
     print_mode_string(entry);
     print_link_count(entry, entries);
     print_author(entry, entries);

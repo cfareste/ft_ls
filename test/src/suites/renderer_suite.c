@@ -45,6 +45,19 @@ static t_file_entry *create_entry(const char *name, const t_file_type file_type,
     return entry;
 }
 
+static t_file_entry *create_failed_entry(const char *name, const char *link_target)
+{
+    t_file_entry *entry = file_entry_create(name);
+
+    if (link_target != NULL)
+    {
+        file_entry_set_file_type(entry, FILE_TYPE_SYMLINK);
+        file_entry_set_link_target(entry, link_target);
+        file_entry_set_file_type(entry, FILE_TYPE_UNKNOWN);
+    }
+    return entry;
+}
+
 static void should_create_a_context(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -540,6 +553,110 @@ static void should_render_entries_in_long_format_aligned(void)
     parsed_arguments_destroy(&parsed_arguments);
 }
 
+static void should_render_one_failed_entry_in_long_format(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("broken"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *args[] = { "-l", "broken", NULL };
+    get_parsed_arguments_result(2, args);
+    t_file_entry_array *entries = file_entry_array_create();
+    file_entry_array_push(entries, create_failed_entry("broken", "target"));
+    t_render_context *context = render_context_create(parsed_arguments);
+
+    render_entries(context, entries);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "%s\n", "?--------- ? ? ? ? ? broken"
+    ));
+
+    file_entry_array_destroy(&entries);
+    render_context_destroy(&context);
+    parsed_arguments_destroy(&parsed_arguments);
+}
+
+static void should_align_one_failed_entry_with_successful_entries_in_long_format(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("broken"),
+        MOCK_FILE("valid"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *args[] = { "-l", "broken", "valid", NULL };
+    get_parsed_arguments_result(3, args);
+    const t_date modification_date = {
+        .day = 1, .month = 1, .year = 2100, .hour = 0, .minute = 0,
+        .timestamp = 4102444800
+    };
+    t_file_entry_array *entries = file_entry_array_create();
+    t_file_entry *valid_entry = create_entry(
+        "valid", FILE_TYPE_REGULAR, PERM_NONE, 12,
+        "long-author", "long-group", 124, modification_date);
+    file_entry_array_push(entries, create_failed_entry("broken", NULL));
+    file_entry_array_push(entries, valid_entry);
+    t_render_context *context = render_context_create(parsed_arguments);
+
+    render_entries(context, entries);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "%s\n%s\n",
+        "?---------  ? ?           ?            ? ?            broken",
+        "---------- 12 long-author long-group 124 Jan  1 00:00 valid"));
+
+    file_entry_array_destroy(&entries);
+    render_context_destroy(&context);
+    parsed_arguments_destroy(&parsed_arguments);
+}
+
+static void should_align_multiple_failed_entries_with_successful_entries_in_long_format(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("valid"),
+        MOCK_FILE("broken-one"),
+        MOCK_FILE("broken-two"),
+        MOCK_FILE("broken-three"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *args[] = {
+        "-l", "valid", "broken-one", "broken-two", "broken-three", NULL
+    };
+    get_parsed_arguments_result(5, args);
+    const t_date modification_date = {
+        .day = 1, .month = 1, .year = 2100, .hour = 0, .minute = 0,
+        .timestamp = 4102444800
+    };
+    t_file_entry_array *entries = file_entry_array_create();
+    t_file_entry *valid_entry = create_entry(
+        "valid", FILE_TYPE_CHARDEVICE, PERM_NONE, 123,
+        "long-author", "long-group", 124, modification_date);
+    file_entry_set_device(valid_entry, (t_device){ .major = 123, .minor = 789 });
+    file_entry_array_push(entries, valid_entry);
+    file_entry_array_push(entries, create_failed_entry("broken-one", NULL));
+    file_entry_array_push(entries, create_failed_entry("broken-two", NULL));
+    file_entry_array_push(entries, create_failed_entry("broken-three", NULL));
+    t_render_context *context = render_context_create(parsed_arguments);
+
+    render_entries(context, entries);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "%s\n%s\n%s\n%s\n",
+        "c--------- 123 long-author long-group 123, 789 Jan  1 00:00 valid",
+        "?---------   ? ?           ?                 ? ?            broken-one",
+        "?---------   ? ?           ?                 ? ?            broken-two",
+        "?---------   ? ?           ?                 ? ?            broken-three"));
+
+    file_entry_array_destroy(&entries);
+    render_context_destroy(&context);
+    parsed_arguments_destroy(&parsed_arguments);
+}
+
 static void should_render_directory_prefix_and_aligned_long_format_entries(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -923,6 +1040,9 @@ void register_renderer_suite(void)
         CU_add_test(suite, "should_not_render_the_types_separator_if_doesnt_have_at_least_one_non_dir_and_one_dir", should_not_render_the_types_separator_if_doesnt_have_at_least_one_non_dir_and_one_dir);
         CU_add_test(suite, "should_render_one_entry_with_long_format", should_render_one_entry_with_long_format);
         CU_add_test(suite, "should_render_entries_in_long_format_aligned", should_render_entries_in_long_format_aligned);
+        CU_add_test(suite, "should_render_one_failed_entry_in_long_format", should_render_one_failed_entry_in_long_format);
+        CU_add_test(suite, "should_align_one_failed_entry_with_successful_entries_in_long_format", should_align_one_failed_entry_with_successful_entries_in_long_format);
+        CU_add_test(suite, "should_align_multiple_failed_entries_with_successful_entries_in_long_format", should_align_multiple_failed_entries_with_successful_entries_in_long_format);
         CU_add_test(suite, "should_render_directory_prefix_and_aligned_long_format_entries", should_render_directory_prefix_and_aligned_long_format_entries);
         CU_add_test(suite, "should_render_entries_with_setuid_in_long_format", should_render_entries_with_setuid_in_long_format);
         CU_add_test(suite, "should_render_entries_with_setgid_in_long_format", should_render_entries_with_setgid_in_long_format);
