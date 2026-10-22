@@ -139,8 +139,16 @@ static void print_author(const t_file_entry *entry, const t_file_entry_array *en
     const size_t author_width = author == NULL ? 0 : ft_strlen(author);
     const size_t width = file_entry_array_get_biggest_author_width(entries);
 
-    ft_printf("%s ", author == NULL ? "" : author);
-    print_padding(width - author_width);
+    if (author == NULL)
+    {
+        ft_printf("? ");
+        print_padding(width > 1 ? width - 1 : 0);
+    }
+    else
+    {
+        ft_printf("%s ", author);
+        print_padding(width - author_width);
+    }
 }
 
 static void print_group(const t_file_entry *entry, const t_file_entry_array *entries)
@@ -149,8 +157,16 @@ static void print_group(const t_file_entry *entry, const t_file_entry_array *ent
     const size_t group_width = group == NULL ? 0 : ft_strlen(group);
     const size_t width = file_entry_array_get_biggest_group_width(entries);
 
-    ft_printf("%s ", group == NULL ? "" : group);
-    print_padding(width - group_width);
+    if (group == NULL)
+    {
+        ft_printf("? ");
+        print_padding(width > 1 ? width - 1 : 0);
+    }
+    else
+    {
+        ft_printf("%s ", group);
+        print_padding(width - group_width);
+    }
 }
 
 static void print_size(const t_file_entry *entry, const t_file_entry_array *entries)

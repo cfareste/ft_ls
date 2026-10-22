@@ -553,6 +553,47 @@ static void should_render_entries_in_long_format_aligned(void)
     parsed_arguments_destroy(&parsed_arguments);
 }
 
+static void should_render_missing_author_and_group_as_question_marks(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("missing-author"),
+        MOCK_FILE("missing-group"),
+        MOCK_FILE("valid"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *args[] = { "-l", "missing-author", "missing-group", "valid", NULL };
+    get_parsed_arguments_result(4, args);
+    const t_date modification_date = {
+        .day = 1, .month = 1, .year = 2100, .hour = 0, .minute = 0,
+        .timestamp = 4102444800
+    };
+    t_file_entry_array *entries = file_entry_array_create();
+    file_entry_array_push(entries, create_entry(
+        "missing-author", FILE_TYPE_REGULAR, PERM_NONE, 1,
+        NULL, "g", 1, modification_date));
+    file_entry_array_push(entries, create_entry(
+        "missing-group", FILE_TYPE_REGULAR, PERM_NONE, 1,
+        "a", NULL, 1, modification_date));
+    file_entry_array_push(entries, create_entry(
+        "valid", FILE_TYPE_REGULAR, PERM_NONE, 1,
+        "long-author", "long-group", 1, modification_date));
+    t_render_context *context = render_context_create(parsed_arguments);
+
+    render_entries(context, entries);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "%s\n%s\n%s\n",
+        "---------- 1 ?           g          1 Jan  1 00:00 missing-author",
+        "---------- 1 a           ?          1 Jan  1 00:00 missing-group",
+        "---------- 1 long-author long-group 1 Jan  1 00:00 valid"));
+
+    file_entry_array_destroy(&entries);
+    render_context_destroy(&context);
+    parsed_arguments_destroy(&parsed_arguments);
+}
+
 static void should_render_one_failed_entry_in_long_format(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -1040,6 +1081,7 @@ void register_renderer_suite(void)
         CU_add_test(suite, "should_not_render_the_types_separator_if_doesnt_have_at_least_one_non_dir_and_one_dir", should_not_render_the_types_separator_if_doesnt_have_at_least_one_non_dir_and_one_dir);
         CU_add_test(suite, "should_render_one_entry_with_long_format", should_render_one_entry_with_long_format);
         CU_add_test(suite, "should_render_entries_in_long_format_aligned", should_render_entries_in_long_format_aligned);
+        CU_add_test(suite, "should_render_missing_author_and_group_as_question_marks", should_render_missing_author_and_group_as_question_marks);
         CU_add_test(suite, "should_render_one_failed_entry_in_long_format", should_render_one_failed_entry_in_long_format);
         CU_add_test(suite, "should_align_one_failed_entry_with_successful_entries_in_long_format", should_align_one_failed_entry_with_successful_entries_in_long_format);
         CU_add_test(suite, "should_align_multiple_failed_entries_with_successful_entries_in_long_format", should_align_multiple_failed_entries_with_successful_entries_in_long_format);
