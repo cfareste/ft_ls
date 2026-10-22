@@ -1,7 +1,6 @@
 TODO:
 1. Implementar opción -l
 2. Refactor de donde se usan file_stats
-   - Guardar file_stats en parsed args
    - Cambiar scanner
      - Crear scan context
      - Pasar parsed args a scan context y decidir que file_stats coger

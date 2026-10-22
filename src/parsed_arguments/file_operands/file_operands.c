@@ -4,7 +4,6 @@
 
 #define DEFAULT_NUM_OF_OPERANDS 1
 #define DEFAULT_FILE_OPERAND "."
-#define DEFAULT_FILE_OPERAND_TYPE FILE_TYPE_DIRECTORY
 
 static int argument_is_an_option(const char *argument)
 {
@@ -39,40 +38,37 @@ static char **get_file_operands_from_arguments(const int num_of_file_operands, c
     return file_operands;
 }
 
-static t_file_type *get_default_file_operand_type(void)
+static t_file_stats **get_default_file_operand_stats(void)
 {
-    t_file_type *file_operands_types = ft_safe_calloc(DEFAULT_NUM_OF_OPERANDS + 1, sizeof(t_file_type));
-
-    file_operands_types[0] = DEFAULT_FILE_OPERAND_TYPE;
-    file_operands_types[1] = FILE_TYPE_NONE;
-
-    return file_operands_types;
+    return ft_safe_calloc(DEFAULT_NUM_OF_OPERANDS + 1, sizeof(t_file_stats *));
 }
 
-static t_file_type *get_operands_types_from_file_operands(const int num_of_file_operands, char **file_operands)
+static t_file_stats **get_stats_from_file_operands(const int num_of_file_operands, char **file_operands)
 {
-    t_file_type *file_operands_types = ft_safe_calloc(num_of_file_operands + 1, sizeof(t_file_type));
+    t_file_stats **file_operands_stats = ft_safe_calloc(num_of_file_operands + 1, sizeof(t_file_stats *));
 
     for (int i = 0; i < num_of_file_operands; i++)
-    {
-        t_file_stats *file_operand_stats = file_stats_get(file_operands[i]);
+        file_operands_stats[i] = file_stats_get(file_operands[i]);
 
-        file_operands_types[i] = file_stats_get_file_type(file_operand_stats);
-
-        file_stats_destroy(&file_operand_stats);
-    }
-
-    file_operands_types[num_of_file_operands] = FILE_TYPE_NONE;
-    return file_operands_types;
+    return file_operands_stats;
 }
 
-static unsigned int get_num_of_non_directory_file_operands(const t_file_type *file_operand_types)
+static t_file_type get_file_operand_type(t_file_stats **file_operands_stats, const unsigned int index, const int has_implicit_default_operand)
+{
+    if (has_implicit_default_operand && index == 0)
+        return FILE_TYPE_DIRECTORY;
+    return file_stats_get_file_type(file_operands_stats[index]);
+}
+
+static unsigned int get_num_of_non_directory_file_operands(char **file_operands, t_file_stats **file_operands_stats, const int has_implicit_default_operand)
 {
     unsigned int num_of_non_directory_file_operands = 0;
 
-    for (unsigned int i = 0; file_operand_types[i] != FILE_TYPE_NONE; i++)
+    for (unsigned int i = 0; file_operands[i] != NULL; i++)
     {
-        if (file_operand_types[i] == FILE_TYPE_DIRECTORY || file_operand_types[i] == FILE_TYPE_UNKNOWN)
+        const t_file_type file_type = get_file_operand_type(file_operands_stats, i, has_implicit_default_operand);
+
+        if (file_type == FILE_TYPE_DIRECTORY || file_type == FILE_TYPE_UNKNOWN)
             continue ;
 
         num_of_non_directory_file_operands++;
@@ -81,13 +77,13 @@ static unsigned int get_num_of_non_directory_file_operands(const t_file_type *fi
     return num_of_non_directory_file_operands;
 }
 
-static unsigned int get_num_of_directory_file_operands(const t_file_type *file_operand_types)
+static unsigned int get_num_of_directory_file_operands(char **file_operands, t_file_stats **file_operands_stats, const int has_implicit_default_operand)
 {
     unsigned int num_of_directory_file_operands = 0;
 
-    for (unsigned int i = 0; file_operand_types[i] != FILE_TYPE_NONE; i++)
+    for (unsigned int i = 0; file_operands[i] != NULL; i++)
     {
-        if (file_operand_types[i] != FILE_TYPE_DIRECTORY)
+        if (get_file_operand_type(file_operands_stats, i, has_implicit_default_operand) != FILE_TYPE_DIRECTORY)
             continue ;
 
         num_of_directory_file_operands++;
@@ -104,23 +100,25 @@ char **file_operands_get(const int num_of_file_operands, const char **arguments)
     return get_file_operands_from_arguments(num_of_file_operands, arguments);
 }
 
-t_file_type *file_operands_get_types(const int num_of_file_operands, char **file_operands)
+t_file_stats **file_operands_get_stats(const int num_of_file_operands, char **file_operands)
 {
     if (num_of_file_operands == 0)
-        return get_default_file_operand_type();
+        return get_default_file_operand_stats();
 
-    return get_operands_types_from_file_operands(num_of_file_operands, file_operands);
+    return get_stats_from_file_operands(num_of_file_operands, file_operands);
 }
 
-char **file_operands_get_non_directory(char **file_operands, const t_file_type *file_operands_types)
+char **file_operands_get_non_directory(char **file_operands, t_file_stats **file_operands_stats, const int has_implicit_default_operand)
 {
-    const unsigned int num_of_non_directory_file_operands = get_num_of_non_directory_file_operands(file_operands_types);
+    const unsigned int num_of_non_directory_file_operands = get_num_of_non_directory_file_operands(file_operands, file_operands_stats, has_implicit_default_operand);
     char **non_directory_file_operands = ft_safe_calloc(num_of_non_directory_file_operands + 1, sizeof(char *));
 
     int num_of_non_directory_operands = 0;
     for (int i = 0; file_operands[i] != NULL; i++)
     {
-        if (file_operands_types[i] == FILE_TYPE_DIRECTORY || file_operands_types[i] == FILE_TYPE_UNKNOWN)
+        const t_file_type file_type = get_file_operand_type(file_operands_stats, i, has_implicit_default_operand);
+
+        if (file_type == FILE_TYPE_DIRECTORY || file_type == FILE_TYPE_UNKNOWN)
             continue ;
 
         non_directory_file_operands[num_of_non_directory_operands] = ft_safe_strdup(file_operands[i]);
@@ -130,15 +128,15 @@ char **file_operands_get_non_directory(char **file_operands, const t_file_type *
     return non_directory_file_operands;
 }
 
-char **file_operands_get_directory(char **file_operands, const t_file_type *file_operand_types)
+char **file_operands_get_directory(char **file_operands, t_file_stats **file_operands_stats, const int has_implicit_default_operand)
 {
-    const unsigned int num_of_directory_file_operands = get_num_of_directory_file_operands(file_operand_types);
+    const unsigned int num_of_directory_file_operands = get_num_of_directory_file_operands(file_operands, file_operands_stats, has_implicit_default_operand);
     char **directory_file_operands = ft_safe_calloc(num_of_directory_file_operands + 1, sizeof(char *));
 
     int num_of_directory_operands = 0;
     for (int i = 0; file_operands[i] != NULL; i++)
     {
-        if (file_operand_types[i] != FILE_TYPE_DIRECTORY)
+        if (get_file_operand_type(file_operands_stats, (unsigned int)i, has_implicit_default_operand) != FILE_TYPE_DIRECTORY)
             continue ;
 
         directory_file_operands[num_of_directory_operands] = ft_safe_strdup(file_operands[i]);
