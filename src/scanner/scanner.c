@@ -21,7 +21,6 @@ static void push_entry(t_scan_context *context, const t_dir_entry *dir_entry, t_
 
     const char *entry_name = directory_get_entry_name(dir_entry);
     char *full_path = build_path(context->directory_path, entry_name);
-    t_file_entry *entry = file_entry_create(entry_name);
     t_file_stats *entry_stats = file_stats_get_without_following_symlinks(full_path);
 
     if (entry_stats == NULL)
@@ -30,7 +29,7 @@ static void push_entry(t_scan_context *context, const t_dir_entry *dir_entry, t_
         context->failed_file = ft_safe_strdup(full_path);
     }
 
-    file_entry_set_file_type(entry, file_stats_get_file_type(entry_stats));
+    t_file_entry *entry = file_entry_create_from_stats(entry_name, entry_stats);
 
     free(full_path);
     file_stats_destroy(&entry_stats);

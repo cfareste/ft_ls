@@ -13,10 +13,10 @@ typedef struct s_application_context
 
 static void process_directory(t_application_context *context, const char *directory_path);
 
-static t_file_entry_array *create_non_directory_entry_array(const char *non_directory_file_operand)
+static t_file_entry_array *create_non_directory_entry_array(const char *non_directory_file_operand, t_file_stats *file_stats)
 {
     t_file_entry_array *file_entry_array = file_entry_array_create();
-    t_file_entry *file_entry = file_entry_create(non_directory_file_operand);
+    t_file_entry *file_entry = file_entry_create_from_stats(non_directory_file_operand, file_stats);
     file_entry_array_push(file_entry_array, file_entry);
 
     return file_entry_array;
@@ -25,10 +25,11 @@ static t_file_entry_array *create_non_directory_entry_array(const char *non_dire
 static void process_non_directory_file_operands(const t_parsed_arguments *parsed_arguments, const t_render_context *render_context)
 {
     const char * const *non_directory_file_operands = parsed_arguments_get_non_directory_file_operands(parsed_arguments);
+    t_file_stats * const *non_directory_file_operands_stats = parsed_arguments_get_non_directory_file_operands_stats(parsed_arguments);
 
     for (unsigned int i = 0; non_directory_file_operands[i] != NULL; i++)
     {
-        t_file_entry_array *file_entry_array = create_non_directory_entry_array(non_directory_file_operands[i]);
+        t_file_entry_array *file_entry_array = create_non_directory_entry_array(non_directory_file_operands[i], non_directory_file_operands_stats[i]);
 
         render_entries(render_context, file_entry_array);
 

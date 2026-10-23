@@ -1133,6 +1133,56 @@ static void should_successfully_print_the_contents_of_the_specified_operands_rec
     CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
 }
 
+static void should_render_file_stats_for_non_directory_and_directory_entries_in_long_format(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE_WITH_STATS("file",
+            MOCK_BLOCKS(2),
+            MOCK_HARDLINK_COUNT(3),
+            MOCK_AUTHOR("alice"),
+            MOCK_GROUP("staff"),
+            MOCK_SIZE(42),
+            MOCK_MODIFICATION_TIME(2, 10, 2000, 12, 30, 0)
+        ),
+        MOCK_DIR_WITH_STATS("dir", ((const char *[]){ "device", "link", NULL }),
+            MOCK_BLOCKS(1)
+        ),
+        MOCK_CHAR_DEVICE_WITH_STATS("dir/device",
+            MOCK_BLOCKS(4),
+            MOCK_HARDLINK_COUNT(5),
+            MOCK_AUTHOR("bob"),
+            MOCK_GROUP("wheel"),
+            MOCK_DEVICE(12, 34),
+            MOCK_MODIFICATION_TIME(2, 10, 2000, 12, 30, 0)
+        ),
+        MOCK_SYMLINK_WITH_STATS("dir/link", "file",
+            MOCK_BLOCKS(2),
+            MOCK_HARDLINK_COUNT(1),
+            MOCK_AUTHOR("alice"),
+            MOCK_GROUP("staff"),
+            MOCK_SIZE(4),
+            MOCK_MODIFICATION_TIME(2, 10, 2000, 12, 30, 0)
+        ),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-l", "file", "dir", NULL };
+    get_parsed_arguments_result(3, arguments);
+
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "%s\n\n%s:\n%s\n%s\n%s\n",
+        "-rw-r--r-- 3 alice staff 42 Oct  2  2000 file",
+        "dir",
+        "total 6",
+        "crw-rw---- 5 bob   wheel 12, 34 Oct  2  2000 device",
+        "lrwxrwxrwx 1 alice staff      4 Oct  2  2000 link"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    assert_application_execution_succeed(result);
+}
+
 static void should_fail_with_a_major_error_and_not_print_anything_if_fails_to_open_the_directory(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -2697,6 +2747,7 @@ void register_application_suite(void)
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_specified_non_directory_even_with_recursive_option", should_successfully_print_the_contents_of_the_specified_non_directory_even_with_recursive_option);
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_specified_directory_recursively", should_successfully_print_the_contents_of_the_specified_directory_recursively);
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_specified_operands_recursively", should_successfully_print_the_contents_of_the_specified_operands_recursively);
+        CU_add_test(suite, "should_render_file_stats_for_non_directory_and_directory_entries_in_long_format", should_render_file_stats_for_non_directory_and_directory_entries_in_long_format);
         CU_add_test(suite, "should_fail_with_a_major_error_and_not_print_anything_if_fails_to_open_the_directory", should_fail_with_a_major_error_and_not_print_anything_if_fails_to_open_the_directory);
         CU_add_test(suite, "should_fail_with_a_major_error_and_not_print_anything_if_fails_to_open_the_current_directory_without_arguments", should_fail_with_a_major_error_and_not_print_anything_if_fails_to_open_the_current_directory_without_arguments);
         CU_add_test(suite, "should_fail_with_a_major_error_and_not_print_anything_if_fails_to_read_the_first_entry_of_the_directory", should_fail_with_a_major_error_and_not_print_anything_if_fails_to_read_the_first_entry_of_the_directory);

@@ -80,6 +80,26 @@ t_file_entry *file_entry_create(const char *file_name)
     return file_entry;
 }
 
+t_file_entry *file_entry_create_from_stats(const char *file_name, t_file_stats *file_stats)
+{
+    t_file_entry *file_entry = file_entry_create(file_name);
+
+    if (file_entry == NULL || file_stats == NULL)
+        return file_entry;
+
+    file_entry_set_blocks(file_entry, file_stats_get_blocks(file_stats));
+    file_entry_set_permissions(file_entry, file_stats_get_permissions(file_stats));
+    file_entry_set_file_type(file_entry, file_stats_get_file_type(file_stats));
+    file_entry_set_link_count(file_entry, file_stats_get_link_count(file_stats));
+    file_entry_set_author(file_entry, file_stats_get_author(file_stats));
+    file_entry_set_group(file_entry, file_stats_get_group(file_stats));
+    file_entry_set_size(file_entry, file_stats_get_size(file_stats));
+    file_entry_set_device(file_entry, file_stats_get_device(file_stats));
+    file_entry_set_modification_date(file_entry, file_stats_get_modification_date(file_stats));
+
+    return file_entry;
+}
+
 t_file_entry_array *file_entry_array_create(void)
 {
     t_file_entry_array *file_entry_array = ft_safe_calloc(1, sizeof(t_file_entry_array));

@@ -2,6 +2,8 @@
 #include "CUnit/CUnit.h"
 #include "CUnit/Basic.h"
 #include "file_entry.h"
+#include "file_stats.h"
+#include "mocks.h"
 
 #define SUITE_NAME "file_entry"
 #define DEFAULT_NAME "default"
@@ -12,6 +14,8 @@ static t_file_entry_array *array_sut;
 
 static void test_setup(void)
 {
+    reset_printing_buffer();
+    vfs_mock_reset();
     entry_sut = file_entry_create(DEFAULT_NAME);
     array_sut = file_entry_array_create();
 }
@@ -32,6 +36,71 @@ static void should_create_file_entry_correctly(void)
     CU_ASSERT_PTR_NOT_NULL(entry_sut);
     CU_ASSERT_STRING_EQUAL(file_entry_get_name(entry_sut), DEFAULT_NAME);
     CU_ASSERT_EQUAL(file_entry_get_file_type(entry_sut), DEFAULT_TYPE);
+}
+
+static void should_create_a_file_entry_from_stats(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_CHAR_DEVICE_WITH_STATS("device",
+            MOCK_BLOCKS(17),
+            MOCK_HARDLINK_COUNT(3),
+            MOCK_AUTHOR("alice"),
+            MOCK_GROUP("developers"),
+            MOCK_SIZE(12345),
+            MOCK_DEVICE(12, 34),
+            MOCK_MODIFICATION_TIME(12, 10, 2024, 14, 10, 42)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+    t_file_stats *stats = file_stats_get("device");
+
+    t_file_entry *entry = file_entry_create_from_stats("entry", stats);
+    const t_date modification_date = file_entry_get_modification_date(entry);
+    const t_device device = file_entry_get_device(entry);
+
+    CU_ASSERT_PTR_NOT_NULL(entry);
+    CU_ASSERT_STRING_EQUAL(file_entry_get_name(entry), "entry");
+    CU_ASSERT_EQUAL(file_entry_get_blocks(entry), 17);
+    CU_ASSERT_EQUAL(file_entry_get_permissions(entry),
+        PERM_OWNER_READ | PERM_OWNER_WRITE | PERM_GROUP_READ | PERM_GROUP_WRITE);
+    CU_ASSERT_EQUAL(file_entry_get_file_type(entry), FILE_TYPE_CHARDEVICE);
+    CU_ASSERT_EQUAL(file_entry_get_link_count(entry), 3);
+    CU_ASSERT_STRING_EQUAL(file_entry_get_author(entry), "alice");
+    CU_ASSERT_STRING_EQUAL(file_entry_get_group(entry), "developers");
+    CU_ASSERT_EQUAL(file_entry_get_size(entry), 12345);
+    CU_ASSERT_EQUAL(device.major, 12);
+    CU_ASSERT_EQUAL(device.minor, 34);
+    CU_ASSERT_EQUAL(modification_date.day, 12);
+    CU_ASSERT_EQUAL(modification_date.month, 10);
+    CU_ASSERT_EQUAL(modification_date.year, 2024);
+    CU_ASSERT_EQUAL(modification_date.hour, 14);
+    CU_ASSERT_EQUAL(modification_date.minute, 10);
+    CU_ASSERT_EQUAL(modification_date.second, 42);
+    CU_ASSERT_PTR_NULL(file_entry_get_link_target(entry));
+    CU_ASSERT(verify_that_no_error_was_printed());
+
+    file_entry_destroy(&entry);
+    file_stats_destroy(&stats);
+}
+
+static void should_not_retrieve_the_link_target_when_creating_a_file_entry_from_symlink_stats(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_READ_SYM_LINK_ERROR(EINVAL, "link", "target"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+    t_file_stats *stats = file_stats_get_without_following_symlinks("link");
+
+    t_file_entry *entry = file_entry_create_from_stats("link", stats);
+
+    CU_ASSERT_PTR_NOT_NULL(entry);
+    CU_ASSERT_EQUAL(file_entry_get_file_type(entry), FILE_TYPE_SYMLINK);
+    CU_ASSERT_PTR_NULL(file_entry_get_link_target(entry));
+    CU_ASSERT(verify_that_no_error_was_printed());
+
+    file_entry_destroy(&entry);
+    file_stats_destroy(&stats);
 }
 
 static void should_create_file_entry_array_correctly(void)
@@ -703,6 +772,8 @@ void register_file_entry_suite(void)
     if (suite != NULL)
     {
         CU_add_test(suite, "should_create_file_entry_correctly", should_create_file_entry_correctly);
+        CU_add_test(suite, "should_create_a_file_entry_from_stats", should_create_a_file_entry_from_stats);
+        CU_add_test(suite, "should_not_retrieve_the_link_target_when_creating_a_file_entry_from_symlink_stats", should_not_retrieve_the_link_target_when_creating_a_file_entry_from_symlink_stats);
         CU_add_test(suite, "should_create_file_entry_array_correctly", should_create_file_entry_array_correctly);
         CU_add_test(suite, "should_fail_to_create_an_entry_if_a_NULL_file_name_is_passed", should_fail_to_create_an_entry_if_a_NULL_file_name_is_passed);
         CU_add_test(suite, "should_fail_to_create_an_entry_if_an_empty_file_name_is_passed", should_fail_to_create_an_entry_if_an_empty_file_name_is_passed);
