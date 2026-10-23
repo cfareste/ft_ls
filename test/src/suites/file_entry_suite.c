@@ -65,8 +65,8 @@ static void should_create_a_file_entry_from_stats(void)
         PERM_OWNER_READ | PERM_OWNER_WRITE | PERM_GROUP_READ | PERM_GROUP_WRITE);
     CU_ASSERT_EQUAL(file_entry_get_file_type(entry), FILE_TYPE_CHARDEVICE);
     CU_ASSERT_EQUAL(file_entry_get_link_count(entry), 3);
-    CU_ASSERT_STRING_EQUAL(file_entry_get_author(entry), "alice");
-    CU_ASSERT_STRING_EQUAL(file_entry_get_group(entry), "developers");
+    CU_ASSERT_PTR_NULL(file_entry_get_author(entry));
+    CU_ASSERT_PTR_NULL(file_entry_get_group(entry));
     CU_ASSERT_EQUAL(file_entry_get_size(entry), 12345);
     CU_ASSERT_EQUAL(device.major, 12);
     CU_ASSERT_EQUAL(device.minor, 34);

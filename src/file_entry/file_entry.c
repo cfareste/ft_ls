@@ -91,8 +91,6 @@ t_file_entry *file_entry_create_from_stats(const char *file_name, t_file_stats *
     file_entry_set_permissions(file_entry, file_stats_get_permissions(file_stats));
     file_entry_set_file_type(file_entry, file_stats_get_file_type(file_stats));
     file_entry_set_link_count(file_entry, file_stats_get_link_count(file_stats));
-    file_entry_set_author(file_entry, file_stats_get_author(file_stats));
-    file_entry_set_group(file_entry, file_stats_get_group(file_stats));
     file_entry_set_size(file_entry, file_stats_get_size(file_stats));
     file_entry_set_device(file_entry, file_stats_get_device(file_stats));
     file_entry_set_modification_date(file_entry, file_stats_get_modification_date(file_stats));

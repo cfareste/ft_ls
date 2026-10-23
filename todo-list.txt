@@ -5,6 +5,7 @@ TODO:
      - Crear scan context
      - Pasar parsed args a scan context y decidir que file_stats coger
    - Decidir que stats coger basándose en parsed args
+   - Eliminar los setters inutiles
 3. Errores (major y minor) por cada función del sistema
 4. Mockear ctime
 
