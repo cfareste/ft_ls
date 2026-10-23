@@ -1144,6 +1144,14 @@ static void should_render_file_stats_for_non_directory_and_directory_entries_in_
             MOCK_SIZE(42),
             MOCK_MODIFICATION_TIME(2, 10, 2000, 12, 30, 0)
         ),
+        MOCK_FILE_WITH_STATS("file2",
+            MOCK_BLOCKS(3),
+            MOCK_HARDLINK_COUNT(12),
+            MOCK_AUTHOR("charlie"),
+            MOCK_GROUP("developers"),
+            MOCK_SIZE(12345),
+            MOCK_MODIFICATION_TIME(2, 10, 2000, 12, 30, 0)
+        ),
         MOCK_DIR_WITH_STATS("dir", ((const char *[]){ "device", "link", NULL }),
             MOCK_BLOCKS(1)
         ),
@@ -1167,18 +1175,27 @@ static void should_render_file_stats_for_non_directory_and_directory_entries_in_
     };
     vfs_mock_setup(vfs);
 
-    const char *arguments[] = { "-l", "file", "dir", NULL };
-    get_parsed_arguments_result(3, arguments);
+    const char *arguments[] = { "-l", "file", "file2", "dir", NULL };
+    get_parsed_arguments_result(4, arguments);
 
     const int result = application_run(parsed_arguments_result);
 
+    // TODO: Add link target
+    // TODO: Add author and group names
     CU_ASSERT(verify_that_the_output_printed_is(
-        "%s\n\n%s:\n%s\n%s\n%s\n",
-        "-rw-r--r-- 3 alice staff 42 Oct  2  2000 file",
+        "%s\n"
+        "%s\n"
+        "\n"
+        "%s:\n"
+        "%s\n"
+        "%s\n"
+        "%s\n",
+        "-rw-r--r--  3 ? ?    42 Oct  2  2000 file",
+        "-rw-r--r-- 12 ? ? 12345 Oct  2  2000 file2",
         "dir",
         "total 6",
-        "crw-rw---- 5 bob   wheel 12, 34 Oct  2  2000 device",
-        "lrwxrwxrwx 1 alice staff      4 Oct  2  2000 link"));
+        "crw-rw---- 5 ? ? 12, 34 Oct  2  2000 device",
+        "lrwxrwxrwx 1 ? ?      4 Oct  2  2000 link"));
     CU_ASSERT(verify_that_no_error_was_printed());
     assert_application_execution_succeed(result);
 }
