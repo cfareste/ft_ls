@@ -12,9 +12,32 @@ typedef struct s_scan_context
     char *failed_file;
     int read_failed;
     int close_failed;
-} t_scan_context;
+    int retrieve_advanced_metadata;
+} t_current_scan_context;
 
-static void push_entry(t_scan_context *context, const t_dir_entry *dir_entry, t_file_entry_array *file_entry_array)
+struct s_scanner_context
+{
+    int retrieve_advanced_metadata;
+};
+
+t_scanner_context *scanner_context_create(const t_parsed_arguments *parsed_arguments)
+{
+    t_scanner_context *context = ft_safe_calloc(1, sizeof(t_scanner_context));
+    context->retrieve_advanced_metadata = parsed_arguments_is_long_format_active(parsed_arguments);
+
+    return context;
+}
+
+void scanner_context_destroy(t_scanner_context **context)
+{
+    if (context == NULL || *context == NULL)
+        return;
+
+    free(*context);
+    *context = NULL;
+}
+
+static void push_entry(t_current_scan_context *context, const t_dir_entry *dir_entry, t_file_entry_array *file_entry_array)
 {
     if (directory_is_entry_hidden_file(dir_entry))
         return ;
@@ -30,13 +53,15 @@ static void push_entry(t_scan_context *context, const t_dir_entry *dir_entry, t_
     }
 
     t_file_entry *entry = file_entry_create_from_stats(entry_name, entry_stats);
+    if (context->retrieve_advanced_metadata)
+        file_entry_set_advanced_metadata_from_stats(entry, entry_stats);
 
     free(full_path);
     file_stats_destroy(&entry_stats);
     file_entry_array_push(file_entry_array, entry);
 }
 
-static int scan_directory_entries(t_scan_context *context, t_file_entry_array *file_entry_array)
+static int scan_directory_entries(t_current_scan_context *context, t_file_entry_array *file_entry_array)
 {
     t_dir_entry *dir_entry = directory_get_next_entry(context->dir_stream);
 
@@ -53,7 +78,7 @@ static int scan_directory_entries(t_scan_context *context, t_file_entry_array *f
     return read_failed;
 }
 
-static t_result *create_scan_result(const t_scan_context *context, t_file_entry_array *file_entry_array)
+static t_result *create_scan_result(const t_current_scan_context *context, t_file_entry_array *file_entry_array)
 {
     if (context->read_failed || context->close_failed)
         return result_create_failed(file_entry_array, context->directory_path);
@@ -63,12 +88,16 @@ static t_result *create_scan_result(const t_scan_context *context, t_file_entry_
     return result_create_successful(file_entry_array);
 }
 
-t_result *scan(const char *path)
+t_result *scan(const t_scanner_context *scanner_context, const char *path)
 {
-    if (!ft_is_valid_path(path))
+    if (scanner_context == NULL || !ft_is_valid_path(path))
         return result_create_failed(NULL, NULL);
 
-    t_scan_context context = { .directory_path = path, .dir_stream = directory_open(path) };
+    t_current_scan_context context = {
+        .directory_path = path,
+        .dir_stream = directory_open(path),
+        .retrieve_advanced_metadata = scanner_context->retrieve_advanced_metadata
+    };
     if (context.dir_stream == NULL)
         return result_create_failed(NULL, path);
 

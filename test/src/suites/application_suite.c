@@ -1180,8 +1180,6 @@ static void should_render_file_stats_for_non_directory_and_directory_entries_in_
 
     const int result = application_run(parsed_arguments_result);
 
-    // TODO: Add link target
-    // TODO: Add author and group names
     CU_ASSERT(verify_that_the_output_printed_is(
         "%s\n"
         "%s\n"
@@ -1190,12 +1188,12 @@ static void should_render_file_stats_for_non_directory_and_directory_entries_in_
         "%s\n"
         "%s\n"
         "%s\n",
-        "-rw-r--r--  3 ? ?    42 Oct  2  2000 file",
-        "-rw-r--r-- 12 ? ? 12345 Oct  2  2000 file2",
+        "-rw-r--r--  3 alice   staff         42 Oct  2  2000 file",
+        "-rw-r--r-- 12 charlie developers 12345 Oct  2  2000 file2",
         "dir",
         "total 6",
-        "crw-rw---- 5 ? ? 12, 34 Oct  2  2000 device",
-        "lrwxrwxrwx 1 ? ?      4 Oct  2  2000 link"));
+        "crw-rw---- 5 bob   wheel 12, 34 Oct  2  2000 device",
+        "lrwxrwxrwx 1 alice staff      4 Oct  2  2000 link -> file"));
     CU_ASSERT(verify_that_no_error_was_printed());
     assert_application_execution_succeed(result);
 }

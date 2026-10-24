@@ -30,6 +30,7 @@ struct s_file_stats
     t_device device;
     t_date modification_date;
     char *target;
+    int target_retrieval_attempted;
 };
 
 static int should_retrieve_file_stats_without_following_symlinks(const int retrieve_error, const struct stat *stats)
@@ -292,8 +293,11 @@ const char *file_stats_get_target_pointed_by_link(t_file_stats *stats)
     if (stats == NULL || stats->type != FILE_TYPE_SYMLINK)
         return NULL;
 
-    if (stats->target == NULL)
+    if (!stats->target_retrieval_attempted)
+    {
+        stats->target_retrieval_attempted = 1;
         retrieve_target_pointed_by_link(stats);
+    }
 
     return stats->target;
 }

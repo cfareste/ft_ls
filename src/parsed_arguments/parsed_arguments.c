@@ -67,6 +67,16 @@ static t_result *create_parsing_arguments_result(t_parsed_arguments *parsed_argu
     return result_create_successful(parsed_arguments);
 }
 
+static void retrieve_advanced_file_stats(t_file_stats **file_operands_stats)
+{
+    for (unsigned int i = 0; file_operands_stats[i] != NULL; i++)
+    {
+        file_stats_get_author(file_operands_stats[i]);
+        file_stats_get_group(file_operands_stats[i]);
+        file_stats_get_target_pointed_by_link(file_operands_stats[i]);
+    }
+}
+
 t_result *parse_arguments(const int num_of_arguments, const char **arguments)
 {
     if (num_of_arguments < 0 || arguments == NULL)
@@ -79,6 +89,8 @@ t_result *parse_arguments(const int num_of_arguments, const char **arguments)
     parsed_arguments->has_implicit_default_operand = num_of_file_operands == 0;
     parsed_arguments->file_operands = file_operands_get(num_of_file_operands, arguments);
     parsed_arguments->file_operands_stats = file_operands_get_stats(num_of_file_operands, parsed_arguments->file_operands);
+    if (parsed_arguments_is_long_format_active(parsed_arguments))
+        retrieve_advanced_file_stats(parsed_arguments->file_operands_stats);
     parsed_arguments->non_directory_file_operands = file_operands_get_non_directory(parsed_arguments->file_operands, parsed_arguments->file_operands_stats, parsed_arguments->has_implicit_default_operand);
     parsed_arguments->directory_file_operands = file_operands_get_directory(parsed_arguments->file_operands, parsed_arguments->file_operands_stats, parsed_arguments->has_implicit_default_operand);
     sort_pointer_array((void **) parsed_arguments->non_directory_file_operands, compare_by_name);
@@ -126,6 +138,11 @@ int parsed_arguments_is_option_active(const t_parsed_arguments *parsed_arguments
         return 0;
 
     return (parsed_arguments->options & option) != OPTIONS_NONE;
+}
+
+int parsed_arguments_is_long_format_active(const t_parsed_arguments *parsed_arguments)
+{
+    return parsed_arguments_is_option_active(parsed_arguments, OPTIONS_LONG_FORMAT);
 }
 
 int parsed_arguments_is_file_operand(const t_parsed_arguments *parsed_arguments, const char *file)

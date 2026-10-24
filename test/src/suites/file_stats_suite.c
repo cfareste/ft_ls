@@ -735,8 +735,10 @@ static void should_return_NULL_when_an_error_reading_symbolic_links_occurs(void)
     t_file_stats *stats = file_stats_get_without_following_symlinks("failingLink");
 
     const char *target = file_stats_get_target_pointed_by_link(stats);
+    const char *retried_target = file_stats_get_target_pointed_by_link(stats);
 
     CU_ASSERT_PTR_NULL(target);
+    CU_ASSERT_PTR_NULL(retried_target);
     CU_ASSERT(verify_that_the_error_printed_is(
         "ft_ls: cannot read symbolic link '%s': %s\n",
         "failingLink", strerror(EACCES)

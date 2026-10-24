@@ -98,6 +98,16 @@ t_file_entry *file_entry_create_from_stats(const char *file_name, t_file_stats *
     return file_entry;
 }
 
+void file_entry_set_advanced_metadata_from_stats(t_file_entry *entry, t_file_stats *file_stats)
+{
+    if (entry == NULL || file_stats == NULL)
+        return;
+
+    file_entry_set_author(entry, file_stats_get_author(file_stats));
+    file_entry_set_group(entry, file_stats_get_group(file_stats));
+    file_entry_set_link_target(entry, file_stats_get_target_pointed_by_link(file_stats));
+}
+
 t_file_entry_array *file_entry_array_create(void)
 {
     t_file_entry_array *file_entry_array = ft_safe_calloc(1, sizeof(t_file_entry_array));
