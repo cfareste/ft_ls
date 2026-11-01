@@ -7,7 +7,7 @@ on:
 jobs:
   test:
     name: make test
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout repository
@@ -18,7 +18,7 @@ jobs:
 
   test_coverage:
     name: make test_cover
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout repository
@@ -29,7 +29,7 @@ jobs:
 
   test_e2e:
     name: make test_e2e
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout repository
