@@ -71,4 +71,3 @@ src -l Makefile file                                                            
 -l nonExistent                                                                          ::       -l nonExistent
 -l nonExistent noTarget                                                                 ::       -l nonExistent noTarget
 -l nonExistent Makefile src                                                             ::       -l nonExistent Makefile src
--l /                                                                                    ::       -l /
