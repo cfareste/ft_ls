@@ -272,7 +272,9 @@ static void print_entry(const t_file_entry *entry, const t_file_entry_array *ent
 
 void directory_entries_prefix_long_format_strategy(const t_file_entry_array *file_entry_array)
 {
-    ft_printf("total %lu\n", file_entry_array_get_total_blocks(file_entry_array));
+    const unsigned long total_blocks = (file_entry_array_get_total_blocks(file_entry_array) + 1) / 2;
+
+    ft_printf("total %lu\n", total_blocks);
 }
 
 void long_format_strategy(const t_file_entry_array *file_entry_array)

@@ -1149,7 +1149,7 @@ static void should_render_the_default_directory_in_long_format(void)
     const int result = application_run(parsed_arguments_result);
 
     CU_ASSERT(verify_that_the_output_printed_is(
-        "total 10\n"
+        "total 5\n"
         "-rw-r--r--  3 alice   staff         42 Oct  2  2000 file\n"
         "-rw-r--r-- 12 charlie developers 12345 Nov 12  2001 large\n"
         "lrwxrwxrwx  1 bob     wheel          4 Jan  1  2002 link -> file\n"));
@@ -1192,7 +1192,7 @@ static void should_render_a_directory_operand_in_long_format(void)
     const int result = application_run(parsed_arguments_result);
 
     CU_ASSERT(verify_that_the_output_printed_is(
-        "total 10\n"
+        "total 5\n"
         "-rw-r--r--  3 alice   staff         42 Oct  2  2000 file\n"
         "-rw-r--r-- 12 charlie developers 12345 Nov 12  2001 large\n"
         "lrwxrwxrwx  1 bob     wheel          4 Jan  1  2002 link -> file\n"));
@@ -1221,7 +1221,7 @@ static void should_render_mixed_operands_in_long_format(void)
         "-rw-r--r-- 12 charlie developers 12345 Nov 12  2001 file2\n"
         "\n"
         "dir:\n"
-        "total 4\n"
+        "total 2\n"
         "-rw-r--r-- 5 bob   wheel 999 Jan  1  2002 inside\n"
         "lrwxrwxrwx 1 alice staff   4 Oct  2  2000 link -> inside\n"));
     CU_ASSERT(verify_that_no_error_was_printed());
@@ -1286,7 +1286,7 @@ static void should_render_file_stats_for_non_directory_and_directory_entries_in_
         "-rw-r--r--  3 alice   staff         42 Oct  2  2000 file",
         "-rw-r--r-- 12 charlie developers 12345 Oct  2  2000 file2",
         "dir",
-        "total 6",
+        "total 3",
         "crw-rw---- 5 bob   wheel 12, 34 Oct  2  2000 device",
         "lrwxrwxrwx 1 alice staff      4 Oct  2  2000 link -> file"));
     CU_ASSERT(verify_that_no_error_was_printed());
@@ -1335,7 +1335,7 @@ static void should_report_a_minor_error_when_lstat_fails_for_directory_content(v
     const int result = application_run(parsed_arguments_result);
 
     CU_ASSERT(verify_that_the_output_printed_is(
-        "total 7\n"
+        "total 4\n"
         "?---------  ? ?       ?              ? ?            failed\n"
         "-rw-r--r-- 12 charlie developers 12345 Nov 12  2001 good\n"
         "lrwxrwxrwx  3 alice   staff          4 Oct  2  2000 link -> good\n"));
@@ -1358,7 +1358,7 @@ static void should_report_a_minor_error_when_readlink_fails_for_directory_conten
     const int result = application_run(parsed_arguments_result);
 
     CU_ASSERT(verify_that_the_output_printed_is(
-        "total 5\n"
+        "total 3\n"
         "-rw-r--r-- 12 charlie developers 12345 Nov 12  2001 good\n"
         "lrwxrwxrwx  1 root    root        1024 Jan  1  1970 link\n"));
     CU_ASSERT(verify_that_the_error_printed_is(
@@ -1436,7 +1436,7 @@ static void should_report_multiple_minor_errors_for_lstat_failures_in_one_direct
     const int result = application_run(parsed_arguments_result);
 
     CU_ASSERT(verify_that_the_output_printed_is(
-        "total 5\n"
+        "total 3\n"
         "?---------  ? ?       ?              ? ?            failed1\n"
         "?---------  ? ?       ?              ? ?            failed2\n"
         "-rw-r--r-- 12 charlie developers 12345 Nov 12  2001 good\n"));
@@ -1468,7 +1468,7 @@ static void should_report_multiple_minor_errors_for_lstat_and_readlink_failures(
     const int result = application_run(parsed_arguments_result);
 
     CU_ASSERT(verify_that_the_output_printed_is(
-        "total 5\n"
+        "total 3\n"
         "?---------  ? ?       ?              ? ?            failed\n"
         "-rw-r--r-- 12 charlie developers 12345 Nov 12  2001 good\n"
         "lrwxrwxrwx  1 root    root        1024 Jan  1  1970 link\n"));
@@ -1557,7 +1557,7 @@ static void should_report_major_and_minor_errors_for_operands_and_directory_cont
         "-rw-r--r-- 12 charlie developers 12345 Nov 12  2001 good\n"
         "\n"
         "dir:\n"
-        "total 2\n"
+        "total 1\n"
         "?--------- ? ?     ?     ? ?            failed\n"
         "lrwxrwxrwx 3 alice staff 4 Oct  2  2000 inside -> good\n"));
     CU_ASSERT(verify_that_the_error_printed_is(

@@ -796,7 +796,7 @@ static void should_render_directory_prefix_and_aligned_long_format_entries(void)
 
     CU_ASSERT(verify_that_the_output_printed_is(
         "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n",
-        "total 28",
+        "total 14",
         "-rw-r--r--  1 a             g                10 Jan  1 00:00 regular",
         "drwxr-xr-x 12 long-author   long-group      124 Feb 12 09:05 directory",
         "cr-s------  3 alice         ops          123, 4 Mar  9 23:59 char-device",
