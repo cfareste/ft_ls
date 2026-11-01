@@ -84,6 +84,25 @@ static void assert_file_entry_array_types_are(const t_file_type *file_types)
     CU_ASSERT_PTR_EQUAL(file_types[i], FILE_TYPE_NONE);
 }
 
+static void should_create_scanner_context(void)
+{
+    t_scanner_context *context = scanner_context_create(NULL);
+
+    CU_ASSERT_PTR_NOT_NULL(context);
+
+    scanner_context_destroy(&context);
+}
+
+static void should_destroy_scanner_context(void)
+{
+    t_scanner_context *context = scanner_context_create(NULL);
+
+    scanner_context_destroy(&context);
+    scanner_context_destroy(NULL);
+
+    CU_ASSERT_PTR_NULL(context);
+}
+
 static void should_return_NULL_if_a_NULL_path_is_specified(void)
 {
     scan_directory(NULL);
@@ -422,6 +441,8 @@ void register_scanner_suite(void)
 
     if (suite != NULL)
     {
+        CU_add_test(suite, "should_create_scanner_context", should_create_scanner_context);
+        CU_add_test(suite, "should_destroy_scanner_context", should_destroy_scanner_context);
         CU_add_test(suite, "should_return_NULL_if_a_NULL_path_is_specified", should_return_NULL_if_a_NULL_path_is_specified);
         CU_add_test(suite, "should_return_NULL_if_an_empty_path_is_specified", should_return_NULL_if_an_empty_path_is_specified);
         CU_add_test(suite, "should_return_one_entry_if_the_current_directory_has_one_file", should_return_one_entry_if_the_current_directory_has_one_file);

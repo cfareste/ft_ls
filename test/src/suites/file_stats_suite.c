@@ -517,6 +517,11 @@ static void should_return_NULL_for_the_target_pointed_by_a_symlink_if_NULL_stats
     CU_ASSERT_PTR_NULL(file_stats_get_target_pointed_by_link(NULL));
 }
 
+static void should_return_false_for_target_retrieval_failed_if_NULL_stats_are_passed(void)
+{
+    CU_ASSERT_FALSE(file_stats_target_retrieval_failed(NULL));
+}
+
 static void should_return_NULL_for_the_target_pointed_by_a_symlink_if_stats_of_a_non_link_file_are_passed(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -528,6 +533,7 @@ static void should_return_NULL_for_the_target_pointed_by_a_symlink_if_stats_of_a
     t_file_stats *stats = file_stats_get_without_following_symlinks("noLink");
 
     CU_ASSERT_PTR_NULL(file_stats_get_target_pointed_by_link(stats));
+    CU_ASSERT_FALSE(file_stats_target_retrieval_failed(stats));
 
     file_stats_destroy(&stats);
 }
@@ -549,6 +555,28 @@ static void should_return_the_target_pointed_by_a_symlink(void)
     t_file_stats *stats = file_stats_get_without_following_symlinks("link");
 
     CU_ASSERT_STRING_EQUAL(file_stats_get_target_pointed_by_link(stats), long_target);
+    CU_ASSERT_FALSE(file_stats_target_retrieval_failed(stats));
+
+    file_stats_destroy(&stats);
+}
+
+static void should_return_true_for_target_retrieval_failed_if_readlink_fails(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_READ_SYM_LINK_ERROR(EACCES, "failingLink", "target"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    t_file_stats *stats = file_stats_get_without_following_symlinks("failingLink");
+
+    CU_ASSERT_FALSE(file_stats_target_retrieval_failed(stats));
+    CU_ASSERT_PTR_NULL(file_stats_get_target_pointed_by_link(stats));
+    CU_ASSERT_TRUE(file_stats_target_retrieval_failed(stats));
+    CU_ASSERT(verify_that_the_error_printed_is(
+        "ft_ls: cannot read symbolic link '%s': %s\n",
+        "failingLink", strerror(EACCES)
+    ));
 
     file_stats_destroy(&stats);
 }
@@ -778,8 +806,10 @@ void register_file_stats_suite(void)
         CU_add_test(suite, "should_return_zero_link_count_when_a_NULL_file_stats_are_specified", should_return_zero_link_count_when_a_NULL_file_stats_are_specified);
         CU_add_test(suite, "should_return_the_link_count_for_a_file_and_directory", should_return_the_link_count_for_a_file_and_directory);
         CU_add_test(suite, "should_return_NULL_for_the_target_pointed_by_a_symlink_if_NULL_stats_are_passed", should_return_NULL_for_the_target_pointed_by_a_symlink_if_NULL_stats_are_passed);
+        CU_add_test(suite, "should_return_false_for_target_retrieval_failed_if_NULL_stats_are_passed", should_return_false_for_target_retrieval_failed_if_NULL_stats_are_passed);
         CU_add_test(suite, "should_return_NULL_for_the_target_pointed_by_a_symlink_if_stats_of_a_non_link_file_are_passed", should_return_NULL_for_the_target_pointed_by_a_symlink_if_stats_of_a_non_link_file_are_passed);
         CU_add_test(suite, "should_return_the_target_pointed_by_a_symlink", should_return_the_target_pointed_by_a_symlink);
+        CU_add_test(suite, "should_return_true_for_target_retrieval_failed_if_readlink_fails", should_return_true_for_target_retrieval_failed_if_readlink_fails);
         CU_add_test(suite, "should_return_NULL_for_the_author_if_NULL_stats_are_passed", should_return_NULL_for_the_author_if_NULL_stats_are_passed);
         CU_add_test(suite, "should_return_the_author_of_a_file", should_return_the_author_of_a_file);
         CU_add_test(suite, "should_return_the_author_id_if_the_author_is_not_found", should_return_the_author_id_if_the_author_is_not_found);

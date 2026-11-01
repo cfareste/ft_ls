@@ -31,6 +31,7 @@ struct s_file_stats
     t_date modification_date;
     char *target;
     int target_retrieval_attempted;
+    int target_retrieval_failed;
 };
 
 static int should_retrieve_file_stats_without_following_symlinks(const int retrieve_error, const struct stat *stats)
@@ -139,7 +140,7 @@ static void initialize_stats(t_file_stats *file_stats, const char *file_path, co
     file_stats->modification_date = date_from_time(stats->st_mtime);
 }
 
-static void retrieve_target_pointed_by_link(t_file_stats *stats)
+static int retrieve_target_pointed_by_link(t_file_stats *stats)
 {
     size_t target_buffer_size = DEFAULT_TARGET_BUFFER_SIZE;
     stats->target = ft_safe_calloc(target_buffer_size + 1, sizeof(char));
@@ -153,11 +154,11 @@ static void retrieve_target_pointed_by_link(t_file_stats *stats)
             report_read_symbolic_link_error(stats->file_name);
             free(stats->target);
             stats->target = NULL;
-            return ;
+            return -1;
         }
 
         if ((size_t)target_length < target_buffer_size)
-            return ;
+            return 0;
 
         const size_t new_buffer_size = target_buffer_size * 2;
         stats->target = ft_safe_realloc(stats->target, target_buffer_size + 1, new_buffer_size + 1);
@@ -166,6 +167,7 @@ static void retrieve_target_pointed_by_link(t_file_stats *stats)
 
     free(stats->target);
     stats->target = NULL;
+    return -1;
 }
 
 t_file_stats *file_stats_get(const char *file_path)
@@ -296,10 +298,15 @@ const char *file_stats_get_target_pointed_by_link(t_file_stats *stats)
     if (!stats->target_retrieval_attempted)
     {
         stats->target_retrieval_attempted = 1;
-        retrieve_target_pointed_by_link(stats);
+        stats->target_retrieval_failed = retrieve_target_pointed_by_link(stats) == -1;
     }
 
     return stats->target;
+}
+
+int file_stats_target_retrieval_failed(const t_file_stats *stats)
+{
+    return stats != NULL && stats->target_retrieval_failed;
 }
 
 void file_stats_destroy(t_file_stats **file_stats)

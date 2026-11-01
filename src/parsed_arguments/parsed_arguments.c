@@ -67,14 +67,22 @@ static t_result *create_parsing_arguments_result(t_parsed_arguments *parsed_argu
     return result_create_successful(parsed_arguments);
 }
 
-static void retrieve_advanced_file_stats(t_file_stats **file_operands_stats)
+static const char *retrieve_advanced_file_stats(char **file_operands, t_file_stats **file_operands_stats)
 {
-    for (unsigned int i = 0; file_operands_stats[i] != NULL; i++)
+    const char *failed_operand = NULL;
+
+    for (unsigned int i = 0; file_operands[i] != NULL; i++)
     {
+        if (file_operands_stats[i] == NULL)
+            continue;
+
         file_stats_get_author(file_operands_stats[i]);
         file_stats_get_group(file_operands_stats[i]);
         file_stats_get_target_pointed_by_link(file_operands_stats[i]);
+        if (failed_operand == NULL && file_stats_target_retrieval_failed(file_operands_stats[i]))
+            failed_operand = file_operands[i];
     }
+    return failed_operand;
 }
 
 t_result *parse_arguments(const int num_of_arguments, const char **arguments)
@@ -89,14 +97,17 @@ t_result *parse_arguments(const int num_of_arguments, const char **arguments)
     parsed_arguments->has_implicit_default_operand = num_of_file_operands == 0;
     parsed_arguments->file_operands = file_operands_get(num_of_file_operands, arguments);
     parsed_arguments->file_operands_stats = file_operands_get_stats(num_of_file_operands, parsed_arguments->file_operands);
+    const char *failed_advanced_metadata_operand = NULL;
     if (parsed_arguments_is_long_format_active(parsed_arguments))
-        retrieve_advanced_file_stats(parsed_arguments->file_operands_stats);
+        failed_advanced_metadata_operand = retrieve_advanced_file_stats(parsed_arguments->file_operands, parsed_arguments->file_operands_stats);
     parsed_arguments->non_directory_file_operands = file_operands_get_non_directory(parsed_arguments->file_operands, parsed_arguments->file_operands_stats, parsed_arguments->has_implicit_default_operand);
     parsed_arguments->directory_file_operands = file_operands_get_directory(parsed_arguments->file_operands, parsed_arguments->file_operands_stats, parsed_arguments->has_implicit_default_operand);
     sort_pointer_array((void **) parsed_arguments->non_directory_file_operands, compare_by_name);
     sort_pointer_array((void **) parsed_arguments->directory_file_operands, compare_by_name);
     parsed_arguments->non_directory_file_operands_stats = get_non_directory_file_operands_stats(parsed_arguments->non_directory_file_operands, parsed_arguments->file_operands, parsed_arguments->file_operands_stats);
 
+    if (failed_advanced_metadata_operand != NULL)
+        return result_create_failed(parsed_arguments, failed_advanced_metadata_operand);
     return create_parsing_arguments_result(parsed_arguments);
 }
 

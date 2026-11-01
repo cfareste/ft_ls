@@ -1133,6 +1133,101 @@ static void should_successfully_print_the_contents_of_the_specified_operands_rec
     CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
 }
 
+static void should_render_the_default_directory_in_long_format(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", ".", "..", "file", "large", "link"),
+        MOCK_FILE_WITH_STATS("file", MOCK_BLOCKS(2), MOCK_HARDLINK_COUNT(3), MOCK_AUTHOR("alice"), MOCK_GROUP("staff"), MOCK_SIZE(42), MOCK_MODIFICATION_TIME(2, 10, 2000, 12, 30, 0)),
+        MOCK_FILE_WITH_STATS("large", MOCK_BLOCKS(7), MOCK_HARDLINK_COUNT(12), MOCK_AUTHOR("charlie"), MOCK_GROUP("developers"), MOCK_SIZE(12345), MOCK_MODIFICATION_TIME(12, 11, 2001, 8, 5, 0)),
+        MOCK_SYMLINK_WITH_STATS("link", "file", MOCK_BLOCKS(1), MOCK_HARDLINK_COUNT(1), MOCK_AUTHOR("bob"), MOCK_GROUP("wheel"), MOCK_SIZE(4), MOCK_MODIFICATION_TIME(1, 1, 2002, 9, 15, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-l", NULL };
+    get_parsed_arguments_result(1, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "total 10\n"
+        "-rw-r--r--  3 alice   staff         42 Oct  2  2000 file\n"
+        "-rw-r--r-- 12 charlie developers 12345 Nov 12  2001 large\n"
+        "lrwxrwxrwx  1 bob     wheel          4 Jan  1  2002 link -> file\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    assert_application_execution_succeed(result);
+}
+
+static void should_render_a_non_directory_operand_in_long_format(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE_WITH_STATS("file", MOCK_BLOCKS(2), MOCK_HARDLINK_COUNT(3), MOCK_AUTHOR("alice"), MOCK_GROUP("staff"), MOCK_SIZE(42), MOCK_MODIFICATION_TIME(2, 10, 2000, 12, 30, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-l", "file", NULL };
+    get_parsed_arguments_result(2, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "-rw-r--r-- 3 alice staff 42 Oct  2  2000 file\n"
+    ));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    assert_application_execution_succeed(result);
+}
+
+static void should_render_a_directory_operand_in_long_format(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("dir", ".", "..", "file", "large", "link"),
+        MOCK_FILE_WITH_STATS("dir/file", MOCK_BLOCKS(2), MOCK_HARDLINK_COUNT(3), MOCK_AUTHOR("alice"), MOCK_GROUP("staff"), MOCK_SIZE(42), MOCK_MODIFICATION_TIME(2, 10, 2000, 12, 30, 0)),
+        MOCK_FILE_WITH_STATS("dir/large", MOCK_BLOCKS(7), MOCK_HARDLINK_COUNT(12), MOCK_AUTHOR("charlie"), MOCK_GROUP("developers"), MOCK_SIZE(12345), MOCK_MODIFICATION_TIME(12, 11, 2001, 8, 5, 0)),
+        MOCK_SYMLINK_WITH_STATS("dir/link", "file", MOCK_BLOCKS(1), MOCK_HARDLINK_COUNT(1), MOCK_AUTHOR("bob"), MOCK_GROUP("wheel"), MOCK_SIZE(4), MOCK_MODIFICATION_TIME(1, 1, 2002, 9, 15, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-l", "dir", NULL };
+    get_parsed_arguments_result(2, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "total 10\n"
+        "-rw-r--r--  3 alice   staff         42 Oct  2  2000 file\n"
+        "-rw-r--r-- 12 charlie developers 12345 Nov 12  2001 large\n"
+        "lrwxrwxrwx  1 bob     wheel          4 Jan  1  2002 link -> file\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    assert_application_execution_succeed(result);
+}
+
+static void should_render_mixed_operands_in_long_format(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE_WITH_STATS("file", MOCK_BLOCKS(2), MOCK_HARDLINK_COUNT(3), MOCK_AUTHOR("alice"), MOCK_GROUP("staff"), MOCK_SIZE(42), MOCK_MODIFICATION_TIME(2, 10, 2000, 12, 30, 0)),
+        MOCK_FILE_WITH_STATS("file2", MOCK_BLOCKS(7), MOCK_HARDLINK_COUNT(12), MOCK_AUTHOR("charlie"), MOCK_GROUP("developers"), MOCK_SIZE(12345), MOCK_MODIFICATION_TIME(12, 11, 2001, 8, 5, 0)),
+        MOCK_DIR_WITH_STATS("dir", ((const char *[]){ "inside", "link", NULL }), MOCK_BLOCKS(1)),
+        MOCK_FILE_WITH_STATS("dir/inside", MOCK_BLOCKS(3), MOCK_HARDLINK_COUNT(5), MOCK_AUTHOR("bob"), MOCK_GROUP("wheel"), MOCK_SIZE(999), MOCK_MODIFICATION_TIME(1, 1, 2002, 9, 15, 0)),
+        MOCK_SYMLINK_WITH_STATS("dir/link", "inside", MOCK_BLOCKS(1), MOCK_HARDLINK_COUNT(1), MOCK_AUTHOR("alice"), MOCK_GROUP("staff"), MOCK_SIZE(4), MOCK_MODIFICATION_TIME(2, 10, 2000, 12, 30, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-l", "file", "file2", "dir", NULL };
+    get_parsed_arguments_result(4, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "-rw-r--r--  3 alice   staff         42 Oct  2  2000 file\n"
+        "-rw-r--r-- 12 charlie developers 12345 Nov 12  2001 file2\n"
+        "\n"
+        "dir:\n"
+        "total 4\n"
+        "-rw-r--r-- 5 bob   wheel 999 Jan  1  2002 inside\n"
+        "lrwxrwxrwx 1 alice staff   4 Oct  2  2000 link -> inside\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    assert_application_execution_succeed(result);
+}
+
 static void should_render_file_stats_for_non_directory_and_directory_entries_in_long_format(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -1194,6 +1289,305 @@ static void should_render_file_stats_for_non_directory_and_directory_entries_in_
         "total 6",
         "crw-rw---- 5 bob   wheel 12, 34 Oct  2  2000 device",
         "lrwxrwxrwx 1 alice staff      4 Oct  2  2000 link -> file"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    assert_application_execution_succeed(result);
+}
+
+static void should_fall_back_to_numeric_author_and_group_in_long_format(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE_WITH_STATS("file", MOCK_UID(12345), MOCK_GID(23456), MOCK_SIZE(42), MOCK_HARDLINK_COUNT(2), MOCK_MODIFICATION_TIME(2, 10, 2000, 12, 30, 0)),
+        MOCK_FILE_WITH_STATS("named", MOCK_AUTHOR("alice"), MOCK_GROUP("developers"), MOCK_SIZE(12345), MOCK_HARDLINK_COUNT(12), MOCK_MODIFICATION_TIME(12, 11, 2001, 8, 5, 0)),
+        MOCK_CHAR_DEVICE_WITH_STATS("device", MOCK_UID(12345), MOCK_GID(23456), MOCK_DEVICE(12, 34), MOCK_HARDLINK_COUNT(5), MOCK_MODIFICATION_TIME(1, 1, 2002, 9, 15, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-l", "file", "named", "device", NULL };
+    get_parsed_arguments_result(4, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "crw-rw----  5 12345 23456      12, 34 Jan  1  2002 device\n"
+        "-rw-r--r--  2 12345 23456          42 Oct  2  2000 file\n"
+        "-rw-r--r-- 12 alice developers  12345 Nov 12  2001 named\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    assert_application_execution_succeed(result);
+}
+
+static void should_report_a_minor_error_when_lstat_fails_for_directory_content(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("dir", ".", "..", "failed", "good", "link"),
+        {
+            .path = "dir/failed",
+            .stats = { .st_mode = DEFAULT_FILE_MODE },
+            .errors = { .lstat_errno = EACCES }
+        },
+        MOCK_FILE_WITH_STATS("dir/good", MOCK_BLOCKS(5), MOCK_HARDLINK_COUNT(12), MOCK_AUTHOR("charlie"), MOCK_GROUP("developers"), MOCK_SIZE(12345), MOCK_MODIFICATION_TIME(12, 11, 2001, 8, 5, 0)),
+        MOCK_SYMLINK_WITH_STATS("dir/link", "good", MOCK_BLOCKS(2), MOCK_HARDLINK_COUNT(3), MOCK_AUTHOR("alice"), MOCK_GROUP("staff"), MOCK_SIZE(4), MOCK_MODIFICATION_TIME(2, 10, 2000, 12, 30, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-l", "dir", NULL };
+    get_parsed_arguments_result(2, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "total 7\n"
+        "?---------  ? ?       ?              ? ?            failed\n"
+        "-rw-r--r-- 12 charlie developers 12345 Nov 12  2001 good\n"
+        "lrwxrwxrwx  3 alice   staff          4 Oct  2  2000 link -> good\n"));
+    CU_ASSERT(verify_that_the_error_printed_is("ft_ls: cannot access '%s': %s\n", "dir/failed", strerror(EACCES)));
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MINOR_ERROR);
+}
+
+static void should_report_a_minor_error_when_readlink_fails_for_directory_content(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("dir", ".", "..", "link", "good"),
+        MOCK_READ_SYM_LINK_ERROR(EACCES, "dir/link", "target"),
+        MOCK_FILE_WITH_STATS("dir/good", MOCK_BLOCKS(5), MOCK_HARDLINK_COUNT(12), MOCK_AUTHOR("charlie"), MOCK_GROUP("developers"), MOCK_SIZE(12345), MOCK_MODIFICATION_TIME(12, 11, 2001, 8, 5, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-l", "dir", NULL };
+    get_parsed_arguments_result(2, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "total 5\n"
+        "-rw-r--r-- 12 charlie developers 12345 Nov 12  2001 good\n"
+        "lrwxrwxrwx  1 root    root        1024 Jan  1  1970 link\n"));
+    CU_ASSERT(verify_that_the_error_printed_is(
+        "ft_ls: cannot read symbolic link '%s': %s\n",
+        "dir/link", strerror(EACCES)));
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MINOR_ERROR);
+}
+
+static void should_report_a_major_error_when_stat_fails_for_an_operand_in_long_format(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE_ACCESS_ERROR(EACCES, "failed"),
+        MOCK_FILE_WITH_STATS("good", MOCK_BLOCKS(5), MOCK_HARDLINK_COUNT(12), MOCK_AUTHOR("charlie"), MOCK_GROUP("developers"), MOCK_SIZE(12345), MOCK_MODIFICATION_TIME(12, 11, 2001, 8, 5, 0)),
+        MOCK_CHAR_DEVICE_WITH_STATS("device", MOCK_BLOCKS(2), MOCK_HARDLINK_COUNT(3), MOCK_AUTHOR("alice"), MOCK_GROUP("staff"), MOCK_DEVICE(12, 34), MOCK_MODIFICATION_TIME(2, 10, 2000, 12, 30, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-l", "failed", "good", "device", NULL };
+    get_parsed_arguments_result(4, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "crw-rw----  3 alice   staff      12, 34 Oct  2  2000 device\n"
+        "-rw-r--r-- 12 charlie developers  12345 Nov 12  2001 good\n"));
+    CU_ASSERT(verify_that_the_error_printed_is("ft_ls: cannot access '%s': %s\n", "failed", strerror(EACCES)));
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MAJOR_ERROR);
+}
+
+static void should_report_a_major_error_when_readlink_fails_for_an_operand_in_long_format(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_READ_SYM_LINK_ERROR(EACCES, "link", "target"),
+        MOCK_FILE_WITH_STATS("good", MOCK_BLOCKS(5), MOCK_HARDLINK_COUNT(12), MOCK_AUTHOR("charlie"), MOCK_GROUP("developers"), MOCK_SIZE(12345), MOCK_MODIFICATION_TIME(12, 11, 2001, 8, 5, 0)),
+        MOCK_SYMLINK_WITH_STATS("link2", "good", MOCK_BLOCKS(2), MOCK_HARDLINK_COUNT(3), MOCK_AUTHOR("alice"), MOCK_GROUP("staff"), MOCK_SIZE(4), MOCK_MODIFICATION_TIME(2, 10, 2000, 12, 30, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-l", "link", "good", "link2", NULL };
+    get_parsed_arguments_result(4, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "-rw-r--r-- 12 charlie developers 12345 Nov 12  2001 good\n"
+        "lrwxrwxrwx  1 root    root        1024 Jan  1  1970 link\n"
+        "lrwxrwxrwx  3 alice   staff          4 Oct  2  2000 link2 -> good\n"));
+    CU_ASSERT(verify_that_the_error_printed_is(
+        "ft_ls: cannot read symbolic link '%s': %s\n",
+        "link", strerror(EACCES)));
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MAJOR_ERROR);
+}
+
+static void should_report_multiple_minor_errors_for_lstat_failures_in_one_directory(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("dir", ".", "..", "failed1", "failed2", "good"),
+        {
+            .path = "dir/failed1",
+            .stats = { .st_mode = DEFAULT_FILE_MODE },
+            .errors = { .lstat_errno = EACCES }
+        },
+        {
+            .path = "dir/failed2",
+            .stats = { .st_mode = DEFAULT_FILE_MODE },
+            .errors = { .lstat_errno = ENOENT }
+        },
+        MOCK_FILE_WITH_STATS("dir/good", MOCK_BLOCKS(5), MOCK_HARDLINK_COUNT(12), MOCK_AUTHOR("charlie"), MOCK_GROUP("developers"), MOCK_SIZE(12345), MOCK_MODIFICATION_TIME(12, 11, 2001, 8, 5, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-l", "dir", NULL };
+    get_parsed_arguments_result(2, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "total 5\n"
+        "?---------  ? ?       ?              ? ?            failed1\n"
+        "?---------  ? ?       ?              ? ?            failed2\n"
+        "-rw-r--r-- 12 charlie developers 12345 Nov 12  2001 good\n"));
+    CU_ASSERT(verify_that_the_error_printed_is(
+        "ft_ls: cannot access '%s': %s\n"
+        "ft_ls: cannot access '%s': %s\n",
+        "dir/failed1", strerror(EACCES),
+        "dir/failed2", strerror(ENOENT)));
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MINOR_ERROR);
+}
+
+static void should_report_multiple_minor_errors_for_lstat_and_readlink_failures(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("dir", ".", "..", "failed", "link", "good"),
+        {
+            .path = "dir/failed",
+            .stats = { .st_mode = DEFAULT_FILE_MODE },
+            .errors = { .lstat_errno = EACCES }
+        },
+        MOCK_READ_SYM_LINK_ERROR(EINVAL, "dir/link", "target"),
+        MOCK_FILE_WITH_STATS("dir/good", MOCK_BLOCKS(5), MOCK_HARDLINK_COUNT(12), MOCK_AUTHOR("charlie"), MOCK_GROUP("developers"), MOCK_SIZE(12345), MOCK_MODIFICATION_TIME(12, 11, 2001, 8, 5, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-l", "dir", NULL };
+    get_parsed_arguments_result(2, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "total 5\n"
+        "?---------  ? ?       ?              ? ?            failed\n"
+        "-rw-r--r-- 12 charlie developers 12345 Nov 12  2001 good\n"
+        "lrwxrwxrwx  1 root    root        1024 Jan  1  1970 link\n"));
+    CU_ASSERT(verify_that_the_error_printed_is(
+        "ft_ls: cannot access '%s': %s\n"
+        "ft_ls: cannot read symbolic link '%s': %s\n",
+        "dir/failed", strerror(EACCES),
+        "dir/link", strerror(EINVAL)));
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MINOR_ERROR);
+}
+
+static void should_report_multiple_major_errors_for_stat_failures_on_operands(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE_ACCESS_ERROR(EACCES, "failed1"),
+        MOCK_FILE_ACCESS_ERROR(ENOENT, "failed2"),
+        MOCK_FILE_WITH_STATS("good", MOCK_BLOCKS(5), MOCK_HARDLINK_COUNT(12), MOCK_AUTHOR("charlie"), MOCK_GROUP("developers"), MOCK_SIZE(12345), MOCK_MODIFICATION_TIME(12, 11, 2001, 8, 5, 0)),
+        MOCK_CHAR_DEVICE_WITH_STATS("device", MOCK_BLOCKS(2), MOCK_HARDLINK_COUNT(3), MOCK_AUTHOR("alice"), MOCK_GROUP("staff"), MOCK_DEVICE(12, 34), MOCK_MODIFICATION_TIME(2, 10, 2000, 12, 30, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-l", "failed1", "failed2", "good", "device", NULL };
+    get_parsed_arguments_result(5, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "crw-rw----  3 alice   staff      12, 34 Oct  2  2000 device\n"
+        "-rw-r--r-- 12 charlie developers  12345 Nov 12  2001 good\n"));
+    CU_ASSERT(verify_that_the_error_printed_is(
+        "ft_ls: cannot access '%s': %s\n"
+        "ft_ls: cannot access '%s': %s\n",
+        "failed1", strerror(EACCES),
+        "failed2", strerror(ENOENT)));
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MAJOR_ERROR);
+}
+
+static void should_report_multiple_major_errors_for_stat_and_readlink_failures_on_operands(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE_ACCESS_ERROR(EACCES, "failed"),
+        MOCK_READ_SYM_LINK_ERROR(EINVAL, "link", "target"),
+        MOCK_FILE_WITH_STATS("good", MOCK_BLOCKS(5), MOCK_HARDLINK_COUNT(12), MOCK_AUTHOR("charlie"), MOCK_GROUP("developers"), MOCK_SIZE(12345), MOCK_MODIFICATION_TIME(12, 11, 2001, 8, 5, 0)),
+        MOCK_SYMLINK_WITH_STATS("link2", "good", MOCK_BLOCKS(2), MOCK_HARDLINK_COUNT(3), MOCK_AUTHOR("alice"), MOCK_GROUP("staff"), MOCK_SIZE(4), MOCK_MODIFICATION_TIME(2, 10, 2000, 12, 30, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-l", "failed", "link", "good", "link2", NULL };
+    get_parsed_arguments_result(5, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "-rw-r--r-- 12 charlie developers 12345 Nov 12  2001 good\n"
+        "lrwxrwxrwx  1 root    root        1024 Jan  1  1970 link\n"
+        "lrwxrwxrwx  3 alice   staff          4 Oct  2  2000 link2 -> good\n"));
+    CU_ASSERT(verify_that_the_error_printed_is(
+        "ft_ls: cannot access '%s': %s\n"
+        "ft_ls: cannot read symbolic link '%s': %s\n",
+        "failed", strerror(EACCES),
+        "link", strerror(EINVAL)));
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MAJOR_ERROR);
+}
+
+static void should_report_major_and_minor_errors_for_operands_and_directory_content(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE_ACCESS_ERROR(EACCES, "failed"),
+        MOCK_FILE_WITH_STATS("good", MOCK_BLOCKS(5), MOCK_HARDLINK_COUNT(12), MOCK_AUTHOR("charlie"), MOCK_GROUP("developers"), MOCK_SIZE(12345), MOCK_MODIFICATION_TIME(12, 11, 2001, 8, 5, 0)),
+        MOCK_DIR("dir", ".", "..", "failed", "inside"),
+        {
+            .path = "dir/failed",
+            .stats = { .st_mode = DEFAULT_FILE_MODE },
+            .errors = { .lstat_errno = ENOENT }
+        },
+        MOCK_SYMLINK_WITH_STATS("dir/inside", "good", MOCK_BLOCKS(2), MOCK_HARDLINK_COUNT(3), MOCK_AUTHOR("alice"), MOCK_GROUP("staff"), MOCK_SIZE(4), MOCK_MODIFICATION_TIME(2, 10, 2000, 12, 30, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-l", "failed", "good", "dir", NULL };
+    get_parsed_arguments_result(4, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "-rw-r--r-- 12 charlie developers 12345 Nov 12  2001 good\n"
+        "\n"
+        "dir:\n"
+        "total 2\n"
+        "?--------- ? ?     ?     ? ?            failed\n"
+        "lrwxrwxrwx 3 alice staff 4 Oct  2  2000 inside -> good\n"));
+    CU_ASSERT(verify_that_the_error_printed_is(
+        "ft_ls: cannot access '%s': %s\n"
+        "ft_ls: cannot access '%s': %s\n",
+        "failed", strerror(EACCES),
+        "dir/failed", strerror(ENOENT)));
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MAJOR_ERROR);
+}
+
+static void should_render_broken_looped_and_multihop_links_in_long_format(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("target"),
+        MOCK_ENTRY("broken", DEFAULT_SYMLINK_MODE, NULL, "missing", ((t_vfs_mock_errors){ .stat_errno = ENOENT })),
+        MOCK_ENTRY("looped", DEFAULT_SYMLINK_MODE, NULL, "looped", ((t_vfs_mock_errors){ .stat_errno = ELOOP })),
+        MOCK_SYMLINK("multihop", "second-hop"),
+        MOCK_SYMLINK("second-hop", "target"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-l", "broken", "looped", "multihop", NULL };
+    get_parsed_arguments_result(4, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "lrwxrwxrwx 1 root root 1024 Jan  1  1970 broken -> missing\n"
+        "lrwxrwxrwx 1 root root 1024 Jan  1  1970 looped -> looped\n"
+        "lrwxrwxrwx 1 root root 1024 Jan  1  1970 multihop -> second-hop\n"));
     CU_ASSERT(verify_that_no_error_was_printed());
     assert_application_execution_succeed(result);
 }
@@ -2762,7 +3156,22 @@ void register_application_suite(void)
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_specified_non_directory_even_with_recursive_option", should_successfully_print_the_contents_of_the_specified_non_directory_even_with_recursive_option);
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_specified_directory_recursively", should_successfully_print_the_contents_of_the_specified_directory_recursively);
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_specified_operands_recursively", should_successfully_print_the_contents_of_the_specified_operands_recursively);
+        CU_add_test(suite, "should_render_the_default_directory_in_long_format", should_render_the_default_directory_in_long_format);
+        CU_add_test(suite, "should_render_a_non_directory_operand_in_long_format", should_render_a_non_directory_operand_in_long_format);
+        CU_add_test(suite, "should_render_a_directory_operand_in_long_format", should_render_a_directory_operand_in_long_format);
+        CU_add_test(suite, "should_render_mixed_operands_in_long_format", should_render_mixed_operands_in_long_format);
         CU_add_test(suite, "should_render_file_stats_for_non_directory_and_directory_entries_in_long_format", should_render_file_stats_for_non_directory_and_directory_entries_in_long_format);
+        CU_add_test(suite, "should_fall_back_to_numeric_author_and_group_in_long_format", should_fall_back_to_numeric_author_and_group_in_long_format);
+        CU_add_test(suite, "should_report_a_minor_error_when_lstat_fails_for_directory_content", should_report_a_minor_error_when_lstat_fails_for_directory_content);
+        CU_add_test(suite, "should_report_a_minor_error_when_readlink_fails_for_directory_content", should_report_a_minor_error_when_readlink_fails_for_directory_content);
+        CU_add_test(suite, "should_report_a_major_error_when_stat_fails_for_an_operand_in_long_format", should_report_a_major_error_when_stat_fails_for_an_operand_in_long_format);
+        CU_add_test(suite, "should_report_a_major_error_when_readlink_fails_for_an_operand_in_long_format", should_report_a_major_error_when_readlink_fails_for_an_operand_in_long_format);
+        CU_add_test(suite, "should_report_multiple_minor_errors_for_lstat_failures_in_one_directory", should_report_multiple_minor_errors_for_lstat_failures_in_one_directory);
+        CU_add_test(suite, "should_report_multiple_minor_errors_for_lstat_and_readlink_failures", should_report_multiple_minor_errors_for_lstat_and_readlink_failures);
+        CU_add_test(suite, "should_report_multiple_major_errors_for_stat_failures_on_operands", should_report_multiple_major_errors_for_stat_failures_on_operands);
+        CU_add_test(suite, "should_report_multiple_major_errors_for_stat_and_readlink_failures_on_operands", should_report_multiple_major_errors_for_stat_and_readlink_failures_on_operands);
+        CU_add_test(suite, "should_report_major_and_minor_errors_for_operands_and_directory_content", should_report_major_and_minor_errors_for_operands_and_directory_content);
+        CU_add_test(suite, "should_render_broken_looped_and_multihop_links_in_long_format", should_render_broken_looped_and_multihop_links_in_long_format);
         CU_add_test(suite, "should_fail_with_a_major_error_and_not_print_anything_if_fails_to_open_the_directory", should_fail_with_a_major_error_and_not_print_anything_if_fails_to_open_the_directory);
         CU_add_test(suite, "should_fail_with_a_major_error_and_not_print_anything_if_fails_to_open_the_current_directory_without_arguments", should_fail_with_a_major_error_and_not_print_anything_if_fails_to_open_the_current_directory_without_arguments);
         CU_add_test(suite, "should_fail_with_a_major_error_and_not_print_anything_if_fails_to_read_the_first_entry_of_the_directory", should_fail_with_a_major_error_and_not_print_anything_if_fails_to_read_the_first_entry_of_the_directory);

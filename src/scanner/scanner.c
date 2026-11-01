@@ -54,7 +54,14 @@ static void push_entry(t_current_scan_context *context, const t_dir_entry *dir_e
 
     t_file_entry *entry = file_entry_create_from_stats(entry_name, entry_stats);
     if (context->retrieve_advanced_metadata)
+    {
         file_entry_set_advanced_metadata_from_stats(entry, entry_stats);
+        if (file_stats_target_retrieval_failed(entry_stats))
+        {
+            free(context->failed_file);
+            context->failed_file = ft_safe_strdup(full_path);
+        }
+    }
 
     free(full_path);
     file_stats_destroy(&entry_stats);
@@ -88,25 +95,25 @@ static t_result *create_scan_result(const t_current_scan_context *context, t_fil
     return result_create_successful(file_entry_array);
 }
 
-t_result *scan(const t_scanner_context *scanner_context, const char *path)
+t_result *scan(const t_scanner_context *context, const char *path)
 {
-    if (scanner_context == NULL || !ft_is_valid_path(path))
+    if (context == NULL || !ft_is_valid_path(path))
         return result_create_failed(NULL, NULL);
 
-    t_current_scan_context context = {
+    t_current_scan_context current_scan = {
         .directory_path = path,
         .dir_stream = directory_open(path),
-        .retrieve_advanced_metadata = scanner_context->retrieve_advanced_metadata
+        .retrieve_advanced_metadata = context->retrieve_advanced_metadata
     };
-    if (context.dir_stream == NULL)
+    if (current_scan.dir_stream == NULL)
         return result_create_failed(NULL, path);
 
     t_file_entry_array *file_entry_array = file_entry_array_create();
-    context.read_failed = scan_directory_entries(&context, file_entry_array);
-    context.close_failed = directory_close(&context.dir_stream) == -1;
+    current_scan.read_failed = scan_directory_entries(&current_scan, file_entry_array);
+    current_scan.close_failed = directory_close(&current_scan.dir_stream) == -1;
 
-    t_result *result = create_scan_result(&context, file_entry_array);
-    free(context.failed_file);
+    t_result *result = create_scan_result(&current_scan, file_entry_array);
+    free(current_scan.failed_file);
 
     return result;
 }
