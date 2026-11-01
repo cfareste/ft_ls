@@ -55,6 +55,12 @@ prepare_test_environment() {
     touch my-pdf.pdf myfiñe nwl test@pdf $'tab\tfile' a "file " " "
     touch firstDir/file firstDir/file2 secondDir/file3 secondDir/file4
 
+    # Special permission bits
+    touch setuid_file setgid_file sticky_file
+    chmod 4755 setuid_file
+    chmod 2755 setgid_file
+    chmod 1755 sticky_file
+
     # Temporary files to test absolute paths
     touch "/tmp/tempfile"
     mkdir -p "/tmp/tempdir"
