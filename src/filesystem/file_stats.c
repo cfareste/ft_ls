@@ -1,16 +1,37 @@
+#include <grp.h>
+#include <pwd.h>
 #include <errno.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <sys/stat.h>
+#include <sys/sysmacros.h>
+#include <unistd.h>
 #include "libft.h"
 #include "file_stats.h"
 #include "error_reporter.h"
 
 #define STATS_RETRIEVAL_ERROR (-1)
 #define STATS_RETRIEVAL_SUCCESS 0
+#define DEFAULT_TARGET_BUFFER_SIZE 128
+#define MAX_SAFE_TARGET_BUFFER_SIZE ((SIZE_MAX - 1) / 2)
 
 struct s_file_stats
 {
+    char *file_name;
+    blkcnt_t blocks;
+    t_permissions permissions;
     t_file_type type;
+    nlink_t link_count;
+    uid_t author_id;
+    gid_t group_id;
+    char *author;
+    char *group;
+    off_t size;
+    t_device device;
+    t_date modification_date;
+    char *target;
+    int target_retrieval_attempted;
+    int target_retrieval_failed;
 };
 
 static int should_retrieve_file_stats_without_following_symlinks(const int retrieve_error, const struct stat *stats)
@@ -70,6 +91,85 @@ static t_file_type get_file_type(const mode_t mode)
     return file_type;
 }
 
+static t_permissions get_file_permissions(const mode_t mode)
+{
+    t_permissions permissions = PERM_NONE;
+
+    if (mode & S_IRUSR)
+        permissions |= PERM_OWNER_READ;
+    if (mode & S_IWUSR)
+        permissions |= PERM_OWNER_WRITE;
+    if (mode & S_IXUSR)
+        permissions |= PERM_OWNER_EXECUTE;
+    if (mode & S_IRGRP)
+        permissions |= PERM_GROUP_READ;
+    if (mode & S_IWGRP)
+        permissions |= PERM_GROUP_WRITE;
+    if (mode & S_IXGRP)
+        permissions |= PERM_GROUP_EXECUTE;
+    if (mode & S_IROTH)
+        permissions |= PERM_OTHER_READ;
+    if (mode & S_IWOTH)
+        permissions |= PERM_OTHER_WRITE;
+    if (mode & S_IXOTH)
+        permissions |= PERM_OTHER_EXECUTE;
+    if (mode & S_ISUID)
+        permissions |= PERM_SETUID;
+    if (mode & S_ISGID)
+        permissions |= PERM_SETGID;
+    if (mode & S_ISVTX)
+        permissions |= PERM_STICKY;
+    return permissions;
+}
+
+static void initialize_stats(t_file_stats *file_stats, const char *file_path, const struct stat *stats)
+{
+    file_stats->file_name = ft_safe_strdup(file_path);
+    file_stats->blocks = stats->st_blocks;
+    file_stats->permissions = get_file_permissions(stats->st_mode);
+    file_stats->type = get_file_type(stats->st_mode);
+    file_stats->link_count = stats->st_nlink;
+    file_stats->author_id = stats->st_uid;
+    file_stats->group_id = stats->st_gid;
+    file_stats->size = stats->st_size;
+    if (S_ISCHR(stats->st_mode) || S_ISBLK(stats->st_mode))
+    {
+        file_stats->device.major = major(stats->st_rdev);
+        file_stats->device.minor = minor(stats->st_rdev);
+    }
+    file_stats->modification_date = date_from_time(stats->st_mtime);
+}
+
+static int retrieve_target_pointed_by_link(t_file_stats *stats)
+{
+    size_t target_buffer_size = DEFAULT_TARGET_BUFFER_SIZE;
+    stats->target = ft_safe_calloc(target_buffer_size + 1, sizeof(char));
+
+    while (target_buffer_size <= MAX_SAFE_TARGET_BUFFER_SIZE)
+    {
+        const ssize_t target_length = readlink(stats->file_name, stats->target, target_buffer_size);
+
+        if (target_length == -1)
+        {
+            report_read_symbolic_link_error(stats->file_name);
+            free(stats->target);
+            stats->target = NULL;
+            return -1;
+        }
+
+        if ((size_t)target_length < target_buffer_size)
+            return 0;
+
+        const size_t new_buffer_size = target_buffer_size * 2;
+        stats->target = ft_safe_realloc(stats->target, target_buffer_size + 1, new_buffer_size + 1);
+        target_buffer_size = new_buffer_size;
+    }
+
+    free(stats->target);
+    stats->target = NULL;
+    return -1;
+}
+
 t_file_stats *file_stats_get(const char *file_path)
 {
     if (!ft_is_valid_path(file_path))
@@ -80,8 +180,7 @@ t_file_stats *file_stats_get(const char *file_path)
         return NULL;
 
     t_file_stats *file_stats = ft_safe_calloc(1, sizeof(t_file_stats));
-    file_stats->type = get_file_type(stats.st_mode);
-
+    initialize_stats(file_stats, file_path, &stats);
     return file_stats;
 }
 
@@ -95,9 +194,24 @@ t_file_stats *file_stats_get_without_following_symlinks(const char *file_path)
         return NULL;
 
     t_file_stats *file_stats = ft_safe_calloc(1, sizeof(t_file_stats));
-    file_stats->type = get_file_type(stats.st_mode);
-
+    initialize_stats(file_stats, file_path, &stats);
     return file_stats;
+}
+
+blkcnt_t file_stats_get_blocks(const t_file_stats *file_stats)
+{
+    if (file_stats == NULL)
+        return 0;
+
+    return file_stats->blocks;
+}
+
+t_permissions file_stats_get_permissions(const t_file_stats *file_stats)
+{
+    if (file_stats == NULL)
+        return PERM_NONE;
+
+    return file_stats->permissions;
 }
 
 t_file_type file_stats_get_file_type(const t_file_stats *file_stats)
@@ -108,11 +222,102 @@ t_file_type file_stats_get_file_type(const t_file_stats *file_stats)
     return file_stats->type;
 }
 
+nlink_t file_stats_get_link_count(const t_file_stats *file_stats)
+{
+    if (file_stats == NULL)
+        return 0;
+
+    return file_stats->link_count;
+}
+
+const char *file_stats_get_author(t_file_stats *stats)
+{
+    if (stats == NULL)
+        return NULL;
+
+    if (stats->author != NULL)
+        return stats->author;
+
+    const struct passwd *author = getpwuid(stats->author_id);
+
+    if (author == NULL || author->pw_name == NULL)
+        stats->author = ft_safe_itoa((int)stats->author_id);
+    else
+        stats->author = ft_safe_strdup(author->pw_name);
+
+    return stats->author;
+}
+
+const char *file_stats_get_group(t_file_stats *stats)
+{
+    if (stats == NULL)
+        return NULL;
+
+    if (stats->group != NULL)
+        return stats->group;
+
+    const struct group *group = getgrgid(stats->group_id);
+
+    if (group == NULL || group->gr_name == NULL)
+        stats->group = ft_safe_itoa((int)stats->group_id);
+    else
+        stats->group = ft_safe_strdup(group->gr_name);
+
+    return stats->group;
+}
+
+off_t file_stats_get_size(const t_file_stats *file_stats)
+{
+    if (file_stats == NULL)
+        return 0;
+
+    return file_stats->size;
+}
+
+t_device file_stats_get_device(const t_file_stats *file_stats)
+{
+    if (file_stats == NULL)
+        return (t_device){0};
+
+    return file_stats->device;
+}
+
+t_date file_stats_get_modification_date(const t_file_stats *file_stats)
+{
+    if (file_stats == NULL)
+        return (t_date){0};
+
+    return file_stats->modification_date;
+}
+
+const char *file_stats_get_target_pointed_by_link(t_file_stats *stats)
+{
+    if (stats == NULL || stats->type != FILE_TYPE_SYMLINK)
+        return NULL;
+
+    if (!stats->target_retrieval_attempted)
+    {
+        stats->target_retrieval_attempted = 1;
+        stats->target_retrieval_failed = retrieve_target_pointed_by_link(stats) == -1;
+    }
+
+    return stats->target;
+}
+
+int file_stats_target_retrieval_failed(const t_file_stats *stats)
+{
+    return stats != NULL && stats->target_retrieval_failed;
+}
+
 void file_stats_destroy(t_file_stats **file_stats)
 {
     if (file_stats == NULL || *file_stats == NULL)
         return ;
 
+    free((*file_stats)->file_name);
+    free((*file_stats)->target);
+    free((*file_stats)->author);
+    free((*file_stats)->group);
     free(*file_stats);
     *file_stats = NULL;
 }

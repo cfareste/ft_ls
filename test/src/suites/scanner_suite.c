@@ -5,28 +5,32 @@
 #include "mocks.h"
 #include "scanner.h"
 #include "file_entry.h"
+#include "parsed_arguments.h"
 
 #define SUITE_NAME "scanner"
 #define CURRENT_DIRECTORY_PATH "."
 
 static t_result *result;
 static t_file_entry_array *sut;
+static t_scanner_context *scanner_context;
 
 static void test_setup(void)
 {
     reset_printing_buffer();
     vfs_mock_reset();
+    scanner_context = scanner_context_create(NULL);
 }
 
 static void test_teardown(void)
 {
     result_destroy(&result);
     file_entry_array_destroy(&sut);
+    scanner_context_destroy(&scanner_context);
 }
 
 static void scan_directory(const char *path)
 {
-    result = scan(path);
+    result = scan(scanner_context, path);
     sut = result_get_value(result);
 }
 
@@ -78,6 +82,25 @@ static void assert_file_entry_array_types_are(const t_file_type *file_types)
     }
 
     CU_ASSERT_PTR_EQUAL(file_types[i], FILE_TYPE_NONE);
+}
+
+static void should_create_scanner_context(void)
+{
+    t_scanner_context *context = scanner_context_create(NULL);
+
+    CU_ASSERT_PTR_NOT_NULL(context);
+
+    scanner_context_destroy(&context);
+}
+
+static void should_destroy_scanner_context(void)
+{
+    t_scanner_context *context = scanner_context_create(NULL);
+
+    scanner_context_destroy(&context);
+    scanner_context_destroy(NULL);
+
+    CU_ASSERT_PTR_NULL(context);
 }
 
 static void should_return_NULL_if_a_NULL_path_is_specified(void)
@@ -364,12 +387,62 @@ static void should_return_a_valid_array_even_if_it_fails_to_access_an_entry(void
     assert_file_entry_array_types_are(expected_file_types);
 }
 
+static void should_retrieve_advanced_metadata_only_when_long_format_is_active(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("dir", ".", "..", "link"),
+        MOCK_SYMLINK_WITH_STATS("dir/link", "target",
+            MOCK_AUTHOR("alice"),
+            MOCK_GROUP("developers")),
+        MOCK_FILE("target"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-l", NULL };
+    t_result *parsed_arguments_result = parse_arguments(1, arguments);
+    t_parsed_arguments *parsed_arguments = result_get_value(parsed_arguments_result);
+    scanner_context_destroy(&scanner_context);
+    scanner_context = scanner_context_create(parsed_arguments);
+
+    scan_directory("dir");
+
+    const t_file_entry *entry = file_entry_array_get_at(sut, 0);
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_STRING_EQUAL(file_entry_get_author(entry), "alice");
+    CU_ASSERT_STRING_EQUAL(file_entry_get_group(entry), "developers");
+    CU_ASSERT_STRING_EQUAL(file_entry_get_link_target(entry), "target");
+
+    parsed_arguments_destroy(&parsed_arguments);
+    result_destroy(&parsed_arguments_result);
+}
+
+static void should_not_retrieve_advanced_metadata_without_long_format(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("dir", ".", "..", "link"),
+        MOCK_READ_SYM_LINK_ERROR(EINVAL, "dir/link", "target"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    scan_directory("dir");
+
+    const t_file_entry *entry = file_entry_array_get_at(sut, 0);
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_PTR_NULL(file_entry_get_author(entry));
+    CU_ASSERT_PTR_NULL(file_entry_get_group(entry));
+    CU_ASSERT_PTR_NULL(file_entry_get_link_target(entry));
+}
+
 void register_scanner_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, test_teardown);
 
     if (suite != NULL)
     {
+        CU_add_test(suite, "should_create_scanner_context", should_create_scanner_context);
+        CU_add_test(suite, "should_destroy_scanner_context", should_destroy_scanner_context);
         CU_add_test(suite, "should_return_NULL_if_a_NULL_path_is_specified", should_return_NULL_if_a_NULL_path_is_specified);
         CU_add_test(suite, "should_return_NULL_if_an_empty_path_is_specified", should_return_NULL_if_an_empty_path_is_specified);
         CU_add_test(suite, "should_return_one_entry_if_the_current_directory_has_one_file", should_return_one_entry_if_the_current_directory_has_one_file);
@@ -384,5 +457,7 @@ void register_scanner_suite(void)
         CU_add_test(suite, "should_return_an_array_with_the_elements_that_didnt_fail_if_fails_to_read_a_middle_entry_of_a_directory", should_return_an_array_with_the_elements_that_didnt_fail_if_fails_to_read_a_middle_entry_of_a_directory);
         CU_add_test(suite, "should_return_a_valid_array_even_if_it_fails_to_close_a_directory", should_return_a_valid_array_even_if_it_fails_to_close_a_directory);
         CU_add_test(suite, "should_return_a_valid_array_even_if_it_fails_to_access_an_entry", should_return_a_valid_array_even_if_it_fails_to_access_an_entry);
+        CU_add_test(suite, "should_retrieve_advanced_metadata_only_when_long_format_is_active", should_retrieve_advanced_metadata_only_when_long_format_is_active);
+        CU_add_test(suite, "should_not_retrieve_advanced_metadata_without_long_format", should_not_retrieve_advanced_metadata_without_long_format);
     }
 }

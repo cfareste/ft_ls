@@ -13,6 +13,32 @@
 #include "libft.h"
 #include <stdlib.h>
 
+static char	*ft_ltoa(long n)
+{
+	char			*digits;
+	char			*num;
+	unsigned long	magnitude;
+	size_t			len;
+
+	if (n >= 0)
+		return (ft_uitoa((unsigned long)n));
+	magnitude = (unsigned long)(-(n + 1)) + 1;
+	digits = ft_uitoa(magnitude);
+	if (!digits)
+		return (0);
+	len = ft_strlen(digits);
+	num = malloc(len + 2);
+	if (!num)
+	{
+		free(digits);
+		return (0);
+	}
+	num[0] = '-';
+	ft_memcpy(num + 1, digits, len + 1);
+	free(digits);
+	return (num);
+}
+
 int	print_character(char c, t_ft_printf_flags *flags)
 {
 	int	byte_to_print;
@@ -39,7 +65,7 @@ int	print_character(char c, t_ft_printf_flags *flags)
 	return (bytes_written);
 }
 
-static int	print_sig_number_string(char *num_str, t_ft_printf_flags *flags, int n)
+static int	print_sig_number_string(char *num_str, t_ft_printf_flags *flags, long n)
 {
 	int	byt_wri;
 	int	wdt_wri;
@@ -68,7 +94,7 @@ static int	print_sig_number_string(char *num_str, t_ft_printf_flags *flags, int 
 	return (byt_wri + wdt_wri);
 }
 
-static int	print_uns_nbr_string(char *num_str, t_ft_printf_flags *flags, unsigned int n)
+static int	print_uns_nbr_string(char *num_str, t_ft_printf_flags *flags, unsigned long n)
 {
 	int	byt_wri;
 	int	wdt_wri;
@@ -95,12 +121,12 @@ static int	print_uns_nbr_string(char *num_str, t_ft_printf_flags *flags, unsigne
 	return (byt_wri + wdt_wri);
 }
 
-int	print_number(int n, t_ft_printf_flags *flags)
+int	print_number(long n, t_ft_printf_flags *flags)
 {
 	char	*num_str;
 	int		num_length;
 
-	num_str = ft_itoa(n);
+	num_str = ft_ltoa(n);
 	if (!num_str)
 		return (-1);
 	num_length = print_sig_number_string(num_str, flags, n);
@@ -108,7 +134,7 @@ int	print_number(int n, t_ft_printf_flags *flags)
 	return (num_length);
 }
 
-int	print_unsigned_number(unsigned int n, t_ft_printf_flags *flags)
+int	print_unsigned_number(unsigned long n, t_ft_printf_flags *flags)
 {
 	char	*num_str;
 	int		num_length;

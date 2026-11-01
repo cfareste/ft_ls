@@ -19,6 +19,8 @@ CC = cc
 CCFLAGS += -g -Wall -Wextra -Werror -Wpedantic -fsanitize=address \
 		   -Dopendir=mock_opendir -Dreaddir=mock_readdir -Dclosedir=mock_closedir \
 		   -Dstat=stat_mock -Dlstat=lstat_mock \
+		   -Dreadlink=readlink_mock \
+		   -Dgetpwuid=getpwuid_mock -Dgetgrgid=getgrgid_mock \
 		   -Dft_printf=printf_mock -Dft_fprintf=fprintf_mock
 COVERAGE_FLAGS = -fprofile-arcs -ftest-coverage
 
@@ -66,9 +68,11 @@ vpath %.c	$(SRC):\
 			$(ROOT_SRC)/parsed_arguments/options:\
 			$(ROOT_SRC)/parsed_arguments/file_operands:\
 			$(ROOT_SRC)/filesystem:\
+			$(ROOT_SRC)/utils:\
 			$(ROOT_SRC)/file_entry:\
 			$(ROOT_SRC)/scanner:\
 			$(ROOT_SRC)/renderer:\
+			$(ROOT_SRC)/renderer/strategies:\
 			$(ROOT_SRC)/sorter:\
 			$(ROOT_SRC)/path_builder:\
 			$(ROOT_SRC)/error_reporter:\
@@ -82,10 +86,13 @@ ROOT_SRCS = application.c \
 			options.c \
 			file_operands.c \
 			directory.c \
+			date.c \
 			file_stats.c \
 			file_entry.c \
 			scanner.c \
 			renderer.c \
+			single_column_strategy.c \
+			long_format_strategy.c \
 			sorter.c \
 			path_builder.c \
 			error_reporter.c \
@@ -96,6 +103,9 @@ SRCS = main.c \
 		directory_mock.c \
 		print_mock.c \
 		stat_mock.c \
+		readlink_mock.c \
+		identity_mock.c \
+		date_suite.c \
 		directory_suite.c \
 		file_entry_suite.c \
 		renderer_suite.c \

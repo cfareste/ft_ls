@@ -8,32 +8,37 @@ typedef struct s_application_context
 {
     const t_parsed_arguments *parsed_arguments;
     t_render_context *render_context;
+    t_scanner_context *scanner_context;
     t_ft_ls_error_code error_code;
 } t_application_context;
 
 static void process_directory(t_application_context *context, const char *directory_path);
 
-static t_file_entry_array *create_non_directory_entry_array(const char *non_directory_file_operand)
+static t_file_entry_array *create_non_directory_entry_array(const t_parsed_arguments *parsed_arguments)
 {
     t_file_entry_array *file_entry_array = file_entry_array_create();
-    t_file_entry *file_entry = file_entry_create(non_directory_file_operand);
-    file_entry_array_push(file_entry_array, file_entry);
+    const char * const *non_directory_file_operands = parsed_arguments_get_non_directory_file_operands(parsed_arguments);
+    t_file_stats * const *non_directory_file_operands_stats = parsed_arguments_get_non_directory_file_operands_stats(parsed_arguments);
+
+    for (unsigned int i = 0; non_directory_file_operands[i] != NULL; i++)
+    {
+        t_file_entry *file_entry = file_entry_create_from_stats(non_directory_file_operands[i], non_directory_file_operands_stats[i]);
+        if (parsed_arguments_is_long_format_active(parsed_arguments))
+            file_entry_set_advanced_metadata_from_stats(file_entry, non_directory_file_operands_stats[i]);
+
+        file_entry_array_push(file_entry_array, file_entry);
+    }
 
     return file_entry_array;
 }
 
 static void process_non_directory_file_operands(const t_parsed_arguments *parsed_arguments, const t_render_context *render_context)
 {
-    const char * const *non_directory_file_operands = parsed_arguments_get_non_directory_file_operands(parsed_arguments);
+    t_file_entry_array *file_entry_array = create_non_directory_entry_array(parsed_arguments);
 
-    for (unsigned int i = 0; non_directory_file_operands[i] != NULL; i++)
-    {
-        t_file_entry_array *file_entry_array = create_non_directory_entry_array(non_directory_file_operands[i]);
+    render_entries(render_context, file_entry_array);
 
-        render_entries(render_context, file_entry_array);
-
-        file_entry_array_destroy(&file_entry_array);
-    }
+    file_entry_array_destroy(&file_entry_array);
 }
 
 static void update_error_code(t_application_context *context, const t_ft_ls_error_code error_code)
@@ -57,7 +62,7 @@ static t_ft_ls_error_code get_scan_error(const t_application_context *context, c
 
 static t_file_entry_array *scan_directory(t_application_context *context, const char *directory_path)
 {
-    t_result *scan_result = scan(directory_path);
+    t_result *scan_result = scan(context->scanner_context, directory_path);
 
     update_error_code(context, get_scan_error(context, scan_result));
     t_file_entry_array *file_entry_array = result_get_value(scan_result);
@@ -118,14 +123,17 @@ t_ft_ls_error_code application_run(const t_result *parsing_arguments_result)
 
     const t_parsed_arguments *parsed_arguments = result_get_value(parsing_arguments_result);
     t_render_context *render_context = render_context_create(parsed_arguments);
+    t_scanner_context *scanner_context = scanner_context_create(parsed_arguments);
     t_application_context context = {
         .parsed_arguments = parsed_arguments,
         .render_context = render_context,
+        .scanner_context = scanner_context,
         .error_code = result_has_failed(parsing_arguments_result) ? FT_LS_APPLICATION_MAJOR_ERROR : FT_LS_APPLICATION_SUCCESS
     };
 
     process_file_operands(&context);
 
     render_context_destroy(&render_context);
+    scanner_context_destroy(&scanner_context);
     return context.error_code;
 }

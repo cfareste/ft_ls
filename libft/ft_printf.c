@@ -14,7 +14,8 @@
 #include <stdarg.h>
 #include <unistd.h>
 
-static int	handle_parameter(char const *str, int *pos, va_list *args, t_ft_printf_flags *flags)
+static int	handle_parameter(char const *str, int *pos, va_list *args,
+		t_ft_printf_flags *flags, int is_long)
 {
 	char	specifier;
 
@@ -26,9 +27,17 @@ static int	handle_parameter(char const *str, int *pos, va_list *args, t_ft_print
 	else if (specifier == 'p')
 		return (print_pointer(va_arg(*args, void *), flags));
 	else if (specifier == 'd' || specifier == 'i')
+	{
+		if (is_long)
+			return (print_number(va_arg(*args, long), flags));
 		return (print_number(va_arg(*args, int), flags));
+	}
 	else if (specifier == 'u')
+	{
+		if (is_long)
+			return (print_unsigned_number(va_arg(*args, unsigned long), flags));
 		return (print_unsigned_number(va_arg(*args, unsigned int), flags));
+	}
 	else if (specifier == 'x' || specifier == 'X')
 		return (print_hex_nbr(va_arg(*args, unsigned int), specifier, flags));
 	else if (specifier == '%')
@@ -39,11 +48,17 @@ static int	handle_parameter(char const *str, int *pos, va_list *args, t_ft_print
 
 static int	handle_flag(char const *str, int *pos, va_list *args, t_ft_printf_flags *flags)
 {
+	int	is_long;
+
 	*pos = *pos + 1;
 	reset_flags(flags);
 	if (count_flags(str, pos, flags) == -1)
 		return (-1);
-	return (handle_parameter(str, pos, args, flags));
+	is_long = (str[*pos] == 'l' && (str[*pos + 1] == 'd'
+				|| str[*pos + 1] == 'i' || str[*pos + 1] == 'u'));
+	if (is_long)
+		*pos = *pos + 1;
+	return (handle_parameter(str, pos, args, flags, is_long));
 }
 
 int	ft_printf(char const *str, ...)

@@ -3,6 +3,7 @@
 #include "CUnit/Basic.h"
 #include "mocks.h"
 #include "parsed_arguments.h"
+#include "file_stats.h"
 
 #define SUITE_NAME "parsed_arguments"
 
@@ -159,6 +160,82 @@ static void should_return_the_non_directory_file_operands(void)
     CU_ASSERT_STRING_EQUAL(non_directory_file_operands[4], args[4]);
     CU_ASSERT_STRING_EQUAL(non_directory_file_operands[5], args[6]);
     CU_ASSERT_PTR_NULL(non_directory_file_operands[6]);
+    CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
+    CU_ASSERT(verify_that_no_error_was_printed());
+}
+
+static void should_classify_a_symlink_to_a_directory_as_non_directory_with_long_format(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_SYMLINK("link", "dir"),
+        MOCK_DIR("dir", ".", "..", "inside"),
+        MOCK_FILE("dir/inside"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *args[] = { "-l", "link", NULL };
+    get_parsed_arguments_result(2, args);
+
+    const char * const *non_directory_operands = parsed_arguments_get_non_directory_file_operands(sut);
+    t_file_stats * const *non_directory_stats = parsed_arguments_get_non_directory_file_operands_stats(sut);
+    const char * const *directory_operands = parsed_arguments_get_directory_file_operands(sut);
+
+    CU_ASSERT_STRING_EQUAL(non_directory_operands[0], "link");
+    CU_ASSERT_EQUAL(file_stats_get_file_type(non_directory_stats[0]), FILE_TYPE_SYMLINK);
+    CU_ASSERT_PTR_NULL(directory_operands[0]);
+    CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
+    CU_ASSERT(verify_that_no_error_was_printed());
+}
+
+static void should_follow_a_symlink_to_a_directory_without_long_format(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_SYMLINK("link", "dir"),
+        MOCK_DIR("dir", ".", "..", "inside"),
+        MOCK_FILE("dir/inside"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *args[] = { "link", NULL };
+    get_parsed_arguments_result(1, args);
+
+    const char * const *non_directory_operands = parsed_arguments_get_non_directory_file_operands(sut);
+    const char * const *directory_operands = parsed_arguments_get_directory_file_operands(sut);
+
+    CU_ASSERT_PTR_NULL(non_directory_operands[0]);
+    CU_ASSERT_STRING_EQUAL(directory_operands[0], "link");
+    CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
+    CU_ASSERT(verify_that_no_error_was_printed());
+}
+
+static void should_return_NULL_stats_if_NULL_parsed_arguments_are_passed(void)
+{
+    CU_ASSERT_PTR_NULL(parsed_arguments_get_non_directory_file_operands_stats(NULL));
+}
+
+static void should_return_stats_for_non_directory_file_operands_in_sorted_order(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_SOCKET("z_socket"),
+        MOCK_DIR("directory", ".", ".."),
+        MOCK_FILE("a_file"),
+        MOCK_FIFO("m_fifo"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *args[] = { "z_socket", "directory", "a_file", "m_fifo", NULL };
+    get_parsed_arguments_result(4, args);
+
+    t_file_stats * const *non_directory_stats = parsed_arguments_get_non_directory_file_operands_stats(sut);
+
+    CU_ASSERT_PTR_NOT_NULL(non_directory_stats);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(non_directory_stats[0]), FILE_TYPE_REGULAR);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(non_directory_stats[1]), FILE_TYPE_FIFO);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(non_directory_stats[2]), FILE_TYPE_SOCKET);
+    CU_ASSERT_PTR_NULL(non_directory_stats[3]);
     CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
     CU_ASSERT(verify_that_no_error_was_printed());
 }
@@ -505,6 +582,76 @@ static void should_parse_the_recursive_option(void)
     CU_ASSERT_STRING_EQUAL(directory_file_operands[0], ".");
     CU_ASSERT_PTR_NULL(directory_file_operands[1]);
     CU_ASSERT(verify_that_no_error_was_printed());
+}
+
+static void should_parse_the_long_format_option(void)
+{
+    const char *arguments[] = { "-l", NULL };
+
+    get_parsed_arguments_result(1, arguments);
+    const char * const *non_directory_file_operands = parsed_arguments_get_non_directory_file_operands(sut);
+    const char * const *directory_file_operands = parsed_arguments_get_directory_file_operands(sut);
+
+    CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
+    CU_ASSERT_TRUE(parsed_arguments_is_option_active(sut, OPTIONS_LONG_FORMAT));
+    CU_ASSERT_PTR_NULL(non_directory_file_operands[0]);
+    CU_ASSERT_STRING_EQUAL(directory_file_operands[0], ".");
+    CU_ASSERT_PTR_NULL(directory_file_operands[1]);
+    CU_ASSERT(verify_that_no_error_was_printed());
+}
+
+static void should_return_false_for_long_format_if_NULL_parsed_arguments_are_passed(void)
+{
+    CU_ASSERT_FALSE(parsed_arguments_is_long_format_active(NULL));
+    CU_ASSERT(verify_that_no_error_was_printed());
+}
+
+static void should_return_true_for_long_format_if_the_option_is_active(void)
+{
+    const char *arguments[] = { "-l", NULL };
+    get_parsed_arguments_result(1, arguments);
+
+    CU_ASSERT_TRUE(parsed_arguments_is_long_format_active(sut));
+    CU_ASSERT(verify_that_no_error_was_printed());
+}
+
+static void should_return_false_for_long_format_if_the_option_is_not_active(void)
+{
+    const char *arguments[] = { "-R", NULL };
+    get_parsed_arguments_result(1, arguments);
+
+    CU_ASSERT_FALSE(parsed_arguments_is_long_format_active(sut));
+    CU_ASSERT(verify_that_no_error_was_printed());
+}
+
+static void should_not_retrieve_advanced_stats_without_long_format(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("target"),
+        MOCK_READ_SYM_LINK_ERROR(EINVAL, "link", "target"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "link", NULL };
+    get_parsed_arguments_result(1, arguments);
+
+    CU_ASSERT(verify_that_no_error_was_printed());
+}
+
+static void should_retrieve_advanced_stats_with_long_format(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("target"),
+        MOCK_READ_SYM_LINK_ERROR(EINVAL, "link", "target"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-l", "link", NULL };
+    get_parsed_arguments_result(2, arguments);
+
+    CU_ASSERT(verify_that_the_error_printed_is("ft_ls: cannot read symbolic link '%s': %s\n", "link", strerror(EINVAL)));
 }
 
 static void should_return_false_for_has_any_option_if_NULL_parsed_arguments_are_passed(void)
@@ -871,6 +1018,10 @@ void register_parsed_arguments_suite(void)
         CU_add_test(suite, "should_be_created_with_default_values_if_arguments_are_NULL", should_return_default_values_if_arguments_are_NULL);
         CU_add_test(suite, "should_return_NULL_non_directory_file_operands_if_NULL_parsed_arguments_are_passed", should_return_NULL_non_directory_file_operands_if_NULL_parsed_arguments_are_passed);
         CU_add_test(suite, "should_return_the_non_directory_file_operands", should_return_the_non_directory_file_operands);
+        CU_add_test(suite, "should_classify_a_symlink_to_a_directory_as_non_directory_with_long_format", should_classify_a_symlink_to_a_directory_as_non_directory_with_long_format);
+        CU_add_test(suite, "should_follow_a_symlink_to_a_directory_without_long_format", should_follow_a_symlink_to_a_directory_without_long_format);
+        CU_add_test(suite, "should_return_NULL_stats_if_NULL_parsed_arguments_are_passed", should_return_NULL_stats_if_NULL_parsed_arguments_are_passed);
+        CU_add_test(suite, "should_return_stats_for_non_directory_file_operands_in_sorted_order", should_return_stats_for_non_directory_file_operands_in_sorted_order);
         CU_add_test(suite, "should_return_NULL_directory_file_operands_if_NULL_parsed_arguments_are_passed", should_return_NULL_directory_file_operands_if_NULL_parsed_arguments_are_passed);
         CU_add_test(suite, "should_return_the_directory_file_operands", should_return_the_directory_file_operands);
         CU_add_test(suite, "should_return_false_for_multiple_file_operands_if_NULL_parsed_arguments_are_passed", should_return_false_for_multiple_file_operands_if_NULL_parsed_arguments_are_passed);
@@ -888,6 +1039,12 @@ void register_parsed_arguments_suite(void)
         CU_add_test(suite, "should_parse_the_option_and_file_operands_if_the_option_was_a_middle_specified_argument", should_parse_the_option_and_file_operands_if_the_option_was_a_middle_specified_argument);
         CU_add_test(suite, "should_parse_the_option_and_file_operands_if_the_option_was_the_last_specified_argument", should_parse_the_option_and_file_operands_if_the_option_was_the_last_specified_argument);
         CU_add_test(suite, "should_parse_the_recursive_option", should_parse_the_recursive_option);
+        CU_add_test(suite, "should_parse_the_long_format_option", should_parse_the_long_format_option);
+        CU_add_test(suite, "should_return_false_for_long_format_if_NULL_parsed_arguments_are_passed", should_return_false_for_long_format_if_NULL_parsed_arguments_are_passed);
+        CU_add_test(suite, "should_return_true_for_long_format_if_the_option_is_active", should_return_true_for_long_format_if_the_option_is_active);
+        CU_add_test(suite, "should_return_false_for_long_format_if_the_option_is_not_active", should_return_false_for_long_format_if_the_option_is_not_active);
+        CU_add_test(suite, "should_not_retrieve_advanced_stats_without_long_format", should_not_retrieve_advanced_stats_without_long_format);
+        CU_add_test(suite, "should_retrieve_advanced_stats_with_long_format", should_retrieve_advanced_stats_with_long_format);
         CU_add_test(suite, "should_return_false_for_has_any_option_if_NULL_parsed_arguments_are_passed", should_return_false_for_has_any_option_if_NULL_parsed_arguments_are_passed);
         CU_add_test(suite, "should_return_false_for_has_any_option_if_at_no_option_was_specified", should_return_false_for_has_any_option_if_at_no_option_was_specified);
         CU_add_test(suite, "should_return_true_for_has_any_option_if_at_least_one_option_was_specified", should_return_true_for_has_any_option_if_at_least_one_option_was_specified);

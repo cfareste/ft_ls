@@ -2,6 +2,7 @@
 #include "options.h"
 
 #define RECURSIVE_OPTION_CHAR 'R'
+#define LONG_FORMAT_OPTION_CHAR 'l'
 
 static int argument_is_an_option(const char *argument)
 {
@@ -19,6 +20,8 @@ t_options options_get(const char **arguments)
 
         if (arguments[i][1] == RECURSIVE_OPTION_CHAR)
             options |= OPTIONS_RECURSIVE;
+        if (arguments[i][1] == LONG_FORMAT_OPTION_CHAR)
+            options |= OPTIONS_LONG_FORMAT;
     }
 
     return options;

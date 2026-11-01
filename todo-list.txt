@@ -3,8 +3,6 @@ TODO:
 
 TODO En algún momento:
 - Investigar si los tests están acoplados a la implementación interna de las cosas
-- Refactor renderer, donde render llama a render_strategy o lo que sea basado en options
-- Para manejar errores de cualquier tipo, mirar la conversación de: https://chatgpt.com/c/6a711028-5c44-83eb-a7a4-e50ff2877990
 - Refactor file stats "file_stats_is_file_type()"
 
 
@@ -216,3 +214,37 @@ parámetros y probarán directamente el comportamiento de ese parámetro (es dec
 No probado en E2E:
     - lstat minor error (probar con ENAMETOOLONG)
     - readdir o closedir major/minor error
+
+
+QA LS-17 Long format (ls -l ... | cat)
+Note: Siempre debe estar presente la opción -l en este QA.
+1. No fallos
+   - Sin parámetros (ls -l)
+   - 1 parámetro (nonDir y dir)
+       * -l y operand
+   - X parámetros (mix nonDirs y dirs)
+       * -l y operands
+2. Con fallos
+   - Falla, pero no cuenta como minor o major error
+       * Falla al hacer getpwuid o getgrgid (no falla y hace fallback al uid o gid retrieved con lstat)
+   - 1 fallo, solo minor
+       * Falla al hacer lstat del contenido de un directorio
+       * Falla al hacer readlink link dentro de un directorio
+   - 1 fallo, solo major
+       * Falla al hacer stat de un operand
+       * Falla al hacer readlink de un operand
+   - X fallos, solo minors
+       * lstat + lstat mismo dir
+       * lstat + readlink (diferente file)
+   - X fallos, solo majors
+       * stat + stat
+       * stat + readlink (diferente file)
+   - X fallos, major y minor
+       * Falla al hacer stat o readlink de un operand, y luego lstat o readlink del contenido de un directorio
+3. Casos especiales
+    - Broken links
+    - Looped links
+    - Multihop links
+No probado en E2E:
+    - Errores de readlink
+    - Errores de lstat minors (contenido de directorio)

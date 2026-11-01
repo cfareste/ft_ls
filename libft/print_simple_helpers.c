@@ -13,7 +13,7 @@
 #include "libft.h"
 #include <stdlib.h>
 
-static int	calculate_num_of_digits(unsigned int num)
+static int	calculate_num_of_digits(unsigned long num)
 {
 	int	digits;
 
@@ -26,7 +26,7 @@ static int	calculate_num_of_digits(unsigned int num)
 	return (digits + 1);
 }
 
-static void	putnbr(char *num, unsigned int n, int index)
+static void	putnbr(char *num, unsigned long n, int index)
 {
 	if (n / 10 == 0)
 		num[index] = n + '0';
@@ -37,7 +37,7 @@ static void	putnbr(char *num, unsigned int n, int index)
 	}
 }
 
-char	*ft_uitoa(unsigned int n)
+char	*ft_uitoa(unsigned long n)
 {
 	char	*num;
 	int		num_of_digits;

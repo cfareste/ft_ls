@@ -5,6 +5,7 @@
 #include "file_stats.h"
 
 #define SUITE_NAME "file_stats"
+#define LINK_BUFFER_SIZE 300
 
 static void test_setup(void)
 {
@@ -78,6 +79,77 @@ static void should_not_fail_to_destroy_file_stats_if_a_NULL_file_stats_is_passed
     file_stats_destroy(&invalid_stats);
 
     CU_ASSERT(verify_that_no_error_was_printed());
+}
+
+static void should_return_zero_permissions_when_a_NULL_file_stats_are_specified(void)
+{
+    CU_ASSERT_EQUAL(file_stats_get_permissions(NULL), PERM_NONE);
+}
+
+static void should_return_permissions_for_a_file_and_directory(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_ENTRY("file", S_IFREG | 0640, NULL, NULL, NO_ERRORS),
+        MOCK_ENTRY("dir", S_IFDIR | 0751, NULL, NULL, NO_ERRORS),
+        MOCK_ENTRY("setuid", S_IFREG | S_ISUID | 0640, NULL, NULL, NO_ERRORS),
+        MOCK_ENTRY("setgid", S_IFREG | S_ISGID | 0640, NULL, NULL, NO_ERRORS),
+        MOCK_ENTRY("sticky", S_IFDIR | S_ISVTX | 0755, NULL, NULL, NO_ERRORS),
+        MOCK_ENTRY("setuid_setgid", S_IFREG | S_ISUID | S_ISGID | 0750, NULL, NULL, NO_ERRORS),
+        MOCK_ENTRY("setgid_sticky", S_IFDIR | S_ISGID | S_ISVTX | 0770, NULL, NULL, NO_ERRORS),
+        MOCK_ENTRY("setuid_sticky", S_IFREG | S_ISUID | S_ISVTX | 0750, NULL, NULL, NO_ERRORS),
+        MOCK_ENTRY("all_special_bits", S_IFDIR | S_ISUID | S_ISGID | S_ISVTX | 0751, NULL, NULL, NO_ERRORS),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    t_file_stats *file_stats = file_stats_get("file");
+    t_file_stats *directory_stats = file_stats_get("dir");
+    t_file_stats *setuid_stats = file_stats_get("setuid");
+    t_file_stats *setgid_stats = file_stats_get("setgid");
+    t_file_stats *sticky_stats = file_stats_get("sticky");
+    t_file_stats *setuid_setgid_stats = file_stats_get("setuid_setgid");
+    t_file_stats *setgid_sticky_stats = file_stats_get("setgid_sticky");
+    t_file_stats *setuid_sticky_stats = file_stats_get("setuid_sticky");
+    t_file_stats *all_special_bits_stats = file_stats_get("all_special_bits");
+
+    CU_ASSERT_EQUAL(file_stats_get_permissions(file_stats),
+        PERM_OWNER_READ | PERM_OWNER_WRITE | PERM_GROUP_READ);
+    CU_ASSERT_EQUAL(file_stats_get_permissions(directory_stats),
+        PERM_OWNER_READ | PERM_OWNER_WRITE | PERM_OWNER_EXECUTE
+        | PERM_GROUP_READ | PERM_GROUP_EXECUTE | PERM_OTHER_EXECUTE);
+    CU_ASSERT_EQUAL(file_stats_get_permissions(setuid_stats),
+        PERM_OWNER_READ | PERM_OWNER_WRITE | PERM_GROUP_READ | PERM_SETUID);
+    CU_ASSERT_EQUAL(file_stats_get_permissions(setgid_stats),
+        PERM_OWNER_READ | PERM_OWNER_WRITE | PERM_GROUP_READ | PERM_SETGID);
+    CU_ASSERT_EQUAL(file_stats_get_permissions(sticky_stats),
+        PERM_OWNER_READ | PERM_OWNER_WRITE | PERM_OWNER_EXECUTE
+        | PERM_GROUP_READ | PERM_GROUP_EXECUTE | PERM_OTHER_READ
+        | PERM_OTHER_EXECUTE | PERM_STICKY);
+    CU_ASSERT_EQUAL(file_stats_get_permissions(setuid_setgid_stats),
+        PERM_OWNER_READ | PERM_OWNER_WRITE | PERM_OWNER_EXECUTE
+        | PERM_GROUP_READ | PERM_GROUP_EXECUTE | PERM_SETUID | PERM_SETGID);
+    CU_ASSERT_EQUAL(file_stats_get_permissions(setgid_sticky_stats),
+        PERM_OWNER_READ | PERM_OWNER_WRITE | PERM_OWNER_EXECUTE
+        | PERM_GROUP_READ | PERM_GROUP_WRITE | PERM_GROUP_EXECUTE
+        | PERM_SETGID | PERM_STICKY);
+    CU_ASSERT_EQUAL(file_stats_get_permissions(setuid_sticky_stats),
+        PERM_OWNER_READ | PERM_OWNER_WRITE | PERM_OWNER_EXECUTE
+        | PERM_GROUP_READ | PERM_GROUP_EXECUTE | PERM_SETUID | PERM_STICKY);
+    CU_ASSERT_EQUAL(file_stats_get_permissions(all_special_bits_stats),
+        PERM_OWNER_READ | PERM_OWNER_WRITE | PERM_OWNER_EXECUTE
+        | PERM_GROUP_READ | PERM_GROUP_EXECUTE | PERM_OTHER_EXECUTE
+        | PERM_SETUID | PERM_SETGID | PERM_STICKY);
+    CU_ASSERT(verify_that_no_error_was_printed());
+
+    file_stats_destroy(&file_stats);
+    file_stats_destroy(&directory_stats);
+    file_stats_destroy(&setuid_stats);
+    file_stats_destroy(&setgid_stats);
+    file_stats_destroy(&sticky_stats);
+    file_stats_destroy(&setuid_setgid_stats);
+    file_stats_destroy(&setgid_sticky_stats);
+    file_stats_destroy(&setuid_sticky_stats);
+    file_stats_destroy(&all_special_bits_stats);
 }
 
 static void should_return_unknown_file_type_when_a_NULL_file_stats_are_specified(void)
@@ -312,6 +384,300 @@ static void should_always_return_link_file_stats_when_retrieving_stats_without_f
     file_stats_destroy(&multiDir_stats);
 }
 
+static void should_return_zero_modification_date_when_a_NULL_file_stats_are_specified(void)
+{
+    const t_date date = file_stats_get_modification_date(NULL);
+
+    CU_ASSERT_EQUAL(date.day, 0);
+    CU_ASSERT_EQUAL(date.month, 0);
+    CU_ASSERT_EQUAL(date.year, 0);
+    CU_ASSERT_EQUAL(date.hour, 0);
+    CU_ASSERT_EQUAL(date.minute, 0);
+    CU_ASSERT_EQUAL(date.second, 0);
+}
+
+static void should_return_the_modification_date_for_a_file_and_directory(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE_WITH_STATS("file", MOCK_MODIFICATION_TIME(10, 5, 2024, 8, 9, 10)),
+        MOCK_DIR_WITH_STATS("dir", NULL, MOCK_MODIFICATION_TIME(21, 11, 2023, 18, 19, 20)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    t_file_stats *file_stats = file_stats_get("file");
+    t_file_stats *directory_stats = file_stats_get_without_following_symlinks("dir");
+    const t_date file_date = file_stats_get_modification_date(file_stats);
+    const t_date directory_date = file_stats_get_modification_date(directory_stats);
+
+    CU_ASSERT_EQUAL(file_date.day, 10);
+    CU_ASSERT_EQUAL(file_date.month, 5);
+    CU_ASSERT_EQUAL(file_date.year, 2024);
+    CU_ASSERT_EQUAL(file_date.hour, 8);
+    CU_ASSERT_EQUAL(file_date.minute, 9);
+    CU_ASSERT_EQUAL(file_date.second, 10);
+    CU_ASSERT_EQUAL(directory_date.day, 21);
+    CU_ASSERT_EQUAL(directory_date.month, 11);
+    CU_ASSERT_EQUAL(directory_date.year, 2023);
+    CU_ASSERT_EQUAL(directory_date.hour, 18);
+    CU_ASSERT_EQUAL(directory_date.minute, 19);
+    CU_ASSERT_EQUAL(directory_date.second, 20);
+    CU_ASSERT(verify_that_no_error_was_printed());
+
+    file_stats_destroy(&file_stats);
+    file_stats_destroy(&directory_stats);
+}
+
+static void should_return_zero_blocks_when_a_NULL_file_stats_are_specified(void)
+{
+    CU_ASSERT_EQUAL(file_stats_get_blocks(NULL), 0);
+}
+
+static void should_return_the_allocated_blocks_for_a_file(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE_WITH_STATS("file", MOCK_BLOCKS(17)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    t_file_stats *stats = file_stats_get("file");
+
+    CU_ASSERT_EQUAL(file_stats_get_blocks(stats), 17);
+    CU_ASSERT(verify_that_no_error_was_printed());
+
+    file_stats_destroy(&stats);
+}
+
+static void should_return_zero_device_numbers_for_NULL_stats(void)
+{
+    const t_device device = file_stats_get_device(NULL);
+
+    CU_ASSERT_EQUAL(device.major, 0);
+    CU_ASSERT_EQUAL(device.minor, 0);
+}
+
+static void should_return_major_and_minor_device_numbers(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_CHAR_DEVICE_WITH_STATS("char", MOCK_DEVICE(12, 34)),
+        MOCK_BLOCK_DEVICE_WITH_STATS("block", MOCK_DEVICE(56, 78)),
+        MOCK_FILE("regular"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    t_file_stats *char_stats = file_stats_get("char");
+    t_file_stats *block_stats = file_stats_get("block");
+    t_file_stats *regular_stats = file_stats_get("regular");
+    const t_device char_device = file_stats_get_device(char_stats);
+    const t_device block_device = file_stats_get_device(block_stats);
+    const t_device regular_device = file_stats_get_device(regular_stats);
+
+    CU_ASSERT_EQUAL(char_device.major, 12);
+    CU_ASSERT_EQUAL(char_device.minor, 34);
+    CU_ASSERT_EQUAL(block_device.major, 56);
+    CU_ASSERT_EQUAL(block_device.minor, 78);
+    CU_ASSERT_EQUAL(regular_device.major, 0);
+    CU_ASSERT_EQUAL(regular_device.minor, 0);
+    CU_ASSERT(verify_that_no_error_was_printed());
+
+    file_stats_destroy(&char_stats);
+    file_stats_destroy(&block_stats);
+    file_stats_destroy(&regular_stats);
+}
+
+static void should_return_zero_link_count_when_a_NULL_file_stats_are_specified(void)
+{
+    CU_ASSERT_EQUAL(file_stats_get_link_count(NULL), 0);
+}
+
+static void should_return_the_link_count_for_a_file_and_directory(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE_WITH_STATS("file", MOCK_HARDLINK_COUNT(3)),
+        MOCK_DIR_WITH_STATS("dir", NULL, MOCK_HARDLINK_COUNT(4)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    t_file_stats *file_stats = file_stats_get("file");
+    t_file_stats *directory_stats = file_stats_get("dir");
+
+    CU_ASSERT_EQUAL(file_stats_get_link_count(file_stats), 3);
+    CU_ASSERT_EQUAL(file_stats_get_link_count(directory_stats), 4);
+    CU_ASSERT(verify_that_no_error_was_printed());
+
+    file_stats_destroy(&file_stats);
+    file_stats_destroy(&directory_stats);
+}
+
+static void should_return_NULL_for_the_target_pointed_by_a_symlink_if_NULL_stats_are_passed(void)
+{
+    CU_ASSERT_PTR_NULL(file_stats_get_target_pointed_by_link(NULL));
+}
+
+static void should_return_false_for_target_retrieval_failed_if_NULL_stats_are_passed(void)
+{
+    CU_ASSERT_FALSE(file_stats_target_retrieval_failed(NULL));
+}
+
+static void should_return_NULL_for_the_target_pointed_by_a_symlink_if_stats_of_a_non_link_file_are_passed(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("noLink"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    t_file_stats *stats = file_stats_get_without_following_symlinks("noLink");
+
+    CU_ASSERT_PTR_NULL(file_stats_get_target_pointed_by_link(stats));
+    CU_ASSERT_FALSE(file_stats_target_retrieval_failed(stats));
+
+    file_stats_destroy(&stats);
+}
+
+static void should_return_the_target_pointed_by_a_symlink(void)
+{
+    char long_target[LINK_BUFFER_SIZE + 1];
+    for (size_t i = 0; i < LINK_BUFFER_SIZE; i++)
+        long_target[i] = 'a';
+    long_target[LINK_BUFFER_SIZE] = '\0';
+
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE(long_target),
+        MOCK_SYMLINK("link", long_target),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    t_file_stats *stats = file_stats_get_without_following_symlinks("link");
+
+    CU_ASSERT_STRING_EQUAL(file_stats_get_target_pointed_by_link(stats), long_target);
+    CU_ASSERT_FALSE(file_stats_target_retrieval_failed(stats));
+
+    file_stats_destroy(&stats);
+}
+
+static void should_return_true_for_target_retrieval_failed_if_readlink_fails(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_READ_SYM_LINK_ERROR(EACCES, "failingLink", "target"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    t_file_stats *stats = file_stats_get_without_following_symlinks("failingLink");
+
+    CU_ASSERT_FALSE(file_stats_target_retrieval_failed(stats));
+    CU_ASSERT_PTR_NULL(file_stats_get_target_pointed_by_link(stats));
+    CU_ASSERT_TRUE(file_stats_target_retrieval_failed(stats));
+    CU_ASSERT(verify_that_the_error_printed_is(
+        "ft_ls: cannot read symbolic link '%s': %s\n",
+        "failingLink", strerror(EACCES)
+    ));
+
+    file_stats_destroy(&stats);
+}
+
+static void should_return_NULL_for_the_author_if_NULL_stats_are_passed(void)
+{
+    CU_ASSERT_PTR_NULL(file_stats_get_author(NULL));
+}
+
+static void should_return_the_author_of_a_file(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE_WITH_STATS("file", MOCK_AUTHOR("alice")),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    t_file_stats *stats = file_stats_get("file");
+
+    CU_ASSERT_STRING_EQUAL(file_stats_get_author(stats), "alice");
+    CU_ASSERT(verify_that_no_error_was_printed());
+
+    file_stats_destroy(&stats);
+}
+
+static void should_return_the_author_id_if_the_author_is_not_found(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE_WITH_STATS("file", MOCK_UID(12345)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    t_file_stats *stats = file_stats_get("file");
+
+    CU_ASSERT_STRING_EQUAL(file_stats_get_author(stats), "12345");
+
+    file_stats_destroy(&stats);
+}
+
+static void should_return_NULL_for_the_group_if_NULL_stats_are_passed(void)
+{
+    CU_ASSERT_PTR_NULL(file_stats_get_group(NULL));
+}
+
+static void should_return_the_group_of_a_file(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE_WITH_STATS("file", MOCK_GROUP("developers")),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    t_file_stats *stats = file_stats_get_without_following_symlinks("file");
+
+    CU_ASSERT_STRING_EQUAL(file_stats_get_group(stats), "developers");
+    CU_ASSERT(verify_that_no_error_was_printed());
+
+    file_stats_destroy(&stats);
+}
+
+static void should_return_the_group_id_if_the_group_is_not_found(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE_WITH_STATS("file", MOCK_GID(12345)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    t_file_stats *stats = file_stats_get_without_following_symlinks("file");
+
+    CU_ASSERT_STRING_EQUAL(file_stats_get_group(stats), "12345");
+
+    file_stats_destroy(&stats);
+}
+
+static void should_return_zero_size_when_a_NULL_file_stats_are_specified(void)
+{
+    CU_ASSERT_EQUAL(file_stats_get_size(NULL), 0);
+}
+
+static void should_return_the_size_for_a_file_and_directory(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE_WITH_STATS("file", MOCK_SIZE(12345)),
+        MOCK_DIR_WITH_STATS("dir", NULL, MOCK_SIZE(67890)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    t_file_stats *file_stats = file_stats_get("file");
+    t_file_stats *directory_stats = file_stats_get_without_following_symlinks("dir");
+
+    CU_ASSERT_EQUAL(file_stats_get_size(file_stats), 12345);
+    CU_ASSERT_EQUAL(file_stats_get_size(directory_stats), 67890);
+    CU_ASSERT(verify_that_no_error_was_printed());
+
+    file_stats_destroy(&file_stats);
+    file_stats_destroy(&directory_stats);
+}
+
 static void should_return_NULL_when_an_error_accessing_a_file_occurs(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -386,6 +752,29 @@ static void should_return_NULL_when_an_error_accessing_a_file_without_following_
     ));
 }
 
+static void should_return_NULL_when_an_error_reading_symbolic_links_occurs(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_READ_SYM_LINK_ERROR(EACCES, "failingLink", "target"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    t_file_stats *stats = file_stats_get_without_following_symlinks("failingLink");
+
+    const char *target = file_stats_get_target_pointed_by_link(stats);
+    const char *retried_target = file_stats_get_target_pointed_by_link(stats);
+
+    CU_ASSERT_PTR_NULL(target);
+    CU_ASSERT_PTR_NULL(retried_target);
+    CU_ASSERT(verify_that_the_error_printed_is(
+        "ft_ls: cannot read symbolic link '%s': %s\n",
+        "failingLink", strerror(EACCES)
+    ));
+
+    file_stats_destroy(&stats);
+}
+
 void register_file_stats_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, NULL);
@@ -398,6 +787,8 @@ void register_file_stats_suite(void)
         CU_add_test(suite, "should_destroy_file_stats_correctly", should_destroy_file_stats_correctly);
         CU_add_test(suite, "should_not_fail_to_destroy_file_stats_if_a_NULL_pointer_is_passed", should_not_fail_to_destroy_file_stats_if_a_NULL_pointer_is_passed);
         CU_add_test(suite, "should_not_fail_to_destroy_file_stats_if_a_NULL_file_stats_is_passed", should_not_fail_to_destroy_file_stats_if_a_NULL_file_stats_is_passed);
+        CU_add_test(suite, "should_return_zero_permissions_when_a_NULL_file_stats_are_specified", should_return_zero_permissions_when_a_NULL_file_stats_are_specified);
+        CU_add_test(suite, "should_return_permissions_for_a_file_and_directory", should_return_permissions_for_a_file_and_directory);
         CU_add_test(suite, "should_return_unknown_file_type_when_a_NULL_file_stats_are_specified", should_return_unknown_file_type_when_a_NULL_file_stats_are_specified);
         CU_add_test(suite, "should_return_the_file_stats_of_the_specified_non_link_files", should_return_the_file_stats_of_the_specified_non_link_files);
         CU_add_test(suite, "should_return_link_file_stats_if_the_specified_files_are_symlinks_to_non_directories", should_return_link_file_stats_if_the_specified_files_are_symlinks_to_non_directories);
@@ -406,7 +797,29 @@ void register_file_stats_suite(void)
         CU_add_test(suite, "should_return_link_file_stats_if_the_specified_file_is_a_looped_symlink", should_return_link_file_stats_if_the_specified_file_is_a_looped_symlink);
         CU_add_test(suite, "should_return_the_correct_file_stats_if_the_specified_files_are_multi_hop_symlinks", should_return_the_correct_file_stats_if_the_specified_files_are_multi_hop_symlinks);
         CU_add_test(suite, "should_always_return_link_file_stats_when_retrieving_stats_without_following_symlinks", should_always_return_link_file_stats_when_retrieving_stats_without_following_symlinks);
+        CU_add_test(suite, "should_return_zero_modification_date_when_a_NULL_file_stats_are_specified", should_return_zero_modification_date_when_a_NULL_file_stats_are_specified);
+        CU_add_test(suite, "should_return_the_modification_date_for_a_file_and_directory", should_return_the_modification_date_for_a_file_and_directory);
+        CU_add_test(suite, "should_return_zero_blocks_when_a_NULL_file_stats_are_specified", should_return_zero_blocks_when_a_NULL_file_stats_are_specified);
+        CU_add_test(suite, "should_return_the_allocated_blocks_for_a_file", should_return_the_allocated_blocks_for_a_file);
+        CU_add_test(suite, "should_return_zero_device_numbers_for_NULL_stats", should_return_zero_device_numbers_for_NULL_stats);
+        CU_add_test(suite, "should_return_major_and_minor_device_numbers", should_return_major_and_minor_device_numbers);
+        CU_add_test(suite, "should_return_zero_link_count_when_a_NULL_file_stats_are_specified", should_return_zero_link_count_when_a_NULL_file_stats_are_specified);
+        CU_add_test(suite, "should_return_the_link_count_for_a_file_and_directory", should_return_the_link_count_for_a_file_and_directory);
+        CU_add_test(suite, "should_return_NULL_for_the_target_pointed_by_a_symlink_if_NULL_stats_are_passed", should_return_NULL_for_the_target_pointed_by_a_symlink_if_NULL_stats_are_passed);
+        CU_add_test(suite, "should_return_false_for_target_retrieval_failed_if_NULL_stats_are_passed", should_return_false_for_target_retrieval_failed_if_NULL_stats_are_passed);
+        CU_add_test(suite, "should_return_NULL_for_the_target_pointed_by_a_symlink_if_stats_of_a_non_link_file_are_passed", should_return_NULL_for_the_target_pointed_by_a_symlink_if_stats_of_a_non_link_file_are_passed);
+        CU_add_test(suite, "should_return_the_target_pointed_by_a_symlink", should_return_the_target_pointed_by_a_symlink);
+        CU_add_test(suite, "should_return_true_for_target_retrieval_failed_if_readlink_fails", should_return_true_for_target_retrieval_failed_if_readlink_fails);
+        CU_add_test(suite, "should_return_NULL_for_the_author_if_NULL_stats_are_passed", should_return_NULL_for_the_author_if_NULL_stats_are_passed);
+        CU_add_test(suite, "should_return_the_author_of_a_file", should_return_the_author_of_a_file);
+        CU_add_test(suite, "should_return_the_author_id_if_the_author_is_not_found", should_return_the_author_id_if_the_author_is_not_found);
+        CU_add_test(suite, "should_return_NULL_for_the_group_if_NULL_stats_are_passed", should_return_NULL_for_the_group_if_NULL_stats_are_passed);
+        CU_add_test(suite, "should_return_the_group_of_a_file", should_return_the_group_of_a_file);
+        CU_add_test(suite, "should_return_the_group_id_if_the_group_is_not_found", should_return_the_group_id_if_the_group_is_not_found);
+        CU_add_test(suite, "should_return_zero_size_when_a_NULL_file_stats_are_specified", should_return_zero_size_when_a_NULL_file_stats_are_specified);
+        CU_add_test(suite, "should_return_the_size_for_a_file_and_directory", should_return_the_size_for_a_file_and_directory);
         CU_add_test(suite, "should_return_NULL_when_an_error_accessing_a_file_occurs", should_return_NULL_when_an_error_accessing_a_file_occurs);
         CU_add_test(suite, "should_return_NULL_when_an_error_accessing_a_file_without_following_symlinks_occurs", should_return_NULL_when_an_error_accessing_a_file_without_following_symlinks_occurs);
+        CU_add_test(suite, "should_return_NULL_when_an_error_reading_symbolic_links_occurs", should_return_NULL_when_an_error_reading_symbolic_links_occurs);
     }
 }

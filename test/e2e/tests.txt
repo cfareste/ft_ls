@@ -56,3 +56,19 @@ Makefile -R .hidden src -R .hiddir                                              
 . . -R                                                                                  ::       . . -R
 . nonExistent -R                                                                        ::       . nonExistent -R
 nonExistent . -R                                                                        ::       . nonExistent -R
+-l                                                                                      ::       -l
+-l Makefile                                                                             ::       -l Makefile
+-l src                                                                                  ::       -l src
+src -l                                                                                  ::       src -l
+src -l Makefile file                                                                    ::       src -l Makefile file
+-l file Makefile                                                                        ::       -l file Makefile
+-l Makefile file firstDir src                                                           ::       -l Makefile file firstDir src
+-l setuid_file setgid_file sticky_file                                                  ::       -l setuid_file setgid_file sticky_file
+-l linkdir                                                                              ::       -l linkdir
+-l linklinkDir                                                                          ::       -l linklinkDir
+-l fifo linkfile linklinkFile linkdir linklinkDir                                       ::       -l fifo linkfile linklinkFile linkdir linklinkDir
+-l brokenLink loop1 loop2                                                               ::       -l brokenLink loop1 loop2
+-l nonExistent                                                                          ::       -l nonExistent
+-l nonExistent noTarget                                                                 ::       -l nonExistent noTarget
+-l nonExistent Makefile src                                                             ::       -l nonExistent Makefile src
+#-l /                                                                                    ::       -l /

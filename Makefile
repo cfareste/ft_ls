@@ -48,9 +48,11 @@ vpath %.c	$(SRC):\
 			$(SRC)/parsed_arguments/options:\
 			$(SRC)/parsed_arguments/file_operands:\
 			$(SRC)/filesystem:\
+			$(SRC)/utils:\
 			$(SRC)/file_entry:\
 			$(SRC)/scanner:\
 			$(SRC)/renderer:\
+			$(SRC)/renderer/strategies:\
 			$(SRC)/sorter:\
 			$(SRC)/path_builder:\
 			$(SRC)/error_reporter:\
@@ -63,10 +65,13 @@ SRCS = ft_ls.c \
 		options.c \
 		file_operands.c \
 		directory.c \
+		date.c \
 		file_stats.c \
 		file_entry.c \
 		scanner.c \
 		renderer.c \
+		single_column_strategy.c \
+		long_format_strategy.c \
 		sorter.c \
 		path_builder.c \
 		error_reporter.c \

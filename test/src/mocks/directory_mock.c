@@ -28,14 +28,14 @@ DIR *mock_opendir(const char *path)
         return NULL;
     }
 
-    while (S_ISLNK(dir_entry->mode))
+    while (S_ISLNK(dir_entry->stats.st_mode))
     {
         dir_entry = find_vfs_entry(dir_entry->target);
         if (dir_entry == NULL)
             return NULL;
     }
 
-    if (!S_ISDIR(dir_entry->mode))
+    if (!S_ISDIR(dir_entry->stats.st_mode))
         return NULL;
 
     t_mock_dir *dir = ft_safe_calloc(1, sizeof(t_mock_dir));
@@ -52,9 +52,9 @@ struct dirent *mock_readdir(DIR *dirp)
     if (stream == NULL || stream->dir_entry == NULL || stream->dir_entry->entries == NULL)
         return NULL;
 
-    if (stream->dir_entry->errors.readdir_error.code != 0 && stream->dir_entry->errors.readdir_error.entry_idx == stream->next_index)
+    if (stream->dir_entry->errors.readdir_errno != 0 && stream->dir_entry->errors.entry_idx == stream->next_index)
     {
-        errno = stream->dir_entry->errors.readdir_error.code;
+        errno = stream->dir_entry->errors.readdir_errno;
         return NULL;
     }
 

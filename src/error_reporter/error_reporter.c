@@ -9,6 +9,7 @@
 #define READING_DIRECTORY_ERROR "reading directory"
 #define CLOSING_DIRECTORY_ERROR "closing directory"
 #define ACCESSING_FILE_ERROR "cannot access"
+#define READING_SYMBOLIC_LINK_ERROR "cannot read symbolic link"
 
 static void report_error(const char *error_message, const char *file_path)
 {
@@ -38,4 +39,9 @@ void report_closing_directory_error(const char *directory_path)
 void report_access_file_error(const char *file_path)
 {
     report_error(ACCESSING_FILE_ERROR, file_path);
+}
+
+void report_read_symbolic_link_error(const char *file_path)
+{
+    report_error(READING_SYMBOLIC_LINK_ERROR, file_path);
 }
