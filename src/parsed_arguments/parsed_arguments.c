@@ -96,7 +96,7 @@ t_result *parse_arguments(const int num_of_arguments, const char **arguments)
     parsed_arguments->options = options_get(arguments);
     parsed_arguments->has_implicit_default_operand = num_of_file_operands == 0;
     parsed_arguments->file_operands = file_operands_get(num_of_file_operands, arguments);
-    parsed_arguments->file_operands_stats = file_operands_get_stats(num_of_file_operands, parsed_arguments->file_operands);
+    parsed_arguments->file_operands_stats = file_operands_get_stats(num_of_file_operands, parsed_arguments->file_operands, !parsed_arguments_is_long_format_active(parsed_arguments));
     const char *failed_advanced_metadata_operand = NULL;
     if (parsed_arguments_is_long_format_active(parsed_arguments))
         failed_advanced_metadata_operand = retrieve_advanced_file_stats(parsed_arguments->file_operands, parsed_arguments->file_operands_stats);

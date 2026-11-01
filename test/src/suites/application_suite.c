@@ -1176,6 +1176,33 @@ static void should_render_a_non_directory_operand_in_long_format(void)
     assert_application_execution_succeed(result);
 }
 
+static void should_render_a_symlink_to_a_directory_operand_as_a_link_in_long_format(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_SYMLINK_WITH_STATS("link", "dir",
+            MOCK_BLOCKS(1),
+            MOCK_HARDLINK_COUNT(4),
+            MOCK_AUTHOR("alice"),
+            MOCK_GROUP("staff"),
+            MOCK_SIZE(3),
+            MOCK_MODIFICATION_TIME(2, 10, 2000, 12, 30, 0)
+        ),
+        MOCK_DIR("dir", ".", "..", "inside"),
+        MOCK_FILE("dir/inside"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-l", "link", NULL };
+    get_parsed_arguments_result(2, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "lrwxrwxrwx 4 alice staff 3 Oct  2  2000 link -> dir\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    assert_application_execution_succeed(result);
+}
+
 static void should_render_a_directory_operand_in_long_format(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -3158,6 +3185,7 @@ void register_application_suite(void)
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_specified_operands_recursively", should_successfully_print_the_contents_of_the_specified_operands_recursively);
         CU_add_test(suite, "should_render_the_default_directory_in_long_format", should_render_the_default_directory_in_long_format);
         CU_add_test(suite, "should_render_a_non_directory_operand_in_long_format", should_render_a_non_directory_operand_in_long_format);
+        CU_add_test(suite, "should_render_a_symlink_to_a_directory_operand_as_a_link_in_long_format", should_render_a_symlink_to_a_directory_operand_as_a_link_in_long_format);
         CU_add_test(suite, "should_render_a_directory_operand_in_long_format", should_render_a_directory_operand_in_long_format);
         CU_add_test(suite, "should_render_mixed_operands_in_long_format", should_render_mixed_operands_in_long_format);
         CU_add_test(suite, "should_render_file_stats_for_non_directory_and_directory_entries_in_long_format", should_render_file_stats_for_non_directory_and_directory_entries_in_long_format);
