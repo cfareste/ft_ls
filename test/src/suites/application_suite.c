@@ -32,6 +32,13 @@ static void assert_application_execution_succeed(const int result)
     CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
 }
 
+static void assert_application_succeeded_with_output(const int result, const char *expected_output)
+{
+    CU_ASSERT(verify_that_the_output_printed_is("%s", expected_output));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    assert_application_execution_succeed(result);
+}
+
 static void should_return_a_major_error_when_passing_a_NULL_parsed_argument(void)
 {
     CU_ASSERT_EQUAL(application_run(parsed_arguments_result), FT_LS_APPLICATION_MAJOR_ERROR);
@@ -1619,6 +1626,364 @@ static void should_render_broken_looped_and_multihop_links_in_long_format(void)
     assert_application_execution_succeed(result);
 }
 
+static void should_print_visible_and_hidden_entries_in_the_current_directory_with_read_all(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", ".", "..", "visible", ".env"),
+        MOCK_DIR("..", ".", ".."),
+        MOCK_FILE("visible"),
+        MOCK_FILE(".env"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-a", NULL };
+    get_parsed_arguments_result(1, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    assert_application_succeeded_with_output(result, ".\n..\n.env\nvisible\n");
+}
+
+static void should_print_visible_entries_in_the_current_directory_without_hidden_entries_with_read_all(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", ".", "..", "visible"),
+        MOCK_DIR("..", ".", ".."),
+        MOCK_FILE("visible"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-a", NULL };
+    get_parsed_arguments_result(1, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    assert_application_succeeded_with_output(result, ".\n..\nvisible\n");
+}
+
+static void should_print_only_dot_entries_for_an_empty_current_directory_with_read_all(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", ".", ".."),
+        MOCK_DIR("..", ".", ".."),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-a", NULL };
+    get_parsed_arguments_result(1, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    assert_application_succeeded_with_output(result, ".\n..\n");
+}
+
+static void should_print_hidden_entries_in_a_current_directory_with_only_hidden_entries_with_read_all(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", ".", "..", ".env", ".config"),
+        MOCK_DIR("..", ".", ".."),
+        MOCK_FILE(".env"),
+        MOCK_FILE(".config"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-a", NULL };
+    get_parsed_arguments_result(1, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    assert_application_succeeded_with_output(result, ".\n..\n.config\n.env\n");
+}
+
+static void should_print_visible_and_hidden_entries_in_a_directory_operand_with_read_all(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("dir", ".", "..", "visible", ".env"),
+        MOCK_DIR("dir/.", ".", ".."),
+        MOCK_DIR("dir/..", ".", ".."),
+        MOCK_FILE("dir/visible"),
+        MOCK_FILE("dir/.env"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-a", "dir", NULL };
+    get_parsed_arguments_result(2, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    assert_application_succeeded_with_output(result, ".\n..\n.env\nvisible\n");
+}
+
+static void should_print_visible_entries_in_a_directory_operand_without_hidden_entries_with_read_all(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("dir", ".", "..", "visible"),
+        MOCK_DIR("dir/.", ".", ".."),
+        MOCK_DIR("dir/..", ".", ".."),
+        MOCK_FILE("dir/visible"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-a", "dir", NULL };
+    get_parsed_arguments_result(2, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    assert_application_succeeded_with_output(result, ".\n..\nvisible\n");
+}
+
+static void should_print_only_dot_entries_for_an_empty_directory_operand_with_read_all(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("empty", ".", ".."),
+        MOCK_DIR("empty/.", ".", ".."),
+        MOCK_DIR("empty/..", ".", ".."),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-a", "empty", NULL };
+    get_parsed_arguments_result(2, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    assert_application_succeeded_with_output(result, ".\n..\n");
+}
+
+static void should_print_hidden_entries_in_a_directory_operand_with_only_hidden_entries_with_read_all(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("dir", ".", "..", ".env", ".config"),
+        MOCK_DIR("dir/.", ".", ".."),
+        MOCK_DIR("dir/..", ".", ".."),
+        MOCK_FILE("dir/.env"),
+        MOCK_FILE("dir/.config"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-a", "dir", NULL };
+    get_parsed_arguments_result(2, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    assert_application_succeeded_with_output(result, ".\n..\n.config\n.env\n");
+}
+
+static void should_print_hidden_and_visible_entries_from_multiple_directory_operands_with_read_all(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("dir1", ".", "..", ".env", "visible"),
+        MOCK_DIR("dir1/.", ".", ".."),
+        MOCK_DIR("dir1/..", ".", ".."),
+        MOCK_DIR("dir2", ".", "..", "normal"),
+        MOCK_DIR("dir2/.", ".", ".."),
+        MOCK_DIR("dir2/..", ".", ".."),
+        MOCK_FILE("dir1/.env"),
+        MOCK_FILE("dir1/visible"),
+        MOCK_FILE("dir2/normal"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-a", "dir1", "dir2", NULL };
+    get_parsed_arguments_result(3, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    assert_application_succeeded_with_output(
+        result,
+        "dir1:\n"
+        ".\n"
+        "..\n"
+        ".env\n"
+        "visible\n"
+        "\n"
+        "dir2:\n"
+        ".\n"
+        "..\n"
+        "normal\n"
+    );
+}
+
+static void should_print_headers_for_empty_and_hidden_only_directory_operands_with_read_all(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("empty", ".", ".."),
+        MOCK_DIR("empty/.", ".", ".."),
+        MOCK_DIR("empty/..", ".", ".."),
+        MOCK_DIR("hidden", ".", "..", ".env"),
+        MOCK_DIR("hidden/.", ".", ".."),
+        MOCK_DIR("hidden/..", ".", ".."),
+        MOCK_FILE("hidden/.env"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-a", "empty", "hidden", NULL };
+    get_parsed_arguments_result(3, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    assert_application_succeeded_with_output(
+        result,
+        "empty:\n"
+        ".\n"
+        "..\n"
+        "\n"
+        "hidden:\n"
+        ".\n"
+        "..\n"
+        ".env\n"
+    );
+}
+
+static void should_print_hidden_and_visible_entries_from_mixed_operands_with_read_all(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE(".env"),
+        MOCK_FILE("file"),
+        MOCK_DIR("dir", ".", "..", ".hidden", "visible"),
+        MOCK_DIR("dir/.", ".", ".."),
+        MOCK_DIR("dir/..", ".", ".."),
+        MOCK_FILE("dir/.hidden"),
+        MOCK_FILE("dir/visible"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-a", ".env", "dir", "file", NULL };
+    get_parsed_arguments_result(4, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    assert_application_succeeded_with_output(
+        result,
+        ".env\n"
+        "file\n"
+        "\n"
+        "dir:\n"
+        ".\n"
+        "..\n"
+        ".hidden\n"
+        "visible\n"
+    );
+}
+
+static void should_print_mixed_operands_with_empty_and_hidden_only_directories_with_read_all(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("file"),
+        MOCK_DIR("empty", ".", ".."),
+        MOCK_DIR("empty/.", ".", ".."),
+        MOCK_DIR("empty/..", ".", ".."),
+        MOCK_DIR("hidden", ".", "..", ".env"),
+        MOCK_DIR("hidden/.", ".", ".."),
+        MOCK_DIR("hidden/..", ".", ".."),
+        MOCK_FILE("hidden/.env"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-a", "file", "empty", "hidden", NULL };
+    get_parsed_arguments_result(4, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    assert_application_succeeded_with_output(
+        result,
+        "file\n"
+        "\n"
+        "empty:\n"
+        ".\n"
+        "..\n"
+        "\n"
+        "hidden:\n"
+        ".\n"
+        "..\n"
+        ".env\n"
+    );
+}
+
+static void should_print_headers_for_all_mixed_operand_directories_with_read_all(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE(".env"),
+        MOCK_FILE("file"),
+        MOCK_DIR("dir", ".", "..", ".hidden", "visible"),
+        MOCK_DIR("dir/.", ".", ".."),
+        MOCK_DIR("dir/..", ".", ".."),
+        MOCK_FILE("dir/.hidden"),
+        MOCK_FILE("dir/visible"),
+        MOCK_DIR("empty", ".", ".."),
+        MOCK_DIR("empty/.", ".", ".."),
+        MOCK_DIR("empty/..", ".", ".."),
+        MOCK_DIR("only_hidden", ".", "..", ".secret"),
+        MOCK_DIR("only_hidden/.", ".", ".."),
+        MOCK_DIR("only_hidden/..", ".", ".."),
+        MOCK_FILE("only_hidden/.secret"),
+        MOCK_DIR("plain_dir", ".", "..", "normal"),
+        MOCK_DIR("plain_dir/.", ".", ".."),
+        MOCK_DIR("plain_dir/..", ".", ".."),
+        MOCK_FILE("plain_dir/normal"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-a", ".env", "dir", "empty", "file", "only_hidden", "plain_dir", NULL };
+    get_parsed_arguments_result(7, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    assert_application_succeeded_with_output(
+        result,
+        ".env\n"
+        "file\n"
+        "\n"
+        "dir:\n"
+        ".\n"
+        "..\n"
+        ".hidden\n"
+        "visible\n"
+        "\n"
+        "empty:\n"
+        ".\n"
+        "..\n"
+        "\n"
+        "only_hidden:\n"
+        ".\n"
+        "..\n"
+        ".secret\n"
+        "\n"
+        "plain_dir:\n"
+        ".\n"
+        "..\n"
+        "normal\n"
+    );
+}
+
+static void should_print_explicitly_specified_hidden_file_and_directory_operands_with_read_all(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE(".env"),
+        MOCK_DIR(".idea", ".", "..", ".settings", "visible"),
+        MOCK_DIR(".idea/.", ".", ".."),
+        MOCK_DIR(".idea/..", ".", ".."),
+        MOCK_FILE(".idea/.settings"),
+        MOCK_FILE(".idea/visible"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-a", ".env", ".idea", NULL };
+    get_parsed_arguments_result(3, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    assert_application_succeeded_with_output(
+        result,
+        ".env\n"
+        "\n"
+        ".idea:\n"
+        ".\n"
+        "..\n"
+        ".settings\n"
+        "visible\n"
+    );
+}
+
 static void should_fail_with_a_major_error_and_not_print_anything_if_fails_to_open_the_directory(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -3200,6 +3565,20 @@ void register_application_suite(void)
         CU_add_test(suite, "should_report_multiple_major_errors_for_stat_and_readlink_failures_on_operands", should_report_multiple_major_errors_for_stat_and_readlink_failures_on_operands);
         CU_add_test(suite, "should_report_major_and_minor_errors_for_operands_and_directory_content", should_report_major_and_minor_errors_for_operands_and_directory_content);
         CU_add_test(suite, "should_render_broken_looped_and_multihop_links_in_long_format", should_render_broken_looped_and_multihop_links_in_long_format);
+        CU_add_test(suite, "should_print_visible_and_hidden_entries_in_the_current_directory_with_read_all", should_print_visible_and_hidden_entries_in_the_current_directory_with_read_all);
+        CU_add_test(suite, "should_print_visible_entries_in_the_current_directory_without_hidden_entries_with_read_all", should_print_visible_entries_in_the_current_directory_without_hidden_entries_with_read_all);
+        CU_add_test(suite, "should_print_only_dot_entries_for_an_empty_current_directory_with_read_all", should_print_only_dot_entries_for_an_empty_current_directory_with_read_all);
+        CU_add_test(suite, "should_print_hidden_entries_in_a_current_directory_with_only_hidden_entries_with_read_all", should_print_hidden_entries_in_a_current_directory_with_only_hidden_entries_with_read_all);
+        CU_add_test(suite, "should_print_visible_and_hidden_entries_in_a_directory_operand_with_read_all", should_print_visible_and_hidden_entries_in_a_directory_operand_with_read_all);
+        CU_add_test(suite, "should_print_visible_entries_in_a_directory_operand_without_hidden_entries_with_read_all", should_print_visible_entries_in_a_directory_operand_without_hidden_entries_with_read_all);
+        CU_add_test(suite, "should_print_only_dot_entries_for_an_empty_directory_operand_with_read_all", should_print_only_dot_entries_for_an_empty_directory_operand_with_read_all);
+        CU_add_test(suite, "should_print_hidden_entries_in_a_directory_operand_with_only_hidden_entries_with_read_all", should_print_hidden_entries_in_a_directory_operand_with_only_hidden_entries_with_read_all);
+        CU_add_test(suite, "should_print_hidden_and_visible_entries_from_multiple_directory_operands_with_read_all", should_print_hidden_and_visible_entries_from_multiple_directory_operands_with_read_all);
+        CU_add_test(suite, "should_print_headers_for_empty_and_hidden_only_directory_operands_with_read_all", should_print_headers_for_empty_and_hidden_only_directory_operands_with_read_all);
+        CU_add_test(suite, "should_print_hidden_and_visible_entries_from_mixed_operands_with_read_all", should_print_hidden_and_visible_entries_from_mixed_operands_with_read_all);
+        CU_add_test(suite, "should_print_mixed_operands_with_empty_and_hidden_only_directories_with_read_all", should_print_mixed_operands_with_empty_and_hidden_only_directories_with_read_all);
+        CU_add_test(suite, "should_print_headers_for_all_mixed_operand_directories_with_read_all", should_print_headers_for_all_mixed_operand_directories_with_read_all);
+        CU_add_test(suite, "should_print_explicitly_specified_hidden_file_and_directory_operands_with_read_all", should_print_explicitly_specified_hidden_file_and_directory_operands_with_read_all);
         CU_add_test(suite, "should_fail_with_a_major_error_and_not_print_anything_if_fails_to_open_the_directory", should_fail_with_a_major_error_and_not_print_anything_if_fails_to_open_the_directory);
         CU_add_test(suite, "should_fail_with_a_major_error_and_not_print_anything_if_fails_to_open_the_current_directory_without_arguments", should_fail_with_a_major_error_and_not_print_anything_if_fails_to_open_the_current_directory_without_arguments);
         CU_add_test(suite, "should_fail_with_a_major_error_and_not_print_anything_if_fails_to_read_the_first_entry_of_the_directory", should_fail_with_a_major_error_and_not_print_anything_if_fails_to_read_the_first_entry_of_the_directory);

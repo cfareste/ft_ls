@@ -1,7 +1,5 @@
 TODO:
 1. Implementar opción -a
-2. Parsear opción -a
-3. No filtrar si la opción está activa
 
 
 TODO En algún momento:
@@ -251,3 +249,23 @@ Note: Siempre debe estar presente la opción -l en este QA.
 No probado en E2E:
     - Errores de readlink
     - Errores de lstat minors (contenido de directorio)
+
+
+QA LS-18 Dont filter hidden files (ls -a ... | cat)
+Note: Siempre debe estar presente la opción -a en este QA.
+1. Sin parámetros (directorio actual)
+   - Con y sin hidden files
+   - Vacío / Solo hidden files
+2. 1 parámetro (directorio)
+   - Con y sin hidden files
+   - Vacío / Solo hidden files
+3. Múltiples parámetros
+   - Si solo hay directorios
+     - Con y sin hidden files
+     - Vacíos / Solo hidden files
+   - Si hay mezcla
+     - Con y sin hidden files
+     - Vacíos / Solo hidden files
+   - Mezcla de lo anterior y comprobar dir headers
+4. Parámetros ocultos (ficheros y directorios | .env .idea/)
+No probado en E2E: Current dir vacío / solo hidden
