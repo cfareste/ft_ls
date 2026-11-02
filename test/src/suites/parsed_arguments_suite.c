@@ -584,6 +584,17 @@ static void should_parse_the_recursive_option(void)
     CU_ASSERT(verify_that_no_error_was_printed());
 }
 
+static void should_parse_the_a_option(void)
+{
+    const char *arguments[] = { "-a", NULL };
+
+    get_parsed_arguments_result(1, arguments);
+
+    CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
+    CU_ASSERT_TRUE(parsed_arguments_is_option_active(sut, OPTIONS_READ_ALL));
+    CU_ASSERT(verify_that_no_error_was_printed());
+}
+
 static void should_parse_the_long_format_option(void)
 {
     const char *arguments[] = { "-l", NULL };
@@ -1039,6 +1050,7 @@ void register_parsed_arguments_suite(void)
         CU_add_test(suite, "should_parse_the_option_and_file_operands_if_the_option_was_a_middle_specified_argument", should_parse_the_option_and_file_operands_if_the_option_was_a_middle_specified_argument);
         CU_add_test(suite, "should_parse_the_option_and_file_operands_if_the_option_was_the_last_specified_argument", should_parse_the_option_and_file_operands_if_the_option_was_the_last_specified_argument);
         CU_add_test(suite, "should_parse_the_recursive_option", should_parse_the_recursive_option);
+        CU_add_test(suite, "should_parse_the_a_option", should_parse_the_a_option);
         CU_add_test(suite, "should_parse_the_long_format_option", should_parse_the_long_format_option);
         CU_add_test(suite, "should_return_false_for_long_format_if_NULL_parsed_arguments_are_passed", should_return_false_for_long_format_if_NULL_parsed_arguments_are_passed);
         CU_add_test(suite, "should_return_true_for_long_format_if_the_option_is_active", should_return_true_for_long_format_if_the_option_is_active);

@@ -72,3 +72,10 @@ src -l Makefile file                                                            
 -l nonExistent noTarget                                                                 ::       -l nonExistent noTarget
 -l nonExistent Makefile src                                                             ::       -l nonExistent Makefile src
 #-l /                                                                                    ::       -l /
+-a                                                                                      ::       -a
+-a src                                                                                  ::       -a src
+-a empty                                                                                ::       -a empty
+-a .hiddir src                                                                          ::       -a .hiddir src
+-a empty empty                                                                          ::       -a empty empty
+-a Makefile src                                                                         ::       -a Makefile src
+-a Makefile src empty                                                                   ::       -a Makefile src empty

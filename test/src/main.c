@@ -20,7 +20,7 @@ int	main(void)
 	register_result_suite();
 	register_application_suite();
 
-	CU_basic_set_mode(CU_BRM_VERBOSE);
+	CU_basic_set_mode(CU_BRM_NORMAL);
 	CU_basic_run_tests();
 	const unsigned int failures = CU_get_number_of_failures();
 	CU_cleanup_registry();

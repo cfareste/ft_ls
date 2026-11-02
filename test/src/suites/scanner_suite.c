@@ -34,6 +34,19 @@ static void scan_directory(const char *path)
     sut = result_get_value(result);
 }
 
+static void enable_read_all_option(void)
+{
+    const char *arguments[] = { "-a", NULL };
+    t_result *parsed_arguments_result = parse_arguments(1, arguments);
+    t_parsed_arguments *parsed_arguments = result_get_value(parsed_arguments_result);
+
+    scanner_context_destroy(&scanner_context);
+    scanner_context = scanner_context_create(parsed_arguments);
+
+    parsed_arguments_destroy(&parsed_arguments);
+    result_destroy(&parsed_arguments_result);
+}
+
 static void assert_file_entry_array_is_null(void)
 {
     CU_ASSERT_PTR_NULL(sut);
@@ -435,6 +448,52 @@ static void should_not_retrieve_advanced_metadata_without_long_format(void)
     CU_ASSERT_PTR_NULL(file_entry_get_link_target(entry));
 }
 
+static void should_return_all_entries_if_read_all_is_active_for_a_directory_with_hidden_files(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("dir", "subdir", ".hidden_dir", "file", ".gitignore", ".env"),
+        MOCK_DIR("dir/subdir", ".", ".."),
+        MOCK_DIR("dir/.hidden_dir", ".", ".."),
+        MOCK_FILE("dir/file"),
+        MOCK_FILE("dir/.gitignore"),
+        MOCK_FILE("dir/.env"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+    enable_read_all_option();
+
+    const char *expected_file_names[] = { "subdir", ".hidden_dir", "file", ".gitignore", ".env", NULL };
+
+    scan_directory("dir");
+
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result_has_failed(result), 0);
+    assert_file_entry_array_length_is(5);
+    assert_file_entry_array_names_are(expected_file_names);
+}
+
+static void should_return_all_entries_if_read_all_is_active_for_a_directory_with_only_hidden_files(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("dir", ".gitignore", ".idea", ".run"),
+        MOCK_FILE("dir/.gitignore"),
+        MOCK_DIR("dir/.idea", ".", ".."),
+        MOCK_DIR("dir/.run", ".", ".."),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+    enable_read_all_option();
+
+    const char *expected_file_names[] = { ".gitignore", ".idea", ".run", NULL };
+
+    scan_directory("dir");
+
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result_has_failed(result), 0);
+    assert_file_entry_array_length_is(3);
+    assert_file_entry_array_names_are(expected_file_names);
+}
+
 void register_scanner_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, test_teardown);
@@ -459,5 +518,7 @@ void register_scanner_suite(void)
         CU_add_test(suite, "should_return_a_valid_array_even_if_it_fails_to_access_an_entry", should_return_a_valid_array_even_if_it_fails_to_access_an_entry);
         CU_add_test(suite, "should_retrieve_advanced_metadata_only_when_long_format_is_active", should_retrieve_advanced_metadata_only_when_long_format_is_active);
         CU_add_test(suite, "should_not_retrieve_advanced_metadata_without_long_format", should_not_retrieve_advanced_metadata_without_long_format);
+        CU_add_test(suite, "should_return_all_entries_if_read_all_is_active_for_a_directory_with_hidden_files", should_return_all_entries_if_read_all_is_active_for_a_directory_with_hidden_files);
+        CU_add_test(suite, "should_return_all_entries_if_read_all_is_active_for_a_directory_with_only_hidden_files", should_return_all_entries_if_read_all_is_active_for_a_directory_with_only_hidden_files);
     }
 }

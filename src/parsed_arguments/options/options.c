@@ -3,6 +3,7 @@
 
 #define RECURSIVE_OPTION_CHAR 'R'
 #define LONG_FORMAT_OPTION_CHAR 'l'
+#define READ_ALL_OPTION_CHAR 'a'
 
 static int argument_is_an_option(const char *argument)
 {
@@ -22,6 +23,8 @@ t_options options_get(const char **arguments)
             options |= OPTIONS_RECURSIVE;
         if (arguments[i][1] == LONG_FORMAT_OPTION_CHAR)
             options |= OPTIONS_LONG_FORMAT;
+        if (arguments[i][1] == READ_ALL_OPTION_CHAR)
+            options |= OPTIONS_READ_ALL;
     }
 
     return options;
