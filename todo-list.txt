@@ -1,5 +1,4 @@
 TODO:
-1. Implementar opción -a
 
 
 TODO En algún momento:
