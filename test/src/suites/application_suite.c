@@ -2004,6 +2004,124 @@ static void should_print_explicitly_specified_hidden_file_and_directory_operands
     );
 }
 
+static void should_reverse_sort_the_current_directory_when_reverse_option_is_active(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", ".", "..", "alpha", "middle", "zeta"),
+        MOCK_FILE("alpha"),
+        MOCK_FILE("middle"),
+        MOCK_FILE("zeta"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-r", NULL };
+    get_parsed_arguments_result(1, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    assert_application_succeeded_with_output(result, "zeta\nmiddle\nalpha\n");
+}
+
+static void should_reverse_sort_a_directory_operand_contents_when_reverse_option_is_active(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("dir", ".", "..", "alpha", "middle", "zeta"),
+        MOCK_FILE("dir/alpha"),
+        MOCK_FILE("dir/middle"),
+        MOCK_FILE("dir/zeta"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-r", "dir", NULL };
+    get_parsed_arguments_result(2, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    assert_application_succeeded_with_output(result, "zeta\nmiddle\nalpha\n");
+}
+
+static void should_reverse_sort_multiple_file_operands_when_reverse_option_is_active(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("alpha"),
+        MOCK_FILE("middle"),
+        MOCK_FILE("zeta"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-r", "alpha", "zeta", "middle", NULL };
+    get_parsed_arguments_result(4, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    assert_application_succeeded_with_output(result, "zeta\nmiddle\nalpha\n");
+}
+
+static void should_reverse_sort_multiple_directory_operands_and_their_contents_when_reverse_option_is_active(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("dirA", ".", "..", "alpha", "zeta"),
+        MOCK_DIR("dirZ", ".", "..", "middle", "zeta"),
+        MOCK_FILE("dirA/alpha"),
+        MOCK_FILE("dirA/zeta"),
+        MOCK_FILE("dirZ/middle"),
+        MOCK_FILE("dirZ/zeta"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-r", "dirA", "dirZ", NULL };
+    get_parsed_arguments_result(3, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    assert_application_succeeded_with_output(
+        result,
+        "dirZ:\n"
+        "zeta\n"
+        "middle\n"
+        "\n"
+        "dirA:\n"
+        "zeta\n"
+        "alpha\n"
+    );
+}
+
+static void should_reverse_sort_file_and_directory_operands_separately_and_directory_contents_when_reverse_option_is_active(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("alpha"),
+        MOCK_FILE("middle"),
+        MOCK_FILE("zeta"),
+        MOCK_DIR("dirA", ".", "..", "alpha", "zeta"),
+        MOCK_DIR("dirZ", ".", "..", "middle", "zeta"),
+        MOCK_FILE("dirA/alpha"),
+        MOCK_FILE("dirA/zeta"),
+        MOCK_FILE("dirZ/middle"),
+        MOCK_FILE("dirZ/zeta"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-r", "dirA", "alpha", "dirZ", "zeta", "middle", NULL };
+    get_parsed_arguments_result(6, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    assert_application_succeeded_with_output(
+        result,
+        "zeta\n"
+        "middle\n"
+        "alpha\n"
+        "\n"
+        "dirZ:\n"
+        "zeta\n"
+        "middle\n"
+        "\n"
+        "dirA:\n"
+        "zeta\n"
+        "alpha\n"
+    );
+}
+
 static void should_fail_with_a_major_error_and_not_print_anything_if_fails_to_open_the_directory(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -3600,6 +3718,11 @@ void register_application_suite(void)
         CU_add_test(suite, "should_print_mixed_operands_with_empty_and_hidden_only_directories_with_read_all", should_print_mixed_operands_with_empty_and_hidden_only_directories_with_read_all);
         CU_add_test(suite, "should_print_headers_for_all_mixed_operand_directories_with_read_all", should_print_headers_for_all_mixed_operand_directories_with_read_all);
         CU_add_test(suite, "should_print_explicitly_specified_hidden_file_and_directory_operands_with_read_all", should_print_explicitly_specified_hidden_file_and_directory_operands_with_read_all);
+        CU_add_test(suite, "should_reverse_sort_the_current_directory_when_reverse_option_is_active", should_reverse_sort_the_current_directory_when_reverse_option_is_active);
+        CU_add_test(suite, "should_reverse_sort_a_directory_operand_contents_when_reverse_option_is_active", should_reverse_sort_a_directory_operand_contents_when_reverse_option_is_active);
+        CU_add_test(suite, "should_reverse_sort_multiple_file_operands_when_reverse_option_is_active", should_reverse_sort_multiple_file_operands_when_reverse_option_is_active);
+        CU_add_test(suite, "should_reverse_sort_multiple_directory_operands_and_their_contents_when_reverse_option_is_active", should_reverse_sort_multiple_directory_operands_and_their_contents_when_reverse_option_is_active);
+        CU_add_test(suite, "should_reverse_sort_file_and_directory_operands_separately_and_directory_contents_when_reverse_option_is_active", should_reverse_sort_file_and_directory_operands_separately_and_directory_contents_when_reverse_option_is_active);
         CU_add_test(suite, "should_fail_with_a_major_error_and_not_print_anything_if_fails_to_open_the_directory", should_fail_with_a_major_error_and_not_print_anything_if_fails_to_open_the_directory);
         CU_add_test(suite, "should_fail_with_a_major_error_and_not_print_anything_if_fails_to_open_the_current_directory_without_arguments", should_fail_with_a_major_error_and_not_print_anything_if_fails_to_open_the_current_directory_without_arguments);
         CU_add_test(suite, "should_fail_with_a_major_error_and_not_print_anything_if_fails_to_read_the_first_entry_of_the_directory", should_fail_with_a_major_error_and_not_print_anything_if_fails_to_read_the_first_entry_of_the_directory);

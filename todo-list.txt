@@ -1,7 +1,5 @@
 TODO:
 1. Implementar -r
-3. Revertir orden de los file operands
-4. Revertir orden del contenido de directorios
 
 
 TODO En algún momento:
@@ -271,3 +269,14 @@ Note: Siempre debe estar presente la opción -a en este QA.
    - Mezcla de lo anterior y comprobar dir headers
 4. Parámetros ocultos (ficheros y directorios | .env .idea/)
 No probado en E2E: Current dir vacío / solo hidden
+
+
+QA LS-19 Reverse sorting order (`ls -r ... | cat`)
+1. Sin parámetros
+2. 1 parámetro (directorio)
+3. Múltiples parámetros
+   - Archivos
+   - Directorios
+     - Que se ordene nombres y contenidos
+   - Mixto
+     - Que se ordenen ambos y por separado
