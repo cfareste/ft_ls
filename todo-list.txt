@@ -1,4 +1,7 @@
 TODO:
+1. Implementar opción -a
+2. Parsear opción -a
+3. No filtrar si la opción está activa
 
 
 TODO En algún momento:
