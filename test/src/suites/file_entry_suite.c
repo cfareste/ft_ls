@@ -4,6 +4,7 @@
 #include "file_entry.h"
 #include "file_stats.h"
 #include "mocks.h"
+#include "sorter.h"
 
 #define SUITE_NAME "file_entry"
 #define DEFAULT_NAME "default"
@@ -11,6 +12,7 @@
 
 static t_file_entry *entry_sut;
 static t_file_entry_array *array_sut;
+static t_sorter_context *sorter_context;
 
 static void test_setup(void)
 {
@@ -18,12 +20,14 @@ static void test_setup(void)
     vfs_mock_reset();
     entry_sut = file_entry_create(DEFAULT_NAME);
     array_sut = file_entry_array_create();
+    sorter_context = sorter_context_create(NULL);
 }
 
 static void test_teardown(void)
 {
     file_entry_destroy(&entry_sut);
     file_entry_array_destroy(&array_sut);
+    sorter_context_destroy(&sorter_context);
 }
 
 static void assert_file_entry_array_is_null(const t_file_entry_array *file_entry_array)
@@ -729,7 +733,7 @@ static void should_push_correctly_an_specified_entry(void)
 
 static void should_not_fail_when_sorting_a_NULL_file_entry_array(void)
 {
-    file_entry_array_sort(NULL);
+    file_entry_array_sort(sorter_context, NULL);
 }
 
 static void should_sort_the_file_operands_by_entry_name(void)
@@ -744,7 +748,7 @@ static void should_sort_the_file_operands_by_entry_name(void)
     file_entry_array_push(array_sut, file_entry_create(entry_names[6]));
     file_entry_array_push(array_sut, file_entry_create(entry_names[7]));
 
-    file_entry_array_sort(array_sut);
+    file_entry_array_sort(sorter_context, array_sut);
     const t_file_entry *first_entry = file_entry_array_get_at(array_sut, 0);
     const t_file_entry *second_entry = file_entry_array_get_at(array_sut, 1);
     const t_file_entry *third_entry = file_entry_array_get_at(array_sut, 2);
