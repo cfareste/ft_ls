@@ -1,4 +1,7 @@
 TODO:
+1. Implementar -r
+3. Revertir orden de los file operands
+4. Revertir orden del contenido de directorios
 
 
 TODO En algún momento:
