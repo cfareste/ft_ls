@@ -13,17 +13,21 @@ typedef struct s_scan_context
     int read_failed;
     int close_failed;
     int retrieve_advanced_metadata;
+    int filter_hidden_files;
 } t_current_scan_context;
 
 struct s_scanner_context
 {
     int retrieve_advanced_metadata;
+    int filter_hidden_files;
 };
 
 t_scanner_context *scanner_context_create(const t_parsed_arguments *parsed_arguments)
 {
     t_scanner_context *context = ft_safe_calloc(1, sizeof(t_scanner_context));
+
     context->retrieve_advanced_metadata = parsed_arguments_is_long_format_active(parsed_arguments);
+    context->filter_hidden_files = !parsed_arguments_is_option_active(parsed_arguments, OPTIONS_READ_ALL);
 
     return context;
 }
@@ -39,7 +43,7 @@ void scanner_context_destroy(t_scanner_context **context)
 
 static void push_entry(t_current_scan_context *context, const t_dir_entry *dir_entry, t_file_entry_array *file_entry_array)
 {
-    if (directory_is_entry_hidden_file(dir_entry))
+    if (context->filter_hidden_files && directory_is_entry_hidden_file(dir_entry))
         return ;
 
     const char *entry_name = directory_get_entry_name(dir_entry);
@@ -103,7 +107,8 @@ t_result *scan(const t_scanner_context *context, const char *path)
     t_current_scan_context current_scan = {
         .directory_path = path,
         .dir_stream = directory_open(path),
-        .retrieve_advanced_metadata = context->retrieve_advanced_metadata
+        .retrieve_advanced_metadata = context->retrieve_advanced_metadata,
+        .filter_hidden_files = context->filter_hidden_files
     };
     if (current_scan.dir_stream == NULL)
         return result_create_failed(NULL, path);
