@@ -1,10 +1,8 @@
 TODO:
-1. Implementar -r
 
 
 TODO En algún momento:
 - Investigar si los tests están acoplados a la implementación interna de las cosas
-- Refactor file stats "file_stats_is_file_type()"
 
 
 TODO Para mejorar siguientes proyectos:
