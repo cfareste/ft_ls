@@ -409,12 +409,12 @@ size_t file_entry_array_get_biggest_date_width(const t_file_entry_array *file_en
     return file_entry_array->biggest_date_width;
 }
 
-void file_entry_array_sort(const t_file_entry_array *file_entry_array)
+void file_entry_array_sort(const t_sorter_context *context, const t_file_entry_array *file_entry_array)
 {
     if (file_entry_array == NULL)
         return ;
 
-    sort_pointer_array((void **) file_entry_array->entries, compare_by_entry_name);
+    sort_pointer_array(context, (void **) file_entry_array->entries, compare_by_entry_name);
 }
 
 void file_entry_destroy(t_file_entry **file_entry)

@@ -102,8 +102,10 @@ t_result *parse_arguments(const int num_of_arguments, const char **arguments)
         failed_advanced_metadata_operand = retrieve_advanced_file_stats(parsed_arguments->file_operands, parsed_arguments->file_operands_stats);
     parsed_arguments->non_directory_file_operands = file_operands_get_non_directory(parsed_arguments->file_operands, parsed_arguments->file_operands_stats, parsed_arguments->has_implicit_default_operand);
     parsed_arguments->directory_file_operands = file_operands_get_directory(parsed_arguments->file_operands, parsed_arguments->file_operands_stats, parsed_arguments->has_implicit_default_operand);
-    sort_pointer_array((void **) parsed_arguments->non_directory_file_operands, compare_by_name);
-    sort_pointer_array((void **) parsed_arguments->directory_file_operands, compare_by_name);
+    t_sorter_context *sorter_context = sorter_context_create(parsed_arguments);
+    sort_pointer_array(sorter_context, (void **) parsed_arguments->non_directory_file_operands, compare_by_name);
+    sort_pointer_array(sorter_context, (void **) parsed_arguments->directory_file_operands, compare_by_name);
+    sorter_context_destroy(&sorter_context);
     parsed_arguments->non_directory_file_operands_stats = get_non_directory_file_operands_stats(parsed_arguments->non_directory_file_operands, parsed_arguments->file_operands, parsed_arguments->file_operands_stats);
 
     if (failed_advanced_metadata_operand != NULL)
