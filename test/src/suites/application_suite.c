@@ -149,6 +149,26 @@ static void should_successfully_print_the_contents_of_the_directory_specified_as
     assert_application_execution_succeed(result);
 }
 
+static void should_successfully_print_directory_contents_in_reverse_order_when_reverse_option_is_active(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("dir", ".", "..", "alpha", "zeta"),
+        MOCK_FILE("dir/alpha"),
+        MOCK_FILE("dir/zeta"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-r", "dir", NULL };
+    get_parsed_arguments_result(2, arguments);
+
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is("zeta\nalpha\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    assert_application_execution_succeed(result);
+}
+
 static void should_successfully_print_the_contents_of_multiple_non_directory_files(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -3523,6 +3543,7 @@ void register_application_suite(void)
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_current_directory", should_successfully_print_the_contents_of_the_current_directory);
         CU_add_test(suite, "should_successfully_print_the_file_name_if_a_regular_file_operand_is_specified", should_successfully_print_the_file_name_if_a_regular_file_operand_is_specified);
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_directory_specified_as_an_operand", should_successfully_print_the_contents_of_the_directory_specified_as_an_operand);
+        CU_add_test(suite, "should_successfully_print_directory_contents_in_reverse_order_when_reverse_option_is_active", should_successfully_print_directory_contents_in_reverse_order_when_reverse_option_is_active);
         CU_add_test(suite, "should_successfully_print_the_contents_of_multiple_non_directory_files", should_successfully_print_the_contents_of_multiple_non_directory_files);
         CU_add_test(suite, "should_successfully_print_the_contents_of_multiple_directory_files", should_successfully_print_the_contents_of_multiple_directory_files);
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_mixed_types_specified_operands", should_successfully_print_the_contents_of_the_mixed_types_specified_operands);
