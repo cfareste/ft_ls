@@ -5,7 +5,7 @@
 #define LONG_FORMAT_OPTION_CHAR 'l'
 #define READ_ALL_OPTION_CHAR 'a'
 #define REVERSE_OPTION_CHAR 'r'
-#define MTIME_SORTING_OPTION_CHAR 't'
+#define TIME_SORTING_OPTION_CHAR 't'
 
 static int argument_is_an_option(const char *argument)
 {
@@ -29,8 +29,8 @@ t_options options_get(const char **arguments)
             options |= OPTIONS_READ_ALL;
         if (arguments[i][1] == REVERSE_OPTION_CHAR)
             options |= OPTIONS_REVERSE;
-        if (arguments[i][1] == MTIME_SORTING_OPTION_CHAR)
-            options |= OPTIONS_MTIME_SORTING;
+        if (arguments[i][1] == TIME_SORTING_OPTION_CHAR)
+            options |= OPTIONS_TIME_SORTING;
     }
 
     return options;

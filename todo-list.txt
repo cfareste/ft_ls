@@ -1,4 +1,7 @@
 TODO:
+1. Implementar -t
+2. Si -t está activo, sort by mtime dir content
+
 
 
 TODO En algún momento:
