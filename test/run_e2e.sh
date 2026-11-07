@@ -100,6 +100,18 @@ prepare_test_environment() {
     mkdir nopermdir
     touch "nopermdir/file"
     chmod 000 nopermdir
+
+    # Modification-time sorting fixtures
+    mkdir mtime_dir_old mtime_dir_new
+    touch mtime_file_old mtime_file_same_z mtime_file_same_a mtime_file_new
+    touch mtime_dir_old/old mtime_dir_old/same_z mtime_dir_old/same_a mtime_dir_old/new
+    touch mtime_dir_new/old mtime_dir_new/same_z mtime_dir_new/same_a mtime_dir_new/new
+    find . -mindepth 1 -maxdepth 1 ! -type s -exec touch -h -t 201901010000 {} +
+    touch -t 202001010000 mtime_file_old mtime_dir_old/old mtime_dir_new/old
+    touch -t 202401010000 mtime_file_same_z mtime_file_same_a mtime_dir_old/same_z mtime_dir_old/same_a mtime_dir_new/same_z mtime_dir_new/same_a
+    touch -t 202501010000 mtime_file_new mtime_dir_old/new mtime_dir_new/new
+    touch -t 202001010000 mtime_dir_old
+    touch -t 202501010000 mtime_dir_new
 }
 
 remove_test_environment() {

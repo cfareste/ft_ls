@@ -84,3 +84,8 @@ src -l Makefile file                                                            
 -r Makefile linkfile .hidden                                                            ::       -r Makefile linkfile .hidden
 -r src .hiddir empty                                                                    ::       -r src .hiddir empty
 -r src Makefile .hiddir empty linkfile .hidden                                          ::       -r src Makefile .hiddir empty linkfile .hidden
+-t                                                                                      ::       -t
+-t mtime_dir_old                                                                        ::       -t mtime_dir_old
+-t mtime_file_old mtime_file_same_z mtime_file_same_a mtime_file_new                    ::       -t mtime_file_old mtime_file_same_z mtime_file_same_a mtime_file_new
+-t mtime_dir_old mtime_dir_new                                                          ::       -t mtime_dir_old mtime_dir_new
+-t mtime_file_old mtime_dir_old mtime_file_new mtime_dir_new                            ::       -t mtime_file_old mtime_dir_old mtime_file_new mtime_dir_new
