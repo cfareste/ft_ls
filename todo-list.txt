@@ -1,7 +1,4 @@
 TODO:
-1. Implementar -t
-2. Si -t está activo, sort by mtime dir content
-
 
 
 TODO En algún momento:
@@ -79,7 +76,7 @@ QA LS-14 Default sorting output (`ls file ... | cat`)
      - Que se ordene nombres y contenidos
    - Mixto
      - Que se ordenen ambos y por separado
-5. No memory leaks
+4. No memory leaks
 
 
 QA LS-13 Support for multiple types of files (`ls block_dev symlink ... | cat`)
@@ -273,6 +270,17 @@ No probado en E2E: Current dir vacío / solo hidden
 
 
 QA LS-19 Reverse sorting order (`ls -r ... | cat`)
+1. Sin parámetros
+2. 1 parámetro (directorio)
+3. Múltiples parámetros
+   - Archivos
+   - Directorios
+     - Que se ordene nombres y contenidos
+   - Mixto
+     - Que se ordenen ambos y por separado
+
+
+QA LS-20 Modification time sorting (`ls -t ... | cat`)
 1. Sin parámetros
 2. 1 parámetro (directorio)
 3. Múltiples parámetros

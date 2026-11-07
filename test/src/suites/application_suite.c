@@ -2122,6 +2122,125 @@ static void should_reverse_sort_file_and_directory_operands_separately_and_direc
     );
 }
 
+static void should_sort_the_current_directory_by_modification_time_when_no_file_operands_are_specified(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", ".", "..", "old", "same_z", "same_a", "new"),
+        MOCK_FILE_WITH_STATS("old", MOCK_MODIFICATION_TIME(1, 1, 2020, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("same_z", MOCK_MODIFICATION_TIME(1, 1, 2024, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("same_a", MOCK_MODIFICATION_TIME(1, 1, 2024, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("new", MOCK_MODIFICATION_TIME(1, 1, 2025, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-t", NULL };
+    get_parsed_arguments_result(1, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    assert_application_succeeded_with_output(result, "new\nsame_a\nsame_z\nold\n");
+}
+
+static void should_sort_a_directory_operand_contents_by_modification_time(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR_WITH_STATS("dir", ((const char *[]){ ".", "..", "old", "same_z", "same_a", "new", NULL }), MOCK_MODIFICATION_TIME(1, 1, 2025, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("dir/old", MOCK_MODIFICATION_TIME(1, 1, 2020, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("dir/same_z", MOCK_MODIFICATION_TIME(1, 1, 2024, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("dir/same_a", MOCK_MODIFICATION_TIME(1, 1, 2024, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("dir/new", MOCK_MODIFICATION_TIME(1, 1, 2025, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-t", "dir", NULL };
+    get_parsed_arguments_result(2, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    assert_application_succeeded_with_output(result, "new\nsame_a\nsame_z\nold\n");
+}
+
+static void should_sort_multiple_file_operands_by_modification_time(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE_WITH_STATS("old", MOCK_MODIFICATION_TIME(1, 1, 2020, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("same_z", MOCK_MODIFICATION_TIME(1, 1, 2024, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("same_a", MOCK_MODIFICATION_TIME(1, 1, 2024, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("new", MOCK_MODIFICATION_TIME(1, 1, 2025, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-t", "old", "same_z", "same_a", "new", NULL };
+    get_parsed_arguments_result(5, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    assert_application_succeeded_with_output(result, "new\nsame_a\nsame_z\nold\n");
+}
+
+static void should_sort_multiple_directory_operands_and_their_contents_by_modification_time(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR_WITH_STATS("dir_old", ((const char *[]){ ".", "..", "old", "new", NULL }), MOCK_MODIFICATION_TIME(1, 1, 2020, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("dir_new", ((const char *[]){ ".", "..", "old", "new", NULL }), MOCK_MODIFICATION_TIME(1, 1, 2025, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("dir_old/old", MOCK_MODIFICATION_TIME(1, 1, 2020, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("dir_old/new", MOCK_MODIFICATION_TIME(1, 1, 2025, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("dir_new/old", MOCK_MODIFICATION_TIME(1, 1, 2020, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("dir_new/new", MOCK_MODIFICATION_TIME(1, 1, 2025, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-t", "dir_old", "dir_new", NULL };
+    get_parsed_arguments_result(3, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    assert_application_succeeded_with_output(
+        result,
+        "dir_new:\n"
+        "new\n"
+        "old\n"
+        "\n"
+        "dir_old:\n"
+        "new\n"
+        "old\n"
+    );
+}
+
+static void should_sort_mixed_file_and_directory_operands_separately_by_modification_time(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE_WITH_STATS("file_old", MOCK_MODIFICATION_TIME(1, 1, 2020, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("file_new", MOCK_MODIFICATION_TIME(1, 1, 2025, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("dir_old", ((const char *[]){ ".", "..", "old", "new", NULL }), MOCK_MODIFICATION_TIME(1, 1, 2020, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("dir_new", ((const char *[]){ ".", "..", "old", "new", NULL }), MOCK_MODIFICATION_TIME(1, 1, 2025, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("dir_old/old", MOCK_MODIFICATION_TIME(1, 1, 2020, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("dir_old/new", MOCK_MODIFICATION_TIME(1, 1, 2025, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("dir_new/old", MOCK_MODIFICATION_TIME(1, 1, 2020, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("dir_new/new", MOCK_MODIFICATION_TIME(1, 1, 2025, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-t", "file_old", "dir_old", "file_new", "dir_new", NULL };
+    get_parsed_arguments_result(5, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    assert_application_succeeded_with_output(
+        result,
+        "file_new\n"
+        "file_old\n"
+        "\n"
+        "dir_new:\n"
+        "new\n"
+        "old\n"
+        "\n"
+        "dir_old:\n"
+        "new\n"
+        "old\n"
+    );
+}
+
 static void should_fail_with_a_major_error_and_not_print_anything_if_fails_to_open_the_directory(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -3723,6 +3842,11 @@ void register_application_suite(void)
         CU_add_test(suite, "should_reverse_sort_multiple_file_operands_when_reverse_option_is_active", should_reverse_sort_multiple_file_operands_when_reverse_option_is_active);
         CU_add_test(suite, "should_reverse_sort_multiple_directory_operands_and_their_contents_when_reverse_option_is_active", should_reverse_sort_multiple_directory_operands_and_their_contents_when_reverse_option_is_active);
         CU_add_test(suite, "should_reverse_sort_file_and_directory_operands_separately_and_directory_contents_when_reverse_option_is_active", should_reverse_sort_file_and_directory_operands_separately_and_directory_contents_when_reverse_option_is_active);
+        CU_add_test(suite, "should_sort_the_current_directory_by_modification_time_when_no_file_operands_are_specified", should_sort_the_current_directory_by_modification_time_when_no_file_operands_are_specified);
+        CU_add_test(suite, "should_sort_a_directory_operand_contents_by_modification_time", should_sort_a_directory_operand_contents_by_modification_time);
+        CU_add_test(suite, "should_sort_multiple_file_operands_by_modification_time", should_sort_multiple_file_operands_by_modification_time);
+        CU_add_test(suite, "should_sort_multiple_directory_operands_and_their_contents_by_modification_time", should_sort_multiple_directory_operands_and_their_contents_by_modification_time);
+        CU_add_test(suite, "should_sort_mixed_file_and_directory_operands_separately_by_modification_time", should_sort_mixed_file_and_directory_operands_separately_by_modification_time);
         CU_add_test(suite, "should_fail_with_a_major_error_and_not_print_anything_if_fails_to_open_the_directory", should_fail_with_a_major_error_and_not_print_anything_if_fails_to_open_the_directory);
         CU_add_test(suite, "should_fail_with_a_major_error_and_not_print_anything_if_fails_to_open_the_current_directory_without_arguments", should_fail_with_a_major_error_and_not_print_anything_if_fails_to_open_the_current_directory_without_arguments);
         CU_add_test(suite, "should_fail_with_a_major_error_and_not_print_anything_if_fails_to_read_the_first_entry_of_the_directory", should_fail_with_a_major_error_and_not_print_anything_if_fails_to_read_the_first_entry_of_the_directory);
