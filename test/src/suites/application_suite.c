@@ -994,6 +994,38 @@ static void should_successfully_print_the_contents_of_the_current_directory_recu
     CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
 }
 
+static void should_not_recurse_into_current_or_parent_directory_entries(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", ".", "..", "subdir"),
+        MOCK_DIR("..", ".", ".."),
+        MOCK_DIR("subdir", ".", ".."),
+        MOCK_DIR("./subdir", ".", ".."),
+        MOCK_DIR("./subdir/.", ".", ".."),
+        MOCK_DIR("./subdir/..", ".", ".."),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-aR", NULL };
+    get_parsed_arguments_result(1, arguments);
+
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        ".:\n"
+        ".\n"
+        "..\n"
+        "subdir\n"
+        "\n"
+        "./subdir:\n"
+        ".\n"
+        "..\n"
+    ));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
 static void should_successfully_print_the_contents_of_the_specified_non_directory_even_with_recursive_option(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -3803,6 +3835,7 @@ void register_application_suite(void)
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_directory_pointed_by_the_specified_symlink", should_successfully_print_the_contents_of_the_directory_pointed_by_the_specified_symlink);
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_symlinks_to_different_file_types", should_successfully_print_the_contents_of_the_symlinks_to_different_file_types);
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_current_directory_recursively", should_successfully_print_the_contents_of_the_current_directory_recursively);
+        CU_add_test(suite, "should_not_recurse_into_current_or_parent_directory_entries", should_not_recurse_into_current_or_parent_directory_entries);
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_specified_non_directory_even_with_recursive_option", should_successfully_print_the_contents_of_the_specified_non_directory_even_with_recursive_option);
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_specified_directory_recursively", should_successfully_print_the_contents_of_the_specified_directory_recursively);
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_specified_operands_recursively", should_successfully_print_the_contents_of_the_specified_operands_recursively);
