@@ -2273,6 +2273,397 @@ static void should_sort_mixed_file_and_directory_operands_separately_by_modifica
     );
 }
 
+static void should_apply_recursive_and_long_options_together(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("qa", ".", "..", "alpha", "subdir"),
+        MOCK_DIR("qa/.", ".", ".."),
+        MOCK_DIR("qa/..", ".", ".."),
+        MOCK_FILE_WITH_STATS("qa/alpha", MOCK_MODIFICATION_TIME(1, 1, 2022, 0, 0, 0)),
+        MOCK_DIR("qa/subdir", ".", "..", "nested"),
+        MOCK_DIR("qa/subdir/.", ".", ".."),
+        MOCK_DIR("qa/subdir/..", ".", ".."),
+        MOCK_FILE_WITH_STATS("qa/subdir/nested", MOCK_MODIFICATION_TIME(1, 1, 2023, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+    const char *arguments[] = { "-Rl", "qa", NULL };
+    get_parsed_arguments_result(2, arguments);
+
+    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_RECURSIVE));
+    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_LONG_FORMAT));
+    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_READ_ALL));
+    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_REVERSE));
+    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_TIME_SORTING));
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_no_error_was_printed());
+    assert_application_execution_succeed(result);
+}
+
+static void should_apply_recursive_and_read_all_options_together(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("qa", ".", "..", ".hidden", "subdir"),
+        MOCK_DIR("qa/.", ".", ".."),
+        MOCK_DIR("qa/..", ".", ".."),
+        MOCK_FILE("qa/.hidden"),
+        MOCK_DIR("qa/subdir", ".", "..", ".nested_hidden"),
+        MOCK_DIR("qa/subdir/.", ".", ".."),
+        MOCK_DIR("qa/subdir/..", ".", ".."),
+        MOCK_FILE("qa/subdir/.nested_hidden"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+    const char *arguments[] = { "-Ra", "qa", NULL };
+    get_parsed_arguments_result(2, arguments);
+
+    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_RECURSIVE));
+    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_LONG_FORMAT));
+    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_READ_ALL));
+    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_REVERSE));
+    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_TIME_SORTING));
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_no_error_was_printed());
+    assert_application_execution_succeed(result);
+}
+
+static void should_apply_recursive_and_reverse_options_together(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("qa", ".", "..", "alpha", "zulu", "subdir"),
+        MOCK_DIR("qa/.", ".", ".."),
+        MOCK_DIR("qa/..", ".", ".."),
+        MOCK_FILE("qa/alpha"),
+        MOCK_FILE("qa/zulu"),
+        MOCK_DIR("qa/subdir", ".", "..", "alpha", "zulu"),
+        MOCK_DIR("qa/subdir/.", ".", ".."),
+        MOCK_DIR("qa/subdir/..", ".", ".."),
+        MOCK_FILE("qa/subdir/alpha"),
+        MOCK_FILE("qa/subdir/zulu"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+    const char *arguments[] = { "-Rr", "qa", NULL };
+    get_parsed_arguments_result(2, arguments);
+
+    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_RECURSIVE));
+    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_LONG_FORMAT));
+    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_READ_ALL));
+    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_REVERSE));
+    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_TIME_SORTING));
+    const int result = application_run(parsed_arguments_result);
+
+    assert_application_succeeded_with_output(result, "qa:\nzulu\nsubdir\nalpha\n\nqa/subdir:\nzulu\nalpha\n");
+}
+
+static void should_apply_recursive_and_time_sorting_options_together(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("qa", ".", "..", "alpha", "zulu", "subdir"),
+        MOCK_DIR("qa/.", ".", ".."),
+        MOCK_DIR("qa/..", ".", ".."),
+        MOCK_FILE_WITH_STATS("qa/alpha", MOCK_MODIFICATION_TIME(1, 1, 2022, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("qa/zulu", MOCK_MODIFICATION_TIME(1, 1, 2024, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("qa/subdir", ((const char *[]){ ".", "..", "nested", NULL }),
+            MOCK_MODIFICATION_TIME(1, 1, 2023, 0, 0, 0)),
+        MOCK_DIR("qa/subdir/.", ".", ".."),
+        MOCK_DIR("qa/subdir/..", ".", ".."),
+        MOCK_FILE_WITH_STATS("qa/subdir/nested", MOCK_MODIFICATION_TIME(1, 1, 2025, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+    const char *arguments[] = { "-Rt", "qa", NULL };
+    get_parsed_arguments_result(2, arguments);
+
+    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_RECURSIVE));
+    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_LONG_FORMAT));
+    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_READ_ALL));
+    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_REVERSE));
+    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_TIME_SORTING));
+    const int result = application_run(parsed_arguments_result);
+
+    assert_application_succeeded_with_output(result, "qa:\nzulu\nsubdir\nalpha\n\nqa/subdir:\nnested\n");
+}
+
+static void should_apply_long_format_and_read_all_options_together(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("qa", ".", "..", ".hidden", "alpha"),
+        MOCK_DIR("qa/.", ".", ".."),
+        MOCK_DIR("qa/..", ".", ".."),
+        MOCK_FILE("qa/.hidden"),
+        MOCK_FILE("qa/alpha"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+    const char *arguments[] = { "-la", "qa", NULL };
+    get_parsed_arguments_result(2, arguments);
+
+    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_RECURSIVE));
+    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_LONG_FORMAT));
+    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_READ_ALL));
+    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_REVERSE));
+    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_TIME_SORTING));
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_no_error_was_printed());
+    assert_application_execution_succeed(result);
+}
+
+static void should_apply_long_format_and_reverse_options_together(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("qa", ".", "..", "alpha", "zulu"),
+        MOCK_DIR("qa/.", ".", ".."),
+        MOCK_DIR("qa/..", ".", ".."),
+        MOCK_FILE("qa/alpha"),
+        MOCK_FILE("qa/zulu"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+    const char *arguments[] = { "-lr", "qa", NULL };
+    get_parsed_arguments_result(2, arguments);
+
+    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_RECURSIVE));
+    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_LONG_FORMAT));
+    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_READ_ALL));
+    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_REVERSE));
+    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_TIME_SORTING));
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_no_error_was_printed());
+    assert_application_execution_succeed(result);
+}
+
+static void should_apply_long_format_and_time_sorting_options_together(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("qa", ".", "..", "old", "new"),
+        MOCK_DIR("qa/.", ".", ".."),
+        MOCK_DIR("qa/..", ".", ".."),
+        MOCK_FILE_WITH_STATS("qa/old", MOCK_MODIFICATION_TIME(1, 1, 2020, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("qa/new", MOCK_MODIFICATION_TIME(1, 1, 2025, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+    const char *arguments[] = { "-lt", "qa", NULL };
+    get_parsed_arguments_result(2, arguments);
+
+    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_RECURSIVE));
+    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_LONG_FORMAT));
+    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_READ_ALL));
+    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_REVERSE));
+    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_TIME_SORTING));
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_no_error_was_printed());
+    assert_application_execution_succeed(result);
+}
+
+static void should_apply_read_all_and_reverse_options_together(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("qa", ".", "..", ".hidden", "alpha", "zulu"),
+        MOCK_DIR("qa/.", ".", ".."),
+        MOCK_DIR("qa/..", ".", ".."),
+        MOCK_FILE("qa/.hidden"),
+        MOCK_FILE("qa/alpha"),
+        MOCK_FILE("qa/zulu"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+    const char *arguments[] = { "-ar", "qa", NULL };
+    get_parsed_arguments_result(2, arguments);
+
+    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_RECURSIVE));
+    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_LONG_FORMAT));
+    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_READ_ALL));
+    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_REVERSE));
+    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_TIME_SORTING));
+    const int result = application_run(parsed_arguments_result);
+
+    assert_application_succeeded_with_output(result, "zulu\nalpha\n.hidden\n..\n.\n");
+}
+
+static void should_apply_read_all_and_time_sorting_options_together(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR_WITH_STATS("qa", ((const char *[]){ ".", "..", ".hidden", "alpha", "zulu", NULL }),
+            MOCK_MODIFICATION_TIME(1, 1, 2021, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("qa/.", ((const char *[]){ ".", "..", NULL }),
+            MOCK_MODIFICATION_TIME(1, 1, 2018, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("qa/..", ((const char *[]){ ".", "..", NULL }),
+            MOCK_MODIFICATION_TIME(1, 1, 2019, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("qa/.hidden", MOCK_MODIFICATION_TIME(1, 1, 2022, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("qa/alpha", MOCK_MODIFICATION_TIME(1, 1, 2023, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("qa/zulu", MOCK_MODIFICATION_TIME(1, 1, 2024, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+    const char *arguments[] = { "-at", "qa", NULL };
+    get_parsed_arguments_result(2, arguments);
+
+    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_RECURSIVE));
+    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_LONG_FORMAT));
+    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_READ_ALL));
+    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_REVERSE));
+    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_TIME_SORTING));
+    const int result = application_run(parsed_arguments_result);
+
+    assert_application_succeeded_with_output(result, "zulu\nalpha\n.hidden\n..\n.\n");
+}
+
+static void should_apply_reverse_and_time_sorting_options_together(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("qa", ".", "..", "old", "middle", "new"),
+        MOCK_DIR("qa/.", ".", ".."),
+        MOCK_DIR("qa/..", ".", ".."),
+        MOCK_FILE_WITH_STATS("qa/old", MOCK_MODIFICATION_TIME(1, 1, 2020, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("qa/middle", MOCK_MODIFICATION_TIME(1, 1, 2022, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("qa/new", MOCK_MODIFICATION_TIME(1, 1, 2025, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+    const char *arguments[] = { "-rt", "qa", NULL };
+    get_parsed_arguments_result(2, arguments);
+
+    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_RECURSIVE));
+    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_LONG_FORMAT));
+    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_READ_ALL));
+    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_REVERSE));
+    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_TIME_SORTING));
+    const int result = application_run(parsed_arguments_result);
+
+    assert_application_succeeded_with_output(result, "old\nmiddle\nnew\n");
+}
+
+static void should_apply_long_format_read_all_and_recursive_options_together(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("qa", ".", "..", ".hidden", "subdir"),
+        MOCK_DIR("qa/.", ".", ".."),
+        MOCK_DIR("qa/..", ".", ".."),
+        MOCK_FILE("qa/.hidden"),
+        MOCK_DIR("qa/subdir", ".", "..", ".nested_hidden"),
+        MOCK_DIR("qa/subdir/.", ".", ".."),
+        MOCK_DIR("qa/subdir/..", ".", ".."),
+        MOCK_FILE("qa/subdir/.nested_hidden"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+    const char *arguments[] = { "-laR", "qa", NULL };
+    get_parsed_arguments_result(2, arguments);
+
+    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_RECURSIVE));
+    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_LONG_FORMAT));
+    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_READ_ALL));
+    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_REVERSE));
+    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_TIME_SORTING));
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_no_error_was_printed());
+    assert_application_execution_succeed(result);
+}
+
+static void should_apply_read_all_reverse_and_time_sorting_options_together(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR_WITH_STATS("qa", ((const char *[]){ ".", "..", ".hidden", "alpha", "zulu", NULL }),
+            MOCK_MODIFICATION_TIME(1, 1, 2021, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("qa/.", ((const char *[]){ ".", "..", NULL }),
+            MOCK_MODIFICATION_TIME(1, 1, 2018, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("qa/..", ((const char *[]){ ".", "..", NULL }),
+            MOCK_MODIFICATION_TIME(1, 1, 2019, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("qa/.hidden", MOCK_MODIFICATION_TIME(1, 1, 2022, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("qa/alpha", MOCK_MODIFICATION_TIME(1, 1, 2023, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("qa/zulu", MOCK_MODIFICATION_TIME(1, 1, 2024, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+    const char *arguments[] = { "-rta", "qa", NULL };
+    get_parsed_arguments_result(2, arguments);
+
+    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_RECURSIVE));
+    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_LONG_FORMAT));
+    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_READ_ALL));
+    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_REVERSE));
+    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_TIME_SORTING));
+    const int result = application_run(parsed_arguments_result);
+
+    assert_application_succeeded_with_output(result, ".\n..\n.hidden\nalpha\nzulu\n");
+}
+
+static void should_apply_recursive_long_format_and_time_sorting_options_together(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR_WITH_STATS("qa", ((const char *[]){ ".", "..", "alpha", "zulu", "subdir", NULL }),
+            MOCK_MODIFICATION_TIME(1, 1, 2021, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("qa/.", ((const char *[]){ ".", "..", NULL }),
+            MOCK_MODIFICATION_TIME(1, 1, 2018, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("qa/..", ((const char *[]){ ".", "..", NULL }),
+            MOCK_MODIFICATION_TIME(1, 1, 2019, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("qa/alpha", MOCK_MODIFICATION_TIME(1, 1, 2022, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("qa/zulu", MOCK_MODIFICATION_TIME(1, 1, 2024, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("qa/subdir", ((const char *[]){ ".", "..", "nested", NULL }),
+            MOCK_MODIFICATION_TIME(1, 1, 2023, 0, 0, 0)),
+        MOCK_DIR("qa/subdir/.", ".", ".."),
+        MOCK_DIR("qa/subdir/..", ".", ".."),
+        MOCK_FILE_WITH_STATS("qa/subdir/nested", MOCK_MODIFICATION_TIME(1, 1, 2025, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+    const char *arguments[] = { "-Rlt", "qa", NULL };
+    get_parsed_arguments_result(2, arguments);
+
+    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_RECURSIVE));
+    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_LONG_FORMAT));
+    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_READ_ALL));
+    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_REVERSE));
+    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_TIME_SORTING));
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_no_error_was_printed());
+    assert_application_execution_succeed(result);
+}
+
+static void should_apply_all_options_together(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR_WITH_STATS("qa", ((const char *[]){ ".", "..", ".hidden", "alpha", "zulu", "subdir", NULL }),
+            MOCK_MODIFICATION_TIME(1, 1, 2021, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("qa/.", ((const char *[]){ ".", "..", NULL }),
+            MOCK_MODIFICATION_TIME(1, 1, 2018, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("qa/..", ((const char *[]){ ".", "..", NULL }),
+            MOCK_MODIFICATION_TIME(1, 1, 2019, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("qa/.hidden", MOCK_MODIFICATION_TIME(1, 1, 2022, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("qa/alpha", MOCK_MODIFICATION_TIME(1, 1, 2023, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("qa/zulu", MOCK_MODIFICATION_TIME(1, 1, 2025, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("qa/subdir", ((const char *[]){ ".", "..", ".nested_hidden", "nested", NULL }),
+            MOCK_MODIFICATION_TIME(1, 1, 2024, 0, 0, 0)),
+        MOCK_DIR("qa/subdir/.", ".", ".."),
+        MOCK_DIR("qa/subdir/..", ".", ".."),
+        MOCK_FILE_WITH_STATS("qa/subdir/.nested_hidden", MOCK_MODIFICATION_TIME(1, 1, 2026, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("qa/subdir/nested", MOCK_MODIFICATION_TIME(1, 1, 2027, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+    const char *arguments[] = { "-lartR", "qa", NULL };
+    get_parsed_arguments_result(2, arguments);
+
+    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_RECURSIVE));
+    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_LONG_FORMAT));
+    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_READ_ALL));
+    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_REVERSE));
+    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_TIME_SORTING));
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_no_error_was_printed());
+    assert_application_execution_succeed(result);
+}
+
 static void should_fail_with_a_major_error_and_not_print_anything_if_fails_to_open_the_directory(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -3880,6 +4271,20 @@ void register_application_suite(void)
         CU_add_test(suite, "should_sort_multiple_file_operands_by_modification_time", should_sort_multiple_file_operands_by_modification_time);
         CU_add_test(suite, "should_sort_multiple_directory_operands_and_their_contents_by_modification_time", should_sort_multiple_directory_operands_and_their_contents_by_modification_time);
         CU_add_test(suite, "should_sort_mixed_file_and_directory_operands_separately_by_modification_time", should_sort_mixed_file_and_directory_operands_separately_by_modification_time);
+        CU_add_test(suite, "should_apply_recursive_and_long_options_together", should_apply_recursive_and_long_options_together);
+        CU_add_test(suite, "should_apply_recursive_and_read_all_options_together", should_apply_recursive_and_read_all_options_together);
+        CU_add_test(suite, "should_apply_recursive_and_reverse_options_together", should_apply_recursive_and_reverse_options_together);
+        CU_add_test(suite, "should_apply_recursive_and_time_sorting_options_together", should_apply_recursive_and_time_sorting_options_together);
+        CU_add_test(suite, "should_apply_long_format_and_read_all_options_together", should_apply_long_format_and_read_all_options_together);
+        CU_add_test(suite, "should_apply_long_format_and_reverse_options_together", should_apply_long_format_and_reverse_options_together);
+        CU_add_test(suite, "should_apply_long_format_and_time_sorting_options_together", should_apply_long_format_and_time_sorting_options_together);
+        CU_add_test(suite, "should_apply_read_all_and_reverse_options_together", should_apply_read_all_and_reverse_options_together);
+        CU_add_test(suite, "should_apply_read_all_and_time_sorting_options_together", should_apply_read_all_and_time_sorting_options_together);
+        CU_add_test(suite, "should_apply_reverse_and_time_sorting_options_together", should_apply_reverse_and_time_sorting_options_together);
+        CU_add_test(suite, "should_apply_long_format_read_all_and_recursive_options_together", should_apply_long_format_read_all_and_recursive_options_together);
+        CU_add_test(suite, "should_apply_read_all_reverse_and_time_sorting_options_together", should_apply_read_all_reverse_and_time_sorting_options_together);
+        CU_add_test(suite, "should_apply_recursive_long_format_and_time_sorting_options_together", should_apply_recursive_long_format_and_time_sorting_options_together);
+        CU_add_test(suite, "should_apply_all_options_together", should_apply_all_options_together);
         CU_add_test(suite, "should_fail_with_a_major_error_and_not_print_anything_if_fails_to_open_the_directory", should_fail_with_a_major_error_and_not_print_anything_if_fails_to_open_the_directory);
         CU_add_test(suite, "should_fail_with_a_major_error_and_not_print_anything_if_fails_to_open_the_current_directory_without_arguments", should_fail_with_a_major_error_and_not_print_anything_if_fails_to_open_the_current_directory_without_arguments);
         CU_add_test(suite, "should_fail_with_a_major_error_and_not_print_anything_if_fails_to_read_the_first_entry_of_the_directory", should_fail_with_a_major_error_and_not_print_anything_if_fails_to_read_the_first_entry_of_the_directory);

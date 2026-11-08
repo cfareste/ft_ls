@@ -1,5 +1,4 @@
 TODO:
-1. Implementar -R + -a
 2. Tests de combinaciones
 
 
@@ -291,3 +290,24 @@ QA LS-20 Modification time sorting (`ls -t ... | cat`)
      - Que se ordene nombres y contenidos
    - Mixto
      - Que se ordenen ambos y por separado
+
+
+QA LS-21 Support for multi-option execution (`ls -Rlart ... | cat)
+1. Combinaciones de 2 parámetros
+   - -R:
+       * l: Recursivo + long format
+       * a: Recursivo + ocultos; No hace recursión para . or ..
+       * r: Recursivo + orden inverso (de cada nivel de depth, últimos directorios primero)
+       * t: Recursivo + orden por mtime
+   -l:
+       * a: Long format + ocultos
+       * r: Long format + orden inverso
+       * t: Long format + orden por mtime
+   -a:
+       * r: Ocultos + orden inverso
+       * t: Ocultos + orden por mtime
+   -r:
+       * t: Orden por mtime inverso
+2. Combinaciones de más de 2 parámetros
+   - Algunas pruebas con múltiples parámetros (-laR, -rta, -Rlt, ...)
+   - Una prueba con todos los parámetros -lartR
