@@ -655,6 +655,27 @@ static void should_parse_the_a_option(void)
     CU_ASSERT(verify_that_no_error_was_printed());
 }
 
+static void should_parse_multiple_options_in_one_argument(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("file"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-al", "file", NULL };
+
+    get_parsed_arguments_result(2, arguments);
+    const char * const *non_directory_file_operands = parsed_arguments_get_non_directory_file_operands(sut);
+
+    CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
+    CU_ASSERT_TRUE(parsed_arguments_is_option_active(sut, OPTIONS_READ_ALL));
+    CU_ASSERT_TRUE(parsed_arguments_is_option_active(sut, OPTIONS_LONG_FORMAT));
+    CU_ASSERT_STRING_EQUAL(non_directory_file_operands[0], "file");
+    CU_ASSERT_PTR_NULL(non_directory_file_operands[1]);
+    CU_ASSERT(verify_that_no_error_was_printed());
+}
+
 static void should_parse_the_r_option(void)
 {
     const char *arguments[] = { "-r", NULL };
@@ -1161,6 +1182,7 @@ void register_parsed_arguments_suite(void)
         CU_add_test(suite, "should_parse_the_option_and_file_operands_if_the_option_was_the_last_specified_argument", should_parse_the_option_and_file_operands_if_the_option_was_the_last_specified_argument);
         CU_add_test(suite, "should_parse_the_recursive_option", should_parse_the_recursive_option);
         CU_add_test(suite, "should_parse_the_a_option", should_parse_the_a_option);
+        CU_add_test(suite, "should_parse_multiple_options_in_one_argument", should_parse_multiple_options_in_one_argument);
         CU_add_test(suite, "should_parse_the_r_option", should_parse_the_r_option);
         CU_add_test(suite, "should_parse_the_t_option", should_parse_the_t_option);
         CU_add_test(suite, "should_sort_file_operands_in_reverse_order_when_r_option_is_active", should_sort_file_operands_in_reverse_order_when_r_option_is_active);

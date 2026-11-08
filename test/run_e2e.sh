@@ -112,6 +112,17 @@ prepare_test_environment() {
     touch -t 202501010000 mtime_file_new mtime_dir_old/new mtime_dir_new/new
     touch -t 202001010000 mtime_dir_old
     touch -t 202501010000 mtime_dir_new
+
+    # Multi-option sorting fixtures with unique modification times
+    mkdir -p multi_flag_dir/subdir
+    touch multi_flag_dir/old multi_flag_dir/.hidden multi_flag_dir/new
+    touch multi_flag_dir/subdir/.nested_hidden multi_flag_dir/subdir/nested
+    touch -t 202001010000 multi_flag_dir/old
+    touch -t 202101010000 multi_flag_dir/.hidden
+    touch -t 202301010000 multi_flag_dir/subdir
+    touch -t 202401010000 multi_flag_dir/new
+    touch -t 202501010000 multi_flag_dir/subdir/.nested_hidden
+    touch -t 202601010000 multi_flag_dir/subdir/nested
 }
 
 remove_test_environment() {

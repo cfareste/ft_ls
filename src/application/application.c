@@ -4,6 +4,7 @@
 #include "renderer.h"
 #include "scanner.h"
 #include "sorter.h"
+#include "libft.h"
 
 typedef struct s_application_context
 {
@@ -79,7 +80,9 @@ static void process_subdirectories(t_application_context *context, const char *d
     for (unsigned int i = 0; i < entries_amount; i++)
     {
         const t_file_entry *entry = file_entry_array_get_at(file_entry_array, i);
-        if (file_entry_get_file_type(entry) != FILE_TYPE_DIRECTORY)
+        if (file_entry_get_file_type(entry) != FILE_TYPE_DIRECTORY
+            || ft_are_string_equals(file_entry_get_name(entry), ".")
+            || ft_are_string_equals(file_entry_get_name(entry), ".."))
             continue;
 
         char *subdir_path = build_full_path(directory_path, file_entry_get_name(entry));
