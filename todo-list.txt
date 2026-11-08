@@ -1,4 +1,6 @@
 TODO:
+1. Implementar -R + -a
+2. Tests de combinaciones
 
 
 TODO En algún momento:
