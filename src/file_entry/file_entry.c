@@ -54,6 +54,20 @@ static int compare_by_entry_name(const void *first_entry, const void *second_ent
     return ft_strcmp(first_entry_name, second_entry_name);
 }
 
+static int compare_by_entry_modification_time(const void *first_entry, const void *second_entry)
+{
+    const t_file_entry *first = first_entry;
+    const t_file_entry *second = second_entry;
+    const t_date first_modification_date = file_entry_get_modification_date(first);
+    const t_date second_modification_date = file_entry_get_modification_date(second);
+
+    if (first_modification_date.timestamp > second_modification_date.timestamp)
+        return -1;
+    if (first_modification_date.timestamp < second_modification_date.timestamp)
+        return 1;
+    return compare_by_entry_name(first_entry, second_entry);
+}
+
 static void increase_entries_capacity(t_file_entry_array *array)
 {
     const unsigned int old_capacity = array->max_capacity;
@@ -414,7 +428,10 @@ void file_entry_array_sort(const t_sorter_context *context, const t_file_entry_a
     if (file_entry_array == NULL)
         return ;
 
-    sort_pointer_array(context, (void **) file_entry_array->entries, compare_by_entry_name);
+    const t_comparator_fn comparator = sorter_context_is_modification_time_order_active(context)
+        ? compare_by_entry_modification_time
+        : compare_by_entry_name;
+    sort_pointer_array(context, (void **) file_entry_array->entries, comparator);
 }
 
 void file_entry_destroy(t_file_entry **file_entry)

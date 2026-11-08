@@ -516,6 +516,66 @@ static void should_parse_the_option_and_file_operands_if_the_option_was_the_firs
     CU_ASSERT(verify_that_no_error_was_printed());
 }
 
+static void should_sort_file_operands_by_modification_time_with_ascii_name_ties_when_t_option_is_active(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE_WITH_STATS("old", MOCK_MODIFICATION_TIME(1, 1, 2020, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("same_z", MOCK_MODIFICATION_TIME(1, 1, 2024, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("same_a", MOCK_MODIFICATION_TIME(1, 1, 2024, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("new", MOCK_MODIFICATION_TIME(1, 1, 2025, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("dir_old", NULL, MOCK_MODIFICATION_TIME(1, 1, 2020, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("dir_same_z", NULL, MOCK_MODIFICATION_TIME(1, 1, 2024, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("dir_same_a", NULL, MOCK_MODIFICATION_TIME(1, 1, 2024, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("dir_new", NULL, MOCK_MODIFICATION_TIME(1, 1, 2025, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *args[] = { "-t", "old", "same_z", "same_a", "new", "dir_old", "dir_same_z", "dir_same_a", "dir_new", NULL };
+    get_parsed_arguments_result(9, args);
+    const char * const *non_directory_file_operands = parsed_arguments_get_non_directory_file_operands(sut);
+    t_file_stats * const *non_directory_file_operands_stats = parsed_arguments_get_non_directory_file_operands_stats(sut);
+    const char * const *directory_file_operands = parsed_arguments_get_directory_file_operands(sut);
+
+    CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
+    CU_ASSERT_STRING_EQUAL(non_directory_file_operands[0], "new");
+    CU_ASSERT_EQUAL(file_stats_get_modification_date(non_directory_file_operands_stats[0]).year, 2025);
+    CU_ASSERT_STRING_EQUAL(non_directory_file_operands[1], "same_a");
+    CU_ASSERT_STRING_EQUAL(non_directory_file_operands[2], "same_z");
+    CU_ASSERT_STRING_EQUAL(non_directory_file_operands[3], "old");
+    CU_ASSERT_PTR_NULL(non_directory_file_operands[4]);
+    CU_ASSERT_STRING_EQUAL(directory_file_operands[0], "dir_new");
+    CU_ASSERT_STRING_EQUAL(directory_file_operands[1], "dir_same_a");
+    CU_ASSERT_STRING_EQUAL(directory_file_operands[2], "dir_same_z");
+    CU_ASSERT_STRING_EQUAL(directory_file_operands[3], "dir_old");
+    CU_ASSERT_PTR_NULL(directory_file_operands[4]);
+    CU_ASSERT(verify_that_no_error_was_printed());
+}
+
+static void should_reverse_modification_time_sorting_when_r_option_is_also_active(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE_WITH_STATS("old", MOCK_MODIFICATION_TIME(1, 1, 2020, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("same_z", MOCK_MODIFICATION_TIME(1, 1, 2024, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("same_a", MOCK_MODIFICATION_TIME(1, 1, 2024, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("new", MOCK_MODIFICATION_TIME(1, 1, 2025, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *args[] = { "-t", "-r", "old", "same_z", "same_a", "new", NULL };
+    get_parsed_arguments_result(6, args);
+    const char * const *non_directory_file_operands = parsed_arguments_get_non_directory_file_operands(sut);
+
+    CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
+    CU_ASSERT_STRING_EQUAL(non_directory_file_operands[0], "old");
+    CU_ASSERT_STRING_EQUAL(non_directory_file_operands[1], "same_z");
+    CU_ASSERT_STRING_EQUAL(non_directory_file_operands[2], "same_a");
+    CU_ASSERT_STRING_EQUAL(non_directory_file_operands[3], "new");
+    CU_ASSERT_PTR_NULL(non_directory_file_operands[4]);
+    CU_ASSERT(verify_that_no_error_was_printed());
+}
+
 static void should_parse_the_option_and_file_operands_if_the_option_was_a_middle_specified_argument(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -603,6 +663,17 @@ static void should_parse_the_r_option(void)
 
     CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
     CU_ASSERT_TRUE(parsed_arguments_is_option_active(sut, OPTIONS_REVERSE));
+    CU_ASSERT(verify_that_no_error_was_printed());
+}
+
+static void should_parse_the_t_option(void)
+{
+    const char *arguments[] = { "-t", NULL };
+
+    get_parsed_arguments_result(1, arguments);
+
+    CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
+    CU_ASSERT_TRUE(parsed_arguments_is_option_active(sut, OPTIONS_TIME_SORTING));
     CU_ASSERT(verify_that_no_error_was_printed());
 }
 
@@ -1083,12 +1154,15 @@ void register_parsed_arguments_suite(void)
         CU_add_test(suite, "should_return_true_for_has_mixed_types_file_operands_if_it_does_have_at_least_one_non_dir_and_one_dir", should_return_true_for_has_mixed_types_file_operands_if_it_does_have_at_least_one_non_dir_and_one_dir);
         CU_add_test(suite, "should_sort_the_non_directory_file_operands_by_ascii_by_default", should_sort_the_non_directory_file_operands_by_ascii_by_default);
         CU_add_test(suite, "should_sort_the_directory_file_operands_by_ascii_by_default", should_sort_the_directory_file_operands_by_ascii_by_default);
+        CU_add_test(suite, "should_sort_file_operands_by_modification_time_with_ascii_name_ties_when_t_option_is_active", should_sort_file_operands_by_modification_time_with_ascii_name_ties_when_t_option_is_active);
+        CU_add_test(suite, "should_reverse_modification_time_sorting_when_r_option_is_also_active", should_reverse_modification_time_sorting_when_r_option_is_also_active);
         CU_add_test(suite, "should_parse_the_option_and_file_operands_if_the_option_was_the_first_specified_argument", should_parse_the_option_and_file_operands_if_the_option_was_the_first_specified_argument);
         CU_add_test(suite, "should_parse_the_option_and_file_operands_if_the_option_was_a_middle_specified_argument", should_parse_the_option_and_file_operands_if_the_option_was_a_middle_specified_argument);
         CU_add_test(suite, "should_parse_the_option_and_file_operands_if_the_option_was_the_last_specified_argument", should_parse_the_option_and_file_operands_if_the_option_was_the_last_specified_argument);
         CU_add_test(suite, "should_parse_the_recursive_option", should_parse_the_recursive_option);
         CU_add_test(suite, "should_parse_the_a_option", should_parse_the_a_option);
         CU_add_test(suite, "should_parse_the_r_option", should_parse_the_r_option);
+        CU_add_test(suite, "should_parse_the_t_option", should_parse_the_t_option);
         CU_add_test(suite, "should_sort_file_operands_in_reverse_order_when_r_option_is_active", should_sort_file_operands_in_reverse_order_when_r_option_is_active);
         CU_add_test(suite, "should_parse_the_long_format_option", should_parse_the_long_format_option);
         CU_add_test(suite, "should_return_false_for_long_format_if_NULL_parsed_arguments_are_passed", should_return_false_for_long_format_if_NULL_parsed_arguments_are_passed);

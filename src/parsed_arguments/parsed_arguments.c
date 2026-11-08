@@ -15,32 +15,83 @@ struct s_parsed_arguments
     char **directory_file_operands;
 };
 
+typedef struct s_file_operand_sort_entry
+{
+    char *name;
+    t_file_stats *stats;
+} t_file_operand_sort_entry;
+
 static int compare_by_name(const void *first_str, const void *second_str)
 {
     return ft_strcmp(first_str, second_str);
 }
 
-static t_file_stats **get_non_directory_file_operands_stats(char **non_directory_file_operands, char **file_operands, t_file_stats **file_operands_stats)
+static int compare_file_operands_by_modification_time(const void *first_item, const void *second_item)
+{
+    const t_file_operand_sort_entry *first = first_item;
+    const t_file_operand_sort_entry *second = second_item;
+    const time_t first_timestamp = file_stats_get_modification_date(first->stats).timestamp;
+    const time_t second_timestamp = file_stats_get_modification_date(second->stats).timestamp;
+
+    if (first_timestamp > second_timestamp)
+        return -1;
+    if (first_timestamp < second_timestamp)
+        return 1;
+    return ft_strcmp(first->name, second->name);
+}
+
+static t_file_stats **get_file_operand_stats(char **operands, char **file_operands, t_file_stats **file_operands_stats)
 {
     unsigned int count = 0;
 
-    while (non_directory_file_operands[count] != NULL)
+    while (operands[count] != NULL)
         count++;
 
-    t_file_stats **non_directory_file_operands_stats = ft_safe_calloc(count + 1, sizeof(t_file_stats *));
+    t_file_stats **operands_stats = ft_safe_calloc(count + 1, sizeof(t_file_stats *));
 
     for (unsigned int i = 0; i < count; i++)
     {
         for (unsigned int j = 0; file_operands[j] != NULL; j++)
         {
-            if (ft_are_string_equals(non_directory_file_operands[i], file_operands[j]))
+            if (ft_are_string_equals(operands[i], file_operands[j]))
             {
-                non_directory_file_operands_stats[i] = file_operands_stats[j];
+                operands_stats[i] = file_operands_stats[j];
                 break;
             }
         }
     }
-    return non_directory_file_operands_stats;
+    return operands_stats;
+}
+
+static void sort_file_operands_by_modification_time(
+    const t_sorter_context *sorter_context,
+    char **operands,
+    t_file_stats **operands_stats)
+{
+    unsigned int count = 0;
+
+    while (operands[count] != NULL)
+        count++;
+
+    t_file_operand_sort_entry *entries = ft_safe_calloc(count, sizeof(t_file_operand_sort_entry));
+    void **entries_to_sort = ft_safe_calloc(count + 1, sizeof(void *));
+    for (unsigned int i = 0; i < count; i++)
+    {
+        entries[i].name = operands[i];
+        entries[i].stats = operands_stats[i];
+        entries_to_sort[i] = &entries[i];
+    }
+
+    sort_pointer_array(sorter_context, entries_to_sort, compare_file_operands_by_modification_time);
+
+    for (unsigned int i = 0; i < count; i++)
+    {
+        const t_file_operand_sort_entry *entry = entries_to_sort[i];
+        operands[i] = entry->name;
+        operands_stats[i] = entry->stats;
+    }
+    free(entries_to_sort);
+    free(entries);
 }
 
 static int has_failed_to_access_a_file_operand(char **file_operands, t_file_stats **file_operands_stats, const int has_implicit_default_operand)
@@ -103,10 +154,22 @@ t_result *parse_arguments(const int num_of_arguments, const char **arguments)
     parsed_arguments->non_directory_file_operands = file_operands_get_non_directory(parsed_arguments->file_operands, parsed_arguments->file_operands_stats, parsed_arguments->has_implicit_default_operand);
     parsed_arguments->directory_file_operands = file_operands_get_directory(parsed_arguments->file_operands, parsed_arguments->file_operands_stats, parsed_arguments->has_implicit_default_operand);
     t_sorter_context *sorter_context = sorter_context_create(parsed_arguments);
-    sort_pointer_array(sorter_context, (void **) parsed_arguments->non_directory_file_operands, compare_by_name);
-    sort_pointer_array(sorter_context, (void **) parsed_arguments->directory_file_operands, compare_by_name);
+    if (parsed_arguments_is_option_active(parsed_arguments, OPTIONS_TIME_SORTING))
+    {
+        parsed_arguments->non_directory_file_operands_stats = get_file_operand_stats(parsed_arguments->non_directory_file_operands, parsed_arguments->file_operands, parsed_arguments->file_operands_stats);
+        t_file_stats **directory_file_operands_stats = get_file_operand_stats(parsed_arguments->directory_file_operands, parsed_arguments->file_operands, parsed_arguments->file_operands_stats);
+        sort_file_operands_by_modification_time(sorter_context, parsed_arguments->non_directory_file_operands, parsed_arguments->non_directory_file_operands_stats);
+        sort_file_operands_by_modification_time(sorter_context, parsed_arguments->directory_file_operands, directory_file_operands_stats);
+        free(directory_file_operands_stats);
+    }
+    else
+    {
+        sort_pointer_array(sorter_context, (void **) parsed_arguments->non_directory_file_operands, compare_by_name);
+        sort_pointer_array(sorter_context, (void **) parsed_arguments->directory_file_operands, compare_by_name);
+    }
     sorter_context_destroy(&sorter_context);
-    parsed_arguments->non_directory_file_operands_stats = get_non_directory_file_operands_stats(parsed_arguments->non_directory_file_operands, parsed_arguments->file_operands, parsed_arguments->file_operands_stats);
+    if (parsed_arguments->non_directory_file_operands_stats == NULL)
+        parsed_arguments->non_directory_file_operands_stats = get_file_operand_stats(parsed_arguments->non_directory_file_operands, parsed_arguments->file_operands, parsed_arguments->file_operands_stats);
 
     if (failed_advanced_metadata_operand != NULL)
         return result_create_failed(parsed_arguments, failed_advanced_metadata_operand);
