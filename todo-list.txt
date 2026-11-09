@@ -1,5 +1,9 @@
 TODO:
-
+1. Implementar invalid operations
+2. Detectar flag inválida
+3. Poner mensaje de error 
+4. Parar ejecución con estado 2
+5. Tests para flags normales, agrupadas, posteriores a operandos
 
 
 TODO En algún momento:
