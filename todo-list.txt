@@ -1,7 +1,6 @@
 TODO:
 
 
-
 TODO En algún momento:
 - Investigar si los tests están acoplados a la implementación interna de las cosas
 
@@ -311,3 +310,9 @@ QA LS-21 Support for multi-option execution (`ls -Rlart ... | cat)
 2. Combinaciones de más de 2 parámetros
    - Algunas pruebas con múltiples parámetros (-laR, -rta, -Rlt, ...)
    - Una prueba con todos los parámetros -lartR
+
+
+QA LS-25 Manage invalid options (`ls -X ... | cat)
+1. Opción singular errónea (-X)
+2. Multiopción con errores (-lRX)
+3. Opción errónea posterior a operando (src -X)

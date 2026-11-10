@@ -12,3 +12,4 @@ typedef enum e_options
 
 t_options options_get(const char **arguments);
 int options_get_amount(const char **arguments);
+char options_get_invalid_option(const char **arguments);

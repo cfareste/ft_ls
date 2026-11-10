@@ -71,7 +71,7 @@ src -l Makefile file                                                            
 -l nonExistent                                                                          ::       -l nonExistent
 -l nonExistent noTarget                                                                 ::       -l nonExistent noTarget
 -l nonExistent Makefile src                                                             ::       -l nonExistent Makefile src
-#-l /                                                                                    ::       -l /
+#-l /                                                                                   ::       -l /
 -a                                                                                      ::       -a
 -a src                                                                                  ::       -a src
 -a empty                                                                                ::       -a empty
@@ -89,21 +89,20 @@ src -l Makefile file                                                            
 -t mtime_file_old mtime_file_same_z mtime_file_same_a mtime_file_new                    ::       -t mtime_file_old mtime_file_same_z mtime_file_same_a mtime_file_new
 -t mtime_dir_old mtime_dir_new                                                          ::       -t mtime_dir_old mtime_dir_new
 -t mtime_file_old mtime_dir_old mtime_file_new mtime_dir_new                            ::       -t mtime_file_old mtime_dir_old mtime_file_new mtime_dir_new
-
-# QA LS-21: combined option pairs
--Rl firstDir                                                                             ::       -Rl firstDir
--Ra .                                                                                    ::       -Ra .
--Rr firstDir                                                                             ::       -Rr firstDir
--Rt mtime_dir_old                                                                        ::       -Rt mtime_dir_old
--la .                                                                                    ::       -la .
--lr firstDir                                                                             ::       -lr firstDir
--lt mtime_dir_old                                                                        ::       -lt mtime_dir_old
--ar .                                                                                    ::       -ar .
+-Rl firstDir                                                                            ::       -Rl firstDir
+-Ra .                                                                                   ::       -Ra .
+-Rr firstDir                                                                            ::       -Rr firstDir
+-Rt mtime_dir_old                                                                       ::       -Rt mtime_dir_old
+-la .                                                                                   ::       -la .
+-lr firstDir                                                                            ::       -lr firstDir
+-lt mtime_dir_old                                                                       ::       -lt mtime_dir_old
+-ar .                                                                                   ::       -ar .
 -at multi_flag_dir                                                                      ::       -at multi_flag_dir
--rt mtime_file_old mtime_file_same_z mtime_file_same_a mtime_file_new                    ::       -rt mtime_file_old mtime_file_same_z mtime_file_same_a mtime_file_new
-
-# QA LS-21: combined option groups
--laR firstDir                                                                            ::       -laR firstDir
--rta multi_flag_dir                                                                      ::       -rta multi_flag_dir
--Rlt mtime_dir_old                                                                       ::       -Rlt mtime_dir_old
--lartR multi_flag_dir                                                                    ::       -lartR multi_flag_dir
+-rt mtime_file_old mtime_file_same_z mtime_file_same_a mtime_file_new                   ::       -rt mtime_file_old mtime_file_same_z mtime_file_same_a mtime_file_new
+-laR firstDir                                                                           ::       -laR firstDir
+-rta multi_flag_dir                                                                     ::       -rta multi_flag_dir
+-Rlt mtime_dir_old                                                                      ::       -Rlt mtime_dir_old
+-lartR multi_flag_dir                                                                   ::       -lartR multi_flag_dir
+-2                                                                                      ::       -2
+-lR2                                                                                    ::       -lR2
+src -2                                                                                  ::       src -2
