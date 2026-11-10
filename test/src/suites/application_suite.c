@@ -39,24 +39,22 @@ static void assert_application_succeeded_with_output(const int result, const cha
     assert_application_execution_succeed(result);
 }
 
+static void assert_invalid_option_is_reported(const int argc, const char **arguments)
+{
+    get_parsed_arguments_result(argc, arguments);
+    CU_ASSERT_PTR_NULL(parsed_arguments);
+    CU_ASSERT_EQUAL(application_run(parsed_arguments_result), FT_LS_APPLICATION_MAJOR_ERROR);
+    CU_ASSERT(verify_that_no_output_was_printed());
+    CU_ASSERT(verify_that_the_error_printed_is(
+        "ft_ls: invalid option -- 'X'\n"
+        "Try 'ft_ls --help' for more information.\n"));
+}
+
 static void should_return_a_major_error_when_passing_a_NULL_parsed_argument(void)
 {
     CU_ASSERT_EQUAL(application_run(parsed_arguments_result), FT_LS_APPLICATION_MAJOR_ERROR);
     CU_ASSERT(verify_that_no_output_was_printed());
     CU_ASSERT(verify_that_no_error_was_printed());
-}
-
-static void should_stop_and_report_the_first_unrecognized_option(void)
-{
-    const char *arguments[] = { "missing", "-lRx", NULL };
-    get_parsed_arguments_result(2, arguments);
-
-    CU_ASSERT_PTR_NULL(parsed_arguments);
-    CU_ASSERT_EQUAL(application_run(parsed_arguments_result), FT_LS_APPLICATION_MAJOR_ERROR);
-    CU_ASSERT(verify_that_no_output_was_printed());
-    CU_ASSERT(verify_that_the_error_printed_is(
-        "ft_ls: invalid option -- 'x'\n"
-        "Try 'ft_ls --help' for more information.\n"));
 }
 
 static void should_successfully_print_the_contents_of_the_current_directory_one_per_line_if_no_file_operands_are_specified(void)
@@ -4205,6 +4203,27 @@ static void should_fail_with_a_major_error_and_print_the_non_failing_files_if_fa
     CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MAJOR_ERROR);
 }
 
+static void should_report_a_singular_invalid_option(void)
+{
+    const char *arguments[] = { "-X", NULL };
+
+    assert_invalid_option_is_reported(1, arguments);
+}
+
+static void should_report_an_invalid_option_in_a_group(void)
+{
+    const char *arguments[] = { "-lRX", NULL };
+
+    assert_invalid_option_is_reported(1, arguments);
+}
+
+static void should_report_an_invalid_option_after_an_operand(void)
+{
+    const char *arguments[] = { "src", "-X", NULL };
+
+    assert_invalid_option_is_reported(2, arguments);
+}
+
 void register_application_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, test_teardown);
@@ -4212,7 +4231,9 @@ void register_application_suite(void)
     if (suite != NULL)
     {
         CU_add_test(suite, "should_return_a_major_error_when_passing_a_NULL_parsed_argument", should_return_a_major_error_when_passing_a_NULL_parsed_argument);
-        CU_add_test(suite, "should_stop_and_report_the_first_unrecognized_option", should_stop_and_report_the_first_unrecognized_option);
+        CU_add_test(suite, "should_report_a_singular_invalid_option", should_report_a_singular_invalid_option);
+        CU_add_test(suite, "should_report_an_invalid_option_in_a_group", should_report_an_invalid_option_in_a_group);
+        CU_add_test(suite, "should_report_an_invalid_option_after_an_operand", should_report_an_invalid_option_after_an_operand);
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_current_directory_one_per_line_if_no_file_operands_are_specified", should_successfully_print_the_contents_of_the_current_directory_one_per_line_if_no_file_operands_are_specified);
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_current_directory", should_successfully_print_the_contents_of_the_current_directory);
         CU_add_test(suite, "should_successfully_print_the_file_name_if_a_regular_file_operand_is_specified", should_successfully_print_the_file_name_if_a_regular_file_operand_is_specified);

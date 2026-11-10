@@ -1,9 +1,6 @@
 TODO:
 1. Implementar invalid operations
-2. Detectar flag inválida
-3. Poner mensaje de error 
-4. Parar ejecución con estado 2
-5. Tests para flags normales, agrupadas, posteriores a operandos
+2. Tests para flags normales, agrupadas, posteriores a operandos
 
 
 TODO En algún momento:
@@ -315,3 +312,9 @@ QA LS-21 Support for multi-option execution (`ls -Rlart ... | cat)
 2. Combinaciones de más de 2 parámetros
    - Algunas pruebas con múltiples parámetros (-laR, -rta, -Rlt, ...)
    - Una prueba con todos los parámetros -lartR
+
+
+QA LS-25 Manage invalid options (`ls -X ... | cat)
+1. Opción singular errónea (-X)
+2. Multiopción con errores (-lRX)
+3. Opción errónea posterior a operando (src -X)
