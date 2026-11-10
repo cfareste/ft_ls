@@ -1,6 +1,4 @@
 TODO:
-1. Implementar invalid operations
-2. Tests para flags normales, agrupadas, posteriores a operandos
 
 
 TODO En algún momento:
