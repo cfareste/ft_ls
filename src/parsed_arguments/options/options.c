@@ -12,6 +12,32 @@ static int argument_is_an_option(const char *argument)
     return argument[0] == '-';
 }
 
+static int option_is_valid(const char option)
+{
+    return option == RECURSIVE_OPTION_CHAR
+        || option == LONG_FORMAT_OPTION_CHAR
+        || option == READ_ALL_OPTION_CHAR
+        || option == REVERSE_OPTION_CHAR
+        || option == TIME_SORTING_OPTION_CHAR;
+}
+
+char options_get_invalid_option(const char **arguments)
+{
+    for (int i = 0; arguments[i] != NULL; i++)
+    {
+        if (!argument_is_an_option(arguments[i]))
+            continue ;
+
+        for (int j = 1; arguments[i][j] != '\0'; j++)
+        {
+            if (!option_is_valid(arguments[i][j]))
+                return arguments[i][j];
+        }
+    }
+
+    return '\0';
+}
+
 t_options options_get(const char **arguments)
 {
     int options = OPTIONS_NONE;

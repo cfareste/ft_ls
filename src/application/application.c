@@ -127,6 +127,9 @@ t_ft_ls_error_code application_run(const t_result *parsing_arguments_result)
         return FT_LS_APPLICATION_MAJOR_ERROR;
 
     const t_parsed_arguments *parsed_arguments = result_get_value(parsing_arguments_result);
+    if (parsed_arguments == NULL)
+        return FT_LS_APPLICATION_MAJOR_ERROR;
+
     t_render_context *render_context = render_context_create(parsed_arguments);
     t_scanner_context *scanner_context = scanner_context_create(parsed_arguments);
     t_sorter_context *sorter_context = sorter_context_create(parsed_arguments);

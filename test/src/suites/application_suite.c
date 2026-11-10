@@ -46,6 +46,19 @@ static void should_return_a_major_error_when_passing_a_NULL_parsed_argument(void
     CU_ASSERT(verify_that_no_error_was_printed());
 }
 
+static void should_stop_and_report_the_first_unrecognized_option(void)
+{
+    const char *arguments[] = { "missing", "-lRx", NULL };
+    get_parsed_arguments_result(2, arguments);
+
+    CU_ASSERT_PTR_NULL(parsed_arguments);
+    CU_ASSERT_EQUAL(application_run(parsed_arguments_result), FT_LS_APPLICATION_MAJOR_ERROR);
+    CU_ASSERT(verify_that_no_output_was_printed());
+    CU_ASSERT(verify_that_the_error_printed_is(
+        "ft_ls: invalid option -- 'x'\n"
+        "Try 'ft_ls --help' for more information.\n"));
+}
+
 static void should_successfully_print_the_contents_of_the_current_directory_one_per_line_if_no_file_operands_are_specified(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -4199,6 +4212,7 @@ void register_application_suite(void)
     if (suite != NULL)
     {
         CU_add_test(suite, "should_return_a_major_error_when_passing_a_NULL_parsed_argument", should_return_a_major_error_when_passing_a_NULL_parsed_argument);
+        CU_add_test(suite, "should_stop_and_report_the_first_unrecognized_option", should_stop_and_report_the_first_unrecognized_option);
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_current_directory_one_per_line_if_no_file_operands_are_specified", should_successfully_print_the_contents_of_the_current_directory_one_per_line_if_no_file_operands_are_specified);
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_current_directory", should_successfully_print_the_contents_of_the_current_directory);
         CU_add_test(suite, "should_successfully_print_the_file_name_if_a_regular_file_operand_is_specified", should_successfully_print_the_file_name_if_a_regular_file_operand_is_specified);

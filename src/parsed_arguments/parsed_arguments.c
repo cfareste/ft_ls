@@ -2,6 +2,7 @@
 #include "parsed_arguments.h"
 #include "file_operands.h"
 #include "sorter.h"
+#include "error_reporter.h"
 #include "libft.h"
 
 struct s_parsed_arguments
@@ -140,6 +141,13 @@ t_result *parse_arguments(const int num_of_arguments, const char **arguments)
 {
     if (num_of_arguments < 0 || arguments == NULL)
         return NULL;
+
+    const char invalid_option = options_get_invalid_option(arguments);
+    if (invalid_option != '\0')
+    {
+        report_invalid_option(invalid_option);
+        return result_create_failed(NULL, NULL);
+    }
 
     t_parsed_arguments *parsed_arguments = ft_safe_calloc(1, sizeof(t_parsed_arguments));
     const int num_of_file_operands = num_of_arguments - options_get_amount(arguments);
