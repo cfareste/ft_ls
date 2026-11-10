@@ -178,7 +178,9 @@ outputs_match() {
         if [[ "${model_lines[index]}" != "${ft_lines[index]}" ]] && \
             ! [[ "${model_lines[index]}" == ls:\ * && \
                 "${ft_lines[index]}" == ft_ls:\ * && \
-                "${model_lines[index]#ls:}" == "${ft_lines[index]#ft_ls:}" ]]; then
+                "${model_lines[index]#ls:}" == "${ft_lines[index]#ft_ls:}" ]] && \
+            ! [[ "${model_lines[index]}" == "Try 'ls --help' for more information." && \
+                "${ft_lines[index]}" == "Try 'ft_ls --help' for more information." ]]; then
             return 1
         fi
         index=$((index + 1))

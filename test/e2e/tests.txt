@@ -103,3 +103,6 @@ src -l Makefile file                                                            
 -rta multi_flag_dir                                                                     ::       -rta multi_flag_dir
 -Rlt mtime_dir_old                                                                      ::       -Rlt mtime_dir_old
 -lartR multi_flag_dir                                                                   ::       -lartR multi_flag_dir
+-2                                                                                      ::       -2
+-lR2                                                                                    ::       -lR2
+src -2                                                                                  ::       src -2
