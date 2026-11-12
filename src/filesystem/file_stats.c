@@ -223,6 +223,13 @@ nlink_t file_stats_get_link_count(const t_file_stats *file_stats)
     return file_stats->link_count;
 }
 
+static char *get_name_or_id(const char *name, const int id)
+{
+    if (name == NULL)
+        return ft_safe_itoa(id);
+    return ft_safe_strdup(name);
+}
+
 const char *file_stats_get_author(t_file_stats *stats)
 {
     if (stats == NULL)
@@ -233,10 +240,7 @@ const char *file_stats_get_author(t_file_stats *stats)
 
     const struct passwd *author = getpwuid(stats->author_id);
 
-    if (author == NULL || author->pw_name == NULL)
-        stats->author = ft_safe_itoa((int)stats->author_id);
-    else
-        stats->author = ft_safe_strdup(author->pw_name);
+    stats->author = get_name_or_id(author == NULL ? NULL : author->pw_name, (int)stats->author_id);
 
     return stats->author;
 }
@@ -251,10 +255,7 @@ const char *file_stats_get_group(t_file_stats *stats)
 
     const struct group *group = getgrgid(stats->group_id);
 
-    if (group == NULL || group->gr_name == NULL)
-        stats->group = ft_safe_itoa((int)stats->group_id);
-    else
-        stats->group = ft_safe_strdup(group->gr_name);
+    stats->group = get_name_or_id(group == NULL ? NULL : group->gr_name, (int)stats->group_id);
 
     return stats->group;
 }

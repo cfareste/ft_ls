@@ -201,10 +201,8 @@ static void print_failed_entry(const t_file_entry *entry, const t_file_entry_arr
     print_mode_string(entry);
     print_padding(link_count_width > 1 ? link_count_width - 1 : 0);
     ft_printf("? ");
-    ft_printf("? ");
-    print_padding(author_width > 1 ? author_width - 1 : 0);
-    ft_printf("? ");
-    print_padding(group_width > 1 ? group_width - 1 : 0);
+    print_padded_text(NULL, author_width);
+    print_padded_text(NULL, group_width);
     print_padding(column_width > 1 ? column_width - 1 : 0);
     ft_printf("? ");
     ft_printf("?");
