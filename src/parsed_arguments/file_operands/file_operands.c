@@ -44,22 +44,13 @@ static char **get_file_operands_from_arguments(const int num_of_file_operands, c
     return file_operands;
 }
 
-static t_file_stats **get_default_file_operand_stats(void)
-{
-    return ft_safe_calloc(DEFAULT_NUM_OF_OPERANDS + 1, sizeof(t_file_stats *));
-}
-
 static t_file_stats **get_stats_from_file_operands(const int num_of_file_operands, char **file_operands, const int follow_symlinks)
 {
     t_file_stats **file_operands_stats = ft_safe_calloc(num_of_file_operands + 1, sizeof(t_file_stats *));
+    t_file_stats *(*get_stats)(const char *) = follow_symlinks ? file_stats_get : file_stats_get_without_following_symlinks;
 
     for (int i = 0; i < num_of_file_operands; i++)
-    {
-        if (follow_symlinks)
-            file_operands_stats[i] = file_stats_get(file_operands[i]);
-        else
-            file_operands_stats[i] = file_stats_get_without_following_symlinks(file_operands[i]);
-    }
+        file_operands_stats[i] = get_stats(file_operands[i]);
 
     return file_operands_stats;
 }
@@ -115,9 +106,6 @@ char **file_operands_get(const int num_of_file_operands, const char **arguments)
 
 t_file_stats **file_operands_get_stats(const int num_of_file_operands, char **file_operands, const int follow_symlinks)
 {
-    if (num_of_file_operands == 0)
-        return get_default_file_operand_stats();
-
     return get_stats_from_file_operands(num_of_file_operands, file_operands, follow_symlinks);
 }
 
