@@ -10,8 +10,7 @@ typedef struct s_scan_context
     const char *directory_path;
     t_dir_stream *dir_stream;
     char *failed_file;
-    int read_failed;
-    int close_failed;
+    int directory_operation_failed;
     int retrieve_advanced_metadata;
     int filter_hidden_files;
 } t_current_scan_context;
@@ -91,7 +90,7 @@ static int scan_directory_entries(t_current_scan_context *context, t_file_entry_
 
 static t_result *create_scan_result(const t_current_scan_context *context, t_file_entry_array *file_entry_array)
 {
-    if (context->read_failed || context->close_failed)
+    if (context->directory_operation_failed)
         return result_create_failed(file_entry_array, context->directory_path);
     if (context->failed_file != NULL)
         return result_create_failed(file_entry_array, context->failed_file);
@@ -114,8 +113,9 @@ t_result *scan(const t_scanner_context *context, const char *path)
         return result_create_failed(NULL, path);
 
     t_file_entry_array *file_entry_array = file_entry_array_create();
-    current_scan.read_failed = scan_directory_entries(&current_scan, file_entry_array);
-    current_scan.close_failed = directory_close(&current_scan.dir_stream) == -1;
+    current_scan.directory_operation_failed = scan_directory_entries(&current_scan, file_entry_array);
+    if (directory_close(&current_scan.dir_stream) == -1)
+        current_scan.directory_operation_failed = 1;
 
     t_result *result = create_scan_result(&current_scan, file_entry_array);
     free(current_scan.failed_file);
