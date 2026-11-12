@@ -133,40 +133,27 @@ static void print_link_count(const t_file_entry *entry, const t_file_entry_array
     ft_printf("%lu ", link_count);
 }
 
+static void print_padded_text(const char *text, const size_t width)
+{
+    const char *display_text = text == NULL ? "?" : text;
+    const size_t text_width = ft_strlen(display_text);
+
+    ft_printf("%s ", display_text);
+    print_padding(width > text_width ? width - text_width : 0);
+}
+
 static void print_author(const t_file_entry *entry, const t_file_entry_array *entries)
 {
     const char *author = file_entry_get_author(entry);
-    const size_t author_width = author == NULL ? 0 : ft_strlen(author);
-    const size_t width = file_entry_array_get_biggest_author_width(entries);
 
-    if (author == NULL)
-    {
-        ft_printf("? ");
-        print_padding(width > 1 ? width - 1 : 0);
-    }
-    else
-    {
-        ft_printf("%s ", author);
-        print_padding(width - author_width);
-    }
+    print_padded_text(author, file_entry_array_get_biggest_author_width(entries));
 }
 
 static void print_group(const t_file_entry *entry, const t_file_entry_array *entries)
 {
     const char *group = file_entry_get_group(entry);
-    const size_t group_width = group == NULL ? 0 : ft_strlen(group);
-    const size_t width = file_entry_array_get_biggest_group_width(entries);
 
-    if (group == NULL)
-    {
-        ft_printf("? ");
-        print_padding(width > 1 ? width - 1 : 0);
-    }
-    else
-    {
-        ft_printf("%s ", group);
-        print_padding(width - group_width);
-    }
+    print_padded_text(group, file_entry_array_get_biggest_group_width(entries));
 }
 
 static void print_size(const t_file_entry *entry, const t_file_entry_array *entries)
