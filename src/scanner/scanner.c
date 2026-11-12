@@ -41,6 +41,12 @@ void scanner_context_destroy(t_scanner_context **context)
     *context = NULL;
 }
 
+static void record_failed_file(t_current_scan_context *context, const char *file_path)
+{
+    free(context->failed_file);
+    context->failed_file = ft_safe_strdup(file_path);
+}
+
 static void push_entry(t_current_scan_context *context, const t_dir_entry *dir_entry, t_file_entry_array *file_entry_array)
 {
     if (context->filter_hidden_files && directory_is_entry_hidden_file(dir_entry))
@@ -51,20 +57,14 @@ static void push_entry(t_current_scan_context *context, const t_dir_entry *dir_e
     t_file_stats *entry_stats = file_stats_get_without_following_symlinks(full_path);
 
     if (entry_stats == NULL)
-    {
-        free(context->failed_file);
-        context->failed_file = ft_safe_strdup(full_path);
-    }
+        record_failed_file(context, full_path);
 
     t_file_entry *entry = file_entry_create_from_stats(entry_name, entry_stats);
     if (context->retrieve_advanced_metadata)
     {
         file_entry_set_advanced_metadata_from_stats(entry, entry_stats);
         if (file_stats_target_retrieval_failed(entry_stats))
-        {
-            free(context->failed_file);
-            context->failed_file = ft_safe_strdup(full_path);
-        }
+            record_failed_file(context, full_path);
     }
 
     free(full_path);

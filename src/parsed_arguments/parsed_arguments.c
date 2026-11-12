@@ -137,31 +137,25 @@ static const char *retrieve_advanced_file_stats(char **file_operands, t_file_sta
     return failed_operand;
 }
 
-t_result *parse_arguments(const int num_of_arguments, const char **arguments)
+static void initialize_file_operands(t_parsed_arguments *parsed_arguments, const int num_of_arguments, const char **arguments)
 {
-    if (num_of_arguments < 0 || arguments == NULL)
-        return NULL;
-
-    const char invalid_option = options_get_invalid_option(arguments);
-    if (invalid_option != '\0')
-    {
-        report_invalid_option(invalid_option);
-        return result_create_failed(NULL, NULL);
-    }
-
-    t_parsed_arguments *parsed_arguments = ft_safe_calloc(1, sizeof(t_parsed_arguments));
     const int num_of_file_operands = num_of_arguments - options_get_amount(arguments);
 
-    parsed_arguments->options = options_get(arguments);
     parsed_arguments->has_implicit_default_operand = num_of_file_operands == 0;
     parsed_arguments->file_operands = file_operands_get(num_of_file_operands, arguments);
     parsed_arguments->file_operands_stats = file_operands_get_stats(num_of_file_operands, parsed_arguments->file_operands, !parsed_arguments_is_long_format_active(parsed_arguments));
-    const char *failed_advanced_metadata_operand = NULL;
-    if (parsed_arguments_is_long_format_active(parsed_arguments))
-        failed_advanced_metadata_operand = retrieve_advanced_file_stats(parsed_arguments->file_operands, parsed_arguments->file_operands_stats);
+}
+
+static void classify_file_operands(t_parsed_arguments *parsed_arguments)
+{
     parsed_arguments->non_directory_file_operands = file_operands_get_non_directory(parsed_arguments->file_operands, parsed_arguments->file_operands_stats, parsed_arguments->has_implicit_default_operand);
     parsed_arguments->directory_file_operands = file_operands_get_directory(parsed_arguments->file_operands, parsed_arguments->file_operands_stats, parsed_arguments->has_implicit_default_operand);
+}
+
+static void sort_file_operands(t_parsed_arguments *parsed_arguments)
+{
     t_sorter_context *sorter_context = sorter_context_create(parsed_arguments);
+
     if (parsed_arguments_is_option_active(parsed_arguments, OPTIONS_TIME_SORTING))
     {
         parsed_arguments->non_directory_file_operands_stats = get_file_operand_stats(parsed_arguments->non_directory_file_operands, parsed_arguments->file_operands, parsed_arguments->file_operands_stats);
@@ -175,12 +169,36 @@ t_result *parse_arguments(const int num_of_arguments, const char **arguments)
         sort_pointer_array(sorter_context, (void **) parsed_arguments->non_directory_file_operands, compare_by_name);
         sort_pointer_array(sorter_context, (void **) parsed_arguments->directory_file_operands, compare_by_name);
     }
+
     sorter_context_destroy(&sorter_context);
     if (parsed_arguments->non_directory_file_operands_stats == NULL)
         parsed_arguments->non_directory_file_operands_stats = get_file_operand_stats(parsed_arguments->non_directory_file_operands, parsed_arguments->file_operands, parsed_arguments->file_operands_stats);
+}
 
+t_result *parse_arguments(const int num_of_arguments, const char **arguments)
+{
+    if (num_of_arguments < 0 || arguments == NULL)
+        return NULL;
+
+    const char invalid_option = options_get_invalid_option(arguments);
+    if (invalid_option != '\0')
+    {
+        report_invalid_option(invalid_option);
+        return result_create_failed(NULL, NULL);
+    }
+
+    t_parsed_arguments *parsed_arguments = ft_safe_calloc(1, sizeof(t_parsed_arguments));
+    parsed_arguments->options = options_get(arguments);
+    initialize_file_operands(parsed_arguments, num_of_arguments, arguments);
+    const char *failed_advanced_metadata_operand = NULL;
+    if (parsed_arguments_is_long_format_active(parsed_arguments))
+        failed_advanced_metadata_operand = retrieve_advanced_file_stats(parsed_arguments->file_operands, parsed_arguments->file_operands_stats);
+
+    classify_file_operands(parsed_arguments);
+    sort_file_operands(parsed_arguments);
     if (failed_advanced_metadata_operand != NULL)
         return result_create_failed(parsed_arguments, failed_advanced_metadata_operand);
+
     return create_parsing_arguments_result(parsed_arguments);
 }
 

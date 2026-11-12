@@ -1,4 +1,20 @@
 TODO:
+1. Application
+2. Error reporter
+3. File entry
+4. Directory
+5. File stats
+6. Parsed arguments
+   - File operands
+   - Options
+7. Path builder
+8. Renderer
+   - Long format strategy
+   - Single column strategy
+9. Result
+10. Scanner
+11. Sorter
+12. Utils
 
 
 TODO En algún momento:
