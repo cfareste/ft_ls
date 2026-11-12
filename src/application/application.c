@@ -46,10 +46,8 @@ static void process_non_directory_file_operands(const t_parsed_arguments *parsed
 
 static void update_error_code(t_application_context *context, const t_ft_ls_error_code error_code)
 {
-    if (context->error_code >= error_code)
-        return ;
-
-    context->error_code = error_code;
+    if (error_code > context->error_code)
+        context->error_code = error_code;
 }
 
 static t_ft_ls_error_code get_scan_error(const t_application_context *context, const t_result *scan_result)

@@ -41,32 +41,15 @@ static char get_write_permission_character(const t_permissions file_permissions,
     return get_permission_character(file_permissions, permission, 'w');
 }
 
-static char get_special_execute_character(const t_permissions special_permission, const int execute_is_set)
+static char get_execute_permission_character(const t_permissions file_permissions, const t_permissions execute_permission, const t_permissions special_permission)
 {
+    const int execute_is_set = (file_permissions & execute_permission) != 0;
+
+    if (!(file_permissions & special_permission))
+        return execute_is_set ? 'x' : '-';
     if (special_permission == PERM_STICKY)
         return execute_is_set ? 't' : 'T';
     return execute_is_set ? 's' : 'S';
-}
-
-static char get_special_execute_permission_character(const t_permissions file_permissions, const t_permissions execute_permission, const t_permissions special_permission)
-{
-    const int execute_is_set = file_permissions & execute_permission;
-    const t_permissions displayed_permission = execute_is_set
-        ? execute_permission
-        : special_permission;
-    const char character = get_special_execute_character(special_permission,
-                                                         execute_is_set);
-
-    return get_permission_character(file_permissions, displayed_permission, character);
-}
-
-static char get_execute_permission_character(const t_permissions file_permissions, const t_permissions execute_permission, const t_permissions special_permission)
-{
-    if (file_permissions & special_permission)
-        return get_special_execute_permission_character(file_permissions,
-                                                        execute_permission,
-                                                        special_permission);
-    return get_permission_character(file_permissions, execute_permission, 'x');
 }
 
 static const char *get_month_abbreviation(const int month)
