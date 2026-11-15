@@ -16,6 +16,8 @@ int	main(void)
 	register_file_stats_suite();
 	register_path_builder_suite();
 	register_parsed_arguments_suite();
+	register_options_suite();
+	register_file_operands_suite();
 	register_error_reporter_suite();
 	register_result_suite();
 	register_application_suite();

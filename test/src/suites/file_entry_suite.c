@@ -88,6 +88,46 @@ static void should_create_a_file_entry_from_stats(void)
     file_stats_destroy(&stats);
 }
 
+static void should_set_advanced_metadata_from_symlink_stats(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_SYMLINK_WITH_STATS("link", "target",
+            MOCK_AUTHOR("alice"),
+            MOCK_GROUP("developers")),
+        MOCK_FILE("target"),
+        MOCK_NULL_TERMINATOR()
+    };
+    t_file_stats *stats;
+    t_file_entry *entry;
+
+    vfs_mock_setup(vfs);
+    stats = file_stats_get_without_following_symlinks("link");
+    entry = file_entry_create_from_stats("link", stats);
+
+    file_entry_set_advanced_metadata_from_stats(entry, stats);
+
+    CU_ASSERT_STRING_EQUAL(file_entry_get_author(entry), "alice");
+    CU_ASSERT_STRING_EQUAL(file_entry_get_group(entry), "developers");
+    CU_ASSERT_STRING_EQUAL(file_entry_get_link_target(entry), "target");
+    CU_ASSERT(verify_that_no_error_was_printed());
+
+    file_entry_destroy(&entry);
+    file_stats_destroy(&stats);
+}
+
+static void should_ignore_null_arguments_when_setting_advanced_metadata(void)
+{
+    t_file_stats *stats = NULL;
+
+    file_entry_set_advanced_metadata_from_stats(NULL, NULL);
+    file_entry_set_advanced_metadata_from_stats(entry_sut, NULL);
+    file_entry_set_advanced_metadata_from_stats(NULL, stats);
+
+    CU_ASSERT_PTR_NULL(file_entry_get_author(entry_sut));
+    CU_ASSERT_PTR_NULL(file_entry_get_group(entry_sut));
+    CU_ASSERT_PTR_NULL(file_entry_get_link_target(entry_sut));
+}
+
 static void should_not_retrieve_the_link_target_when_creating_a_file_entry_from_symlink_stats(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -814,6 +854,8 @@ void register_file_entry_suite(void)
     {
         CU_add_test(suite, "should_create_file_entry_correctly", should_create_file_entry_correctly);
         CU_add_test(suite, "should_create_a_file_entry_from_stats", should_create_a_file_entry_from_stats);
+        CU_add_test(suite, "should_set_advanced_metadata_from_symlink_stats", should_set_advanced_metadata_from_symlink_stats);
+        CU_add_test(suite, "should_ignore_null_arguments_when_setting_advanced_metadata", should_ignore_null_arguments_when_setting_advanced_metadata);
         CU_add_test(suite, "should_not_retrieve_the_link_target_when_creating_a_file_entry_from_symlink_stats", should_not_retrieve_the_link_target_when_creating_a_file_entry_from_symlink_stats);
         CU_add_test(suite, "should_create_file_entry_array_correctly", should_create_file_entry_array_correctly);
         CU_add_test(suite, "should_fail_to_create_an_entry_if_a_NULL_file_name_is_passed", should_fail_to_create_an_entry_if_a_NULL_file_name_is_passed);

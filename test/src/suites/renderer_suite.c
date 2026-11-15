@@ -2,6 +2,7 @@
 #include "CUnit/CUnit.h"
 #include "CUnit/Basic.h"
 #include "renderer.h"
+#include "render_strategies.h"
 #include "mocks.h"
 
 #define SUITE_NAME "renderer"
@@ -56,6 +57,76 @@ static t_file_entry *create_failed_entry(const char *name, const char *link_targ
         file_entry_set_file_type(entry, FILE_TYPE_UNKNOWN);
     }
     return entry;
+}
+
+static void should_print_single_column_entries_when_the_strategy_is_called_directly(void)
+{
+    t_file_entry_array *entries = file_entry_array_create();
+
+    single_column_strategy(NULL);
+    single_column_strategy(entries);
+    CU_ASSERT(verify_that_no_output_was_printed());
+
+    file_entry_array_push(entries, file_entry_create("first"));
+    file_entry_array_push(entries, file_entry_create("second"));
+    single_column_strategy(entries);
+
+    CU_ASSERT(verify_that_the_output_printed_is("first\nsecond\n"));
+    file_entry_array_destroy(&entries);
+}
+
+static void should_leave_single_column_directory_prefix_empty(void)
+{
+    t_file_entry_array *entries = file_entry_array_create();
+
+    directory_entries_prefix_single_column_strategy(NULL);
+    directory_entries_prefix_single_column_strategy(entries);
+    file_entry_array_push(entries, file_entry_create("entry"));
+    directory_entries_prefix_single_column_strategy(entries);
+
+    CU_ASSERT(verify_that_no_output_was_printed());
+    file_entry_array_destroy(&entries);
+}
+
+static void should_print_the_long_format_block_total_when_the_strategy_is_called_directly(void)
+{
+    t_file_entry_array *entries = file_entry_array_create();
+    t_file_entry *entry = file_entry_create("entry");
+
+    directory_entries_prefix_long_format_strategy(NULL);
+    CU_ASSERT(verify_that_the_output_printed_is("total 0\n"));
+
+    reset_printing_buffer();
+    file_entry_set_blocks(entry, 5);
+    file_entry_array_push(entries, entry);
+    directory_entries_prefix_long_format_strategy(entries);
+
+    CU_ASSERT(verify_that_the_output_printed_is("total 3\n"));
+    file_entry_array_destroy(&entries);
+}
+
+static void should_render_successful_and_failed_entries_when_long_format_strategy_is_called_directly(void)
+{
+    const t_date date = {
+        .day = 1, .month = 1, .year = 2100, .hour = 0, .minute = 0,
+        .timestamp = 4102444800
+    };
+    t_file_entry_array *entries = file_entry_array_create();
+
+    long_format_strategy(NULL);
+    long_format_strategy(entries);
+    CU_ASSERT(verify_that_no_output_was_printed());
+
+    file_entry_array_push(entries, create_entry(
+        "file", FILE_TYPE_REGULAR, PERM_NONE, 1, "alice", "staff", 12, date));
+    file_entry_array_push(entries, create_failed_entry("broken", NULL));
+    long_format_strategy(entries);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "%s\n%s\n",
+        "---------- 1 alice staff 12 Jan  1 00:00 file",
+        "?--------- ? ?     ?      ? ?            broken"));
+    file_entry_array_destroy(&entries);
 }
 
 static void should_create_a_context(void)
@@ -1059,6 +1130,10 @@ void register_renderer_suite(void)
 
     if (suite != NULL)
     {
+        CU_add_test(suite, "should_print_single_column_entries_when_the_strategy_is_called_directly", should_print_single_column_entries_when_the_strategy_is_called_directly);
+        CU_add_test(suite, "should_leave_single_column_directory_prefix_empty", should_leave_single_column_directory_prefix_empty);
+        CU_add_test(suite, "should_print_the_long_format_block_total_when_the_strategy_is_called_directly", should_print_the_long_format_block_total_when_the_strategy_is_called_directly);
+        CU_add_test(suite, "should_render_successful_and_failed_entries_when_long_format_strategy_is_called_directly", should_render_successful_and_failed_entries_when_long_format_strategy_is_called_directly);
         CU_add_test(suite, "should_create_a_context", should_create_a_context);
         CU_add_test(suite, "should_return_NULL_when_creating_a_context_if_null_parsed_args_are_specified", should_return_NULL_when_creating_a_context_if_null_parsed_args_are_specified);
         CU_add_test(suite, "should_destroy_a_context", should_destroy_a_context);

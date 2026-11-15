@@ -1,4 +1,3 @@
-#include <stddef.h>
 #include <stdlib.h>
 #include "sorter.h"
 #include "parsed_arguments.h"
@@ -16,6 +15,7 @@ t_sorter_context *sorter_context_create(const t_parsed_arguments *parsed_argumen
 
     context->reverse_order = parsed_arguments_is_option_active(parsed_arguments, OPTIONS_REVERSE);
     context->modification_time_order = parsed_arguments_is_option_active(parsed_arguments, OPTIONS_TIME_SORTING);
+
     return context;
 }
 

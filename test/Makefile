@@ -114,6 +114,8 @@ SRCS = main.c \
 		sorter_suite.c \
 		path_builder_suite.c \
 		parsed_arguments_suite.c \
+		options_suite.c \
+		file_operands_suite.c \
 		application_suite.c \
 		error_reporter_suite.c \
 		result_suite.c \

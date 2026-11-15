@@ -12,17 +12,26 @@ static int argument_is_an_option(const char *argument)
     return argument[0] == '-';
 }
 
-static int option_is_valid(const char option)
+static t_options get_option_flag(const char option)
 {
-    return option == RECURSIVE_OPTION_CHAR
-        || option == LONG_FORMAT_OPTION_CHAR
-        || option == READ_ALL_OPTION_CHAR
-        || option == REVERSE_OPTION_CHAR
-        || option == TIME_SORTING_OPTION_CHAR;
+    if (option == RECURSIVE_OPTION_CHAR)
+        return OPTIONS_RECURSIVE;
+    if (option == LONG_FORMAT_OPTION_CHAR)
+        return OPTIONS_LONG_FORMAT;
+    if (option == READ_ALL_OPTION_CHAR)
+        return OPTIONS_READ_ALL;
+    if (option == REVERSE_OPTION_CHAR)
+        return OPTIONS_REVERSE;
+    if (option == TIME_SORTING_OPTION_CHAR)
+        return OPTIONS_TIME_SORTING;
+    return OPTIONS_NONE;
 }
 
 char options_get_invalid_option(const char **arguments)
 {
+    if (arguments == NULL)
+        return '\0';
+
     for (int i = 0; arguments[i] != NULL; i++)
     {
         if (!argument_is_an_option(arguments[i]))
@@ -30,7 +39,7 @@ char options_get_invalid_option(const char **arguments)
 
         for (int j = 1; arguments[i][j] != '\0'; j++)
         {
-            if (!option_is_valid(arguments[i][j]))
+            if (get_option_flag(arguments[i][j]) == OPTIONS_NONE)
                 return arguments[i][j];
         }
     }
@@ -40,6 +49,9 @@ char options_get_invalid_option(const char **arguments)
 
 t_options options_get(const char **arguments)
 {
+    if (arguments == NULL)
+        return OPTIONS_NONE;
+
     int options = OPTIONS_NONE;
 
     for (int i = 0; arguments[i] != NULL; i++)
@@ -49,16 +61,7 @@ t_options options_get(const char **arguments)
 
         for (int j = 1; arguments[i][j] != '\0'; j++)
         {
-            if (arguments[i][j] == RECURSIVE_OPTION_CHAR)
-                options |= OPTIONS_RECURSIVE;
-            if (arguments[i][j] == LONG_FORMAT_OPTION_CHAR)
-                options |= OPTIONS_LONG_FORMAT;
-            if (arguments[i][j] == READ_ALL_OPTION_CHAR)
-                options |= OPTIONS_READ_ALL;
-            if (arguments[i][j] == REVERSE_OPTION_CHAR)
-                options |= OPTIONS_REVERSE;
-            if (arguments[i][j] == TIME_SORTING_OPTION_CHAR)
-                options |= OPTIONS_TIME_SORTING;
+            options |= get_option_flag(arguments[i][j]);
         }
     }
 
@@ -67,6 +70,9 @@ t_options options_get(const char **arguments)
 
 int options_get_amount(const char **arguments)
 {
+    if (arguments == NULL)
+        return 0;
+
     int num_of_options = 0;
 
     for (int i = 0; arguments[i] != 0; i++)
