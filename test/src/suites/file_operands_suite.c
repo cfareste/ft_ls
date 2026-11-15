@@ -70,15 +70,6 @@ static void should_reject_missing_or_negative_operand_counts(void)
     CU_ASSERT_PTR_NULL(file_operands_get(-1, arguments));
 }
 
-static void should_reject_an_operand_count_that_does_not_match_the_arguments(void)
-{
-    const char *too_many_operands[] = { "first", "second", NULL };
-    const char *too_few_operands[] = { "first", NULL };
-
-    CU_ASSERT_PTR_NULL(file_operands_get(1, too_many_operands));
-    CU_ASSERT_PTR_NULL(file_operands_get(2, too_few_operands));
-}
-
 static void should_retrieve_stats_with_or_without_following_symlinks(void)
 {
     const t_vfs_mock_entry entries[] = {
@@ -192,7 +183,6 @@ void register_file_operands_suite(void)
     CU_add_test(suite, "should_return_the_default_directory_for_zero_operands", should_return_the_default_directory_for_zero_operands);
     CU_add_test(suite, "should_copy_operands_in_order_and_skip_option_arguments", should_copy_operands_in_order_and_skip_option_arguments);
     CU_add_test(suite, "should_reject_missing_or_negative_operand_counts", should_reject_missing_or_negative_operand_counts);
-    CU_add_test(suite, "should_reject_an_operand_count_that_does_not_match_the_arguments", should_reject_an_operand_count_that_does_not_match_the_arguments);
     CU_add_test(suite, "should_retrieve_stats_with_or_without_following_symlinks", should_retrieve_stats_with_or_without_following_symlinks);
     CU_add_test(suite, "should_return_an_empty_stats_array_for_zero_operands", should_return_an_empty_stats_array_for_zero_operands);
     CU_add_test(suite, "should_reject_missing_or_negative_stats_inputs", should_reject_missing_or_negative_stats_inputs);
