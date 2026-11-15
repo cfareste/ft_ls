@@ -98,6 +98,9 @@ static char **get_file_operands_by_category(char **file_operands, t_file_stats *
 
 char **file_operands_get(const int num_of_file_operands, const char **arguments)
 {
+    if (num_of_file_operands < 0 || (num_of_file_operands > 0 && arguments == NULL))
+        return NULL;
+
     if (num_of_file_operands == 0)
         return get_default_file_operands();
 
@@ -106,15 +109,24 @@ char **file_operands_get(const int num_of_file_operands, const char **arguments)
 
 t_file_stats **file_operands_get_stats(const int num_of_file_operands, char **file_operands, const int follow_symlinks)
 {
+    if (num_of_file_operands < 0 || (num_of_file_operands > 0 && file_operands == NULL))
+        return NULL;
+
     return get_stats_from_file_operands(num_of_file_operands, file_operands, follow_symlinks);
 }
 
 char **file_operands_get_non_directory(char **file_operands, t_file_stats **file_operands_stats, const int has_implicit_default_operand)
 {
+    if (file_operands == NULL || file_operands_stats == NULL)
+        return NULL;
+
     return get_file_operands_by_category(file_operands, file_operands_stats, has_implicit_default_operand, FILE_OPERAND_NON_DIRECTORY);
 }
 
 char **file_operands_get_directory(char **file_operands, t_file_stats **file_operands_stats, const int has_implicit_default_operand)
 {
+    if (file_operands == NULL || file_operands_stats == NULL)
+        return NULL;
+
     return get_file_operands_by_category(file_operands, file_operands_stats, has_implicit_default_operand, FILE_OPERAND_DIRECTORY);
 }

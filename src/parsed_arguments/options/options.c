@@ -29,6 +29,9 @@ static t_options get_option_flag(const char option)
 
 char options_get_invalid_option(const char **arguments)
 {
+    if (arguments == NULL)
+        return '\0';
+
     for (int i = 0; arguments[i] != NULL; i++)
     {
         if (!argument_is_an_option(arguments[i]))
@@ -46,6 +49,9 @@ char options_get_invalid_option(const char **arguments)
 
 t_options options_get(const char **arguments)
 {
+    if (arguments == NULL)
+        return OPTIONS_NONE;
+
     int options = OPTIONS_NONE;
 
     for (int i = 0; arguments[i] != NULL; i++)
@@ -64,6 +70,9 @@ t_options options_get(const char **arguments)
 
 int options_get_amount(const char **arguments)
 {
+    if (arguments == NULL)
+        return 0;
+
     int num_of_options = 0;
 
     for (int i = 0; arguments[i] != 0; i++)

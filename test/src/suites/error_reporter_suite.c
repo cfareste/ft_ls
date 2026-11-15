@@ -157,6 +157,15 @@ static void should_print_the_read_symbolic_link_error_with_the_specified_file_pa
     CU_ASSERT(verify_that_the_error_printed_is("%s '%s': %s\n", READ_SYMBOLIC_LINK_ERROR_PREFIX, link_path, strerror(errno)));
 }
 
+static void should_print_the_invalid_option_and_help_hint(void)
+{
+    report_invalid_option('x');
+
+    CU_ASSERT(verify_that_the_error_printed_is(
+        "ft_ls: invalid option -- 'x'\n"
+        "Try 'ft_ls --help' for more information.\n"));
+}
+
 void register_error_reporter_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, NULL);
@@ -178,5 +187,6 @@ void register_error_reporter_suite(void)
         CU_add_test(suite, "should_only_print_the_read_symbolic_link_error_if_a_NULL_file_path_is_specified", should_only_print_the_read_symbolic_link_error_if_a_NULL_file_path_is_specified);
         CU_add_test(suite, "should_only_print_the_read_symbolic_link_error_if_an_empty_file_path_is_specified", should_only_print_the_read_symbolic_link_error_if_an_empty_file_path_is_specified);
         CU_add_test(suite, "should_print_the_read_symbolic_link_error_with_the_specified_file_path", should_print_the_read_symbolic_link_error_with_the_specified_file_path);
+        CU_add_test(suite, "should_print_the_invalid_option_and_help_hint", should_print_the_invalid_option_and_help_hint);
     }
 }

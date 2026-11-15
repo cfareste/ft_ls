@@ -33,6 +33,30 @@ static void should_create_sorter_context(void)
     sorter_context_destroy(&context);
 }
 
+static void should_report_modification_time_order_only_when_the_t_option_is_active(void)
+{
+    const char *time_arguments[] = { "-t", NULL };
+    const char *other_arguments[] = { "-r", NULL };
+    t_result *time_result = parse_arguments(1, time_arguments);
+    t_result *other_result = parse_arguments(1, other_arguments);
+    t_parsed_arguments *time_arguments_parsed = result_get_value(time_result);
+    t_parsed_arguments *other_arguments_parsed = result_get_value(other_result);
+    t_sorter_context *time_context = sorter_context_create(time_arguments_parsed);
+    t_sorter_context *other_context = sorter_context_create(other_arguments_parsed);
+
+    CU_ASSERT_EQUAL(sorter_context_is_modification_time_order_active(NULL), 0);
+    CU_ASSERT_EQUAL(sorter_context_is_modification_time_order_active(sorter_context), 0);
+    CU_ASSERT_EQUAL(sorter_context_is_modification_time_order_active(time_context), 1);
+    CU_ASSERT_EQUAL(sorter_context_is_modification_time_order_active(other_context), 0);
+
+    sorter_context_destroy(&time_context);
+    sorter_context_destroy(&other_context);
+    parsed_arguments_destroy(&time_arguments_parsed);
+    parsed_arguments_destroy(&other_arguments_parsed);
+    result_destroy(&time_result);
+    result_destroy(&other_result);
+}
+
 static void should_destroy_sorter_context(void)
 {
     t_sorter_context *context = sorter_context_create(NULL);
@@ -135,6 +159,7 @@ void register_sorter_suite(void)
     if (suite != NULL)
     {
         CU_add_test(suite, "should_create_sorter_context", should_create_sorter_context);
+        CU_add_test(suite, "should_report_modification_time_order_only_when_the_t_option_is_active", should_report_modification_time_order_only_when_the_t_option_is_active);
         CU_add_test(suite, "should_destroy_sorter_context", should_destroy_sorter_context);
         CU_add_test(suite, "should_not_fail_when_passing_a_NULL_pointer", should_not_fail_when_passing_a_NULL_pointer);
         CU_add_test(suite, "should_not_fail_when_passing_a_NULL_file_entry_array", should_not_fail_when_passing_a_NULL_file_entry_array);
