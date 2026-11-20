@@ -139,6 +139,7 @@ static const char *retrieve_advanced_file_stats(char **file_operands, t_file_sta
         file_stats_get_author(file_operands_stats[i]);
         file_stats_get_group(file_operands_stats[i]);
         file_stats_get_target_pointed_by_link(file_operands_stats[i]);
+        file_stats_get_acl_type(file_operands_stats[i]);
         if (failed_operand == NULL && file_stats_target_retrieval_failed(file_operands_stats[i]))
             failed_operand = file_operands[i];
     }
