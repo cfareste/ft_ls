@@ -1,11 +1,10 @@
 TODO:
 1. Implementar LS-28 Manage ACL and extended attributes with long format option
-2. Guardar si tienen o no xattrs los file entries y file entry array
-3. Renderizar carácter especiale
-4. Coger los datos en non dir file operands
-5. Coger los datos en scanner
-6. Tests
-7. Errores
+2. Renderizar carácter especiale
+3. Coger los datos en non dir file operands
+4. Coger los datos en scanner
+5. Tests
+6. Errores
 
 
 TODO En algún momento:

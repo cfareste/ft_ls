@@ -351,7 +351,7 @@ void file_entry_array_push(t_file_entry_array *array, t_file_entry *entry)
     array->entries[array->count] = entry;
     array->count++;
 
-    if (entry->acl_type == FILE_ACL_REAL)
+    if (entry->acl_type != FILE_ACL_NONE)
         array->has_acl = 1;
 
     array->total_blocks += entry->blocks;

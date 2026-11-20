@@ -208,7 +208,7 @@ static void should_track_real_acls_in_a_file_entry_array(void)
         file_entry_set_advanced_metadata_from_stats(entry, stats);
         file_entry_array_push(array_sut, entry);
         file_stats_destroy(&stats);
-        CU_ASSERT_EQUAL(file_entry_array_has_acl(array_sut), i == 3);
+        CU_ASSERT_EQUAL(file_entry_array_has_acl(array_sut), i != 0);
     }
     CU_ASSERT_FALSE(file_entry_array_has_acl(NULL));
 }
