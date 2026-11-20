@@ -29,6 +29,42 @@ static void should_create_file_stats_correctly(void)
     file_stats_destroy(&stats);
 }
 
+static void should_detect_the_acl_type_for_each_file(void)
+{
+    static const t_vfs_mock_xattr selinux_xattrs[] = {
+        { .name = "security.selinux", .size = 1 },
+        { .name = NULL }
+    };
+    static const t_vfs_mock_xattr acl_xattrs[] = {
+        { .name = "system.posix_acl_access", .size = 1 },
+        { .name = NULL }
+    };
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("no_acl"),
+        MOCK_LGETXATTR_ERROR(EACCES, "unknown_acl"),
+        MOCK_FILE_WITH_STATS("selinux_only", .xattrs = selinux_xattrs),
+        MOCK_FILE_WITH_STATS("real_acl", .xattrs = acl_xattrs),
+        MOCK_NULL_TERMINATOR()
+    };
+    const char *paths[] = { "no_acl", "unknown_acl", "selinux_only", "real_acl" };
+    const t_file_acl_type expected[] = {
+        FILE_ACL_NONE,
+        FILE_ACL_UNKNOWN,
+        FILE_ACL_SELINUX_ONLY,
+        FILE_ACL_REAL
+    };
+
+    vfs_mock_setup(vfs);
+    for (size_t i = 0; i < sizeof(paths) / sizeof(paths[0]); i++)
+    {
+        t_file_stats *stats = file_stats_get(paths[i]);
+
+        CU_ASSERT_PTR_NOT_NULL(stats);
+        CU_ASSERT_EQUAL(file_stats_get_acl_type(stats), expected[i]);
+        file_stats_destroy(&stats);
+    }
+}
+
 static void should_return_NULL_when_creating_file_stats_with_a_NULL_path(void)
 {
     const t_file_stats *stats = file_stats_get(NULL);
@@ -782,6 +818,7 @@ void register_file_stats_suite(void)
     if (suite != NULL)
     {
         CU_add_test(suite, "should_create_file_stats_correctly", should_create_file_stats_correctly);
+        CU_add_test(suite, "should_detect_the_acl_type_for_each_file", should_detect_the_acl_type_for_each_file);
         CU_add_test(suite, "should_return_NULL_when_creating_file_stats_with_an_empty_path", should_return_NULL_when_creating_file_stats_with_an_empty_path);
         CU_add_test(suite, "should_return_NULL_when_creating_file_stats_with_a_NULL_path", should_return_NULL_when_creating_file_stats_with_a_NULL_path);
         CU_add_test(suite, "should_destroy_file_stats_correctly", should_destroy_file_stats_correctly);

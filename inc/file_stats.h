@@ -16,6 +16,14 @@ typedef enum e_file_type
     FILE_TYPE_SOCKET
 } t_file_type;
 
+typedef enum e_file_acl_type
+{
+    FILE_ACL_NONE,
+    FILE_ACL_UNKNOWN,
+    FILE_ACL_SELINUX_ONLY,
+    FILE_ACL_REAL
+} t_file_acl_type;
+
 typedef enum e_permissions
 {
     PERM_NONE = 0,
@@ -40,6 +48,7 @@ t_file_stats *file_stats_get_without_following_symlinks(const char *file_path);
 long file_stats_get_blocks(const t_file_stats *file_stats);
 t_permissions file_stats_get_permissions(const t_file_stats *file_stats);
 t_file_type file_stats_get_file_type(const t_file_stats *file_stats);
+t_file_acl_type file_stats_get_acl_type(t_file_stats *file_stats);
 unsigned long file_stats_get_link_count(const t_file_stats *file_stats);
 const char *file_stats_get_author(t_file_stats *stats);
 const char *file_stats_get_group(t_file_stats *stats);

@@ -11,6 +11,7 @@ struct s_file_entry
     long blocks;
     t_permissions permissions;
     t_file_type type;
+    t_file_acl_type acl_type;
     unsigned long link_count;
     char *author;
     char *group;
@@ -32,6 +33,7 @@ struct s_file_entry_array
     long biggest_size;
     size_t biggest_device_width;
     size_t biggest_date_width;
+    int has_acl;
 };
 
 static size_t count_unsigned_digits(unsigned long number)
@@ -120,6 +122,7 @@ void file_entry_set_advanced_metadata_from_stats(t_file_entry *entry, t_file_sta
     file_entry_set_author(entry, file_stats_get_author(file_stats));
     file_entry_set_group(entry, file_stats_get_group(file_stats));
     file_entry_set_link_target(entry, file_stats_get_target_pointed_by_link(file_stats));
+    file_entry_set_acl_type(entry, file_stats_get_acl_type(file_stats));
 }
 
 t_file_entry_array *file_entry_array_create(void)
@@ -197,6 +200,22 @@ void file_entry_set_file_type(t_file_entry *entry, const t_file_type file_type)
         return ;
 
     entry->type = file_type;
+}
+
+t_file_acl_type file_entry_get_acl_type(const t_file_entry *entry)
+{
+    if (entry == NULL)
+        return FILE_ACL_UNKNOWN;
+
+    return entry->acl_type;
+}
+
+void file_entry_set_acl_type(t_file_entry *entry, const t_file_acl_type acl_type)
+{
+    if (entry == NULL)
+        return;
+
+    entry->acl_type = acl_type;
 }
 
 unsigned long file_entry_get_link_count(const t_file_entry *entry)
@@ -332,6 +351,9 @@ void file_entry_array_push(t_file_entry_array *array, t_file_entry *entry)
     array->entries[array->count] = entry;
     array->count++;
 
+    if (entry->acl_type == FILE_ACL_REAL)
+        array->has_acl = 1;
+
     array->total_blocks += entry->blocks;
 
     if (entry->link_count > array->biggest_link_count)
@@ -365,6 +387,14 @@ unsigned int file_entry_array_get_length(const t_file_entry_array *file_entry_ar
         return 0;
 
     return file_entry_array->count;
+}
+
+int file_entry_array_has_acl(const t_file_entry_array *file_entry_array)
+{
+    if (file_entry_array == NULL)
+        return 0;
+
+    return file_entry_array->has_acl;
 }
 
 long file_entry_array_get_total_blocks(const t_file_entry_array *file_entry_array)

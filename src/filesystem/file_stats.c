@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <sys/sysmacros.h>
+#include <sys/xattr.h>
 #include <unistd.h>
 #include "libft.h"
 #include "file_stats.h"
@@ -21,6 +22,8 @@ struct s_file_stats
     blkcnt_t blocks;
     t_permissions permissions;
     t_file_type type;
+    t_file_acl_type acl_type;
+    int acl_type_retrieval_attempted;
     nlink_t link_count;
     uid_t author_id;
     gid_t group_id;
@@ -115,12 +118,28 @@ static t_permissions get_file_permissions(const mode_t mode)
     return permissions;
 }
 
+static t_file_acl_type get_file_acl_type(const char *file_path)
+{
+    if (lgetxattr(file_path, "system.posix_acl_access", NULL, 0) >= 0)
+        return FILE_ACL_REAL;
+    if (errno != ENODATA)
+        return FILE_ACL_UNKNOWN;
+
+    if (lgetxattr(file_path, "security.selinux", NULL, 0) >= 0)
+        return FILE_ACL_SELINUX_ONLY;
+    if (errno != ENODATA)
+        return FILE_ACL_UNKNOWN;
+
+    return FILE_ACL_NONE;
+}
+
 static void initialize_stats(t_file_stats *file_stats, const char *file_path, const struct stat *stats)
 {
     file_stats->file_name = ft_safe_strdup(file_path);
     file_stats->blocks = stats->st_blocks;
     file_stats->permissions = get_file_permissions(stats->st_mode);
     file_stats->type = get_file_type(stats->st_mode);
+    file_stats->acl_type = FILE_ACL_UNKNOWN;
     file_stats->link_count = stats->st_nlink;
     file_stats->author_id = stats->st_uid;
     file_stats->group_id = stats->st_gid;
@@ -213,6 +232,20 @@ t_file_type file_stats_get_file_type(const t_file_stats *file_stats)
         return FILE_TYPE_UNKNOWN;
 
     return file_stats->type;
+}
+
+t_file_acl_type file_stats_get_acl_type(t_file_stats *file_stats)
+{
+    if (file_stats == NULL)
+        return FILE_ACL_UNKNOWN;
+
+    if (!file_stats->acl_type_retrieval_attempted)
+    {
+        file_stats->acl_type = get_file_acl_type(file_stats->file_name);
+        file_stats->acl_type_retrieval_attempted = 1;
+    }
+
+    return file_stats->acl_type;
 }
 
 nlink_t file_stats_get_link_count(const t_file_stats *file_stats)

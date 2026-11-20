@@ -88,6 +88,31 @@ static void should_create_a_file_entry_from_stats(void)
     file_stats_destroy(&stats);
 }
 
+static void should_copy_acl_type_from_stats_to_file_entry(void)
+{
+    static const t_vfs_mock_xattr acl_xattrs[] = {
+        { .name = "system.posix_acl_access", .size = 1 },
+        { .name = NULL }
+    };
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE_WITH_STATS("file_with_acl", .xattrs = acl_xattrs),
+        MOCK_NULL_TERMINATOR()
+    };
+
+    vfs_mock_setup(vfs);
+    t_file_stats *stats = file_stats_get("file_with_acl");
+    t_file_entry *entry = file_entry_create_from_stats("file_with_acl", stats);
+
+    CU_ASSERT_EQUAL(file_entry_get_acl_type(entry), FILE_ACL_NONE);
+    CU_ASSERT_EQUAL(file_stats_get_acl_type(stats), FILE_ACL_REAL);
+    file_entry_set_advanced_metadata_from_stats(entry, stats);
+    CU_ASSERT_EQUAL(file_entry_get_acl_type(entry), FILE_ACL_REAL);
+    CU_ASSERT_EQUAL(file_entry_get_acl_type(entry_sut), FILE_ACL_NONE);
+
+    file_entry_destroy(&entry);
+    file_stats_destroy(&stats);
+}
+
 static void should_set_advanced_metadata_from_symlink_stats(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -151,6 +176,41 @@ static void should_not_retrieve_the_link_target_when_creating_a_file_entry_from_
 static void should_create_file_entry_array_correctly(void)
 {
     CU_ASSERT_PTR_NOT_NULL(array_sut);
+    CU_ASSERT_FALSE(file_entry_array_has_acl(array_sut));
+}
+
+static void should_track_real_acls_in_a_file_entry_array(void)
+{
+    static const t_vfs_mock_xattr selinux_xattrs[] = {
+        { .name = "security.selinux", .size = 1 },
+        { .name = NULL }
+    };
+    static const t_vfs_mock_xattr acl_xattrs[] = {
+        { .name = "system.posix_acl_access", .size = 1 },
+        { .name = NULL }
+    };
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("no_acl"),
+        MOCK_LGETXATTR_ERROR(EACCES, "unknown_acl"),
+        MOCK_FILE_WITH_STATS("selinux_only", .xattrs = selinux_xattrs),
+        MOCK_FILE_WITH_STATS("real_acl", .xattrs = acl_xattrs),
+        MOCK_NULL_TERMINATOR()
+    };
+    const char *paths[] = { "no_acl", "unknown_acl", "selinux_only", "real_acl" };
+
+    vfs_mock_setup(vfs);
+    CU_ASSERT_FALSE(file_entry_array_has_acl(array_sut));
+    for (size_t i = 0; i < sizeof(paths) / sizeof(paths[0]); i++)
+    {
+        t_file_stats *stats = file_stats_get(paths[i]);
+        t_file_entry *entry = file_entry_create_from_stats(paths[i], stats);
+
+        file_entry_set_advanced_metadata_from_stats(entry, stats);
+        file_entry_array_push(array_sut, entry);
+        file_stats_destroy(&stats);
+        CU_ASSERT_EQUAL(file_entry_array_has_acl(array_sut), i == 3);
+    }
+    CU_ASSERT_FALSE(file_entry_array_has_acl(NULL));
 }
 
 static void should_fail_to_create_an_entry_if_a_NULL_file_name_is_passed(void)
@@ -854,10 +914,12 @@ void register_file_entry_suite(void)
     {
         CU_add_test(suite, "should_create_file_entry_correctly", should_create_file_entry_correctly);
         CU_add_test(suite, "should_create_a_file_entry_from_stats", should_create_a_file_entry_from_stats);
+        CU_add_test(suite, "should_copy_acl_type_from_stats_to_file_entry", should_copy_acl_type_from_stats_to_file_entry);
         CU_add_test(suite, "should_set_advanced_metadata_from_symlink_stats", should_set_advanced_metadata_from_symlink_stats);
         CU_add_test(suite, "should_ignore_null_arguments_when_setting_advanced_metadata", should_ignore_null_arguments_when_setting_advanced_metadata);
         CU_add_test(suite, "should_not_retrieve_the_link_target_when_creating_a_file_entry_from_symlink_stats", should_not_retrieve_the_link_target_when_creating_a_file_entry_from_symlink_stats);
         CU_add_test(suite, "should_create_file_entry_array_correctly", should_create_file_entry_array_correctly);
+        CU_add_test(suite, "should_track_real_acls_in_a_file_entry_array", should_track_real_acls_in_a_file_entry_array);
         CU_add_test(suite, "should_fail_to_create_an_entry_if_a_NULL_file_name_is_passed", should_fail_to_create_an_entry_if_a_NULL_file_name_is_passed);
         CU_add_test(suite, "should_fail_to_create_an_entry_if_an_empty_file_name_is_passed", should_fail_to_create_an_entry_if_an_empty_file_name_is_passed);
         CU_add_test(suite, "should_destroy_file_entry_correctly", should_destroy_file_entry_correctly);
