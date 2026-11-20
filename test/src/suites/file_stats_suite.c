@@ -113,6 +113,30 @@ static void should_detect_default_posix_acl_and_probe_selinux_when_xattrs_are_un
     file_stats_destroy(&unsupported_posix_with_selinux);
 }
 
+static void should_only_check_selinux_attributes_for_symlinks(void)
+{
+    static const t_vfs_mock_xattr symlink_xattrs[] = {
+        { .name = "system.posix_acl_access", .error = EIO },
+        { .name = "system.posix_acl_default", .error = EIO },
+        { .name = "security.selinux", .size = 1 },
+        { .name = NULL }
+    };
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_SYMLINK_WITH_STATS("link", "target", .xattrs = symlink_xattrs),
+        MOCK_FILE("target"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+    t_file_stats *stats = file_stats_get_without_following_symlinks("link");
+
+    CU_ASSERT_EQUAL(file_stats_get_file_type(stats), FILE_TYPE_SYMLINK);
+    CU_ASSERT_EQUAL(file_stats_get_acl_type(stats), FILE_ACL_SELINUX_ONLY);
+    CU_ASSERT_FALSE(file_stats_acl_retrieval_failed(stats));
+    CU_ASSERT(verify_that_no_error_was_printed());
+
+    file_stats_destroy(&stats);
+}
+
 static void should_classify_acl_retrieval_errors(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -901,6 +925,7 @@ void register_file_stats_suite(void)
         CU_add_test(suite, "should_create_file_stats_correctly", should_create_file_stats_correctly);
         CU_add_test(suite, "should_detect_the_acl_type_for_each_file", should_detect_the_acl_type_for_each_file);
         CU_add_test(suite, "should_detect_default_posix_acl_and_probe_selinux_when_xattrs_are_unsupported", should_detect_default_posix_acl_and_probe_selinux_when_xattrs_are_unsupported);
+        CU_add_test(suite, "should_only_check_selinux_attributes_for_symlinks", should_only_check_selinux_attributes_for_symlinks);
         CU_add_test(suite, "should_classify_acl_retrieval_errors", should_classify_acl_retrieval_errors);
         CU_add_test(suite, "should_return_NULL_when_creating_file_stats_with_an_empty_path", should_return_NULL_when_creating_file_stats_with_an_empty_path);
         CU_add_test(suite, "should_return_NULL_when_creating_file_stats_with_a_NULL_path", should_return_NULL_when_creating_file_stats_with_a_NULL_path);

@@ -161,25 +161,30 @@ static t_acl_xattr_status get_acl_xattr_status(t_file_stats *file_stats, const c
 
 static t_file_acl_type get_file_acl_type(t_file_stats *file_stats)
 {
-    const t_acl_xattr_status access_acl_status =
-        get_acl_xattr_status(file_stats, "system.posix_acl_access");
-    int has_unknown_acl = access_acl_status == ACL_XATTR_UNKNOWN;
+    int has_unknown_acl = 0;
 
-    if (access_acl_status == ACL_XATTR_PRESENT)
-        return FILE_ACL_REAL;
-    if (access_acl_status == ACL_XATTR_ERROR)
-        return FILE_ACL_NONE;
-
-    if (file_stats->type == FILE_TYPE_DIRECTORY)
+    if (file_stats->type != FILE_TYPE_SYMLINK)
     {
-        const t_acl_xattr_status default_acl_status =
-            get_acl_xattr_status(file_stats, "system.posix_acl_default");
+        const t_acl_xattr_status access_acl_status =
+            get_acl_xattr_status(file_stats, "system.posix_acl_access");
 
-        if (default_acl_status == ACL_XATTR_PRESENT)
+        if (access_acl_status == ACL_XATTR_PRESENT)
             return FILE_ACL_REAL;
-        if (default_acl_status == ACL_XATTR_ERROR)
+        if (access_acl_status == ACL_XATTR_ERROR)
             return FILE_ACL_NONE;
-        has_unknown_acl |= default_acl_status == ACL_XATTR_UNKNOWN;
+        has_unknown_acl = access_acl_status == ACL_XATTR_UNKNOWN;
+
+        if (file_stats->type == FILE_TYPE_DIRECTORY)
+        {
+            const t_acl_xattr_status default_acl_status =
+                get_acl_xattr_status(file_stats, "system.posix_acl_default");
+
+            if (default_acl_status == ACL_XATTR_PRESENT)
+                return FILE_ACL_REAL;
+            if (default_acl_status == ACL_XATTR_ERROR)
+                return FILE_ACL_NONE;
+            has_unknown_acl |= default_acl_status == ACL_XATTR_UNKNOWN;
+        }
     }
 
     const t_acl_xattr_status selinux_status =
