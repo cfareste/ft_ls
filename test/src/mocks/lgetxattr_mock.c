@@ -42,6 +42,11 @@ ssize_t lgetxattr_mock(const char *path, const char *name, void *value, size_t s
 
             if (strcmp(xattr->name, name) != 0)
                 continue;
+            if (xattr->error != 0)
+            {
+                errno = xattr->error;
+                return -1;
+            }
             if (value == NULL)
                 return (ssize_t)xattr->size;
             if (size < xattr->size)

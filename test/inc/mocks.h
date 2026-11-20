@@ -22,6 +22,7 @@ typedef struct s_vfs_mock_xattr
     const char *name;
     const void *value;
     size_t size;
+    int error;
 } t_vfs_mock_xattr;
 
 typedef struct s_vfs_mock_entry

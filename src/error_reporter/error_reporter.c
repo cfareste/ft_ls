@@ -46,6 +46,11 @@ void report_read_symbolic_link_error(const char *file_path)
     report_error(READING_SYMBOLIC_LINK_ERROR, file_path);
 }
 
+void report_acl_error(const char *file_path)
+{
+    ft_fprintf(STDERR_FILENO, "%s: '%s': %s\n", APPLICATION_PREFIX, file_path, strerror(errno));
+}
+
 void report_invalid_option(const char option)
 {
     ft_fprintf(STDERR_FILENO,

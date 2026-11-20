@@ -24,6 +24,7 @@ struct s_file_stats
     t_file_type type;
     t_file_acl_type acl_type;
     int acl_type_retrieval_attempted;
+    int acl_retrieval_failed;
     nlink_t link_count;
     uid_t author_id;
     gid_t group_id;
@@ -36,6 +37,14 @@ struct s_file_stats
     int target_retrieval_attempted;
     int target_retrieval_failed;
 };
+
+typedef enum e_acl_xattr_status
+{
+    ACL_XATTR_PRESENT,
+    ACL_XATTR_ABSENT,
+    ACL_XATTR_UNKNOWN,
+    ACL_XATTR_ERROR
+} t_acl_xattr_status;
 
 static int should_retrieve_file_stats_without_following_symlinks(const int retrieve_error, const struct stat *stats)
 {
@@ -118,19 +127,70 @@ static t_permissions get_file_permissions(const mode_t mode)
     return permissions;
 }
 
-static t_file_acl_type get_file_acl_type(const char *file_path)
+static int is_acl_xattr_unsupported(const int error)
 {
-    if (lgetxattr(file_path, "system.posix_acl_access", NULL, 0) >= 0)
+    return error == ENOTSUP || error == EOPNOTSUPP;
+}
+
+static int is_acl_absent(const int error)
+{
+    return error == ENODATA || is_acl_xattr_unsupported(error);
+}
+
+static int is_acl_error_permission_denied(const int error)
+{
+    return error == EACCES || error == EPERM || error == ENOENT;
+}
+
+static t_acl_xattr_status get_acl_xattr_status(t_file_stats *file_stats, const char *xattr_name)
+{
+    if (lgetxattr(file_stats->file_name, xattr_name, NULL, 0) >= 0)
+        return ACL_XATTR_PRESENT;
+
+    const int error = errno;
+    if (is_acl_error_permission_denied(error))
+        return ACL_XATTR_UNKNOWN;
+    if (is_acl_absent(error))
+        return ACL_XATTR_ABSENT;
+
+    errno = error;
+    report_acl_error(file_stats->file_name);
+    file_stats->acl_retrieval_failed = 1;
+    return ACL_XATTR_ERROR;
+}
+
+static t_file_acl_type get_file_acl_type(t_file_stats *file_stats)
+{
+    const t_acl_xattr_status access_acl_status =
+        get_acl_xattr_status(file_stats, "system.posix_acl_access");
+    int has_unknown_acl = access_acl_status == ACL_XATTR_UNKNOWN;
+
+    if (access_acl_status == ACL_XATTR_PRESENT)
         return FILE_ACL_REAL;
-    if (errno != ENODATA)
-        return FILE_ACL_UNKNOWN;
+    if (access_acl_status == ACL_XATTR_ERROR)
+        return FILE_ACL_NONE;
 
-    if (lgetxattr(file_path, "security.selinux", NULL, 0) >= 0)
+    if (file_stats->type == FILE_TYPE_DIRECTORY)
+    {
+        const t_acl_xattr_status default_acl_status =
+            get_acl_xattr_status(file_stats, "system.posix_acl_default");
+
+        if (default_acl_status == ACL_XATTR_PRESENT)
+            return FILE_ACL_REAL;
+        if (default_acl_status == ACL_XATTR_ERROR)
+            return FILE_ACL_NONE;
+        has_unknown_acl |= default_acl_status == ACL_XATTR_UNKNOWN;
+    }
+
+    const t_acl_xattr_status selinux_status =
+        get_acl_xattr_status(file_stats, "security.selinux");
+    if (selinux_status == ACL_XATTR_PRESENT)
         return FILE_ACL_SELINUX_ONLY;
-    if (errno != ENODATA)
-        return FILE_ACL_UNKNOWN;
+    if (selinux_status == ACL_XATTR_ERROR)
+        return FILE_ACL_NONE;
+    has_unknown_acl |= selinux_status == ACL_XATTR_UNKNOWN;
 
-    return FILE_ACL_NONE;
+    return has_unknown_acl ? FILE_ACL_UNKNOWN : FILE_ACL_NONE;
 }
 
 static void initialize_stats(t_file_stats *file_stats, const char *file_path, const struct stat *stats)
@@ -241,11 +301,16 @@ t_file_acl_type file_stats_get_acl_type(t_file_stats *file_stats)
 
     if (!file_stats->acl_type_retrieval_attempted)
     {
-        file_stats->acl_type = get_file_acl_type(file_stats->file_name);
+        file_stats->acl_type = get_file_acl_type(file_stats);
         file_stats->acl_type_retrieval_attempted = 1;
     }
 
     return file_stats->acl_type;
+}
+
+int file_stats_acl_retrieval_failed(const t_file_stats *file_stats)
+{
+    return file_stats != NULL && file_stats->acl_retrieval_failed;
 }
 
 nlink_t file_stats_get_link_count(const t_file_stats *file_stats)

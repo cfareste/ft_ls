@@ -1530,6 +1530,26 @@ static void should_report_a_minor_error_when_readlink_fails_for_directory_conten
     CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MINOR_ERROR);
 }
 
+static void should_report_a_minor_error_when_acl_retrieval_fails_for_directory_content(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("dir", ".", "..", "failed"),
+        MOCK_LGETXATTR_ERROR(EIO, "dir/failed"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-l", "dir", NULL };
+    get_parsed_arguments_result(2, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "total 0\n"
+        "-rw-r--r-- 1 root root 1024 Jan  1  1970 failed\n"));
+    CU_ASSERT(verify_that_the_error_printed_is("ft_ls: '%s': %s\n", "dir/failed", strerror(EIO)));
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MINOR_ERROR);
+}
+
 static void should_report_a_major_error_when_stat_fails_for_an_operand_in_long_format(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -1548,6 +1568,24 @@ static void should_report_a_major_error_when_stat_fails_for_an_operand_in_long_f
         "crw-rw----  3 alice   staff      12, 34 Oct  2  2000 device\n"
         "-rw-r--r-- 12 charlie developers  12345 Nov 12  2001 good\n"));
     CU_ASSERT(verify_that_the_error_printed_is("ft_ls: cannot access '%s': %s\n", "failed", strerror(EACCES)));
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MAJOR_ERROR);
+}
+
+static void should_report_a_major_error_when_acl_retrieval_fails_for_an_operand(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_LGETXATTR_ERROR(EIO, "failed"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-l", "failed", NULL };
+    get_parsed_arguments_result(2, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "-rw-r--r-- 1 root root 1024 Jan  1  1970 failed\n"));
+    CU_ASSERT(verify_that_the_error_printed_is("ft_ls: '%s': %s\n", "failed", strerror(EIO)));
     CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MAJOR_ERROR);
 }
 
@@ -4342,7 +4380,9 @@ void register_application_suite(void)
         CU_add_test(suite, "should_fall_back_to_numeric_author_and_group_in_long_format", should_fall_back_to_numeric_author_and_group_in_long_format);
         CU_add_test(suite, "should_report_a_minor_error_when_lstat_fails_for_directory_content", should_report_a_minor_error_when_lstat_fails_for_directory_content);
         CU_add_test(suite, "should_report_a_minor_error_when_readlink_fails_for_directory_content", should_report_a_minor_error_when_readlink_fails_for_directory_content);
+        CU_add_test(suite, "should_report_a_minor_error_when_acl_retrieval_fails_for_directory_content", should_report_a_minor_error_when_acl_retrieval_fails_for_directory_content);
         CU_add_test(suite, "should_report_a_major_error_when_stat_fails_for_an_operand_in_long_format", should_report_a_major_error_when_stat_fails_for_an_operand_in_long_format);
+        CU_add_test(suite, "should_report_a_major_error_when_acl_retrieval_fails_for_an_operand", should_report_a_major_error_when_acl_retrieval_fails_for_an_operand);
         CU_add_test(suite, "should_report_a_major_error_when_readlink_fails_for_an_operand_in_long_format", should_report_a_major_error_when_readlink_fails_for_an_operand_in_long_format);
         CU_add_test(suite, "should_report_multiple_minor_errors_for_lstat_failures_in_one_directory", should_report_multiple_minor_errors_for_lstat_failures_in_one_directory);
         CU_add_test(suite, "should_report_multiple_minor_errors_for_lstat_and_readlink_failures", should_report_multiple_minor_errors_for_lstat_and_readlink_failures);

@@ -40,30 +40,110 @@ static void should_detect_the_acl_type_for_each_file(void)
         { .name = "system.posix_acl_access", .size = 1 },
         { .name = NULL }
     };
+    static const t_vfs_mock_xattr access_denied_with_selinux_xattrs[] = {
+        { .name = "system.posix_acl_access", .error = EACCES },
+        { .name = "security.selinux", .size = 1 },
+        { .name = NULL }
+    };
     const t_vfs_mock_entry vfs[] = {
         MOCK_FILE("no_acl"),
         MOCK_LGETXATTR_ERROR(EACCES, "unknown_acl"),
         MOCK_FILE_WITH_STATS("selinux_only", .xattrs = selinux_xattrs),
         MOCK_FILE_WITH_STATS("real_acl", .xattrs = acl_xattrs),
+        MOCK_FILE_WITH_STATS("access_denied_with_selinux", .xattrs = access_denied_with_selinux_xattrs),
         MOCK_NULL_TERMINATOR()
     };
-    const char *paths[ACL_TYPE_CASE_COUNT] = { "no_acl", "unknown_acl", "selinux_only", "real_acl" };
-    const t_file_acl_type expected[ACL_TYPE_CASE_COUNT] = {
-        FILE_ACL_NONE,
-        FILE_ACL_UNKNOWN,
-        FILE_ACL_SELINUX_ONLY,
-        FILE_ACL_REAL
-    };
-
     vfs_mock_setup(vfs);
-    for (size_t i = 0; i < ACL_TYPE_CASE_COUNT; i++)
-    {
-        t_file_stats *stats = file_stats_get(paths[i]);
+    t_file_stats *no_acl = file_stats_get("no_acl");
+    t_file_stats *unknown_acl = file_stats_get("unknown_acl");
+    t_file_stats *selinux_only = file_stats_get("selinux_only");
+    t_file_stats *real_acl = file_stats_get("real_acl");
+    t_file_stats *access_denied_with_selinux = file_stats_get("access_denied_with_selinux");
 
-        CU_ASSERT_PTR_NOT_NULL(stats);
-        CU_ASSERT_EQUAL(file_stats_get_acl_type(stats), expected[i]);
-        file_stats_destroy(&stats);
-    }
+    CU_ASSERT_EQUAL(file_stats_get_acl_type(no_acl), FILE_ACL_NONE);
+    CU_ASSERT_EQUAL(file_stats_get_acl_type(unknown_acl), FILE_ACL_UNKNOWN);
+    CU_ASSERT_EQUAL(file_stats_get_acl_type(selinux_only), FILE_ACL_SELINUX_ONLY);
+    CU_ASSERT_EQUAL(file_stats_get_acl_type(real_acl), FILE_ACL_REAL);
+    CU_ASSERT_EQUAL(file_stats_get_acl_type(access_denied_with_selinux), FILE_ACL_SELINUX_ONLY);
+    CU_ASSERT(verify_that_no_error_was_printed());
+
+    file_stats_destroy(&no_acl);
+    file_stats_destroy(&unknown_acl);
+    file_stats_destroy(&selinux_only);
+    file_stats_destroy(&real_acl);
+    file_stats_destroy(&access_denied_with_selinux);
+}
+
+static void should_detect_default_posix_acl_and_probe_selinux_when_xattrs_are_unsupported(void)
+{
+    static const t_vfs_mock_xattr default_acl_xattrs[] = {
+        { .name = "system.posix_acl_default", .size = 1 },
+        { .name = NULL }
+    };
+    static const t_vfs_mock_xattr default_acl_on_file_xattrs[] = {
+        { .name = "system.posix_acl_default", .size = 1 },
+        { .name = NULL }
+    };
+    static const t_vfs_mock_xattr unsupported_posix_with_selinux_xattrs[] = {
+        { .name = "system.posix_acl_access", .error = EOPNOTSUPP },
+        { .name = "security.selinux", .size = 1 },
+        { .name = NULL }
+    };
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR_WITH_STATS("default_acl", NULL, .xattrs = default_acl_xattrs),
+        MOCK_FILE_WITH_STATS("default_acl_on_file", .xattrs = default_acl_on_file_xattrs),
+        MOCK_FILE_WITH_STATS("unsupported_posix_with_selinux", .xattrs = unsupported_posix_with_selinux_xattrs),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+    t_file_stats *default_acl = file_stats_get("default_acl");
+    t_file_stats *default_acl_on_file = file_stats_get("default_acl_on_file");
+    t_file_stats *unsupported_posix_with_selinux = file_stats_get("unsupported_posix_with_selinux");
+
+    CU_ASSERT_EQUAL(file_stats_get_acl_type(default_acl), FILE_ACL_REAL);
+    CU_ASSERT_EQUAL(file_stats_get_acl_type(default_acl_on_file), FILE_ACL_NONE);
+    CU_ASSERT_EQUAL(file_stats_get_acl_type(unsupported_posix_with_selinux), FILE_ACL_SELINUX_ONLY);
+    CU_ASSERT_FALSE(file_stats_acl_retrieval_failed(default_acl));
+    CU_ASSERT_FALSE(file_stats_acl_retrieval_failed(default_acl_on_file));
+    CU_ASSERT_FALSE(file_stats_acl_retrieval_failed(unsupported_posix_with_selinux));
+    CU_ASSERT(verify_that_no_error_was_printed());
+
+    file_stats_destroy(&default_acl);
+    file_stats_destroy(&default_acl_on_file);
+    file_stats_destroy(&unsupported_posix_with_selinux);
+}
+
+static void should_classify_acl_retrieval_errors(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_LGETXATTR_ERROR(EPERM, "permission_denied"),
+        MOCK_LGETXATTR_ERROR(ENOENT, "missing_xattr_target"),
+        MOCK_LGETXATTR_ERROR(EOPNOTSUPP, "unsupported"),
+        MOCK_LGETXATTR_ERROR(EIO, "unexpected"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    t_file_stats *permission_denied = file_stats_get("permission_denied");
+    t_file_stats *missing_xattr_target = file_stats_get("missing_xattr_target");
+    t_file_stats *unsupported = file_stats_get("unsupported");
+    t_file_stats *unexpected = file_stats_get("unexpected");
+
+    CU_ASSERT_EQUAL(file_stats_get_acl_type(permission_denied), FILE_ACL_UNKNOWN);
+    CU_ASSERT_FALSE(file_stats_acl_retrieval_failed(permission_denied));
+    CU_ASSERT_EQUAL(file_stats_get_acl_type(missing_xattr_target), FILE_ACL_UNKNOWN);
+    CU_ASSERT_FALSE(file_stats_acl_retrieval_failed(missing_xattr_target));
+    CU_ASSERT_EQUAL(file_stats_get_acl_type(unsupported), FILE_ACL_NONE);
+    CU_ASSERT_FALSE(file_stats_acl_retrieval_failed(unsupported));
+    CU_ASSERT_EQUAL(file_stats_get_acl_type(unexpected), FILE_ACL_NONE);
+    CU_ASSERT_TRUE(file_stats_acl_retrieval_failed(unexpected));
+    CU_ASSERT(verify_that_the_error_printed_is(
+        "ft_ls: '%s': %s\n", "unexpected", strerror(EIO)));
+
+    file_stats_destroy(&permission_denied);
+    file_stats_destroy(&missing_xattr_target);
+    file_stats_destroy(&unsupported);
+    file_stats_destroy(&unexpected);
 }
 
 static void should_return_NULL_when_creating_file_stats_with_a_NULL_path(void)
@@ -820,6 +900,8 @@ void register_file_stats_suite(void)
     {
         CU_add_test(suite, "should_create_file_stats_correctly", should_create_file_stats_correctly);
         CU_add_test(suite, "should_detect_the_acl_type_for_each_file", should_detect_the_acl_type_for_each_file);
+        CU_add_test(suite, "should_detect_default_posix_acl_and_probe_selinux_when_xattrs_are_unsupported", should_detect_default_posix_acl_and_probe_selinux_when_xattrs_are_unsupported);
+        CU_add_test(suite, "should_classify_acl_retrieval_errors", should_classify_acl_retrieval_errors);
         CU_add_test(suite, "should_return_NULL_when_creating_file_stats_with_an_empty_path", should_return_NULL_when_creating_file_stats_with_an_empty_path);
         CU_add_test(suite, "should_return_NULL_when_creating_file_stats_with_a_NULL_path", should_return_NULL_when_creating_file_stats_with_a_NULL_path);
         CU_add_test(suite, "should_destroy_file_stats_correctly", should_destroy_file_stats_correctly);
