@@ -1,7 +1,6 @@
 TODO:
 1. Implementar LS-28 Manage ACL and extended attributes with long format option
 2. Tests
-3. Errores
 
 
 TODO En algún momento:
