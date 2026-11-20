@@ -1,10 +1,7 @@
 TODO:
 1. Implementar LS-28 Manage ACL and extended attributes with long format option
-2. Renderizar carácter especiale
-3. Coger los datos en non dir file operands
-4. Coger los datos en scanner
-5. Tests
-6. Errores
+2. Tests
+3. Errores
 
 
 TODO En algún momento:

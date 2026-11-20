@@ -1329,6 +1329,40 @@ static void should_render_a_directory_operand_in_long_format(void)
     assert_application_execution_succeed(result);
 }
 
+static void should_render_acl_metadata_for_directory_contents_in_long_format(void)
+{
+    static const t_vfs_mock_xattr selinux_xattrs[] = {
+        { .name = "security.selinux", .size = 1 },
+        { .name = NULL }
+    };
+    static const t_vfs_mock_xattr acl_xattrs[] = {
+        { .name = "system.posix_acl_access", .size = 1 },
+        { .name = NULL }
+    };
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("dir", ".", "..", "none", "unknown", "selinux", "real"),
+        MOCK_FILE("dir/none"),
+        MOCK_LGETXATTR_ERROR(EACCES, "dir/unknown"),
+        MOCK_FILE_WITH_STATS("dir/selinux", .xattrs = selinux_xattrs),
+        MOCK_FILE_WITH_STATS("dir/real", .xattrs = acl_xattrs),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-l", "dir", NULL };
+    get_parsed_arguments_result(2, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "total 0\n"
+        "-rw-r--r--  1 root root 1024 Jan  1  1970 none\n"
+        "-rw-r--r--+ 1 root root 1024 Jan  1  1970 real\n"
+        "-rw-r--r--. 1 root root 1024 Jan  1  1970 selinux\n"
+        "-rw-r--r--? 1 root root 1024 Jan  1  1970 unknown\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    assert_application_execution_succeed(result);
+}
+
 static void should_render_mixed_operands_in_long_format(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -4302,6 +4336,7 @@ void register_application_suite(void)
         CU_add_test(suite, "should_render_acl_metadata_for_a_non_directory_operand_in_long_format", should_render_acl_metadata_for_a_non_directory_operand_in_long_format);
         CU_add_test(suite, "should_render_a_symlink_to_a_directory_operand_as_a_link_in_long_format", should_render_a_symlink_to_a_directory_operand_as_a_link_in_long_format);
         CU_add_test(suite, "should_render_a_directory_operand_in_long_format", should_render_a_directory_operand_in_long_format);
+        CU_add_test(suite, "should_render_acl_metadata_for_directory_contents_in_long_format", should_render_acl_metadata_for_directory_contents_in_long_format);
         CU_add_test(suite, "should_render_mixed_operands_in_long_format", should_render_mixed_operands_in_long_format);
         CU_add_test(suite, "should_render_file_stats_for_non_directory_and_directory_entries_in_long_format", should_render_file_stats_for_non_directory_and_directory_entries_in_long_format);
         CU_add_test(suite, "should_fall_back_to_numeric_author_and_group_in_long_format", should_fall_back_to_numeric_author_and_group_in_long_format);
