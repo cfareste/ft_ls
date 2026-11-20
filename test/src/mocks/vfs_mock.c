@@ -4,6 +4,8 @@
 #include "libft.h"
 #include "mocks.h"
 
+#define MOCK_IDENTITY_COUNT 6
+
 static const t_vfs_mock_entry *vfs_mock_entries = NULL;
 
 typedef struct s_mock_identity
@@ -12,7 +14,7 @@ typedef struct s_mock_identity
     unsigned int id;
 } t_mock_identity;
 
-static const t_mock_identity mock_authors[] = {
+static const t_mock_identity mock_authors[MOCK_IDENTITY_COUNT] = {
     { "root", 0 },
     { "daemon", 1 },
     { "alice", 1000 },
@@ -21,7 +23,7 @@ static const t_mock_identity mock_authors[] = {
     { "nobody", 65534 }
 };
 
-static const t_mock_identity mock_groups[] = {
+static const t_mock_identity mock_groups[MOCK_IDENTITY_COUNT] = {
     { "root", 0 },
     { "wheel", 10 },
     { "staff", 50 },
@@ -29,8 +31,6 @@ static const t_mock_identity mock_groups[] = {
     { "developers", 1000 },
     { "nogroup", 65534 }
 };
-
-static const size_t identity_size = sizeof(mock_authors) / sizeof(mock_authors[0]);
 
 time_t vfs_mock_make_timestamp(int day, int month, int year, int hour, int minute, int second)
 {
@@ -49,7 +49,7 @@ time_t vfs_mock_make_timestamp(int day, int month, int year, int hour, int minut
 
 static const t_mock_identity *find_identity(unsigned int id, const t_mock_identity *identities)
 {
-    for (size_t i = 0; i < identity_size; i++)
+    for (size_t i = 0; i < MOCK_IDENTITY_COUNT; i++)
     {
         if (identities[i].id == id)
             return &identities[i];
@@ -62,7 +62,7 @@ static const t_mock_identity *find_identity_by_name(const char *name,
 {
     if (name == NULL)
         return NULL;
-    for (size_t i = 0; i < identity_size; i++)
+    for (size_t i = 0; i < MOCK_IDENTITY_COUNT; i++)
     {
         if (ft_strcmp(name, identities[i].name) == EQUAL_STRINGS)
             return &identities[i];

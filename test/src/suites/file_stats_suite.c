@@ -6,6 +6,7 @@
 
 #define SUITE_NAME "file_stats"
 #define LINK_BUFFER_SIZE 300
+#define ACL_TYPE_CASE_COUNT 4
 
 static void test_setup(void)
 {
@@ -46,8 +47,8 @@ static void should_detect_the_acl_type_for_each_file(void)
         MOCK_FILE_WITH_STATS("real_acl", .xattrs = acl_xattrs),
         MOCK_NULL_TERMINATOR()
     };
-    const char *paths[] = { "no_acl", "unknown_acl", "selinux_only", "real_acl" };
-    const t_file_acl_type expected[] = {
+    const char *paths[ACL_TYPE_CASE_COUNT] = { "no_acl", "unknown_acl", "selinux_only", "real_acl" };
+    const t_file_acl_type expected[ACL_TYPE_CASE_COUNT] = {
         FILE_ACL_NONE,
         FILE_ACL_UNKNOWN,
         FILE_ACL_SELINUX_ONLY,
@@ -55,7 +56,7 @@ static void should_detect_the_acl_type_for_each_file(void)
     };
 
     vfs_mock_setup(vfs);
-    for (size_t i = 0; i < sizeof(paths) / sizeof(paths[0]); i++)
+    for (size_t i = 0; i < ACL_TYPE_CASE_COUNT; i++)
     {
         t_file_stats *stats = file_stats_get(paths[i]);
 

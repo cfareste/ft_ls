@@ -986,6 +986,48 @@ static void should_render_entries_with_sticky_bit_in_long_format(void)
     parsed_arguments_destroy(&parsed_arguments);
 }
 
+static void should_render_acl_markers_for_all_entries_when_any_entry_has_acl(void)
+{
+    const t_permissions permissions = PERM_OWNER_READ | PERM_OWNER_WRITE | PERM_GROUP_READ
+        | PERM_OTHER_READ;
+    t_file_entry_array *entries = file_entry_array_create();
+    t_file_entry *none_entry = create_entry("none", FILE_TYPE_REGULAR, permissions, 1,
+                                            "user", "group", 1,
+                                            (t_date){ .day = 1, .month = 1, .year = 2100, .timestamp = 4102444800 });
+    t_file_entry *unknown_entry = create_entry("unknown", FILE_TYPE_REGULAR, permissions, 1,
+                                               "user", "group", 1,
+                                               (t_date){ .day = 1, .month = 1, .year = 2100, .timestamp = 4102444800 });
+    t_file_entry *selinux_entry = create_entry("selinux", FILE_TYPE_REGULAR, permissions, 1,
+                                               "user", "group", 1,
+                                               (t_date){ .day = 1, .month = 1, .year = 2100, .timestamp = 4102444800 });
+    t_file_entry *acl_entry = create_entry("acl", FILE_TYPE_REGULAR, permissions, 1,
+                                           "user", "group", 1,
+                                           (t_date){ .day = 1, .month = 1, .year = 2100, .timestamp = 4102444800 });
+    file_entry_set_acl_type(unknown_entry, FILE_ACL_UNKNOWN);
+    file_entry_set_acl_type(selinux_entry, FILE_ACL_SELINUX_ONLY);
+    file_entry_set_acl_type(acl_entry, FILE_ACL_REAL);
+    file_entry_array_push(entries, none_entry);
+    file_entry_array_push(entries, unknown_entry);
+    file_entry_array_push(entries, selinux_entry);
+    file_entry_array_push(entries, acl_entry);
+
+    const char *args[] = { "-l", "none", NULL };
+    get_parsed_arguments_result(2, args);
+    t_render_context *context = render_context_create(parsed_arguments);
+
+    render_entries(context, entries);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "%s\n%s\n%s\n%s\n",
+        "-rw-r--r--  1 user group 1 Jan  1 00:00 none",
+        "-rw-r--r--? 1 user group 1 Jan  1 00:00 unknown",
+        "-rw-r--r--. 1 user group 1 Jan  1 00:00 selinux",
+        "-rw-r--r--+ 1 user group 1 Jan  1 00:00 acl"));
+
+    file_entry_array_destroy(&entries);
+    render_context_destroy(&context);
+}
+
 static void should_render_char_and_block_devices_in_long_format(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -1164,6 +1206,7 @@ void register_renderer_suite(void)
         CU_add_test(suite, "should_render_entries_with_setuid_in_long_format", should_render_entries_with_setuid_in_long_format);
         CU_add_test(suite, "should_render_entries_with_setgid_in_long_format", should_render_entries_with_setgid_in_long_format);
         CU_add_test(suite, "should_render_entries_with_sticky_bit_in_long_format", should_render_entries_with_sticky_bit_in_long_format);
+        CU_add_test(suite, "should_render_acl_markers_for_all_entries_when_any_entry_has_acl", should_render_acl_markers_for_all_entries_when_any_entry_has_acl);
         CU_add_test(suite, "should_render_char_and_block_devices_in_long_format", should_render_char_and_block_devices_in_long_format);
         CU_add_test(suite, "should_render_an_old_modification_file_in_long_format", should_render_an_old_modification_file_in_long_format);
         CU_add_test(suite, "should_render_a_symlink_name_with_its_target_in_long_format", should_render_a_symlink_name_with_its_target_in_long_format);

@@ -10,6 +10,7 @@
 #define SUITE_NAME "file_entry"
 #define DEFAULT_NAME "default"
 #define DEFAULT_TYPE FILE_TYPE_UNKNOWN
+#define ACL_TYPE_CASE_COUNT 4
 
 static t_file_entry *entry_sut;
 static t_file_entry_array *array_sut;
@@ -196,11 +197,11 @@ static void should_track_real_acls_in_a_file_entry_array(void)
         MOCK_FILE_WITH_STATS("real_acl", .xattrs = acl_xattrs),
         MOCK_NULL_TERMINATOR()
     };
-    const char *paths[] = { "no_acl", "unknown_acl", "selinux_only", "real_acl" };
+    const char *paths[ACL_TYPE_CASE_COUNT] = { "no_acl", "unknown_acl", "selinux_only", "real_acl" };
 
     vfs_mock_setup(vfs);
     CU_ASSERT_FALSE(file_entry_array_has_acl(array_sut));
-    for (size_t i = 0; i < sizeof(paths) / sizeof(paths[0]); i++)
+    for (size_t i = 0; i < ACL_TYPE_CASE_COUNT; i++)
     {
         t_file_stats *stats = file_stats_get(paths[i]);
         t_file_entry *entry = file_entry_create_from_stats(paths[i], stats);
