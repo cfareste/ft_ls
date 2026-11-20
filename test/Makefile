@@ -19,6 +19,7 @@ CC = cc
 CCFLAGS += -g -Wall -Wextra -Werror -Wpedantic -fsanitize=address \
 		   -Dopendir=mock_opendir -Dreaddir=mock_readdir -Dclosedir=mock_closedir \
 		   -Dstat=stat_mock -Dlstat=lstat_mock \
+		   -Dlgetxattr=lgetxattr_mock \
 		   -Dreadlink=readlink_mock \
 		   -Dgetpwuid=getpwuid_mock -Dgetgrgid=getgrgid_mock \
 		   -Dft_printf=printf_mock -Dft_fprintf=fprintf_mock
@@ -103,6 +104,7 @@ SRCS = main.c \
 		directory_mock.c \
 		print_mock.c \
 		stat_mock.c \
+		lgetxattr_mock.c \
 		readlink_mock.c \
 		identity_mock.c \
 		date_suite.c \

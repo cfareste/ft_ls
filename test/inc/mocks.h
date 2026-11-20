@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stddef.h>
 #include <sys/stat.h>
 #include <sys/sysmacros.h>
 #include <time.h>
@@ -13,7 +14,15 @@ typedef struct s_vfs_mock_errors
     int readdir_errno;
     int closedir_errno;
     int readlink_errno;
+    int lgetxattr_errno;
 } t_vfs_mock_errors;
+
+typedef struct s_vfs_mock_xattr
+{
+    const char *name;
+    const void *value;
+    size_t size;
+} t_vfs_mock_xattr;
 
 typedef struct s_vfs_mock_entry
 {
@@ -23,6 +32,7 @@ typedef struct s_vfs_mock_entry
     const char *target;
     const char *author;
     const char *group;
+    const t_vfs_mock_xattr *xattrs;
     t_vfs_mock_errors errors;
 } t_vfs_mock_entry;
 
@@ -94,6 +104,7 @@ typedef struct s_vfs_mock_entry
 #define MOCK_DIR_READ_ERROR(p, entry_error_idx, ...)    MOCK_ENTRY((p), S_IFDIR | 0755, ((const char *[]){ __VA_ARGS__, NULL }), NULL, ((t_vfs_mock_errors){ .entry_idx = (entry_error_idx), .readdir_errno = EBADF }))
 #define MOCK_DIR_CLOSE_ERROR(p, ...)                    MOCK_ENTRY((p), S_IFDIR | 0755, ((const char *[]){ __VA_ARGS__, NULL }), NULL, ((t_vfs_mock_errors){ .closedir_errno = EBADF }))
 #define MOCK_READ_SYM_LINK_ERROR(err, p, link_target)   MOCK_ENTRY((p), S_IFLNK | 0777, NULL, (link_target), ((t_vfs_mock_errors){ .readlink_errno = (err) }))
+#define MOCK_LGETXATTR_ERROR(err, p)                    MOCK_ENTRY((p), DEFAULT_FILE_MODE, NULL, NULL, ((t_vfs_mock_errors){ .lgetxattr_errno = (err) }))
 
 void vfs_mock_setup(const t_vfs_mock_entry *entries);
 const t_vfs_mock_entry *find_vfs_entry(const char *path);
