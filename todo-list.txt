@@ -1,9 +1,8 @@
 TODO:
 1. Implementar LS-29 Print dynamic multi-column output
-2. Detección de tty
-   - Guardar el valor de isatty
-3. Obtención de tamaños con ioctl (default 80 colsize)
-4. Algoritmo de columnas
+2. Obtención de tamaños con ioctl (default 80 colsize)
+   - Guardar el valor de window width
+3. Algoritmo de columnas
 
 
 TODO En algún momento:
