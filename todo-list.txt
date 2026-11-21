@@ -1,6 +1,8 @@
 TODO:
-1. Implementar LS-28 Manage ACL and extended attributes with long format option
-2. Tests
+1. Implementar LS-29 Print dynamic multi-column output
+2. Parsear opción -C
+3. Detección de tty y obtención de tamaños con ioctl (default 80 colsize)
+4. Algoritmo de columnas
 
 
 TODO En algún momento:

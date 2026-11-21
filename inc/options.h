@@ -7,7 +7,8 @@ typedef enum e_options
     OPTIONS_LONG_FORMAT = 1 << 1,
     OPTIONS_READ_ALL = 1 << 2,
     OPTIONS_REVERSE = 1 << 3,
-    OPTIONS_TIME_SORTING = 1 << 4
+    OPTIONS_TIME_SORTING = 1 << 4,
+    OPTIONS_MULTI_COLUMN_FORMAT = 1 << 5
 } t_options;
 
 t_options options_get(const char **arguments);
