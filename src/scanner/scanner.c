@@ -56,7 +56,7 @@ static void retrieve_entry_metadata(t_scan_state *state, t_file_entry *entry, t_
         return;
 
     file_entry_set_advanced_metadata_from_stats(entry, stats);
-    if (file_stats_target_retrieval_failed(stats))
+    if (file_stats_target_retrieval_failed(stats) || file_stats_acl_retrieval_failed(stats))
         record_failed_entry(state, entry_path);
 }
 

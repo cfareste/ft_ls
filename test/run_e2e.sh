@@ -14,7 +14,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TESTS_DIR="${SCRIPT_DIR}/e2e"
 TESTS_FILE="${TESTS_DIR}/tests.txt"
 DELIMITER="::"
-FT_CMD="../ft_ls"
+FT_CMD="${SCRIPT_DIR}/../ft_ls"
 MODEL_LS_BIN="$(uname -s | grep -q 'Darwin' && printf '%s' 'gls' || printf '%s' 'ls')"
 
 trim() {
@@ -38,6 +38,13 @@ print_info() {
 
 print_summary() {
     printf '%bSummary: %d tests executed, %d passed, %d failed%b\n' "${YELLOW}" "$1" "$2" "$3" "${RESET}"
+}
+
+set_test_acl() {
+    if ! setfacl -m "$1" "$2"; then
+        printf '%b[ERROR] Could not set ACL on %s%b\n' "${RED}" "$2" "${RESET}" >&2
+        return 1
+    fi
 }
 
 prepare_test_environment() {
@@ -123,6 +130,60 @@ prepare_test_environment() {
     touch -t 202401010000 multi_flag_dir/new
     touch -t 202501010000 multi_flag_dir/subdir/.nested_hidden
     touch -t 202601010000 multi_flag_dir/subdir/nested
+
+    # ACL fixtures for long-format output
+    if ! command -v setfacl >/dev/null 2>&1; then
+        printf '%b[ERROR] E2E ACL tests require setfacl%b\n' "${RED}" "${RESET}" >&2
+        return 1
+    fi
+
+    mkdir -p acl-cases/no-acls \
+        acl-cases/non-dirs \
+        acl-cases/with-acls \
+        acl-cases/dirs/no-acl-one \
+        acl-cases/dirs/no-acl-two \
+        acl-cases/dirs/acl-one \
+        acl-cases/dirs/acl-two \
+        acl-cases/mixed/no-acl-dir \
+        acl-cases/mixed/acl-dir
+    touch acl-cases/no-acls/plain
+    mkdir acl-cases/no-acls/empty-dir
+
+    touch acl-cases/with-acls/plain acl-cases/with-acls/access-acl
+    mkdir acl-cases/with-acls/default-acl-dir
+    set_test_acl u:65534:r-- acl-cases/with-acls/access-acl || return 1
+    set_test_acl d:u:65534:rwx acl-cases/with-acls/default-acl-dir || return 1
+    touch acl-cases/with-acls/default-acl-dir/inherited-acl
+
+    touch acl-cases/non-dirs/plain-one acl-cases/non-dirs/plain-two
+    touch acl-cases/non-dirs/acl-one acl-cases/non-dirs/acl-two
+    set_test_acl u:65534:r-- acl-cases/non-dirs/acl-one || return 1
+    set_test_acl u:65534:r-- acl-cases/non-dirs/acl-two || return 1
+
+    touch acl-cases/dirs/no-acl-one/plain acl-cases/dirs/no-acl-two/plain
+    touch acl-cases/dirs/acl-one/access-acl acl-cases/dirs/acl-two/access-acl
+    set_test_acl u:65534:r-- acl-cases/dirs/acl-one/access-acl || return 1
+    set_test_acl u:65534:r-- acl-cases/dirs/acl-two/access-acl || return 1
+    set_test_acl d:u:65534:rwx acl-cases/dirs/acl-one || return 1
+    set_test_acl d:u:65534:rwx acl-cases/dirs/acl-two || return 1
+
+    touch acl-cases/mixed/plain acl-cases/mixed/acl-file
+    truncate -s 4096 acl-cases/mixed/plain acl-cases/mixed/acl-file
+    touch acl-cases/mixed/no-acl-dir/plain acl-cases/mixed/acl-dir/access-acl
+    set_test_acl u:65534:r-- acl-cases/mixed/acl-file || return 1
+    set_test_acl u:65534:r-- acl-cases/mixed/acl-dir/access-acl || return 1
+    set_test_acl d:u:65534:rwx acl-cases/mixed/acl-dir || return 1
+
+    mkdir -p acl-cases/symlinks
+    touch acl-cases/symlinks/target
+    ln -s missing-target acl-cases/symlinks/broken
+    ln -s second-hop acl-cases/symlinks/first-hop
+    ln -s target acl-cases/symlinks/second-hop
+    ln -s loop-two acl-cases/symlinks/loop-one
+    ln -s loop-one acl-cases/symlinks/loop-two
+
+    # Keep the parent directory older than multi_flag_dir for the -t ordering tests.
+    touch -t 201901010000 .
 }
 
 remove_test_environment() {
@@ -251,7 +312,10 @@ main() {
 
     mkdir -p "${SCRIPT_DIR}/testdir"
     cd "${SCRIPT_DIR}/testdir" || exit 1
-    prepare_test_environment
+    if ! prepare_test_environment; then
+        remove_test_environment
+        exit 1
+    fi
 
     local line=""
     local parsed=""

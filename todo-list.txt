@@ -1,4 +1,6 @@
 TODO:
+1. Implementar LS-28 Manage ACL and extended attributes with long format option
+2. Tests
 
 
 TODO En algún momento:
@@ -316,3 +318,38 @@ QA LS-25 Manage invalid options (`ls -X ... | cat)
 1. Opción singular errónea (-X)
 2. Multiopción con errores (-lRX)
 3. Opción errónea posterior a operando (src -X)
+
+
+QA LS-28 Manage ACL and extended attributes with long format option (`ls -l ... | cat)
+1. Sin parámetros
+   - Directorio actual con ficheros sin ningún ACL flag
+   - Directorio actual con ficheros con ACLs y / o SELinux (también directorio con acl default)
+   - Errores de lgetxattrs no graves
+   - Errores de lgetxattrs graves
+2. 1 parámetro
+   - Fichero non dir sin ACLs
+   - Fichero non dir con ACLs o SELinux
+   - Directorio a directorio sin ACLs
+   - Directorio a directorio con ACLs o SELinux
+   - Error de lgetxattrs no graves, tanto para el fichero como el directorio
+   - Error de lgetxattrs graves, tanto para el fichero como el directorio
+3. Múltiples parámetros
+   - Solo non dirs:
+       * Ninguno con ACL
+       * Alguno / Todos con ACLs o SELinux
+       * Errores de lgetxattrs no graves
+       * Errores de lgetxattrs graves
+   - Solo directorios:
+       * Ningún archivo con ACLs
+       * Alguno / Todos con ACLs o SELinux
+       * Errores de lgetxattrs no graves
+       * Errores de lgetxattrs graves
+   - Mix de tipos:
+       * Ninguno con ACL
+       * Alguno / Todos con ACLs o SELinux
+       * Errores de lgetxattrs no graves
+       * Errores de lgetxattrs graves
+4. Ficheros especiales
+   - Errores mezclados diferentes a ACL
+   - Symlinks, symlinks rotos, loopeds y multihops
+   - Directorios vacíos

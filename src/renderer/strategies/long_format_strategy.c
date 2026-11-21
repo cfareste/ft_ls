@@ -2,6 +2,8 @@
 #include "libft.h"
 
 #define SIX_MONTHS_IN_SECONDS (6 * 30 * 24 * 60 * 60)
+#define PERMISSION_COLUMN_COUNT 9
+#define MODE_BUFFER_SIZE (PERMISSION_COLUMN_COUNT + 3)
 
 typedef struct s_permission_column
 {
@@ -21,7 +23,7 @@ typedef struct s_column_widths
     size_t date;
 } t_column_widths;
 
-static const t_permission_column PERMISSION_COLUMNS[] = {
+static const t_permission_column PERMISSION_COLUMNS[PERMISSION_COLUMN_COUNT] = {
     { PERM_OWNER_READ, PERM_NONE, 'r', 0, 0 },
     { PERM_OWNER_WRITE, PERM_NONE, 'w', 0, 0 },
     { PERM_OWNER_EXECUTE, PERM_SETUID, 'x', 's', 'S' },
@@ -119,15 +121,30 @@ static t_column_widths get_column_widths(const t_file_entry_array *entries)
     };
 }
 
-static void print_mode_string(const t_file_entry *entry)
+static char get_acl_character(const t_file_acl_type acl_type)
+{
+    switch (acl_type)
+    {
+        case FILE_ACL_REAL: return '+';
+        case FILE_ACL_SELINUX_ONLY: return '.';
+        case FILE_ACL_UNKNOWN: return '?';
+        case FILE_ACL_NONE: return ' ';
+    }
+    return '?';
+}
+
+static void print_mode_string(const t_file_entry *entry, const int has_acl)
 {
     const t_permissions permissions = file_entry_get_permissions(entry);
-    char mode[11];
+    char mode[MODE_BUFFER_SIZE];
 
     mode[0] = get_file_type_character(file_entry_get_file_type(entry));
-    for (size_t i = 0; i < sizeof(PERMISSION_COLUMNS) / sizeof(PERMISSION_COLUMNS[0]); i++)
+    for (size_t i = 0; i < PERMISSION_COLUMN_COUNT; i++)
         mode[i + 1] = get_permission_character(permissions, PERMISSION_COLUMNS[i]);
-    mode[sizeof(mode) - 1] = '\0';
+    size_t mode_length = PERMISSION_COLUMN_COUNT + 1;
+    if (has_acl)
+        mode[mode_length++] = get_acl_character(file_entry_get_acl_type(entry));
+    mode[mode_length] = '\0';
     ft_printf("%s ", mode);
 }
 
@@ -191,9 +208,9 @@ static void print_modification_date(const t_file_entry *entry)
               modification_date.year);
 }
 
-static void print_failed_entry(const t_file_entry *entry, const t_column_widths widths)
+static void print_failed_entry(const t_file_entry *entry, const t_column_widths widths, const int has_acl)
 {
-    print_mode_string(entry);
+    print_mode_string(entry, has_acl);
     print_alignment_padding(widths.link_count, 1);
     ft_printf("? ");
     print_padded_text(NULL, widths.author);
@@ -214,15 +231,15 @@ static void print_entry_name(const t_file_entry *entry)
         ft_printf(" -> %s", target);
 }
 
-static void print_entry(const t_file_entry *entry, const t_column_widths widths)
+static void print_entry(const t_file_entry *entry, const t_column_widths widths, const int has_acl)
 {
     if (file_entry_get_file_type(entry) == FILE_TYPE_UNKNOWN)
     {
-        print_failed_entry(entry, widths);
+        print_failed_entry(entry, widths, has_acl);
         return;
     }
 
-    print_mode_string(entry);
+    print_mode_string(entry, has_acl);
     print_link_count(entry, widths);
     print_padded_text(file_entry_get_author(entry), widths.author);
     print_padded_text(file_entry_get_group(entry), widths.group);
@@ -243,7 +260,8 @@ void long_format_strategy(const t_file_entry_array *file_entry_array)
 {
     const unsigned int count = file_entry_array_get_length(file_entry_array);
     const t_column_widths widths = get_column_widths(file_entry_array);
+    const int has_acl = file_entry_array_has_acl(file_entry_array);
 
     for (unsigned int i = 0; i < count; i++)
-        print_entry(file_entry_array_get_at(file_entry_array, i), widths);
+        print_entry(file_entry_array_get_at(file_entry_array, i), widths, has_acl);
 }
