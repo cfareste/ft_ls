@@ -32,25 +32,12 @@ static void should_create_file_stats_correctly(void)
 
 static void should_detect_the_acl_type_for_each_file(void)
 {
-    static const t_vfs_mock_xattr selinux_xattrs[] = {
-        { .name = "security.selinux", .size = 1 },
-        { .name = NULL }
-    };
-    static const t_vfs_mock_xattr acl_xattrs[] = {
-        { .name = "system.posix_acl_access", .size = 1 },
-        { .name = NULL }
-    };
-    static const t_vfs_mock_xattr access_denied_with_selinux_xattrs[] = {
-        { .name = "system.posix_acl_access", .error = EACCES },
-        { .name = "security.selinux", .size = 1 },
-        { .name = NULL }
-    };
     const t_vfs_mock_entry vfs[] = {
         MOCK_FILE("no_acl"),
         MOCK_LGETXATTR_ERROR(EACCES, "unknown_acl"),
-        MOCK_FILE_WITH_STATS("selinux_only", .xattrs = selinux_xattrs),
-        MOCK_FILE_WITH_STATS("real_acl", .xattrs = acl_xattrs),
-        MOCK_FILE_WITH_STATS("access_denied_with_selinux", .xattrs = access_denied_with_selinux_xattrs),
+        MOCK_FILE_SELINUX_ACL("selinux_only"),
+        MOCK_FILE_REAL_ACL("real_acl"),
+        MOCK_FILE_UNKNOWN_WITH_SELINUX_ACL("access_denied_with_selinux", EACCES),
         MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
@@ -76,23 +63,10 @@ static void should_detect_the_acl_type_for_each_file(void)
 
 static void should_detect_default_posix_acl_and_probe_selinux_when_xattrs_are_unsupported(void)
 {
-    static const t_vfs_mock_xattr default_acl_xattrs[] = {
-        { .name = "system.posix_acl_default", .size = 1 },
-        { .name = NULL }
-    };
-    static const t_vfs_mock_xattr default_acl_on_file_xattrs[] = {
-        { .name = "system.posix_acl_default", .size = 1 },
-        { .name = NULL }
-    };
-    static const t_vfs_mock_xattr unsupported_posix_with_selinux_xattrs[] = {
-        { .name = "system.posix_acl_access", .error = EOPNOTSUPP },
-        { .name = "security.selinux", .size = 1 },
-        { .name = NULL }
-    };
     const t_vfs_mock_entry vfs[] = {
-        MOCK_DIR_WITH_STATS("default_acl", NULL, .xattrs = default_acl_xattrs),
-        MOCK_FILE_WITH_STATS("default_acl_on_file", .xattrs = default_acl_on_file_xattrs),
-        MOCK_FILE_WITH_STATS("unsupported_posix_with_selinux", .xattrs = unsupported_posix_with_selinux_xattrs),
+        MOCK_DIR_DEFAULT_ACL("default_acl"),
+        MOCK_FILE("default_acl_on_file"),
+        MOCK_FILE_UNSUPPORTED_WITH_SELINUX_ACL("unsupported_posix_with_selinux"),
         MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
@@ -115,14 +89,8 @@ static void should_detect_default_posix_acl_and_probe_selinux_when_xattrs_are_un
 
 static void should_only_check_selinux_attributes_for_symlinks(void)
 {
-    static const t_vfs_mock_xattr symlink_xattrs[] = {
-        { .name = "system.posix_acl_access", .error = EIO },
-        { .name = "system.posix_acl_default", .error = EIO },
-        { .name = "security.selinux", .size = 1 },
-        { .name = NULL }
-    };
     const t_vfs_mock_entry vfs[] = {
-        MOCK_SYMLINK_WITH_STATS("link", "target", .xattrs = symlink_xattrs),
+        MOCK_SYMLINK_SELINUX_ACL("link", "target"),
         MOCK_FILE("target"),
         MOCK_NULL_TERMINATOR()
     };

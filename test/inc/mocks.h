@@ -1,5 +1,6 @@
 #pragma once
 
+#include <errno.h>
 #include <stddef.h>
 #include <sys/stat.h>
 #include <sys/sysmacros.h>
@@ -106,6 +107,32 @@ typedef struct s_vfs_mock_entry
 #define MOCK_DIR_CLOSE_ERROR(p, ...)                    MOCK_ENTRY((p), S_IFDIR | 0755, ((const char *[]){ __VA_ARGS__, NULL }), NULL, ((t_vfs_mock_errors){ .closedir_errno = EBADF }))
 #define MOCK_READ_SYM_LINK_ERROR(err, p, link_target)   MOCK_ENTRY((p), S_IFLNK | 0777, NULL, (link_target), ((t_vfs_mock_errors){ .readlink_errno = (err) }))
 #define MOCK_LGETXATTR_ERROR(err, p)                    MOCK_ENTRY((p), DEFAULT_FILE_MODE, NULL, NULL, ((t_vfs_mock_errors){ .lgetxattr_errno = (err) }))
+
+#define MOCK_NO_ACL_XATTRS                              NULL
+#define MOCK_REAL_ACL_XATTRS                            ((const t_vfs_mock_xattr[]){ { .name = "system.posix_acl_access", .size = 1 }, { .name = NULL } })
+#define MOCK_DEFAULT_ACL_XATTRS                         ((const t_vfs_mock_xattr[]){ { .name = "system.posix_acl_default", .size = 1 }, { .name = NULL } })
+#define MOCK_SELINUX_ACL_XATTRS                         ((const t_vfs_mock_xattr[]){ { .name = "security.selinux", .size = 1 }, { .name = NULL } })
+#define MOCK_UNKNOWN_ACL_XATTRS(err)                    ((const t_vfs_mock_xattr[]){ { .name = "system.posix_acl_access", .error = (err) }, { .name = NULL } })
+#define MOCK_UNKNOWN_WITH_SELINUX_ACL_XATTRS(err)       ((const t_vfs_mock_xattr[]){ { .name = "system.posix_acl_access", .error = (err) }, { .name = "security.selinux", .size = 1 }, { .name = NULL } })
+#define MOCK_UNSUPPORTED_ACL_XATTRS                     ((const t_vfs_mock_xattr[]){ { .name = "system.posix_acl_access", .error = EOPNOTSUPP }, { .name = NULL } })
+#define MOCK_UNSUPPORTED_POSIX_WITH_SELINUX_XATTRS      ((const t_vfs_mock_xattr[]){ { .name = "system.posix_acl_access", .error = EOPNOTSUPP }, { .name = "security.selinux", .size = 1 }, { .name = NULL } })
+#define MOCK_SYMLINK_SELINUX_XATTRS                     ((const t_vfs_mock_xattr[]){ { .name = "system.posix_acl_access", .error = EIO }, { .name = "system.posix_acl_default", .error = EIO }, { .name = "security.selinux", .size = 1 }, { .name = NULL } })
+
+#define MOCK_FILE_NO_ACL(p)                             MOCK_FILE((p))
+#define MOCK_FILE_REAL_ACL(p)                           MOCK_FILE_WITH_STATS((p), .xattrs = MOCK_REAL_ACL_XATTRS)
+#define MOCK_FILE_SELINUX_ACL(p)                        MOCK_FILE_WITH_STATS((p), .xattrs = MOCK_SELINUX_ACL_XATTRS)
+#define MOCK_FILE_UNKNOWN_ACL(p, err)                   MOCK_FILE_WITH_STATS((p), .xattrs = MOCK_UNKNOWN_ACL_XATTRS((err)))
+#define MOCK_FILE_UNKNOWN_WITH_SELINUX_ACL(p, err)      MOCK_FILE_WITH_STATS((p), .xattrs = MOCK_UNKNOWN_WITH_SELINUX_ACL_XATTRS((err)))
+#define MOCK_FILE_UNSUPPORTED_ACL(p)                    MOCK_FILE_WITH_STATS((p), .xattrs = MOCK_UNSUPPORTED_ACL_XATTRS)
+#define MOCK_FILE_UNSUPPORTED_WITH_SELINUX_ACL(p)       MOCK_FILE_WITH_STATS((p), .xattrs = MOCK_UNSUPPORTED_POSIX_WITH_SELINUX_XATTRS)
+#define MOCK_CHAR_DEVICE_SELINUX_ACL(p)                 MOCK_CHAR_DEVICE_WITH_STATS((p), .xattrs = MOCK_SELINUX_ACL_XATTRS)
+#define MOCK_DIR_REAL_ACL(p)                            MOCK_DIR_WITH_STATS((p), NULL, .xattrs = MOCK_REAL_ACL_XATTRS)
+#define MOCK_DIR_REAL_ACL_WITH_ENTRIES(p, ...)          MOCK_DIR_WITH_STATS((p), ((const char *[]){ __VA_ARGS__, NULL }), .xattrs = MOCK_REAL_ACL_XATTRS)
+#define MOCK_DIR_DEFAULT_ACL(p)                         MOCK_DIR_WITH_STATS((p), NULL, .xattrs = MOCK_DEFAULT_ACL_XATTRS)
+#define MOCK_DIR_DEFAULT_ACL_WITH_ENTRIES(p, ...)       MOCK_DIR_WITH_STATS((p), ((const char *[]){ __VA_ARGS__, NULL }), .xattrs = MOCK_DEFAULT_ACL_XATTRS)
+#define MOCK_DIR_SELINUX_ACL(p)                         MOCK_DIR_WITH_STATS((p), NULL, .xattrs = MOCK_SELINUX_ACL_XATTRS)
+#define MOCK_DIR_SELINUX_ACL_WITH_ENTRIES(p, ...)       MOCK_DIR_WITH_STATS((p), ((const char *[]){ __VA_ARGS__, NULL }), .xattrs = MOCK_SELINUX_ACL_XATTRS)
+#define MOCK_SYMLINK_SELINUX_ACL(p, target)             MOCK_SYMLINK_WITH_STATS((p), (target), .xattrs = MOCK_SYMLINK_SELINUX_XATTRS)
 
 void vfs_mock_setup(const t_vfs_mock_entry *entries);
 const t_vfs_mock_entry *find_vfs_entry(const char *path);

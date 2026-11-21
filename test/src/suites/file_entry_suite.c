@@ -91,12 +91,8 @@ static void should_create_a_file_entry_from_stats(void)
 
 static void should_copy_acl_type_from_stats_to_file_entry(void)
 {
-    static const t_vfs_mock_xattr acl_xattrs[] = {
-        { .name = "system.posix_acl_access", .size = 1 },
-        { .name = NULL }
-    };
     const t_vfs_mock_entry vfs[] = {
-        MOCK_FILE_WITH_STATS("file_with_acl", .xattrs = acl_xattrs),
+        MOCK_FILE_REAL_ACL("file_with_acl"),
         MOCK_NULL_TERMINATOR()
     };
 
@@ -182,19 +178,11 @@ static void should_create_file_entry_array_correctly(void)
 
 static void should_track_real_acls_in_a_file_entry_array(void)
 {
-    static const t_vfs_mock_xattr selinux_xattrs[] = {
-        { .name = "security.selinux", .size = 1 },
-        { .name = NULL }
-    };
-    static const t_vfs_mock_xattr acl_xattrs[] = {
-        { .name = "system.posix_acl_access", .size = 1 },
-        { .name = NULL }
-    };
     const t_vfs_mock_entry vfs[] = {
         MOCK_FILE("no_acl"),
         MOCK_LGETXATTR_ERROR(EACCES, "unknown_acl"),
-        MOCK_FILE_WITH_STATS("selinux_only", .xattrs = selinux_xattrs),
-        MOCK_FILE_WITH_STATS("real_acl", .xattrs = acl_xattrs),
+        MOCK_FILE_SELINUX_ACL("selinux_only"),
+        MOCK_FILE_REAL_ACL("real_acl"),
         MOCK_NULL_TERMINATOR()
     };
     const char *paths[ACL_TYPE_CASE_COUNT] = { "no_acl", "unknown_acl", "selinux_only", "real_acl" };

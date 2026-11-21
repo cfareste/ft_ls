@@ -1248,19 +1248,11 @@ static void should_render_a_non_directory_operand_in_long_format(void)
 
 static void should_render_acl_metadata_for_a_non_directory_operand_in_long_format(void)
 {
-    static const t_vfs_mock_xattr selinux_xattrs[] = {
-        { .name = "security.selinux", .size = 1 },
-        { .name = NULL }
-    };
-    static const t_vfs_mock_xattr acl_xattrs[] = {
-        { .name = "system.posix_acl_access", .size = 1 },
-        { .name = NULL }
-    };
     const t_vfs_mock_entry vfs[] = {
         MOCK_FILE("none"),
         MOCK_LGETXATTR_ERROR(EACCES, "unknown"),
-        MOCK_FILE_WITH_STATS("selinux", .xattrs = selinux_xattrs),
-        MOCK_FILE_WITH_STATS("real", .xattrs = acl_xattrs),
+        MOCK_FILE_SELINUX_ACL("selinux"),
+        MOCK_FILE_REAL_ACL("real"),
         MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
@@ -1331,20 +1323,12 @@ static void should_render_a_directory_operand_in_long_format(void)
 
 static void should_render_acl_metadata_for_directory_contents_in_long_format(void)
 {
-    static const t_vfs_mock_xattr selinux_xattrs[] = {
-        { .name = "security.selinux", .size = 1 },
-        { .name = NULL }
-    };
-    static const t_vfs_mock_xattr acl_xattrs[] = {
-        { .name = "system.posix_acl_access", .size = 1 },
-        { .name = NULL }
-    };
     const t_vfs_mock_entry vfs[] = {
         MOCK_DIR("dir", ".", "..", "none", "unknown", "selinux", "real"),
         MOCK_FILE("dir/none"),
         MOCK_LGETXATTR_ERROR(EACCES, "dir/unknown"),
-        MOCK_FILE_WITH_STATS("dir/selinux", .xattrs = selinux_xattrs),
-        MOCK_FILE_WITH_STATS("dir/real", .xattrs = acl_xattrs),
+        MOCK_FILE_SELINUX_ACL("dir/selinux"),
+        MOCK_FILE_REAL_ACL("dir/real"),
         MOCK_NULL_TERMINATOR()
     };
     vfs_mock_setup(vfs);
@@ -4328,6 +4312,444 @@ static void should_report_an_invalid_option_after_an_operand(void)
     assert_invalid_option_is_reported(2, arguments);
 }
 
+static void should_render_no_acls_in_the_current_directory(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", ".", "..", "block", "char", "fifo", "regular", "socket", "subdir"),
+        MOCK_BLOCK_DEVICE("block"),
+        MOCK_CHAR_DEVICE("char"),
+        MOCK_FIFO("fifo"),
+        MOCK_FILE("regular"),
+        MOCK_SOCKET("socket"),
+        MOCK_DIR("subdir", ".", ".."),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-l", NULL };
+    get_parsed_arguments_result(1, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "total 0\n"
+        "brw-rw---- 1 root root 0, 0 Jan  1  1970 block\n"
+        "crw-rw---- 1 root root 0, 0 Jan  1  1970 char\n"
+        "prw-rw-r-- 1 root root 1024 Jan  1  1970 fifo\n"
+        "-rw-r--r-- 1 root root 1024 Jan  1  1970 regular\n"
+        "srwxrwxrwx 1 root root 1024 Jan  1  1970 socket\n"
+        "drwxr-xr-x 1 root root 1024 Jan  1  1970 subdir\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    assert_application_execution_succeed(result);
+}
+
+static void should_render_mixed_acls_in_the_current_directory(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", ".", "..", "a_none", "b_real", "c_selinux", "d_unknown", "e_default"),
+        MOCK_FILE("a_none"),
+        MOCK_FILE_REAL_ACL("b_real"),
+        MOCK_FILE_SELINUX_ACL("c_selinux"),
+        MOCK_FILE_UNKNOWN_ACL("d_unknown", EACCES),
+        MOCK_DIR_DEFAULT_ACL("e_default"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-l", NULL };
+    get_parsed_arguments_result(1, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "total 0\n"
+        "-rw-r--r--  1 root root 1024 Jan  1  1970 a_none\n"
+        "-rw-r--r--+ 1 root root 1024 Jan  1  1970 b_real\n"
+        "-rw-r--r--. 1 root root 1024 Jan  1  1970 c_selinux\n"
+        "-rw-r--r--? 1 root root 1024 Jan  1  1970 d_unknown\n"
+        "drwxr-xr-x+ 1 root root 1024 Jan  1  1970 e_default\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    assert_application_execution_succeed(result);
+}
+
+static void should_handle_non_grave_acl_errors_in_the_current_directory(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", ".", "..", "unsupported", "unknown"),
+        MOCK_FILE_UNSUPPORTED_ACL("unsupported"),
+        MOCK_FILE_UNKNOWN_ACL("unknown", EPERM),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-l", NULL };
+    get_parsed_arguments_result(1, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "total 0\n"
+        "-rw-r--r--? 1 root root 1024 Jan  1  1970 unknown\n"
+        "-rw-r--r--  1 root root 1024 Jan  1  1970 unsupported\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    assert_application_execution_succeed(result);
+}
+
+static void should_handle_grave_acl_errors_in_the_current_directory(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", ".", "..", "failed", "good"),
+        MOCK_LGETXATTR_ERROR(EIO, "failed"),
+        MOCK_FILE("good"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-l", NULL };
+    get_parsed_arguments_result(1, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "total 0\n"
+        "-rw-r--r-- 1 root root 1024 Jan  1  1970 failed\n"
+        "-rw-r--r-- 1 root root 1024 Jan  1  1970 good\n"));
+    CU_ASSERT(verify_that_the_error_printed_is("ft_ls: '%s': %s\n", "failed", strerror(EIO)));
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MINOR_ERROR);
+}
+
+static void should_render_one_non_directory_operand_with_acl_states(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FIFO("fifo"),
+        MOCK_FILE_NO_ACL("none"),
+        MOCK_FILE_REAL_ACL("real"),
+        MOCK_CHAR_DEVICE_SELINUX_ACL("selinux"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-l", "selinux", NULL };
+    get_parsed_arguments_result(2, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "crw-rw----. 1 root root 0, 0 Jan  1  1970 selinux\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    assert_application_execution_succeed(result);
+}
+
+static void should_render_one_non_directory_operand_without_acls(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE_NO_ACL("file"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-l", "file", NULL };
+    get_parsed_arguments_result(2, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "-rw-r--r-- 1 root root 1024 Jan  1  1970 file\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    assert_application_execution_succeed(result);
+}
+
+static void should_handle_non_grave_acl_errors_for_one_non_directory_operand(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE_UNKNOWN_ACL("file", EACCES),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-l", "file", NULL };
+    get_parsed_arguments_result(2, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "-rw-r--r--? 1 root root 1024 Jan  1  1970 file\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    assert_application_execution_succeed(result);
+}
+
+static void should_render_one_directory_operand_with_no_acls(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("empty", ".", ".."),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-l", "empty", NULL };
+    get_parsed_arguments_result(2, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is("total 0\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    assert_application_execution_succeed(result);
+}
+
+static void should_render_one_directory_operand_with_mixed_acls(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("dir", ".", "..", "none", "real", "selinux", "default"),
+        MOCK_FILE("dir/none"),
+        MOCK_FILE_REAL_ACL("dir/real"),
+        MOCK_FILE_SELINUX_ACL("dir/selinux"),
+        MOCK_DIR_DEFAULT_ACL("dir/default"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-l", "dir", NULL };
+    get_parsed_arguments_result(2, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "total 0\n"
+        "drwxr-xr-x+ 1 root root 1024 Jan  1  1970 default\n"
+        "-rw-r--r--  1 root root 1024 Jan  1  1970 none\n"
+        "-rw-r--r--+ 1 root root 1024 Jan  1  1970 real\n"
+        "-rw-r--r--. 1 root root 1024 Jan  1  1970 selinux\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    assert_application_execution_succeed(result);
+}
+
+static void should_handle_non_grave_acl_errors_for_one_file_and_directory(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE_UNKNOWN_ACL("file", EACCES),
+        MOCK_DIR("dir", ".", "..", "inside"),
+        MOCK_FILE_UNKNOWN_ACL("dir/inside", EACCES),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-l", "file", "dir", NULL };
+    get_parsed_arguments_result(3, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "-rw-r--r--? 1 root root 1024 Jan  1  1970 file\n"
+        "\n"
+        "dir:\n"
+        "total 0\n"
+        "-rw-r--r--? 1 root root 1024 Jan  1  1970 inside\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    assert_application_execution_succeed(result);
+}
+
+static void should_handle_grave_acl_errors_for_one_file_and_directory(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_LGETXATTR_ERROR(EIO, "file"),
+        MOCK_DIR("dir", ".", "..", "inside"),
+        MOCK_LGETXATTR_ERROR(EIO, "dir/inside"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-l", "file", "dir", NULL };
+    get_parsed_arguments_result(3, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "-rw-r--r-- 1 root root 1024 Jan  1  1970 file\n"
+        "\n"
+        "dir:\n"
+        "total 0\n"
+        "-rw-r--r-- 1 root root 1024 Jan  1  1970 inside\n"));
+    CU_ASSERT(verify_that_the_error_printed_is(
+        "ft_ls: '%s': %s\n"
+        "ft_ls: '%s': %s\n",
+        "file", strerror(EIO), "dir/inside", strerror(EIO)));
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MAJOR_ERROR);
+}
+
+static void should_render_multiple_non_directory_operands_with_partial_and_complete_acls(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("none"),
+        MOCK_FIFO("fifo"),
+        MOCK_FILE_REAL_ACL("real"),
+        MOCK_CHAR_DEVICE_SELINUX_ACL("selinux"),
+        MOCK_SOCKET("socket"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-l", "socket", "none", "real", "fifo", "selinux", NULL };
+    get_parsed_arguments_result(6, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "prw-rw-r--  1 root root 1024 Jan  1  1970 fifo\n"
+        "-rw-r--r--  1 root root 1024 Jan  1  1970 none\n"
+        "-rw-r--r--+ 1 root root 1024 Jan  1  1970 real\n"
+        "crw-rw----. 1 root root 0, 0 Jan  1  1970 selinux\n"
+        "srwxrwxrwx  1 root root 1024 Jan  1  1970 socket\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    assert_application_execution_succeed(result);
+}
+
+static void should_render_multiple_directory_operands_with_mixed_acls(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("dir_none", ".", "..", "inside"),
+        MOCK_FILE("dir_none/inside"),
+        MOCK_DIR("dir_real", ".", "..", "inside_real"),
+        MOCK_FILE_REAL_ACL("dir_real/inside_real"),
+        MOCK_DIR_DEFAULT_ACL_WITH_ENTRIES("dir_default", ".", "inside_default"),
+        MOCK_DIR("dir_default/inside_default", ".", ".."),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-l", "dir_real", "dir_default", "dir_none", NULL };
+    get_parsed_arguments_result(4, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "dir_default:\n"
+        "total 0\n"
+        "drwxr-xr-x 1 root root 1024 Jan  1  1970 inside_default\n"
+        "\n"
+        "dir_none:\n"
+        "total 0\n"
+        "-rw-r--r-- 1 root root 1024 Jan  1  1970 inside\n"
+        "\n"
+        "dir_real:\n"
+        "total 0\n"
+        "-rw-r--r--+ 1 root root 1024 Jan  1  1970 inside_real\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    assert_application_execution_succeed(result);
+}
+
+static void should_handle_non_grave_acl_errors_for_multiple_directory_operands(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("dir1", ".", "..", "unknown"),
+        MOCK_FILE_UNKNOWN_ACL("dir1/unknown", EACCES),
+        MOCK_DIR("dir2", ".", "..", "good"),
+        MOCK_FILE("dir2/good"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-l", "dir1", "dir2", NULL };
+    get_parsed_arguments_result(3, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "dir1:\n"
+        "total 0\n"
+        "-rw-r--r--? 1 root root 1024 Jan  1  1970 unknown\n"
+        "\n"
+        "dir2:\n"
+        "total 0\n"
+        "-rw-r--r-- 1 root root 1024 Jan  1  1970 good\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    assert_application_execution_succeed(result);
+}
+
+static void should_handle_grave_acl_errors_for_multiple_directory_operands(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("dir1", ".", "..", "failed"),
+        MOCK_LGETXATTR_ERROR(EIO, "dir1/failed"),
+        MOCK_DIR("dir2", ".", "..", "good"),
+        MOCK_FILE("dir2/good"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-l", "dir1", "dir2", NULL };
+    get_parsed_arguments_result(3, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "dir1:\n"
+        "total 0\n"
+        "-rw-r--r-- 1 root root 1024 Jan  1  1970 failed\n"
+        "\n"
+        "dir2:\n"
+        "total 0\n"
+        "-rw-r--r-- 1 root root 1024 Jan  1  1970 good\n"));
+    CU_ASSERT(verify_that_the_error_printed_is(
+        "ft_ls: '%s': %s\n", "dir1/failed", strerror(EIO)));
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MINOR_ERROR);
+}
+
+static void should_handle_grave_acl_errors_for_multiple_non_directory_operands(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_LGETXATTR_ERROR(EIO, "failed"),
+        MOCK_FILE("good"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-l", "failed", "good", NULL };
+    get_parsed_arguments_result(3, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "-rw-r--r-- 1 root root 1024 Jan  1  1970 failed\n"
+        "-rw-r--r-- 1 root root 1024 Jan  1  1970 good\n"));
+    CU_ASSERT(verify_that_the_error_printed_is(
+        "ft_ls: '%s': %s\n", "failed", strerror(EIO)));
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MAJOR_ERROR);
+}
+
+static void should_render_mixed_operand_types_with_partial_acls(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("file_none"),
+        MOCK_FILE_REAL_ACL("file_real"),
+        MOCK_SYMLINK_SELINUX_ACL("link", "file_real"),
+        MOCK_DIR("dir", ".", "..", "inside"),
+        MOCK_FILE_SELINUX_ACL("dir/inside"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-l", "link", "file_real", "dir", "file_none", NULL };
+    get_parsed_arguments_result(5, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "-rw-r--r--  1 root root 1024 Jan  1  1970 file_none\n"
+        "-rw-r--r--+ 1 root root 1024 Jan  1  1970 file_real\n"
+        "lrwxrwxrwx. 1 root root 1024 Jan  1  1970 link -> file_real\n"
+        "\n"
+        "dir:\n"
+        "total 0\n"
+        "-rw-r--r--. 1 root root 1024 Jan  1  1970 inside\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    assert_application_execution_succeed(result);
+}
+
+static void should_handle_acl_errors_for_mixed_and_special_operands(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_LGETXATTR_ERROR(EACCES, "unknown"),
+        MOCK_LGETXATTR_ERROR(EIO, "failed"),
+        MOCK_SYMLINK_SELINUX_ACL("link", "broken"),
+        MOCK_SYMLINK("loop", "loop"),
+        MOCK_SYMLINK("first", "second"),
+        MOCK_SYMLINK("second", "target"),
+        MOCK_FILE("target"),
+        MOCK_DIR("empty", ".", ".."),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-l", "failed", "unknown", "link", "loop", "first", "empty", NULL };
+    get_parsed_arguments_result(7, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MAJOR_ERROR);
+}
+
 void register_application_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, test_teardown);
@@ -4349,9 +4771,7 @@ void register_application_suite(void)
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_explicitly_specified_hidden_non_directory_file_operands", should_successfully_print_the_contents_of_the_explicitly_specified_hidden_non_directory_file_operands);
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_explicitly_specified_hidden_directory_file_operands", should_successfully_print_the_contents_of_the_explicitly_specified_hidden_directory_file_operands);
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_explicitly_specified_hidden_mixed_file_operands", should_successfully_print_the_contents_of_the_explicitly_specified_hidden_mixed_file_operands);
-        CU_add_test(suite, "should_successfully_not_print_anything_if_the_specified_directory_is_empty", should_successfully_not_print_anything_if_the_specified_directory_is_empty);
         CU_add_test(suite, "should_successfully_not_print_anything_if_the_specified_directory_only_has_hidden_files", should_successfully_not_print_anything_if_the_specified_directory_only_has_hidden_files);
-        CU_add_test(suite, "should_successfully_only_print_dir_headers_if_the_specified_directories_are_empty", should_successfully_only_print_dir_headers_if_the_specified_directories_are_empty);
         CU_add_test(suite, "should_successfully_only_print_dir_headers_if_the_specified_directories_only_have_hidden_files", should_successfully_only_print_dir_headers_if_the_specified_directories_only_have_hidden_files);
         CU_add_test(suite, "should_successfully_only_print_dir_headers_with_non_directory_files_if_the_specified_directories_are_empty", should_successfully_only_print_dir_headers_with_non_directory_files_if_the_specified_directories_are_empty);
         CU_add_test(suite, "should_successfully_only_print_dir_headers_with_non_directory_files_if_the_specified_directories_only_have_hidden_files", should_successfully_only_print_dir_headers_with_non_directory_files_if_the_specified_directories_only_have_hidden_files);
@@ -4371,25 +4791,19 @@ void register_application_suite(void)
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_specified_operands_recursively", should_successfully_print_the_contents_of_the_specified_operands_recursively);
         CU_add_test(suite, "should_render_the_default_directory_in_long_format", should_render_the_default_directory_in_long_format);
         CU_add_test(suite, "should_render_a_non_directory_operand_in_long_format", should_render_a_non_directory_operand_in_long_format);
-        CU_add_test(suite, "should_render_acl_metadata_for_a_non_directory_operand_in_long_format", should_render_acl_metadata_for_a_non_directory_operand_in_long_format);
         CU_add_test(suite, "should_render_a_symlink_to_a_directory_operand_as_a_link_in_long_format", should_render_a_symlink_to_a_directory_operand_as_a_link_in_long_format);
         CU_add_test(suite, "should_render_a_directory_operand_in_long_format", should_render_a_directory_operand_in_long_format);
-        CU_add_test(suite, "should_render_acl_metadata_for_directory_contents_in_long_format", should_render_acl_metadata_for_directory_contents_in_long_format);
         CU_add_test(suite, "should_render_mixed_operands_in_long_format", should_render_mixed_operands_in_long_format);
         CU_add_test(suite, "should_render_file_stats_for_non_directory_and_directory_entries_in_long_format", should_render_file_stats_for_non_directory_and_directory_entries_in_long_format);
         CU_add_test(suite, "should_fall_back_to_numeric_author_and_group_in_long_format", should_fall_back_to_numeric_author_and_group_in_long_format);
         CU_add_test(suite, "should_report_a_minor_error_when_lstat_fails_for_directory_content", should_report_a_minor_error_when_lstat_fails_for_directory_content);
         CU_add_test(suite, "should_report_a_minor_error_when_readlink_fails_for_directory_content", should_report_a_minor_error_when_readlink_fails_for_directory_content);
-        CU_add_test(suite, "should_report_a_minor_error_when_acl_retrieval_fails_for_directory_content", should_report_a_minor_error_when_acl_retrieval_fails_for_directory_content);
         CU_add_test(suite, "should_report_a_major_error_when_stat_fails_for_an_operand_in_long_format", should_report_a_major_error_when_stat_fails_for_an_operand_in_long_format);
-        CU_add_test(suite, "should_report_a_major_error_when_acl_retrieval_fails_for_an_operand", should_report_a_major_error_when_acl_retrieval_fails_for_an_operand);
         CU_add_test(suite, "should_report_a_major_error_when_readlink_fails_for_an_operand_in_long_format", should_report_a_major_error_when_readlink_fails_for_an_operand_in_long_format);
         CU_add_test(suite, "should_report_multiple_minor_errors_for_lstat_failures_in_one_directory", should_report_multiple_minor_errors_for_lstat_failures_in_one_directory);
         CU_add_test(suite, "should_report_multiple_minor_errors_for_lstat_and_readlink_failures", should_report_multiple_minor_errors_for_lstat_and_readlink_failures);
         CU_add_test(suite, "should_report_multiple_major_errors_for_stat_failures_on_operands", should_report_multiple_major_errors_for_stat_failures_on_operands);
         CU_add_test(suite, "should_report_multiple_major_errors_for_stat_and_readlink_failures_on_operands", should_report_multiple_major_errors_for_stat_and_readlink_failures_on_operands);
-        CU_add_test(suite, "should_report_major_and_minor_errors_for_operands_and_directory_content", should_report_major_and_minor_errors_for_operands_and_directory_content);
-        CU_add_test(suite, "should_render_broken_looped_and_multihop_links_in_long_format", should_render_broken_looped_and_multihop_links_in_long_format);
         CU_add_test(suite, "should_print_visible_and_hidden_entries_in_the_current_directory_with_read_all", should_print_visible_and_hidden_entries_in_the_current_directory_with_read_all);
         CU_add_test(suite, "should_print_visible_entries_in_the_current_directory_without_hidden_entries_with_read_all", should_print_visible_entries_in_the_current_directory_without_hidden_entries_with_read_all);
         CU_add_test(suite, "should_print_only_dot_entries_for_an_empty_current_directory_with_read_all", should_print_only_dot_entries_for_an_empty_current_directory_with_read_all);
@@ -4463,5 +4877,31 @@ void register_application_suite(void)
         CU_add_test(suite, "should_fail_with_a_major_error_and_print_the_non_failing_files_if_fails_to_open_a_directory_operand_and_to_read_subdirectory_content", should_fail_with_a_major_error_and_print_the_non_failing_files_if_fails_to_open_a_directory_operand_and_to_read_subdirectory_content);
         CU_add_test(suite, "should_fail_with_a_major_error_and_print_the_non_failing_files_if_fails_to_read_a_directory_operand_and_to_close_subdirectory", should_fail_with_a_major_error_and_print_the_non_failing_files_if_fails_to_read_a_directory_operand_and_to_close_subdirectory);
         CU_add_test(suite, "should_fail_with_a_major_error_and_print_the_non_failing_files_if_fails_to_close_a_directory_operand_and_to_access_subdirectory_contents", should_fail_with_a_major_error_and_print_the_non_failing_files_if_fails_to_close_a_directory_operand_and_to_access_subdirectory_contents);
+        CU_add_test(suite, "should_render_no_acls_in_the_current_directory", should_render_no_acls_in_the_current_directory);
+        CU_add_test(suite, "should_render_mixed_acls_in_the_current_directory", should_render_mixed_acls_in_the_current_directory);
+        CU_add_test(suite, "should_handle_non_grave_acl_errors_in_the_current_directory", should_handle_non_grave_acl_errors_in_the_current_directory);
+        CU_add_test(suite, "should_handle_grave_acl_errors_in_the_current_directory", should_handle_grave_acl_errors_in_the_current_directory);
+        CU_add_test(suite, "should_render_one_non_directory_operand_without_acls", should_render_one_non_directory_operand_without_acls);
+        CU_add_test(suite, "should_render_one_non_directory_operand_with_acl_states", should_render_one_non_directory_operand_with_acl_states);
+        CU_add_test(suite, "should_render_one_directory_operand_with_no_acls", should_render_one_directory_operand_with_no_acls);
+        CU_add_test(suite, "should_render_one_directory_operand_with_mixed_acls", should_render_one_directory_operand_with_mixed_acls);
+        CU_add_test(suite, "should_handle_non_grave_acl_errors_for_one_non_directory_operand", should_handle_non_grave_acl_errors_for_one_non_directory_operand);
+        CU_add_test(suite, "should_render_acl_metadata_for_directory_contents_in_long_format", should_render_acl_metadata_for_directory_contents_in_long_format);
+        CU_add_test(suite, "should_report_a_major_error_when_acl_retrieval_fails_for_an_operand", should_report_a_major_error_when_acl_retrieval_fails_for_an_operand);
+        CU_add_test(suite, "should_report_a_minor_error_when_acl_retrieval_fails_for_directory_content", should_report_a_minor_error_when_acl_retrieval_fails_for_directory_content);
+        CU_add_test(suite, "should_render_multiple_non_directory_operands_with_partial_and_complete_acls", should_render_multiple_non_directory_operands_with_partial_and_complete_acls);
+        CU_add_test(suite, "should_render_acl_metadata_for_a_non_directory_operand_in_long_format", should_render_acl_metadata_for_a_non_directory_operand_in_long_format);
+        CU_add_test(suite, "should_handle_grave_acl_errors_for_multiple_non_directory_operands", should_handle_grave_acl_errors_for_multiple_non_directory_operands);
+        CU_add_test(suite, "should_render_multiple_directory_operands_with_mixed_acls", should_render_multiple_directory_operands_with_mixed_acls);
+        CU_add_test(suite, "should_handle_non_grave_acl_errors_for_multiple_directory_operands", should_handle_non_grave_acl_errors_for_multiple_directory_operands);
+        CU_add_test(suite, "should_handle_grave_acl_errors_for_multiple_directory_operands", should_handle_grave_acl_errors_for_multiple_directory_operands);
+        CU_add_test(suite, "should_render_mixed_operand_types_with_partial_acls", should_render_mixed_operand_types_with_partial_acls);
+        CU_add_test(suite, "should_handle_non_grave_acl_errors_for_one_file_and_directory", should_handle_non_grave_acl_errors_for_one_file_and_directory);
+        CU_add_test(suite, "should_handle_grave_acl_errors_for_one_file_and_directory", should_handle_grave_acl_errors_for_one_file_and_directory);
+        CU_add_test(suite, "should_report_major_and_minor_errors_for_operands_and_directory_content", should_report_major_and_minor_errors_for_operands_and_directory_content);
+        CU_add_test(suite, "should_render_broken_looped_and_multihop_links_in_long_format", should_render_broken_looped_and_multihop_links_in_long_format);
+        CU_add_test(suite, "should_handle_acl_errors_for_mixed_and_special_operands", should_handle_acl_errors_for_mixed_and_special_operands);
+        CU_add_test(suite, "should_successfully_not_print_anything_if_the_specified_directory_is_empty", should_successfully_not_print_anything_if_the_specified_directory_is_empty);
+        CU_add_test(suite, "should_successfully_only_print_dir_headers_if_the_specified_directories_are_empty", should_successfully_only_print_dir_headers_if_the_specified_directories_are_empty);
     }
 }
