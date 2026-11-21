@@ -134,6 +134,10 @@ typedef struct s_vfs_mock_entry
 #define MOCK_DIR_SELINUX_ACL_WITH_ENTRIES(p, ...)       MOCK_DIR_WITH_STATS((p), ((const char *[]){ __VA_ARGS__, NULL }), .xattrs = MOCK_SELINUX_ACL_XATTRS)
 #define MOCK_SYMLINK_SELINUX_ACL(p, target)             MOCK_SYMLINK_WITH_STATS((p), (target), .xattrs = MOCK_SYMLINK_SELINUX_XATTRS)
 
+#define MOCK_ISATTY(fd, result)                         isatty_mock_setup((fd), (result))
+#define MOCK_STDOUT_IS_TTY()                            MOCK_ISATTY(1, 1)
+#define MOCK_STDOUT_IS_NOT_TTY()                        MOCK_ISATTY(1, 0)
+
 void vfs_mock_setup(const t_vfs_mock_entry *entries);
 const t_vfs_mock_entry *find_vfs_entry(const char *path);
 int vfs_mock_resolve_author(const char *author, uid_t *uid);
@@ -142,6 +146,10 @@ const char *vfs_mock_author_name(uid_t uid);
 const char *vfs_mock_group_name(gid_t gid);
 time_t vfs_mock_make_timestamp(int day, int month, int year, int hour, int minute, int second);
 void vfs_mock_reset(void);
+
+int isatty_mock(int fd);
+void isatty_mock_setup(int fd, int result);
+void isatty_mock_reset(void);
 
 int verify_that_the_output_printed_is(const char *str, ...);
 int verify_that_the_error_printed_is(const char *str, ...);

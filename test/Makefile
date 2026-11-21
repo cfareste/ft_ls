@@ -21,6 +21,7 @@ CCFLAGS += -g -Wall -Wextra -Werror -Wpedantic -fsanitize=address \
 		   -Dstat=stat_mock -Dlstat=lstat_mock \
 		   -Dlgetxattr=lgetxattr_mock \
 		   -Dreadlink=readlink_mock \
+		   -Disatty=isatty_mock \
 		   -Dgetpwuid=getpwuid_mock -Dgetgrgid=getgrgid_mock \
 		   -Dft_printf=printf_mock -Dft_fprintf=fprintf_mock
 COVERAGE_FLAGS = -fprofile-arcs -ftest-coverage
@@ -106,6 +107,7 @@ SRCS = main.c \
 		stat_mock.c \
 		lgetxattr_mock.c \
 		readlink_mock.c \
+		isatty_mock.c \
 		identity_mock.c \
 		date_suite.c \
 		directory_suite.c \

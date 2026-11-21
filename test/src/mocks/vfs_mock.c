@@ -127,4 +127,5 @@ void vfs_mock_reset(void)
 {
     errno = 0;
     vfs_mock_entries = NULL;
+    isatty_mock_reset();
 }
