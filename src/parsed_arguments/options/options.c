@@ -6,6 +6,7 @@
 #define READ_ALL_OPTION_CHAR 'a'
 #define REVERSE_OPTION_CHAR 'r'
 #define TIME_SORTING_OPTION_CHAR 't'
+#define MULTI_COLUMN_FORMAT_OPTION_CHAR 'C'
 
 static int argument_is_an_option(const char *argument)
 {
@@ -24,6 +25,8 @@ static t_options get_option_flag(const char option)
         return OPTIONS_REVERSE;
     if (option == TIME_SORTING_OPTION_CHAR)
         return OPTIONS_TIME_SORTING;
+    if (option == MULTI_COLUMN_FORMAT_OPTION_CHAR)
+        return OPTIONS_MULTI_COLUMN_FORMAT;
     return OPTIONS_NONE;
 }
 

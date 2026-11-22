@@ -88,6 +88,40 @@ static void should_leave_single_column_directory_prefix_empty(void)
     file_entry_array_destroy(&entries);
 }
 
+static void should_print_entries_column_by_column_within_the_terminal_width(void)
+{
+    const char *names[] = { "a", "b", "c", "d", "e", "f" };
+    t_file_entry_array *entries = file_entry_array_create();
+
+    MOCK_TERMINAL_COLUMNS(9);
+    for (size_t i = 0; i < sizeof(names) / sizeof(names[0]); i++)
+        file_entry_array_push(entries, file_entry_create(names[i]));
+
+    multi_column_strategy(entries);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "a  c  e\n"
+        "b  d  f\n"));
+    file_entry_array_destroy(&entries);
+}
+
+static void should_account_for_different_column_widths_when_selecting_a_layout(void)
+{
+    const char *names[] = { "a", "12345", "c", "d" };
+    t_file_entry_array *entries = file_entry_array_create();
+
+    MOCK_TERMINAL_COLUMNS(12);
+    for (size_t i = 0; i < sizeof(names) / sizeof(names[0]); i++)
+        file_entry_array_push(entries, file_entry_create(names[i]));
+
+    multi_column_strategy(entries);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "a      c\n"
+        "12345  d\n"));
+    file_entry_array_destroy(&entries);
+}
+
 static void should_print_the_long_format_block_total_when_the_strategy_is_called_directly(void)
 {
     t_file_entry_array *entries = file_entry_array_create();
@@ -1174,6 +1208,8 @@ void register_renderer_suite(void)
     {
         CU_add_test(suite, "should_print_single_column_entries_when_the_strategy_is_called_directly", should_print_single_column_entries_when_the_strategy_is_called_directly);
         CU_add_test(suite, "should_leave_single_column_directory_prefix_empty", should_leave_single_column_directory_prefix_empty);
+        CU_add_test(suite, "should_print_entries_column_by_column_within_the_terminal_width", should_print_entries_column_by_column_within_the_terminal_width);
+        CU_add_test(suite, "should_account_for_different_column_widths_when_selecting_a_layout", should_account_for_different_column_widths_when_selecting_a_layout);
         CU_add_test(suite, "should_print_the_long_format_block_total_when_the_strategy_is_called_directly", should_print_the_long_format_block_total_when_the_strategy_is_called_directly);
         CU_add_test(suite, "should_render_successful_and_failed_entries_when_long_format_strategy_is_called_directly", should_render_successful_and_failed_entries_when_long_format_strategy_is_called_directly);
         CU_add_test(suite, "should_create_a_context", should_create_a_context);

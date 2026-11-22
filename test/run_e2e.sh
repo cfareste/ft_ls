@@ -89,6 +89,18 @@ prepare_test_environment() {
     cp capacity/* capacity2
     touch "capacity2/a" "capacity2/b" "capacity2/c" "capacity2/d" "capacity2/e" "capacity2/f" "capacity2/g" "capacity2/h"
 
+    # Multi-column output fixtures. Longer names emulate narrower terminal widths.
+    mkdir -p columns_80/subdir1 dir_normal dir_many
+    touch columns_80/file1 columns_80/zz
+    ln -s file1 columns_80/symlink
+    touch c001 c002 c003 c004 c005 c006 c007 c008 c009 c010 c011 c012
+    touch w20_000000001 w20_000000002 w20_000000003 w20_000000004 w20_000000005
+    touch file_short file_medium_length file_very_long_name_for_testing_columns_extended_padding_123456
+    touch b dir_normal/inside_one dir_normal/inside_two
+    touch dir_many/aa dir_many/mediumxx dir_many/very_long_name_12345 dir_many/zz
+    touch wrap_000000000000001 wrap_000000000000002 wrap_000000000000003
+    touch wrap_000000000000004 wrap_000000000000005 wrap_000000000000006
+
     # Different file types
     mkdir -p firstDir/dir
     touch firstDir/file firstDir/dir/file
@@ -309,6 +321,7 @@ main() {
 
     export LANG=C
     export LC_ALL=C
+    export COLUMNS=80
 
     mkdir -p "${SCRIPT_DIR}/testdir"
     cd "${SCRIPT_DIR}/testdir" || exit 1

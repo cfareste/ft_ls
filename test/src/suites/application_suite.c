@@ -4750,6 +4750,185 @@ static void should_handle_acl_errors_for_mixed_and_special_operands(void)
     CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_MAJOR_ERROR);
 }
 
+static void should_print_current_directory_in_columns_at_80_columns(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", ".", "..", "file1", "subdir1", "symlink", "zz"),
+        MOCK_FILE("file1"),
+        MOCK_DIR("subdir1", ".", ".."),
+        MOCK_SYMLINK("symlink", "file1"),
+        MOCK_FILE("zz"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+    MOCK_TERMINAL_COLUMNS(80);
+
+    const char *arguments[] = { "-C", NULL };
+    get_parsed_arguments_result(1, arguments);
+
+    const int result = application_run(parsed_arguments_result);
+    CU_ASSERT(verify_that_the_output_printed_is("file1  subdir1  symlink  zz\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    assert_application_execution_succeed(result);
+}
+
+static void should_print_twelve_operands_in_columns_at_40_columns(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("a"), MOCK_FILE("b"), MOCK_FILE("c"), MOCK_FILE("d"),
+        MOCK_FILE("e"), MOCK_FILE("f"), MOCK_FILE("g"), MOCK_FILE("h"),
+        MOCK_FILE("i"), MOCK_FILE("j"), MOCK_FILE("k"), MOCK_FILE("l"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+    MOCK_TERMINAL_COLUMNS(40);
+
+    const char *arguments[] = { "-C", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", NULL };
+    get_parsed_arguments_result(13, arguments);
+
+    const int result = application_run(parsed_arguments_result);
+    CU_ASSERT(verify_that_the_output_printed_is("a  b  c  d  e  f  g  h  i  j  k  l\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    assert_application_execution_succeed(result);
+}
+
+static void should_print_five_operands_in_columns_at_20_columns(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("a"), MOCK_FILE("b"), MOCK_FILE("c"), MOCK_FILE("d"),
+        MOCK_FILE("e"), MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+    MOCK_TERMINAL_COLUMNS(20);
+
+    const char *arguments[] = { "-C", "a", "b", "c", "d", "e", NULL };
+    get_parsed_arguments_result(6, arguments);
+
+    const int result = application_run(parsed_arguments_result);
+    CU_ASSERT(verify_that_the_output_printed_is("a  b  c  d  e\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    assert_application_execution_succeed(result);
+}
+
+static void should_fall_back_to_one_column_for_long_names_at_50_columns(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("file_short"),
+        MOCK_FILE("file_medium_length"),
+        MOCK_FILE("file_very_long_name_for_testing_columns"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+    MOCK_TERMINAL_COLUMNS(50);
+
+    const char *arguments[] = { "-C", "file_short", "file_medium_length", "file_very_long_name_for_testing_columns", NULL };
+    get_parsed_arguments_result(4, arguments);
+
+    const int result = application_run(parsed_arguments_result);
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "file_medium_length\n"
+        "file_short\n"
+        "file_very_long_name_for_testing_columns\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    assert_application_execution_succeed(result);
+}
+
+static void should_render_mixed_file_and_directory_operands_in_columns_at_40_columns(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("a"),
+        MOCK_FILE("b"),
+        MOCK_DIR("dir_normal", ".", "..", "inside_one", "inside_two"),
+        MOCK_FILE("dir_normal/inside_one"),
+        MOCK_FILE("dir_normal/inside_two"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+    MOCK_TERMINAL_COLUMNS(40);
+
+    const char *arguments[] = { "-C", "a", "b", "dir_normal", NULL };
+    get_parsed_arguments_result(4, arguments);
+
+    const int result = application_run(parsed_arguments_result);
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "a  b\n"
+        "\n"
+        "dir_normal:\n"
+        "inside_one  inside_two\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    assert_application_execution_succeed(result);
+}
+
+static void should_print_multiple_directory_contents_in_columns_at_60_columns(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("dir_normal", ".", "..", "alpha", "beta", "gamma"),
+        MOCK_FILE("dir_normal/alpha"),
+        MOCK_FILE("dir_normal/beta"),
+        MOCK_FILE("dir_normal/gamma"),
+        MOCK_DIR("dir_many", ".", "..", "a", "medium", "z", "very_long_name"),
+        MOCK_FILE("dir_many/a"),
+        MOCK_FILE("dir_many/medium"),
+        MOCK_FILE("dir_many/z"),
+        MOCK_FILE("dir_many/very_long_name"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+    MOCK_TERMINAL_COLUMNS(60);
+
+    const char *arguments[] = { "-C", "dir_normal", "dir_many", NULL };
+    get_parsed_arguments_result(3, arguments);
+
+    const int result = application_run(parsed_arguments_result);
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "dir_many:\n"
+        "a  medium  very_long_name  z\n"
+        "\n"
+        "dir_normal:\n"
+        "alpha  beta  gamma\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    assert_application_execution_succeed(result);
+}
+
+static void should_print_a_single_regular_operand_in_columns_at_80_columns(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("a"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+    MOCK_TERMINAL_COLUMNS(80);
+
+    const char *arguments[] = { "-C", "a", NULL };
+    get_parsed_arguments_result(2, arguments);
+
+    const int result = application_run(parsed_arguments_result);
+    CU_ASSERT(verify_that_the_output_printed_is("a\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    assert_application_execution_succeed(result);
+}
+
+static void should_wrap_columns_at_a_narrow_terminal_width(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("a"), MOCK_FILE("b"), MOCK_FILE("c"),
+        MOCK_FILE("d"), MOCK_FILE("e"), MOCK_FILE("f"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+    MOCK_TERMINAL_COLUMNS(9);
+
+    const char *arguments[] = { "-C", "a", "b", "c", "d", "e", "f", NULL };
+    get_parsed_arguments_result(7, arguments);
+
+    const int result = application_run(parsed_arguments_result);
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "a  c  e\n"
+        "b  d  f\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    assert_application_execution_succeed(result);
+}
+
 void register_application_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, test_teardown);
@@ -4901,6 +5080,14 @@ void register_application_suite(void)
         CU_add_test(suite, "should_report_major_and_minor_errors_for_operands_and_directory_content", should_report_major_and_minor_errors_for_operands_and_directory_content);
         CU_add_test(suite, "should_render_broken_looped_and_multihop_links_in_long_format", should_render_broken_looped_and_multihop_links_in_long_format);
         CU_add_test(suite, "should_handle_acl_errors_for_mixed_and_special_operands", should_handle_acl_errors_for_mixed_and_special_operands);
+        CU_add_test(suite, "should_print_current_directory_in_columns_at_80_columns", should_print_current_directory_in_columns_at_80_columns);
+        CU_add_test(suite, "should_print_twelve_operands_in_columns_at_40_columns", should_print_twelve_operands_in_columns_at_40_columns);
+        CU_add_test(suite, "should_print_five_operands_in_columns_at_20_columns", should_print_five_operands_in_columns_at_20_columns);
+        CU_add_test(suite, "should_fall_back_to_one_column_for_long_names_at_50_columns", should_fall_back_to_one_column_for_long_names_at_50_columns);
+        CU_add_test(suite, "should_render_mixed_file_and_directory_operands_in_columns_at_40_columns", should_render_mixed_file_and_directory_operands_in_columns_at_40_columns);
+        CU_add_test(suite, "should_print_multiple_directory_contents_in_columns_at_60_columns", should_print_multiple_directory_contents_in_columns_at_60_columns);
+        CU_add_test(suite, "should_print_a_single_regular_operand_in_columns_at_80_columns", should_print_a_single_regular_operand_in_columns_at_80_columns);
+        CU_add_test(suite, "should_wrap_columns_at_a_narrow_terminal_width", should_wrap_columns_at_a_narrow_terminal_width);
         CU_add_test(suite, "should_successfully_not_print_anything_if_the_specified_directory_is_empty", should_successfully_not_print_anything_if_the_specified_directory_is_empty);
         CU_add_test(suite, "should_successfully_only_print_dir_headers_if_the_specified_directories_are_empty", should_successfully_only_print_dir_headers_if_the_specified_directories_are_empty);
     }

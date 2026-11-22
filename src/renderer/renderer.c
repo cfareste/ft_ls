@@ -25,6 +25,11 @@ static const t_render_strategy SINGLE_COLUMN_RENDER_STRATEGY = {
     .render_entries = single_column_strategy
 };
 
+static const t_render_strategy MULTI_COLUMN_RENDER_STRATEGY = {
+    .render_directory_prefix = directory_entries_prefix_single_column_strategy,
+    .render_entries = multi_column_strategy
+};
+
 static const t_render_strategy LONG_FORMAT_RENDER_STRATEGY = {
     .render_directory_prefix = directory_entries_prefix_long_format_strategy,
     .render_entries = long_format_strategy
@@ -43,6 +48,9 @@ static const t_render_strategy *select_render_strategy(const t_parsed_arguments 
 {
     if (parsed_arguments_is_option_active(parsed_arguments, OPTIONS_LONG_FORMAT))
         return &LONG_FORMAT_RENDER_STRATEGY;
+    if (parsed_arguments_is_option_active(parsed_arguments, OPTIONS_MULTI_COLUMN_FORMAT)
+        || parsed_arguments_is_stdout_a_tty(parsed_arguments))
+        return &MULTI_COLUMN_RENDER_STRATEGY;
 
     return &SINGLE_COLUMN_RENDER_STRATEGY;
 }

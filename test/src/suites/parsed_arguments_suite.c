@@ -764,6 +764,31 @@ static void should_return_false_for_long_format_if_the_option_is_not_active(void
     CU_ASSERT(verify_that_no_error_was_printed());
 }
 
+static void should_return_true_for_stdout_terminal_if_stdout_is_a_terminal(void)
+{
+    const char *arguments[] = { NULL };
+    MOCK_STDOUT_IS_TTY();
+
+    get_parsed_arguments_result(0, arguments);
+
+    CU_ASSERT_TRUE(parsed_arguments_is_stdout_a_tty(sut));
+}
+
+static void should_return_false_for_stdout_terminal_if_stdout_is_not_a_terminal(void)
+{
+    const char *arguments[] = { NULL };
+    MOCK_STDOUT_IS_NOT_TTY();
+
+    get_parsed_arguments_result(0, arguments);
+
+    CU_ASSERT_FALSE(parsed_arguments_is_stdout_a_tty(sut));
+}
+
+static void should_return_false_for_stdout_terminal_if_NULL_parsed_arguments_are_passed(void)
+{
+    CU_ASSERT_FALSE(parsed_arguments_is_stdout_a_tty(NULL));
+}
+
 static void should_not_retrieve_advanced_stats_without_long_format(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -1190,6 +1215,9 @@ void register_parsed_arguments_suite(void)
         CU_add_test(suite, "should_return_false_for_long_format_if_NULL_parsed_arguments_are_passed", should_return_false_for_long_format_if_NULL_parsed_arguments_are_passed);
         CU_add_test(suite, "should_return_true_for_long_format_if_the_option_is_active", should_return_true_for_long_format_if_the_option_is_active);
         CU_add_test(suite, "should_return_false_for_long_format_if_the_option_is_not_active", should_return_false_for_long_format_if_the_option_is_not_active);
+        CU_add_test(suite, "should_return_true_for_stdout_terminal_if_stdout_is_a_terminal", should_return_true_for_stdout_terminal_if_stdout_is_a_terminal);
+        CU_add_test(suite, "should_return_false_for_stdout_terminal_if_stdout_is_not_a_terminal", should_return_false_for_stdout_terminal_if_stdout_is_not_a_terminal);
+        CU_add_test(suite, "should_return_false_for_stdout_terminal_if_NULL_parsed_arguments_are_passed", should_return_false_for_stdout_terminal_if_NULL_parsed_arguments_are_passed);
         CU_add_test(suite, "should_not_retrieve_advanced_stats_without_long_format", should_not_retrieve_advanced_stats_without_long_format);
         CU_add_test(suite, "should_retrieve_advanced_stats_with_long_format", should_retrieve_advanced_stats_with_long_format);
         CU_add_test(suite, "should_return_false_for_has_any_option_if_NULL_parsed_arguments_are_passed", should_return_false_for_has_any_option_if_NULL_parsed_arguments_are_passed);

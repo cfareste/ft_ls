@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <unistd.h>
 #include "parsed_arguments.h"
 #include "file_operands.h"
 #include "sorter.h"
@@ -12,6 +13,7 @@ struct s_parsed_arguments
     t_file_stats **file_operands_stats;
     t_file_stats **non_directory_file_operands_stats;
     int has_implicit_default_operand;
+    int stdout_is_terminal;
     char **non_directory_file_operands;
     char **directory_file_operands;
 };
@@ -196,6 +198,7 @@ t_result *parse_arguments(const int num_of_arguments, const char **arguments)
 
     t_parsed_arguments *parsed_arguments = ft_safe_calloc(1, sizeof(t_parsed_arguments));
 
+    parsed_arguments->stdout_is_terminal = isatty(STDOUT_FILENO);
     parsed_arguments->options = options_get(arguments);
     const char *failed_advanced_metadata_operand = initialize_file_operands(parsed_arguments, num_of_arguments, arguments);
     classify_file_operands(parsed_arguments);
@@ -249,6 +252,14 @@ int parsed_arguments_is_option_active(const t_parsed_arguments *parsed_arguments
 int parsed_arguments_is_long_format_active(const t_parsed_arguments *parsed_arguments)
 {
     return parsed_arguments_is_option_active(parsed_arguments, OPTIONS_LONG_FORMAT);
+}
+
+int parsed_arguments_is_stdout_a_tty(const t_parsed_arguments *parsed_arguments)
+{
+    if (parsed_arguments == NULL)
+        return 0;
+
+    return parsed_arguments->stdout_is_terminal;
 }
 
 int parsed_arguments_is_file_operand(const t_parsed_arguments *parsed_arguments, const char *file)
