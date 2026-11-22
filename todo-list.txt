@@ -353,7 +353,7 @@ QA LS-28 Manage ACL and extended attributes with long format option (`ls -l ... 
    - Directorios vacíos
 
 
-QA LS-29 Print dynamic multi-column output (`ls -C ... | cat)
+QA LS-29 Print dynamic multi-column output (`ls -C --tabsize=0 -w 80 ... | cat)
 1. C=80 ls -C
 2. C=40 ls -C a b c d e f g h i j k l
 3. C=20 ls -C a b c d e
