@@ -351,3 +351,14 @@ QA LS-28 Manage ACL and extended attributes with long format option (`ls -l ... 
    - Errores mezclados diferentes a ACL
    - Symlinks, symlinks rotos, loopeds y multihops
    - Directorios vacíos
+
+
+QA LS-29 Print dynamic multi-column output (`ls -C ... | cat)
+1. C=80 ls -C
+2. C=40 ls -C a b c d e f g h i j k l
+3. C=20 ls -C a b c d e
+4. C=50 ls -C file_short file_medium_length file_very_long_name_for_testing_columns
+5. C=40 ls -C a b dir_normal
+6. C=60 ls -C dir_normal dir_many
+7. C=80 ls -C a
+8. Cualquier otro test que pruebe las columnas

@@ -52,8 +52,7 @@ static void initialize_column_infos(t_column_info *column_infos, const size_t ma
     }
 }
 
-static void update_column_infos(t_column_info *column_infos, const size_t maximum_column_count, const unsigned int file_count, const t_file_entry_array *file_entry_array,
-    const size_t terminal_width)
+static void update_column_infos(t_column_info *column_infos, const size_t maximum_column_count, const unsigned int file_count, const t_file_entry_array *file_entry_array, const size_t terminal_width)
 {
     for (unsigned int file_index = 0; file_index < file_count; file_index++)
     {
@@ -122,8 +121,7 @@ static void print_entries_in_columns(const t_file_entry_array *file_entry_array,
 
     for (size_t row = 0; row < row_count; row++)
     {
-        const size_t last_column = get_last_column_with_entry(
-            file_count, row, row_count, column_count);
+        const size_t last_column = get_last_column_with_entry(file_count, row, row_count, column_count);
 
         for (size_t column = 0; column <= last_column; column++)
         {
