@@ -1,8 +1,4 @@
 TODO:
-1. Implementar LS-29 Print dynamic multi-column output
-2. Obtención de tamaños con ioctl (default 80 colsize)
-   - Guardar el valor de window width
-3. Algoritmo de columnas
 
 
 TODO En algún momento:
