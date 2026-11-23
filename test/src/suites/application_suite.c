@@ -4929,12 +4929,169 @@ static void should_wrap_columns_at_a_narrow_terminal_width(void)
     assert_application_execution_succeed(result);
 }
 
+static void should_color_a_single_orphan_operand(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_SYMLINK("orphan", "missing"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "--color", "orphan", NULL };
+    get_parsed_arguments_result(2, arguments);
+
+    assert_application_succeeded_with_output(application_run(parsed_arguments_result),
+        "\033[40;31;01morphan\033[0m\n");
+}
+
+static void should_color_links_and_their_targets_in_long_format(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_SYMLINK("orphan", "missing"),
+        MOCK_SYMLINK("valid", "program"),
+        MOCK_ENTRY("program", S_IFREG | 0755, NULL, NULL, NO_ERRORS),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-l", "--color", "valid", "orphan", NULL };
+    get_parsed_arguments_result(4, arguments);
+
+    assert_application_succeeded_with_output(application_run(parsed_arguments_result),
+        "lrwxrwxrwx 1 root root 1024 Jan  1  1970 \033[40;31;01morphan\033[0m -> \033[40;31;01mmissing\033[0m\n"
+        "lrwxrwxrwx 1 root root 1024 Jan  1  1970 \033[01;36mvalid\033[0m -> \033[01;32mprogram\033[0m\n");
+}
+
+static void should_color_directories_by_sticky_bit_and_other_write_permission(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("dirs", "writable", "sticky", "standard", "shared"),
+        MOCK_ENTRY("dirs/shared", S_IFDIR | 01777, NULL, NULL, NO_ERRORS),
+        MOCK_DIR("dirs/standard", ".", ".."),
+        MOCK_ENTRY("dirs/sticky", S_IFDIR | 01755, NULL, NULL, NO_ERRORS),
+        MOCK_ENTRY("dirs/writable", S_IFDIR | 0777, NULL, NULL, NO_ERRORS),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "--color", "-l", "dirs", NULL };
+    get_parsed_arguments_result(3, arguments);
+
+    assert_application_succeeded_with_output(application_run(parsed_arguments_result),
+        "total 0\n"
+        "drwxrwxrwt 1 root root 1024 Jan  1  1970 \033[30;42mshared\033[0m\n"
+        "drwxr-xr-x 1 root root 1024 Jan  1  1970 \033[01;34mstandard\033[0m\n"
+        "drwxr-xr-t 1 root root 1024 Jan  1  1970 \033[37;44msticky\033[0m\n"
+        "drwxrwxrwx 1 root root 1024 Jan  1  1970 \033[34;42mwritable\033[0m\n");
+}
+
+static void should_color_regular_operands_by_mode(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_ENTRY_WITH_STATS("cap", S_IFREG | 0755, NULL, NULL, NO_ERRORS,
+            .xattrs = ((const t_vfs_mock_xattr[]){
+                { .name = "security.capability", .size = 20 }, { .name = NULL }
+            })),
+        MOCK_ENTRY("exec", S_IFREG | 0755, NULL, NULL, NO_ERRORS),
+        MOCK_FILE_WITH_STATS("hardlink", MOCK_HARDLINK_COUNT(2)),
+        MOCK_FILE("plain"),
+        MOCK_ENTRY("setgid", S_IFREG | 02755, NULL, NULL, NO_ERRORS),
+        MOCK_ENTRY("setuid", S_IFREG | 04755, NULL, NULL, NO_ERRORS),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "--color", "-l", "plain", "setuid", "hardlink", "exec", "cap", "setgid", NULL };
+    get_parsed_arguments_result(8, arguments);
+
+    assert_application_succeeded_with_output(application_run(parsed_arguments_result),
+        "-rwxr-xr-x 1 root root 1024 Jan  1  1970 \033[01;32mcap\033[0m\n"
+        "-rwxr-xr-x 1 root root 1024 Jan  1  1970 \033[01;32mexec\033[0m\n"
+        "-rw-r--r-- 2 root root 1024 Jan  1  1970 hardlink\n"
+        "-rw-r--r-- 1 root root 1024 Jan  1  1970 plain\n"
+        "-rwxr-sr-x 1 root root 1024 Jan  1  1970 \033[30;43msetgid\033[0m\n"
+        "-rwsr-xr-x 1 root root 1024 Jan  1  1970 \033[37;41msetuid\033[0m\n");
+}
+
+static void should_color_special_file_operands(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_BLOCK_DEVICE("block"),
+        MOCK_CHAR_DEVICE("char"),
+        MOCK_FIFO("fifo"),
+        MOCK_SOCKET("socket"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "--color", "socket", "fifo", "char", "block", NULL };
+    get_parsed_arguments_result(5, arguments);
+
+    assert_application_succeeded_with_output(application_run(parsed_arguments_result),
+        "\033[40;33;01mblock\033[0m\n"
+        "\033[40;33;01mchar\033[0m\n"
+        "\033[40;33mfifo\033[0m\n"
+        "\033[01;35msocket\033[0m\n");
+}
+
+static void should_color_every_supported_file_suffix(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", "archive.7z", "archive.gz", "archive.rar", "archive.tar", "archive.zip",
+            "audio.aac", "audio.flac", "audio.mp3", "audio.ogg", "audio.wav",
+            "media.gif", "media.jpeg", "media.jpg", "media.mp4", "media.png", "media.ppm",
+            "temp.bak", "temp.old", "temp.swp", "temp.tmp", "temp~"),
+        MOCK_FILE("archive.7z"), MOCK_FILE("archive.gz"), MOCK_FILE("archive.rar"),
+        MOCK_FILE("archive.tar"), MOCK_FILE("archive.zip"),
+        MOCK_FILE("audio.aac"), MOCK_FILE("audio.flac"), MOCK_FILE("audio.mp3"),
+        MOCK_FILE("audio.ogg"), MOCK_FILE("audio.wav"),
+        MOCK_FILE("media.gif"), MOCK_FILE("media.jpeg"), MOCK_FILE("media.jpg"),
+        MOCK_FILE("media.mp4"), MOCK_FILE("media.png"), MOCK_FILE("media.ppm"),
+        MOCK_FILE("temp.bak"), MOCK_FILE("temp.old"), MOCK_FILE("temp.swp"),
+        MOCK_FILE("temp.tmp"), MOCK_FILE("temp~"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "--color", NULL };
+    get_parsed_arguments_result(1, arguments);
+
+    assert_application_succeeded_with_output(application_run(parsed_arguments_result),
+        "\033[01;31marchive.7z\033[0m\n"
+        "\033[01;31marchive.gz\033[0m\n"
+        "\033[01;31marchive.rar\033[0m\n"
+        "\033[01;31marchive.tar\033[0m\n"
+        "\033[01;31marchive.zip\033[0m\n"
+        "\033[00;36maudio.aac\033[0m\n"
+        "\033[00;36maudio.flac\033[0m\n"
+        "\033[00;36maudio.mp3\033[0m\n"
+        "\033[00;36maudio.ogg\033[0m\n"
+        "\033[00;36maudio.wav\033[0m\n"
+        "\033[01;35mmedia.gif\033[0m\n"
+        "\033[01;35mmedia.jpeg\033[0m\n"
+        "\033[01;35mmedia.jpg\033[0m\n"
+        "\033[01;35mmedia.mp4\033[0m\n"
+        "\033[01;35mmedia.png\033[0m\n"
+        "\033[01;35mmedia.ppm\033[0m\n"
+        "\033[00;90mtemp.bak\033[0m\n"
+        "\033[00;90mtemp.old\033[0m\n"
+        "\033[00;90mtemp.swp\033[0m\n"
+        "\033[00;90mtemp.tmp\033[0m\n"
+        "\033[00;90mtemp~\033[0m\n");
+}
+
 void register_application_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, test_teardown);
 
     if (suite != NULL)
     {
+        CU_add_test(suite, "should_color_a_single_orphan_operand", should_color_a_single_orphan_operand);
+        CU_add_test(suite, "should_color_links_and_their_targets_in_long_format", should_color_links_and_their_targets_in_long_format);
+        CU_add_test(suite, "should_color_directories_by_sticky_bit_and_other_write_permission", should_color_directories_by_sticky_bit_and_other_write_permission);
+        CU_add_test(suite, "should_color_regular_operands_by_mode", should_color_regular_operands_by_mode);
+        CU_add_test(suite, "should_color_special_file_operands", should_color_special_file_operands);
+        CU_add_test(suite, "should_color_every_supported_file_suffix", should_color_every_supported_file_suffix);
         CU_add_test(suite, "should_return_a_major_error_when_passing_a_NULL_parsed_argument", should_return_a_major_error_when_passing_a_NULL_parsed_argument);
         CU_add_test(suite, "should_report_a_singular_invalid_option", should_report_a_singular_invalid_option);
         CU_add_test(suite, "should_report_an_invalid_option_in_a_group", should_report_an_invalid_option_in_a_group);
