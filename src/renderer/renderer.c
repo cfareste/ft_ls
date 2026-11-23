@@ -3,8 +3,8 @@
 #include "renderer.h"
 #include "render_strategies.h"
 
-typedef void (*t_directory_entries_prefix_strategy)(const t_file_entry_array *file_entry_array);
-typedef void (*t_render_entries_strategy)(const t_file_entry_array *file_entry_array);
+typedef void (*t_directory_entries_prefix_strategy)(const t_parsed_arguments *parsed_arguments, const t_file_entry_array *file_entry_array);
+typedef void (*t_render_entries_strategy)(const t_parsed_arguments *parsed_arguments, const t_file_entry_array *file_entry_array);
 
 typedef struct s_render_strategy
 {
@@ -14,6 +14,7 @@ typedef struct s_render_strategy
 
 struct s_render_context
 {
+    const t_parsed_arguments *parsed_arguments;
     int is_first_directory;
     int print_types_separator;
     int print_directory_header;
@@ -74,6 +75,7 @@ t_render_context *render_context_create(const t_parsed_arguments *parsed_argumen
     t_render_context *context = ft_safe_calloc(1, sizeof(t_render_context));
 
     context->is_first_directory = 1;
+    context->parsed_arguments = parsed_arguments;
     context->print_directory_header = should_print_directory_header(parsed_arguments);
     context->print_types_separator = parsed_arguments_has_mixed_types_file_operands(parsed_arguments);
     context->strategy = select_render_strategy(parsed_arguments);
@@ -95,7 +97,7 @@ void render_entries(const t_render_context *context, const t_file_entry_array *f
     if (context == NULL || file_entry_array == NULL)
         return;
 
-    context->strategy->render_entries(file_entry_array);
+    context->strategy->render_entries(context->parsed_arguments, file_entry_array);
 }
 
 void render_directory(t_render_context *context, const char *directory_header, const t_file_entry_array *file_entry_array)
@@ -104,7 +106,7 @@ void render_directory(t_render_context *context, const char *directory_header, c
         return;
 
     render_directory_header(context, directory_header);
-    context->strategy->render_directory_prefix(file_entry_array);
+    context->strategy->render_directory_prefix(context->parsed_arguments, file_entry_array);
     render_entries(context, file_entry_array);
 }
 

@@ -1,4 +1,6 @@
 TODO:
+1. Implementar LS-41 Colored output
+2. QA
 
 
 TODO En algún momento:
