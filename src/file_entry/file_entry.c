@@ -8,6 +8,7 @@
 struct s_file_entry
 {
     char *name;
+    char *path;
     long blocks;
     t_permissions permissions;
     t_file_type type;
@@ -88,6 +89,7 @@ t_file_entry *file_entry_create(const char *file_name)
 
     t_file_entry *file_entry = ft_safe_calloc(1, sizeof(t_file_entry));
     file_entry_set_name(file_entry, file_name);
+    file_entry_set_path(file_entry, file_name);
     file_entry->blocks = 0;
     file_entry->permissions = PERM_NONE;
     file_entry->type = FILE_TYPE_UNKNOWN;
@@ -152,6 +154,23 @@ void file_entry_set_name(t_file_entry *entry, const char *name)
 
     free(entry->name);
     entry->name = ft_safe_strdup(name);
+}
+
+const char *file_entry_get_path(const t_file_entry *file_entry)
+{
+    if (file_entry == NULL)
+        return NULL;
+
+    return file_entry->path;
+}
+
+void file_entry_set_path(t_file_entry *entry, const char *path)
+{
+    if (entry == NULL || !ft_is_valid_path(path))
+        return;
+
+    free(entry->path);
+    entry->path = ft_safe_strdup(path);
 }
 
 long file_entry_get_blocks(const t_file_entry *entry)
@@ -470,6 +489,7 @@ void file_entry_destroy(t_file_entry **file_entry)
         return;
 
     free((*file_entry)->name);
+    free((*file_entry)->path);
     free((*file_entry)->author);
     free((*file_entry)->group);
     free((*file_entry)->target);

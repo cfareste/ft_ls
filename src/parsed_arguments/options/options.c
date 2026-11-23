@@ -1,5 +1,6 @@
 #include <stddef.h>
 #include "options.h"
+#include "libft.h"
 
 #define RECURSIVE_OPTION_CHAR 'R'
 #define LONG_FORMAT_OPTION_CHAR 'l'
@@ -7,10 +8,16 @@
 #define REVERSE_OPTION_CHAR 'r'
 #define TIME_SORTING_OPTION_CHAR 't'
 #define MULTI_COLUMN_FORMAT_OPTION_CHAR 'C'
+#define COLOR_OPTION "--color"
 
 static int argument_is_an_option(const char *argument)
 {
     return argument[0] == '-';
+}
+
+static int argument_is_color_option(const char *argument)
+{
+    return ft_are_string_equals(argument, COLOR_OPTION);
 }
 
 static t_options get_option_flag(const char option)
@@ -39,6 +46,8 @@ char options_get_invalid_option(const char **arguments)
     {
         if (!argument_is_an_option(arguments[i]))
             continue ;
+        if (argument_is_color_option(arguments[i]))
+            continue ;
 
         for (int j = 1; arguments[i][j] != '\0'; j++)
         {
@@ -61,6 +70,11 @@ t_options options_get(const char **arguments)
     {
         if (!argument_is_an_option(arguments[i]))
             continue ;
+        if (argument_is_color_option(arguments[i]))
+        {
+            options |= OPTIONS_COLOR;
+            continue ;
+        }
 
         for (int j = 1; arguments[i][j] != '\0'; j++)
         {

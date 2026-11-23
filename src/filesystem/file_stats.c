@@ -261,6 +261,20 @@ t_file_stats *file_stats_get(const char *file_path)
     return file_stats;
 }
 
+t_file_stats *file_stats_get_following_symlinks(const char *file_path)
+{
+    if (!ft_is_valid_path(file_path))
+        return NULL;
+
+    struct stat stats;
+    if (stat(file_path, &stats) == -1)
+        return NULL;
+
+    t_file_stats *file_stats = ft_safe_calloc(1, sizeof(t_file_stats));
+    initialize_stats(file_stats, file_path, &stats);
+    return file_stats;
+}
+
 t_file_stats *file_stats_get_without_following_symlinks(const char *file_path)
 {
     if (!ft_is_valid_path(file_path))

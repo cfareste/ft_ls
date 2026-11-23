@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "libft.h"
 #include "render_strategies.h"
+#include "render_colors.h"
 
 #define DEFAULT_TERMINAL_WIDTH 80
 #define MINIMUM_COLUMN_WIDTH 3
@@ -115,7 +116,7 @@ static void print_spaces(const size_t count)
         ft_printf(" ");
 }
 
-static void print_entries_in_columns(const t_file_entry_array *file_entry_array, const unsigned int file_count, const size_t column_count, const size_t *column_widths)
+static void print_entries_in_columns(const t_parsed_arguments *parsed_arguments, const t_file_entry_array *file_entry_array, const unsigned int file_count, const size_t column_count, const size_t *column_widths)
 {
     const size_t row_count = get_row_count(file_count, column_count);
 
@@ -129,7 +130,7 @@ static void print_entries_in_columns(const t_file_entry_array *file_entry_array,
             const t_file_entry *entry = file_entry_array_get_at(file_entry_array, file_index);
             const char *name = file_entry_get_name(entry);
 
-            ft_printf("%s", name);
+            render_colors_print_name(parsed_arguments, entry);
             if (column < last_column)
                 print_spaces(column_widths[column] - ft_strlen(name) + COLUMN_SEPARATOR_WIDTH);
         }
@@ -137,7 +138,7 @@ static void print_entries_in_columns(const t_file_entry_array *file_entry_array,
     }
 }
 
-void multi_column_strategy(const t_file_entry_array *file_entry_array)
+void multi_column_strategy(const t_parsed_arguments *parsed_arguments, const t_file_entry_array *file_entry_array)
 {
     if (file_entry_array == NULL)
         return;
@@ -155,9 +156,9 @@ void multi_column_strategy(const t_file_entry_array *file_entry_array)
 
     t_column_info *winning_column_info = get_winning_column_info(column_infos, maximum_column_count);
     if (winning_column_info == NULL)
-        single_column_strategy(file_entry_array);
+        single_column_strategy(parsed_arguments, file_entry_array);
     else
-        print_entries_in_columns(file_entry_array, file_count, (size_t)(winning_column_info - column_infos) + 1, winning_column_info->col_arr);
+        print_entries_in_columns(parsed_arguments, file_entry_array, file_count, (size_t)(winning_column_info - column_infos) + 1, winning_column_info->col_arr);
 
     destroy_column_infos(column_infos, maximum_column_count);
 }

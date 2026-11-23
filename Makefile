@@ -70,6 +70,7 @@ SRCS = ft_ls.c \
 		file_entry.c \
 		scanner.c \
 		renderer.c \
+		render_colors.c \
 		single_column_strategy.c \
 		multi_column_strategy.c \
 		long_format_strategy.c \

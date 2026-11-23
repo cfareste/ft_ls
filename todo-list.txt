@@ -1,4 +1,6 @@
 TODO:
+1. Implementar LS-41 Colored output
+2. QA
 
 
 TODO En algún momento:
@@ -362,3 +364,26 @@ QA LS-29 Print dynamic multi-column output (`ls -C --tabsize=0 -w 80 ... | cat)
 6. C=60 ls -C dir_normal dir_many
 7. C=80 ls -C a
 8. Cualquier otro test que pruebe las columnas
+
+
+QA LS-41 Colored output (`ls --color | cat`)
+1. Enlace simbólico roto (huérfano / destino inexistente)
+2. Directorio con Sticky bit y escribible por otros
+3. Directorio escribible por otros (sin Sticky bit)
+4. Directorio con Sticky bit (no escribible por otros)
+5. Directorio estándar (sin permisos especiales)
+6. Archivo regular ejecutable con SetUID
+7. Archivo regular ejecutable con SetGID
+8. Archivo regular con Capabilities de Linux
+9. Archivo regular con permisos de ejecución estándar
+10. Archivo regular con múltiples enlaces duros (Hardlinks &gt; 1)
+11. Archivo regular por defecto (sin ejecución ni extensión mapeada)
+12. Tubería con nombre (FIFO)
+13. Socket UNIX
+14. Dispositivo de caracteres (Char device)
+15. Dispositivo de bloques (Block device)
+16. Enlace simbólico válido (no roto)
+17. Archivo regular con extensión de compresión / empaquetado
+18. Archivo regular con extensión de imagen / vídeo
+19. Archivo regular con extensión de audio
+20. Archivo regular con extensión o sufijo de respaldo / temporal

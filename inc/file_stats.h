@@ -44,6 +44,7 @@ typedef enum e_permissions
 typedef struct s_file_stats t_file_stats;
 
 t_file_stats *file_stats_get(const char *file_path);
+t_file_stats *file_stats_get_following_symlinks(const char *file_path);
 t_file_stats *file_stats_get_without_following_symlinks(const char *file_path);
 long file_stats_get_blocks(const t_file_stats *file_stats);
 t_permissions file_stats_get_permissions(const t_file_stats *file_stats);

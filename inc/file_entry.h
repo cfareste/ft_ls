@@ -13,6 +13,8 @@ void file_entry_set_advanced_metadata_from_stats(t_file_entry *entry, t_file_sta
 t_file_entry_array *file_entry_array_create(void);
 const char *file_entry_get_name(const t_file_entry *file_entry);
 void file_entry_set_name(t_file_entry *entry, const char *name);
+const char *file_entry_get_path(const t_file_entry *file_entry);
+void file_entry_set_path(t_file_entry *entry, const char *path);
 long file_entry_get_blocks(const t_file_entry *entry);
 void file_entry_set_blocks(t_file_entry *entry, long blocks);
 t_permissions file_entry_get_permissions(const t_file_entry *entry);

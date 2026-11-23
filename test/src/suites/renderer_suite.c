@@ -3,6 +3,7 @@
 #include "CUnit/Basic.h"
 #include "renderer.h"
 #include "render_strategies.h"
+#include "render_colors.h"
 #include "mocks.h"
 
 #define SUITE_NAME "renderer"
@@ -63,26 +64,98 @@ static void should_print_single_column_entries_when_the_strategy_is_called_direc
 {
     t_file_entry_array *entries = file_entry_array_create();
 
-    single_column_strategy(NULL);
-    single_column_strategy(entries);
+    single_column_strategy(NULL, NULL);
+    single_column_strategy(NULL, entries);
     CU_ASSERT(verify_that_no_output_was_printed());
 
     file_entry_array_push(entries, file_entry_create("first"));
     file_entry_array_push(entries, file_entry_create("second"));
-    single_column_strategy(entries);
+    single_column_strategy(NULL, entries);
 
     CU_ASSERT(verify_that_the_output_printed_is("first\nsecond\n"));
     file_entry_array_destroy(&entries);
+}
+
+static void should_apply_extension_and_executable_colors(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("file"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *args[] = { "--color", "file", NULL };
+    get_parsed_arguments_result(2, args);
+
+    t_file_entry_array *entries = file_entry_array_create();
+    file_entry_array_push(entries, create_entry(
+        "archive.zip", FILE_TYPE_REGULAR, PERM_NONE, 1, NULL, NULL, 0, (t_date){0}));
+    file_entry_array_push(entries, create_entry(
+        "image.png", FILE_TYPE_REGULAR, PERM_NONE, 1, NULL, NULL, 0, (t_date){0}));
+    file_entry_array_push(entries, create_entry(
+        "song.mp3", FILE_TYPE_REGULAR, PERM_NONE, 1, NULL, NULL, 0, (t_date){0}));
+    file_entry_array_push(entries, create_entry(
+        "backup~", FILE_TYPE_REGULAR, PERM_NONE, 1, NULL, NULL, 0, (t_date){0}));
+    file_entry_array_push(entries, create_entry(
+        "program", FILE_TYPE_REGULAR, PERM_OWNER_EXECUTE, 1, NULL, NULL, 0, (t_date){0}));
+    file_entry_array_push(entries, create_entry(
+        "Makefile", FILE_TYPE_REGULAR, PERM_NONE, 1, NULL, NULL, 0, (t_date){0}));
+    file_entry_array_push(entries, create_entry(
+        "linked.zip", FILE_TYPE_REGULAR, PERM_NONE, 2, NULL, NULL, 0, (t_date){0}));
+
+    single_column_strategy(parsed_arguments, entries);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "\033[01;31marchive.zip\033[0m\n"
+        "\033[01;35mimage.png\033[0m\n"
+        "\033[00;36msong.mp3\033[0m\n"
+        "\033[00;90mbackup~\033[0m\n"
+        "\033[01;32mprogram\033[0m\n"
+        "Makefile\n"
+        "\033[01;31mlinked.zip\033[0m\n"));
+
+    file_entry_array_destroy(&entries);
+}
+
+static void should_color_symlinks_and_their_targets_and_mark_broken_links(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_SYMLINK("link", "target"),
+        MOCK_ENTRY("target", S_IFREG | 0755, NULL, NULL, NO_ERRORS),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *args[] = { "--color", "link", NULL };
+    get_parsed_arguments_result(2, args);
+    t_file_entry *entry = file_entry_create("link");
+    file_entry_set_file_type(entry, FILE_TYPE_SYMLINK);
+    file_entry_set_link_target(entry, "target");
+
+    render_colors_print_name_with_target(parsed_arguments, entry);
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "\033[01;36mlink\033[0m -> \033[01;32mtarget\033[0m"));
+
+    reset_printing_buffer();
+    t_file_entry *broken_entry = file_entry_create("broken");
+    file_entry_set_file_type(broken_entry, FILE_TYPE_SYMLINK);
+    file_entry_set_link_target(broken_entry, "missing");
+    render_colors_print_name_with_target(parsed_arguments, broken_entry);
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "\033[40;31;01mbroken\033[0m -> \033[40;31;01mmissing\033[0m"));
+
+    file_entry_destroy(&entry);
+    file_entry_destroy(&broken_entry);
 }
 
 static void should_leave_single_column_directory_prefix_empty(void)
 {
     t_file_entry_array *entries = file_entry_array_create();
 
-    directory_entries_prefix_single_column_strategy(NULL);
-    directory_entries_prefix_single_column_strategy(entries);
+    directory_entries_prefix_single_column_strategy(NULL, NULL);
+    directory_entries_prefix_single_column_strategy(NULL, entries);
     file_entry_array_push(entries, file_entry_create("entry"));
-    directory_entries_prefix_single_column_strategy(entries);
+    directory_entries_prefix_single_column_strategy(NULL, entries);
 
     CU_ASSERT(verify_that_no_output_was_printed());
     file_entry_array_destroy(&entries);
@@ -97,7 +170,7 @@ static void should_print_entries_column_by_column_within_the_terminal_width(void
     for (size_t i = 0; i < sizeof(names) / sizeof(names[0]); i++)
         file_entry_array_push(entries, file_entry_create(names[i]));
 
-    multi_column_strategy(entries);
+    multi_column_strategy(NULL, entries);
 
     CU_ASSERT(verify_that_the_output_printed_is(
         "a  c  e\n"
@@ -114,7 +187,7 @@ static void should_account_for_different_column_widths_when_selecting_a_layout(v
     for (size_t i = 0; i < sizeof(names) / sizeof(names[0]); i++)
         file_entry_array_push(entries, file_entry_create(names[i]));
 
-    multi_column_strategy(entries);
+    multi_column_strategy(NULL, entries);
 
     CU_ASSERT(verify_that_the_output_printed_is(
         "a      c\n"
@@ -127,13 +200,13 @@ static void should_print_the_long_format_block_total_when_the_strategy_is_called
     t_file_entry_array *entries = file_entry_array_create();
     t_file_entry *entry = file_entry_create("entry");
 
-    directory_entries_prefix_long_format_strategy(NULL);
+    directory_entries_prefix_long_format_strategy(NULL, NULL);
     CU_ASSERT(verify_that_the_output_printed_is("total 0\n"));
 
     reset_printing_buffer();
     file_entry_set_blocks(entry, 5);
     file_entry_array_push(entries, entry);
-    directory_entries_prefix_long_format_strategy(entries);
+    directory_entries_prefix_long_format_strategy(NULL, entries);
 
     CU_ASSERT(verify_that_the_output_printed_is("total 3\n"));
     file_entry_array_destroy(&entries);
@@ -147,14 +220,14 @@ static void should_render_successful_and_failed_entries_when_long_format_strateg
     };
     t_file_entry_array *entries = file_entry_array_create();
 
-    long_format_strategy(NULL);
-    long_format_strategy(entries);
+    long_format_strategy(NULL, NULL);
+    long_format_strategy(NULL, entries);
     CU_ASSERT(verify_that_no_output_was_printed());
 
     file_entry_array_push(entries, create_entry(
         "file", FILE_TYPE_REGULAR, PERM_NONE, 1, "alice", "staff", 12, date));
     file_entry_array_push(entries, create_failed_entry("broken", NULL));
-    long_format_strategy(entries);
+    long_format_strategy(NULL, entries);
 
     CU_ASSERT(verify_that_the_output_printed_is(
         "%s\n%s\n",
@@ -1207,6 +1280,8 @@ void register_renderer_suite(void)
     if (suite != NULL)
     {
         CU_add_test(suite, "should_print_single_column_entries_when_the_strategy_is_called_directly", should_print_single_column_entries_when_the_strategy_is_called_directly);
+        CU_add_test(suite, "should_apply_extension_and_executable_colors", should_apply_extension_and_executable_colors);
+        CU_add_test(suite, "should_color_symlinks_and_their_targets_and_mark_broken_links", should_color_symlinks_and_their_targets_and_mark_broken_links);
         CU_add_test(suite, "should_leave_single_column_directory_prefix_empty", should_leave_single_column_directory_prefix_empty);
         CU_add_test(suite, "should_print_entries_column_by_column_within_the_terminal_width", should_print_entries_column_by_column_within_the_terminal_width);
         CU_add_test(suite, "should_account_for_different_column_widths_when_selecting_a_layout", should_account_for_different_column_widths_when_selecting_a_layout);

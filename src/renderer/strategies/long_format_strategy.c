@@ -1,4 +1,5 @@
 #include "render_strategies.h"
+#include "render_colors.h"
 #include "libft.h"
 
 #define SIX_MONTHS_IN_SECONDS (6 * 30 * 24 * 60 * 60)
@@ -221,17 +222,7 @@ static void print_failed_entry(const t_file_entry *entry, const t_column_widths 
     ft_printf(" %s\n", file_entry_get_name(entry));
 }
 
-static void print_entry_name(const t_file_entry *entry)
-{
-    const char *name = file_entry_get_name(entry);
-    const char *target = file_entry_get_link_target(entry);
-
-    ft_printf("%s", name);
-    if (target != NULL)
-        ft_printf(" -> %s", target);
-}
-
-static void print_entry(const t_file_entry *entry, const t_column_widths widths, const int has_acl)
+static void print_entry(const t_parsed_arguments *parsed_arguments, const t_file_entry *entry, const t_column_widths widths, const int has_acl)
 {
     if (file_entry_get_file_type(entry) == FILE_TYPE_UNKNOWN)
     {
@@ -245,23 +236,24 @@ static void print_entry(const t_file_entry *entry, const t_column_widths widths,
     print_padded_text(file_entry_get_group(entry), widths.group);
     print_size(entry, widths);
     print_modification_date(entry);
-    print_entry_name(entry);
+    render_colors_print_name_with_target(parsed_arguments, entry);
     ft_printf("\n");
 }
 
-void directory_entries_prefix_long_format_strategy(const t_file_entry_array *file_entry_array)
+void directory_entries_prefix_long_format_strategy(const t_parsed_arguments *parsed_arguments, const t_file_entry_array *file_entry_array)
 {
+    (void)parsed_arguments;
     const unsigned long total_blocks = (file_entry_array_get_total_blocks(file_entry_array) + 1) / 2;
 
     ft_printf("total %lu\n", total_blocks);
 }
 
-void long_format_strategy(const t_file_entry_array *file_entry_array)
+void long_format_strategy(const t_parsed_arguments *parsed_arguments, const t_file_entry_array *file_entry_array)
 {
     const unsigned int count = file_entry_array_get_length(file_entry_array);
     const t_column_widths widths = get_column_widths(file_entry_array);
     const int has_acl = file_entry_array_has_acl(file_entry_array);
 
     for (unsigned int i = 0; i < count; i++)
-        print_entry(file_entry_array_get_at(file_entry_array, i), widths, has_acl);
+        print_entry(parsed_arguments, file_entry_array_get_at(file_entry_array, i), widths, has_acl);
 }

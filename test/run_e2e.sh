@@ -16,6 +16,11 @@ TESTS_FILE="${TESTS_DIR}/tests.txt"
 DELIMITER="::"
 FT_CMD="${SCRIPT_DIR}/../ft_ls"
 MODEL_LS_BIN="$(uname -s | grep -q 'Darwin' && printf '%s' 'gls' || printf '%s' 'ls')"
+COLOR_PALETTE='fi=00:di=01;34:ln=01;36:or=40;31;01:mi=40;31;01:pi=40;33:so=01;35:bd=40;33;01:cd=40;33;01:su=37;41:sg=30;43:tw=30;42:ow=34;42:st=37;44:ex=01;32:ca=0:mh=0'
+COLOR_PALETTE+=':*.7z=01;31:*.gz=01;31:*.rar=01;31:*.tar=01;31:*.zip=01;31'
+COLOR_PALETTE+=':*.gif=01;35:*.jpeg=01;35:*.jpg=01;35:*.mp4=01;35:*.png=01;35:*.ppm=01;35'
+COLOR_PALETTE+=':*.aac=00;36:*.flac=00;36:*.mp3=00;36:*.ogg=00;36:*.wav=00;36'
+COLOR_PALETTE+=':*.bak=00;90:*.old=00;90:*.swp=00;90:*.tmp=00;90:*~=00;90'
 
 trim() {
     local value="$1"
@@ -45,6 +50,42 @@ set_test_acl() {
         printf '%b[ERROR] Could not set ACL on %s%b\n' "${RED}" "$2" "${RESET}" >&2
         return 1
     fi
+}
+
+prepare_color_fixtures() {
+    mkdir -p color-cases/dirs/{shared,standard,sticky,writable} color-cases/suffixes || return 1
+    chmod 1777 color-cases/dirs/shared &&
+        chmod 0755 color-cases/dirs/standard &&
+        chmod 1755 color-cases/dirs/sticky &&
+        chmod 0777 color-cases/dirs/writable || return 1
+    touch color-cases/plain color-cases/program color-cases/hardlink &&
+        chmod 0755 color-cases/program &&
+        ln color-cases/hardlink color-cases/hardlink-copy &&
+        ln -s program color-cases/valid &&
+        ln -s missing color-cases/orphan || return 1
+    touch color-cases/suffixes/archive.{7z,gz,rar,tar,zip} \
+        color-cases/suffixes/media.{gif,jpeg,jpg,mp4,png,ppm} \
+        color-cases/suffixes/audio.{aac,flac,mp3,ogg,wav} \
+        color-cases/suffixes/temp.{bak,old,swp,tmp} color-cases/suffixes/temp~ || return 1
+
+    COLOR_CAP_FILE=''
+    COLOR_BLOCK_DEVICE=''
+    if command -v getcap >/dev/null 2>&1 &&
+        [[ -n "$(getcap /usr/bin/ping 2>/dev/null)" ]]; then
+        COLOR_CAP_FILE=/usr/bin/ping
+    elif command -v setcap >/dev/null 2>&1; then
+        touch color-cases/capability && chmod 0755 color-cases/capability || return 1
+        if setcap cap_net_bind_service=ep color-cases/capability 2>/dev/null; then
+            COLOR_CAP_FILE=color-cases/capability
+        fi
+    fi
+    if mknod color-cases/block b 7 0 2>/dev/null; then
+        COLOR_BLOCK_DEVICE=color-cases/block
+    else
+        COLOR_BLOCK_DEVICE="$(find /dev -type b -print -quit 2>/dev/null)"
+    fi
+    export COLOR_CAP_FILE COLOR_BLOCK_DEVICE
+    touch -t 201901020000 color-cases
 }
 
 prepare_test_environment() {
@@ -194,6 +235,8 @@ prepare_test_environment() {
     ln -s loop-two acl-cases/symlinks/loop-one
     ln -s loop-one acl-cases/symlinks/loop-two
 
+    prepare_color_fixtures || return 1
+
     # Keep the parent directory older than multi_flag_dir for the -t ordering tests.
     touch -t 201901010000 .
 }
@@ -277,7 +320,13 @@ run_single_test() {
     fi
 
     bash -lc "${ft_cmd}" >"${ft_output}" 2>&1 || ft_status=$?
-    bash -lc "${model_cmd}" >"${model_output}" 2>&1 || model_status=$?
+    if [[ "${model_args}" == --color=* ]]; then
+        LS_COLORS="${COLOR_PALETTE}" bash -lc "${model_cmd}" >"${model_output}" 2>&1 || model_status=$?
+        # GNU ls emits an initial reset and wraps ordinary names in a no-op color.
+        sed -E -i '0,/\x1b\[0m/s///; s/\x1b\[00m([^\x1b]*)\x1b\[0m/\1/g' "${model_output}"
+    else
+        bash -lc "${model_cmd}" >"${model_output}" 2>&1 || model_status=$?
+    fi
 
     if [[ "${ft_status}" -eq "${model_status}" ]] && outputs_match "${model_output}" "${ft_output}"; then
         print_pass "ft_ls ${ft_args}"
@@ -338,6 +387,7 @@ main() {
     passed=0
     failed=0
     total=0
+    local skipped=0
 
     while IFS= read -r line || [[ -n "${line}" ]]; do
         line="$(trim "${line}")"
@@ -349,11 +399,20 @@ main() {
         parsed="$(parse_test_entry "${line}")" || continue
         ft_cmd="$(printf '%s\n' "${parsed}" | sed -n '1p')"
         model_cmd="$(printf '%s\n' "${parsed}" | sed -n '2p')"
+        if [[ "${ft_cmd}" == *'$COLOR_CAP_FILE'* && -z "${COLOR_CAP_FILE}" ]] ||
+            [[ "${ft_cmd}" == *'$COLOR_BLOCK_DEVICE'* && -z "${COLOR_BLOCK_DEVICE}" ]]; then
+            printf '%b[SKIP] ft_ls %s (fixture unavailable)%b\n' "${YELLOW}" "${ft_cmd}" "${RESET}"
+            skipped=$((skipped + 1))
+            continue
+        fi
         run_single_test "${ft_cmd}" "${model_cmd}"
     done < "${TESTS_FILE}"
 
     echo
     print_summary "${total}" "${passed}" "${failed}"
+    if [[ "${skipped}" -gt 0 ]]; then
+        print_info "${skipped} tests skipped"
+    fi
 
     remove_test_environment
 
