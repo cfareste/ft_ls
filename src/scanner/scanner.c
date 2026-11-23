@@ -73,6 +73,7 @@ static void append_entry(t_scan_state *state, const t_dir_entry *directory_entry
         record_failed_entry(state, entry_path);
 
     t_file_entry *entry = file_entry_create_from_stats(entry_name, stats);
+    file_entry_set_path(entry, entry_path);
     retrieve_entry_metadata(state, entry, stats, entry_path);
 
     free(entry_path);
