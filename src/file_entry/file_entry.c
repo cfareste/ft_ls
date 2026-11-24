@@ -71,6 +71,13 @@ static int compare_by_entry_modification_time(const void *first_entry, const voi
     return compare_by_entry_name(first_entry, second_entry);
 }
 
+static int compare_no_sort(const void *first_entry, const void *second_entry)
+{
+    (void) first_entry;
+    (void) second_entry;
+    return 0;
+}
+
 static void increase_entries_capacity(t_file_entry_array *array)
 {
     const unsigned int old_capacity = array->max_capacity;
@@ -477,9 +484,12 @@ void file_entry_array_sort(const t_sorter_context *context, const t_file_entry_a
     if (file_entry_array == NULL)
         return ;
 
-    const t_comparator_fn comparator = sorter_context_is_modification_time_order_active(context)
-        ? compare_by_entry_modification_time
-        : compare_by_entry_name;
+    t_comparator_fn comparator = compare_by_entry_name;
+    if (sorter_context_is_no_sort_active(context))
+        comparator = compare_no_sort;
+    else if (sorter_context_is_modification_time_order_active(context))
+        comparator = compare_by_entry_modification_time;
+
     sort_pointer_array(context, (void **) file_entry_array->entries, comparator);
 }
 

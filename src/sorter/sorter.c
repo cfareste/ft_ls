@@ -5,6 +5,7 @@
 
 struct s_sorter_context
 {
+    int no_sort;
     int reverse_order;
     int modification_time_order;
 };
@@ -13,6 +14,7 @@ t_sorter_context *sorter_context_create(const t_parsed_arguments *parsed_argumen
 {
     t_sorter_context *context = ft_safe_calloc(1, sizeof(t_sorter_context));
 
+    context->no_sort = parsed_arguments_is_option_active(parsed_arguments, OPTIONS_NO_SORT);
     context->reverse_order = parsed_arguments_is_option_active(parsed_arguments, OPTIONS_REVERSE);
     context->modification_time_order = parsed_arguments_is_option_active(parsed_arguments, OPTIONS_TIME_SORTING);
 
@@ -22,6 +24,11 @@ t_sorter_context *sorter_context_create(const t_parsed_arguments *parsed_argumen
 int sorter_context_is_modification_time_order_active(const t_sorter_context *context)
 {
     return context != NULL && context->modification_time_order;
+}
+
+int sorter_context_is_no_sort_active(const t_sorter_context *context)
+{
+    return context != NULL && context->no_sort;
 }
 
 void sorter_context_destroy(t_sorter_context **context)
