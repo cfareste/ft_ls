@@ -19,10 +19,11 @@ static void should_return_no_options_for_an_empty_argument_list(void)
 
 static void should_combine_all_supported_options_including_combined_flags(void)
 {
-    const char *arguments[] = { "-Rld", "-Car", "-tU", "--color", "file", NULL };
+    const char *arguments[] = { "-Rldg", "-Car", "-tU", "--color", "file", NULL };
     const t_options expected = OPTIONS_RECURSIVE | OPTIONS_LONG_FORMAT
         | OPTIONS_MULTI_COLUMN_FORMAT | OPTIONS_READ_ALL | OPTIONS_REVERSE
-        | OPTIONS_TIME_SORTING | OPTIONS_COLOR | OPTIONS_NO_SORT | OPTIONS_IMMEDIATE_DIRS;
+        | OPTIONS_TIME_SORTING | OPTIONS_COLOR | OPTIONS_NO_SORT | OPTIONS_IMMEDIATE_DIRS
+        | OPTIONS_LONG_FORMAT_NO_OWNER;
 
     CU_ASSERT_EQUAL(options_get(arguments), expected);
 }
@@ -39,6 +40,15 @@ static void should_accept_d_as_a_standalone_option(void)
 static void should_return_zero_option_count_for_a_NULL_argument_list(void)
 {
     CU_ASSERT_EQUAL(options_get_amount(NULL), 0);
+}
+
+static void should_accept_g_as_a_standalone_option(void)
+{
+    const char *arguments[] = { "-g", NULL };
+
+    CU_ASSERT_EQUAL(options_get(arguments), OPTIONS_LONG_FORMAT_NO_OWNER);
+    CU_ASSERT_EQUAL(options_get_invalid_option(arguments), '\0');
+    CU_ASSERT_EQUAL(options_get_amount(arguments), 1);
 }
 
 static void should_count_option_arguments_not_individual_flags(void)
@@ -78,6 +88,7 @@ void register_options_suite(void)
     CU_add_test(suite, "should_return_no_options_for_an_empty_argument_list", should_return_no_options_for_an_empty_argument_list);
     CU_add_test(suite, "should_combine_all_supported_options_including_combined_flags", should_combine_all_supported_options_including_combined_flags);
     CU_add_test(suite, "should_accept_d_as_a_standalone_option", should_accept_d_as_a_standalone_option);
+    CU_add_test(suite, "should_accept_g_as_a_standalone_option", should_accept_g_as_a_standalone_option);
     CU_add_test(suite, "should_return_zero_option_count_for_a_NULL_argument_list", should_return_zero_option_count_for_a_NULL_argument_list);
     CU_add_test(suite, "should_count_option_arguments_not_individual_flags", should_count_option_arguments_not_individual_flags);
     CU_add_test(suite, "should_return_no_invalid_option_for_a_NULL_argument_list", should_return_no_invalid_option_for_a_NULL_argument_list);
