@@ -39,6 +39,60 @@ static void assert_application_succeeded_with_output(const int result, const cha
     assert_application_execution_succeed(result);
 }
 
+static void assert_d_output(const int argc, const char **arguments, const char *expected_output)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", ".", "..", "file", "file2", "firstDir", "secondDir"),
+        MOCK_FILE("file"),
+        MOCK_FILE("file2"),
+        MOCK_DIR("firstDir", ".", "..", "child"),
+        MOCK_FILE("firstDir/child"),
+        MOCK_DIR("secondDir", ".", "..", "child"),
+        MOCK_FILE("secondDir/child"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+    get_parsed_arguments_result(argc, arguments);
+
+    assert_application_succeeded_with_output(application_run(parsed_arguments_result), expected_output);
+}
+
+static void should_print_the_implicit_operand_with_d(void)
+{
+    const char *arguments[] = { "-d", NULL };
+    assert_d_output(1, arguments, ".\n");
+}
+
+static void should_print_one_file_operand_with_d(void)
+{
+    const char *arguments[] = { "-d", "file", NULL };
+    assert_d_output(2, arguments, "file\n");
+}
+
+static void should_print_one_directory_operand_with_d(void)
+{
+    const char *arguments[] = { "-d", "firstDir", NULL };
+    assert_d_output(2, arguments, "firstDir\n");
+}
+
+static void should_print_multiple_file_operands_in_order_with_d(void)
+{
+    const char *arguments[] = { "-d", "file2", "file", NULL };
+    assert_d_output(3, arguments, "file\nfile2\n");
+}
+
+static void should_print_multiple_directory_operands_in_order_with_d(void)
+{
+    const char *arguments[] = { "-d", "secondDir", "firstDir", NULL };
+    assert_d_output(3, arguments, "firstDir\nsecondDir\n");
+}
+
+static void should_print_mixed_operands_in_one_ordered_list_with_d(void)
+{
+    const char *arguments[] = { "-d", "secondDir", "file2", "firstDir", "file", NULL };
+    assert_d_output(5, arguments, "file\nfile2\nfirstDir\nsecondDir\n");
+}
+
 static void assert_invalid_option_is_reported(const int argc, const char **arguments)
 {
     get_parsed_arguments_result(argc, arguments);
@@ -5332,6 +5386,12 @@ void register_application_suite(void)
         CU_add_test(suite, "should_fail_with_a_major_error_and_print_the_non_failing_files_if_fails_to_open_a_directory_operand_and_to_read_subdirectory_content", should_fail_with_a_major_error_and_print_the_non_failing_files_if_fails_to_open_a_directory_operand_and_to_read_subdirectory_content);
         CU_add_test(suite, "should_fail_with_a_major_error_and_print_the_non_failing_files_if_fails_to_read_a_directory_operand_and_to_close_subdirectory", should_fail_with_a_major_error_and_print_the_non_failing_files_if_fails_to_read_a_directory_operand_and_to_close_subdirectory);
         CU_add_test(suite, "should_fail_with_a_major_error_and_print_the_non_failing_files_if_fails_to_close_a_directory_operand_and_to_access_subdirectory_contents", should_fail_with_a_major_error_and_print_the_non_failing_files_if_fails_to_close_a_directory_operand_and_to_access_subdirectory_contents);
+        CU_add_test(suite, "should_print_the_implicit_operand_with_d", should_print_the_implicit_operand_with_d);
+        CU_add_test(suite, "should_print_one_file_operand_with_d", should_print_one_file_operand_with_d);
+        CU_add_test(suite, "should_print_one_directory_operand_with_d", should_print_one_directory_operand_with_d);
+        CU_add_test(suite, "should_print_multiple_file_operands_in_order_with_d", should_print_multiple_file_operands_in_order_with_d);
+        CU_add_test(suite, "should_print_multiple_directory_operands_in_order_with_d", should_print_multiple_directory_operands_in_order_with_d);
+        CU_add_test(suite, "should_print_mixed_operands_in_one_ordered_list_with_d", should_print_mixed_operands_in_one_ordered_list_with_d);
         CU_add_test(suite, "should_render_no_acls_in_the_current_directory", should_render_no_acls_in_the_current_directory);
         CU_add_test(suite, "should_render_mixed_acls_in_the_current_directory", should_render_mixed_acls_in_the_current_directory);
         CU_add_test(suite, "should_handle_non_grave_acl_errors_in_the_current_directory", should_handle_non_grave_acl_errors_in_the_current_directory);
