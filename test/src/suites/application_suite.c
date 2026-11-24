@@ -2481,6 +2481,129 @@ static void should_reverse_sort_file_and_directory_operands_separately_and_direc
     );
 }
 
+static void should_print_all_entries_in_directory_order_with_f(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", ".", "..", "z", ".hidden", "a"),
+        MOCK_DIR("..", ".", ".."),
+        MOCK_FILE("z"),
+        MOCK_FILE(".hidden"),
+        MOCK_FILE("a"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-f", NULL };
+    get_parsed_arguments_result(1, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(".\n..\nz\n.hidden\na\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
+static void should_print_all_entries_for_one_directory_operand_with_f(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("dir", ".", "..", "z", ".hidden"),
+        MOCK_DIR("dir/.", ".", ".."),
+        MOCK_DIR("dir/..", ".", ".."),
+        MOCK_FILE("dir/z"),
+        MOCK_FILE("dir/.hidden"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-f", "dir", NULL };
+    get_parsed_arguments_result(2, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        ".\n..\nz\n.hidden\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
+static void should_preserve_file_operand_order_with_f(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("z"),
+        MOCK_FILE(".hidden"),
+        MOCK_FILE("a"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-f", "z", ".hidden", "a", NULL };
+    get_parsed_arguments_result(4, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "z\n.hidden\na\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
+static void should_preserve_directory_operand_order_and_print_hidden_entries_with_f(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("dirZ", ".", "..", "z", ".hidden"),
+        MOCK_DIR("dirZ/.", ".", ".."),
+        MOCK_DIR("dirZ/..", ".", ".."),
+        MOCK_FILE("dirZ/z"),
+        MOCK_FILE("dirZ/.hidden"),
+        MOCK_DIR("dirA", ".", "..", "z", ".hidden"),
+        MOCK_DIR("dirA/.", ".", ".."),
+        MOCK_DIR("dirA/..", ".", ".."),
+        MOCK_FILE("dirA/z"),
+        MOCK_FILE("dirA/.hidden"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-f", "dirZ", "dirA", NULL };
+    get_parsed_arguments_result(3, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "dirZ:\n.\n..\nz\n.hidden\n\n"
+        "dirA:\n.\n..\nz\n.hidden\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
+static void should_preserve_operand_order_within_each_group_with_f(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("dirZ", ".", "..", "z", ".hidden"),
+        MOCK_DIR("dirZ/.", ".", ".."),
+        MOCK_DIR("dirZ/..", ".", ".."),
+        MOCK_FILE("dirZ/z"),
+        MOCK_FILE("dirZ/.hidden"),
+        MOCK_DIR("dirA", ".", "..", "z", ".hidden"),
+        MOCK_DIR("dirA/.", ".", ".."),
+        MOCK_DIR("dirA/..", ".", ".."),
+        MOCK_FILE("dirA/z"),
+        MOCK_FILE("dirA/.hidden"),
+        MOCK_FILE("z"),
+        MOCK_FILE(".hidden"),
+        MOCK_FILE("a"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-f", "dirZ", "z", "dirA", ".hidden", "a", NULL };
+    get_parsed_arguments_result(6, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "z\n.hidden\na\n\n"
+        "dirZ:\n.\n..\nz\n.hidden\n\n"
+        "dirA:\n.\n..\nz\n.hidden\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
 static void should_preserve_order_for_current_directory_with_no_sort(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -5507,6 +5630,11 @@ void register_application_suite(void)
         CU_add_test(suite, "should_reverse_sort_multiple_directory_operands_and_their_contents_when_reverse_option_is_active", should_reverse_sort_multiple_directory_operands_and_their_contents_when_reverse_option_is_active);
         CU_add_test(suite, "should_reverse_sort_file_and_directory_operands_separately_and_directory_contents_when_reverse_option_is_active", should_reverse_sort_file_and_directory_operands_separately_and_directory_contents_when_reverse_option_is_active);
         CU_add_test(suite, "should_preserve_order_for_current_directory_with_no_sort", should_preserve_order_for_current_directory_with_no_sort);
+        CU_add_test(suite, "should_print_all_entries_in_directory_order_with_f", should_print_all_entries_in_directory_order_with_f);
+        CU_add_test(suite, "should_print_all_entries_for_one_directory_operand_with_f", should_print_all_entries_for_one_directory_operand_with_f);
+        CU_add_test(suite, "should_preserve_file_operand_order_with_f", should_preserve_file_operand_order_with_f);
+        CU_add_test(suite, "should_preserve_directory_operand_order_and_print_hidden_entries_with_f", should_preserve_directory_operand_order_and_print_hidden_entries_with_f);
+        CU_add_test(suite, "should_preserve_operand_order_within_each_group_with_f", should_preserve_operand_order_within_each_group_with_f);
         CU_add_test(suite, "should_preserve_order_for_single_directory_operand_with_no_sort", should_preserve_order_for_single_directory_operand_with_no_sort);
         CU_add_test(suite, "should_preserve_order_for_multiple_file_operands_with_no_sort", should_preserve_order_for_multiple_file_operands_with_no_sort);
         CU_add_test(suite, "should_preserve_order_for_multiple_directory_operands_with_no_sort", should_preserve_order_for_multiple_directory_operands_with_no_sort);
