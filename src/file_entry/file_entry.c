@@ -123,12 +123,13 @@ t_file_entry *file_entry_create_from_stats(const char *file_name, t_file_stats *
     return file_entry;
 }
 
-void file_entry_set_advanced_metadata_from_stats(t_file_entry *entry, t_file_stats *file_stats)
+void file_entry_set_advanced_metadata_from_stats(t_file_entry *entry, t_file_stats *file_stats, const int retrieve_author)
 {
     if (entry == NULL || file_stats == NULL)
         return;
 
-    file_entry_set_author(entry, file_stats_get_author(file_stats));
+    if (retrieve_author)
+        file_entry_set_author(entry, file_stats_get_author(file_stats));
     file_entry_set_group(entry, file_stats_get_group(file_stats));
     file_entry_set_link_target(entry, file_stats_get_target_pointed_by_link(file_stats));
     file_entry_set_acl_type(entry, file_stats_get_acl_type(file_stats));

@@ -19,6 +19,7 @@ typedef struct s_column_widths
 {
     size_t link_count;
     size_t author;
+    int show_author;
     size_t group;
     size_t size;
     size_t date;
@@ -106,7 +107,7 @@ static void print_alignment_padding(const size_t column_width, const size_t valu
         print_padding(column_width - value_width);
 }
 
-static t_column_widths get_column_widths(const t_file_entry_array *entries)
+static t_column_widths get_column_widths(const t_file_entry_array *entries, const int show_author)
 {
     const size_t size_width = file_entry_array_get_biggest_size(entries);
     const size_t device_digits = file_entry_array_get_biggest_device_width(entries);
@@ -115,7 +116,8 @@ static t_column_widths get_column_widths(const t_file_entry_array *entries)
 
     return (t_column_widths){
         .link_count = file_entry_array_get_biggest_link_count(entries),
-        .author = file_entry_array_get_biggest_author_width(entries),
+        .author = show_author ? file_entry_array_get_biggest_author_width(entries) : 0,
+        .show_author = show_author,
         .group = file_entry_array_get_biggest_group_width(entries),
         .size = column_size_width,
         .date = file_entry_array_get_biggest_date_width(entries)
@@ -214,7 +216,8 @@ static void print_failed_entry(const t_file_entry *entry, const t_column_widths 
     print_mode_string(entry, has_acl);
     print_alignment_padding(widths.link_count, 1);
     ft_printf("? ");
-    print_padded_text(NULL, widths.author);
+    if (widths.show_author)
+        print_padded_text(NULL, widths.author);
     print_padded_text(NULL, widths.group);
     print_alignment_padding(widths.size, 1);
     ft_printf("? ?");
@@ -232,7 +235,8 @@ static void print_entry(const t_parsed_arguments *parsed_arguments, const t_file
 
     print_mode_string(entry, has_acl);
     print_link_count(entry, widths);
-    print_padded_text(file_entry_get_author(entry), widths.author);
+    if (widths.show_author)
+        print_padded_text(file_entry_get_author(entry), widths.author);
     print_padded_text(file_entry_get_group(entry), widths.group);
     print_size(entry, widths);
     print_modification_date(entry);
@@ -251,7 +255,8 @@ void directory_entries_prefix_long_format_strategy(const t_parsed_arguments *par
 void long_format_strategy(const t_parsed_arguments *parsed_arguments, const t_file_entry_array *file_entry_array)
 {
     const unsigned int count = file_entry_array_get_length(file_entry_array);
-    const t_column_widths widths = get_column_widths(file_entry_array);
+    const int show_author = !parsed_arguments_is_option_active(parsed_arguments, OPTIONS_LONG_FORMAT_NO_OWNER);
+    const t_column_widths widths = get_column_widths(file_entry_array, show_author);
     const int has_acl = file_entry_array_has_acl(file_entry_array);
 
     for (unsigned int i = 0; i < count; i++)

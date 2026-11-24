@@ -4,6 +4,7 @@
 
 #define RECURSIVE_OPTION_CHAR 'R'
 #define LONG_FORMAT_OPTION_CHAR 'l'
+#define LONG_FORMAT_NO_OWNER_OPTION_CHAR 'g'
 #define READ_ALL_OPTION_CHAR 'a'
 #define REVERSE_OPTION_CHAR 'r'
 #define TIME_SORTING_OPTION_CHAR 't'
@@ -28,6 +29,8 @@ static t_options get_option_flag(const char option)
         return OPTIONS_RECURSIVE;
     if (option == LONG_FORMAT_OPTION_CHAR)
         return OPTIONS_LONG_FORMAT;
+    if (option == LONG_FORMAT_NO_OWNER_OPTION_CHAR)
+        return OPTIONS_LONG_FORMAT_NO_OWNER;
     if (option == READ_ALL_OPTION_CHAR)
         return OPTIONS_READ_ALL;
     if (option == REVERSE_OPTION_CHAR)

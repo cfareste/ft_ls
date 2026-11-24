@@ -102,7 +102,7 @@ static void should_copy_acl_type_from_stats_to_file_entry(void)
 
     CU_ASSERT_EQUAL(file_entry_get_acl_type(entry), FILE_ACL_NONE);
     CU_ASSERT_EQUAL(file_stats_get_acl_type(stats), FILE_ACL_REAL);
-    file_entry_set_advanced_metadata_from_stats(entry, stats);
+    file_entry_set_advanced_metadata_from_stats(entry, stats, 1);
     CU_ASSERT_EQUAL(file_entry_get_acl_type(entry), FILE_ACL_REAL);
     CU_ASSERT_EQUAL(file_entry_get_acl_type(entry_sut), FILE_ACL_NONE);
 
@@ -126,7 +126,7 @@ static void should_set_advanced_metadata_from_symlink_stats(void)
     stats = file_stats_get_without_following_symlinks("link");
     entry = file_entry_create_from_stats("link", stats);
 
-    file_entry_set_advanced_metadata_from_stats(entry, stats);
+    file_entry_set_advanced_metadata_from_stats(entry, stats, 1);
 
     CU_ASSERT_STRING_EQUAL(file_entry_get_author(entry), "alice");
     CU_ASSERT_STRING_EQUAL(file_entry_get_group(entry), "developers");
@@ -141,9 +141,9 @@ static void should_ignore_null_arguments_when_setting_advanced_metadata(void)
 {
     t_file_stats *stats = NULL;
 
-    file_entry_set_advanced_metadata_from_stats(NULL, NULL);
-    file_entry_set_advanced_metadata_from_stats(entry_sut, NULL);
-    file_entry_set_advanced_metadata_from_stats(NULL, stats);
+    file_entry_set_advanced_metadata_from_stats(NULL, NULL, 1);
+    file_entry_set_advanced_metadata_from_stats(entry_sut, NULL, 1);
+    file_entry_set_advanced_metadata_from_stats(NULL, stats, 1);
 
     CU_ASSERT_PTR_NULL(file_entry_get_author(entry_sut));
     CU_ASSERT_PTR_NULL(file_entry_get_group(entry_sut));
@@ -194,7 +194,7 @@ static void should_track_real_acls_in_a_file_entry_array(void)
         t_file_stats *stats = file_stats_get(paths[i]);
         t_file_entry *entry = file_entry_create_from_stats(paths[i], stats);
 
-        file_entry_set_advanced_metadata_from_stats(entry, stats);
+        file_entry_set_advanced_metadata_from_stats(entry, stats, 1);
         file_entry_array_push(array_sut, entry);
         file_stats_destroy(&stats);
         CU_ASSERT_EQUAL(file_entry_array_has_acl(array_sut), i != 0);

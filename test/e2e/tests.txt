@@ -159,3 +159,7 @@ src -2                                                                          
 -d file2 file                                                                                                                                     ::       -d file2 file
 -d secondDir firstDir                                                                                                                             ::       -d secondDir firstDir
 -d secondDir file2 firstDir file                                                                                                                  ::       -d secondDir file2 firstDir file
+-g                                                                                                                                                ::       -g
+-g file                                                                                                                                           ::       -g file
+-g firstDir                                                                                                                                       ::       -g firstDir
+-g secondDir file firstDir Makefile                                                                                                               ::       -g secondDir file firstDir Makefile
