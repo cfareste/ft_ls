@@ -19,10 +19,10 @@ static void should_return_no_options_for_an_empty_argument_list(void)
 
 static void should_combine_all_supported_options_including_combined_flags(void)
 {
-    const char *arguments[] = { "-Rl", "-Car", "-t", "--color", "file", NULL };
+    const char *arguments[] = { "-Rl", "-Car", "-tU", "--color", "file", NULL };
     const t_options expected = OPTIONS_RECURSIVE | OPTIONS_LONG_FORMAT
         | OPTIONS_MULTI_COLUMN_FORMAT | OPTIONS_READ_ALL | OPTIONS_REVERSE
-        | OPTIONS_TIME_SORTING | OPTIONS_COLOR;
+        | OPTIONS_TIME_SORTING | OPTIONS_COLOR | OPTIONS_NO_SORT;
 
     CU_ASSERT_EQUAL(options_get(arguments), expected);
 }
@@ -46,7 +46,7 @@ static void should_return_no_invalid_option_for_a_NULL_argument_list(void)
 
 static void should_return_no_invalid_option_for_supported_and_non_option_arguments(void)
 {
-    const char *arguments[] = { "-RlaC", "--color", "file", NULL };
+    const char *arguments[] = { "-RlaC", "-U", "--color", "file", NULL };
 
     CU_ASSERT_EQUAL(options_get_invalid_option(arguments), '\0');
 }
