@@ -1346,6 +1346,47 @@ static void should_render_the_default_directory_in_long_format(void)
     assert_application_execution_succeed(result);
 }
 
+static void should_render_the_default_directory_without_an_owner_column_with_g(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", ".", "..", "large", "file"),
+        MOCK_FILE_WITH_STATS("file", MOCK_BLOCKS(2), MOCK_AUTHOR("alice"), MOCK_GROUP("staff"), MOCK_SIZE(42)),
+        MOCK_FILE_WITH_STATS("large", MOCK_BLOCKS(6), MOCK_HARDLINK_COUNT(12), MOCK_AUTHOR("charlie"), MOCK_GROUP("developers"), MOCK_SIZE(12345)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-g", NULL };
+    get_parsed_arguments_result(1, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "total 4\n"
+        "-rw-r--r--  1 staff         42 Jan  1  1970 file\n"
+        "-rw-r--r-- 12 developers 12345 Jan  1  1970 large\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
+static void should_render_a_symlink_operand_without_an_owner_column_with_gl(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_SYMLINK_WITH_STATS("link", "dir", MOCK_AUTHOR("alice"), MOCK_GROUP("staff"), MOCK_SIZE(3)),
+        MOCK_DIR("dir", ".", "..", "file"),
+        MOCK_FILE("dir/file"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-gl", "link", NULL };
+    get_parsed_arguments_result(2, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is("lrwxrwxrwx 1 staff 3 Jan  1  1970 link -> dir\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
 static void should_render_a_non_directory_operand_in_long_format(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -5359,6 +5400,8 @@ void register_application_suite(void)
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_specified_directory_recursively", should_successfully_print_the_contents_of_the_specified_directory_recursively);
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_specified_operands_recursively", should_successfully_print_the_contents_of_the_specified_operands_recursively);
         CU_add_test(suite, "should_render_the_default_directory_in_long_format", should_render_the_default_directory_in_long_format);
+        CU_add_test(suite, "should_render_the_default_directory_without_an_owner_column_with_g", should_render_the_default_directory_without_an_owner_column_with_g);
+        CU_add_test(suite, "should_render_a_symlink_operand_without_an_owner_column_with_gl", should_render_a_symlink_operand_without_an_owner_column_with_gl);
         CU_add_test(suite, "should_render_a_non_directory_operand_in_long_format", should_render_a_non_directory_operand_in_long_format);
         CU_add_test(suite, "should_render_a_symlink_to_a_directory_operand_as_a_link_in_long_format", should_render_a_symlink_to_a_directory_operand_as_a_link_in_long_format);
         CU_add_test(suite, "should_render_a_directory_operand_in_long_format", should_render_a_directory_operand_in_long_format);

@@ -47,7 +47,7 @@ static int should_print_directory_header(const t_parsed_arguments *parsed_argume
 
 static const t_render_strategy *select_render_strategy(const t_parsed_arguments *parsed_arguments)
 {
-    if (parsed_arguments_is_option_active(parsed_arguments, OPTIONS_LONG_FORMAT))
+    if (parsed_arguments_is_long_format_active(parsed_arguments))
         return &LONG_FORMAT_RENDER_STRATEGY;
     if (parsed_arguments_is_option_active(parsed_arguments, OPTIONS_MULTI_COLUMN_FORMAT)
         || parsed_arguments_is_stdout_a_tty(parsed_arguments))

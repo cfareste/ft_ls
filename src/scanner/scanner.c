@@ -8,6 +8,7 @@
 struct s_scanner_context
 {
     int retrieve_long_format_metadata;
+    int retrieve_author;
     int include_hidden_entries;
 };
 
@@ -25,6 +26,7 @@ t_scanner_context *scanner_context_create(const t_parsed_arguments *parsed_argum
     t_scanner_context *context = ft_safe_calloc(1, sizeof(t_scanner_context));
 
     context->retrieve_long_format_metadata = parsed_arguments_is_long_format_active(parsed_arguments);
+    context->retrieve_author = !parsed_arguments_is_option_active(parsed_arguments, OPTIONS_LONG_FORMAT_NO_OWNER);
     context->include_hidden_entries = parsed_arguments_is_option_active(parsed_arguments, OPTIONS_READ_ALL);
 
     return context;
@@ -55,7 +57,7 @@ static void retrieve_entry_metadata(t_scan_state *state, t_file_entry *entry, t_
     if (!state->scanner->retrieve_long_format_metadata)
         return;
 
-    file_entry_set_advanced_metadata_from_stats(entry, stats);
+    file_entry_set_advanced_metadata_from_stats(entry, stats, state->scanner->retrieve_author);
     if (file_stats_target_retrieval_failed(stats) || file_stats_acl_retrieval_failed(stats))
         record_failed_entry(state, entry_path);
 }

@@ -22,7 +22,10 @@ static t_file_entry *create_file_operand_entry(const t_parsed_arguments *parsed_
     t_file_entry *entry = file_entry_create_from_stats(file_operand, file_stats);
 
     if (parsed_arguments_is_long_format_active(parsed_arguments))
-        file_entry_set_advanced_metadata_from_stats(entry, file_stats);
+    {
+        const int retrieve_author = !parsed_arguments_is_option_active(parsed_arguments, OPTIONS_LONG_FORMAT_NO_OWNER);
+        file_entry_set_advanced_metadata_from_stats(entry, file_stats, retrieve_author);
+    }
     return entry;
 }
 

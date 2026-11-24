@@ -73,7 +73,7 @@ static t_result *create_parsing_arguments_result(t_parsed_arguments *parsed_argu
     return result_create_successful(parsed_arguments);
 }
 
-static const char *retrieve_advanced_file_stats(char **file_operands, t_file_stats **file_operands_stats)
+static const char *retrieve_advanced_file_stats(char **file_operands, t_file_stats **file_operands_stats, const int retrieve_author)
 {
     const char *failed_operand = NULL;
 
@@ -82,7 +82,8 @@ static const char *retrieve_advanced_file_stats(char **file_operands, t_file_sta
         if (file_operands_stats[i] == NULL)
             continue;
 
-        file_stats_get_author(file_operands_stats[i]);
+        if (retrieve_author)
+            file_stats_get_author(file_operands_stats[i]);
         file_stats_get_group(file_operands_stats[i]);
         file_stats_get_target_pointed_by_link(file_operands_stats[i]);
         file_stats_get_acl_type(file_operands_stats[i]);
@@ -106,7 +107,10 @@ static const char *initialize_file_operands(t_parsed_arguments *parsed_arguments
     parsed_arguments->file_operands_stats = file_operands_get_stats(stats_count, parsed_arguments->file_operands, follow_symlinks);
 
     if (parsed_arguments_is_long_format_active(parsed_arguments))
-        return retrieve_advanced_file_stats(parsed_arguments->file_operands, parsed_arguments->file_operands_stats);
+    {
+        const int retrieve_author = !parsed_arguments_is_option_active(parsed_arguments, OPTIONS_LONG_FORMAT_NO_OWNER);
+        return retrieve_advanced_file_stats(parsed_arguments->file_operands, parsed_arguments->file_operands_stats, retrieve_author);
+    }
 
     return NULL;
 }
@@ -260,7 +264,7 @@ int parsed_arguments_is_option_active(const t_parsed_arguments *parsed_arguments
 
 int parsed_arguments_is_long_format_active(const t_parsed_arguments *parsed_arguments)
 {
-    return parsed_arguments_is_option_active(parsed_arguments, OPTIONS_LONG_FORMAT);
+    return parsed_arguments_is_option_active(parsed_arguments, OPTIONS_LONG_FORMAT | OPTIONS_LONG_FORMAT_NO_OWNER);
 }
 
 int parsed_arguments_is_stdout_a_tty(const t_parsed_arguments *parsed_arguments)
