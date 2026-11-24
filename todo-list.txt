@@ -1,6 +1,4 @@
 TODO:
-1. Implementar LS-41 Colored output
-2. QA
 
 
 TODO En algún momento:
@@ -387,3 +385,12 @@ QA LS-41 Colored output (`ls --color | cat`)
 18. Archivo regular con extensión de imagen / vídeo
 19. Archivo regular con extensión de audio
 20. Archivo regular con extensión o sufijo de respaldo / temporal
+
+
+QA LS-37 No sorting (`ls -U ... | cat`)
+1. Sin parámetros
+2. 1 parámetro (directorio)
+3. Múltiples parámetros
+   - Archivos
+   - Directorios
+   - Mixto
