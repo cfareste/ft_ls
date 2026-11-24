@@ -8,6 +8,7 @@
 #define REVERSE_OPTION_CHAR 'r'
 #define TIME_SORTING_OPTION_CHAR 't'
 #define NO_SORT_OPTION_CHAR 'U'
+#define IMMEDIATE_DIRS_OPTION_CHAR 'd'
 #define MULTI_COLUMN_FORMAT_OPTION_CHAR 'C'
 #define COLOR_OPTION "--color"
 
@@ -35,6 +36,8 @@ static t_options get_option_flag(const char option)
         return OPTIONS_TIME_SORTING;
     if (option == NO_SORT_OPTION_CHAR)
         return OPTIONS_NO_SORT;
+    if (option == IMMEDIATE_DIRS_OPTION_CHAR)
+        return OPTIONS_IMMEDIATE_DIRS;
     if (option == MULTI_COLUMN_FORMAT_OPTION_CHAR)
         return OPTIONS_MULTI_COLUMN_FORMAT;
     return OPTIONS_NONE;
