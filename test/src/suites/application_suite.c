@@ -2253,6 +2253,120 @@ static void should_reverse_sort_file_and_directory_operands_separately_and_direc
     );
 }
 
+static void should_preserve_order_for_current_directory_with_no_sort(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", ".", "..", "middle", "zeta", "alpha"),
+        MOCK_FILE("alpha"),
+        MOCK_FILE("middle"),
+        MOCK_FILE("zeta"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-U", NULL };
+    get_parsed_arguments_result(1, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    assert_application_succeeded_with_output(
+        result,
+        "middle\nzeta\nalpha\n"
+    );
+}
+
+static void should_preserve_order_for_single_directory_operand_with_no_sort(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("dir", ".", "..", "middle", "zeta", "alpha"),
+        MOCK_FILE("dir/alpha"),
+        MOCK_FILE("dir/middle"),
+        MOCK_FILE("dir/zeta"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-U", "dir", NULL };
+    get_parsed_arguments_result(2, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    assert_application_succeeded_with_output(
+        result,
+        "middle\nzeta\nalpha\n"
+    );
+}
+
+static void should_preserve_order_for_multiple_file_operands_with_no_sort(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("alpha"),
+        MOCK_FILE("middle"),
+        MOCK_FILE("zeta"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-U", "middle", "zeta", "alpha", NULL };
+    get_parsed_arguments_result(4, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    assert_application_succeeded_with_output(
+        result,
+        "middle\nzeta\nalpha\n"
+    );
+}
+
+static void should_preserve_order_for_multiple_directory_operands_with_no_sort(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("dirA", ".", "..", "zeta", "alpha"),
+        MOCK_DIR("dirZ", ".", "..", "middle", "alpha"),
+        MOCK_FILE("dirA/alpha"),
+        MOCK_FILE("dirA/zeta"),
+        MOCK_FILE("dirZ/alpha"),
+        MOCK_FILE("dirZ/middle"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-U", "dirZ", "dirA", NULL };
+    get_parsed_arguments_result(3, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    assert_application_succeeded_with_output(
+        result,
+        "dirZ:\nmiddle\nalpha\n\n"
+        "dirA:\nzeta\nalpha\n"
+    );
+}
+
+static void should_preserve_order_for_mixed_operands_with_no_sort(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("alpha"),
+        MOCK_FILE("middle"),
+        MOCK_FILE("zeta"),
+        MOCK_DIR("dirA", ".", "..", "zeta", "alpha"),
+        MOCK_DIR("dirZ", ".", "..", "middle", "alpha"),
+        MOCK_FILE("dirA/alpha"),
+        MOCK_FILE("dirA/zeta"),
+        MOCK_FILE("dirZ/alpha"),
+        MOCK_FILE("dirZ/middle"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-U", "dirZ", "middle", "dirA", "zeta", "alpha", NULL };
+    get_parsed_arguments_result(6, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    assert_application_succeeded_with_output(
+        result,
+        "middle\nzeta\nalpha\n\n"
+        "dirZ:\nmiddle\nalpha\n\n"
+        "dirA:\nzeta\nalpha\n"
+    );
+}
+
 static void should_sort_the_current_directory_by_modification_time_when_no_file_operands_are_specified(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -5159,6 +5273,11 @@ void register_application_suite(void)
         CU_add_test(suite, "should_reverse_sort_multiple_file_operands_when_reverse_option_is_active", should_reverse_sort_multiple_file_operands_when_reverse_option_is_active);
         CU_add_test(suite, "should_reverse_sort_multiple_directory_operands_and_their_contents_when_reverse_option_is_active", should_reverse_sort_multiple_directory_operands_and_their_contents_when_reverse_option_is_active);
         CU_add_test(suite, "should_reverse_sort_file_and_directory_operands_separately_and_directory_contents_when_reverse_option_is_active", should_reverse_sort_file_and_directory_operands_separately_and_directory_contents_when_reverse_option_is_active);
+        CU_add_test(suite, "should_preserve_order_for_current_directory_with_no_sort", should_preserve_order_for_current_directory_with_no_sort);
+        CU_add_test(suite, "should_preserve_order_for_single_directory_operand_with_no_sort", should_preserve_order_for_single_directory_operand_with_no_sort);
+        CU_add_test(suite, "should_preserve_order_for_multiple_file_operands_with_no_sort", should_preserve_order_for_multiple_file_operands_with_no_sort);
+        CU_add_test(suite, "should_preserve_order_for_multiple_directory_operands_with_no_sort", should_preserve_order_for_multiple_directory_operands_with_no_sort);
+        CU_add_test(suite, "should_preserve_order_for_mixed_operands_with_no_sort", should_preserve_order_for_mixed_operands_with_no_sort);
         CU_add_test(suite, "should_sort_the_current_directory_by_modification_time_when_no_file_operands_are_specified", should_sort_the_current_directory_by_modification_time_when_no_file_operands_are_specified);
         CU_add_test(suite, "should_sort_a_directory_operand_contents_by_modification_time", should_sort_a_directory_operand_contents_by_modification_time);
         CU_add_test(suite, "should_sort_multiple_file_operands_by_modification_time", should_sort_multiple_file_operands_by_modification_time);

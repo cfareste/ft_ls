@@ -1168,12 +1168,47 @@ static void should_be_created_correctly_even_if_some_arguments_cannot_be_accesse
     CU_ASSERT_PTR_NOT_NULL(sut);
 }
 
+static void should_preserve_each_operand_group_order_when_U_option_is_active(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE_WITH_STATS("m", MOCK_MODIFICATION_TIME(1, 1, 2024, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("z", MOCK_MODIFICATION_TIME(1, 1, 2025, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("a", MOCK_MODIFICATION_TIME(1, 1, 2020, 0, 0, 0)),
+        MOCK_DIR("dir_m", NULL),
+        MOCK_DIR("dir_z", NULL),
+        MOCK_DIR("dir_a", NULL),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *args[] = { "-trU", "dir_m", "m", "dir_z", "z", "dir_a", "a", NULL };
+    get_parsed_arguments_result(7, args);
+    CU_ASSERT_TRUE_FATAL(result_has_succeed(parsed_arguments_result));
+
+    const char * const *files = parsed_arguments_get_non_directory_file_operands(sut);
+    const char * const *directories = parsed_arguments_get_directory_file_operands(sut);
+    t_file_stats * const *stats = parsed_arguments_get_non_directory_file_operands_stats(sut);
+
+    CU_ASSERT_STRING_EQUAL(files[0], "m");
+    CU_ASSERT_STRING_EQUAL(files[1], "z");
+    CU_ASSERT_STRING_EQUAL(files[2], "a");
+    CU_ASSERT_PTR_NULL(files[3]);
+    CU_ASSERT_STRING_EQUAL(directories[0], "dir_m");
+    CU_ASSERT_STRING_EQUAL(directories[1], "dir_z");
+    CU_ASSERT_STRING_EQUAL(directories[2], "dir_a");
+    CU_ASSERT_PTR_NULL(directories[3]);
+    CU_ASSERT_EQUAL(file_stats_get_modification_date(stats[0]).year, 2024);
+    CU_ASSERT_EQUAL(file_stats_get_modification_date(stats[1]).year, 2025);
+    CU_ASSERT_EQUAL(file_stats_get_modification_date(stats[2]).year, 2020);
+}
+
 void register_parsed_arguments_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, test_teardown);
 
     if (suite != NULL)
     {
+        CU_add_test(suite, "should_preserve_each_operand_group_order_when_U_option_is_active", should_preserve_each_operand_group_order_when_U_option_is_active);
         CU_add_test(suite, "should_be_created_correctly", should_be_created_correctly);
         CU_add_test(suite, "should_be_destroyed_correctly", should_be_destroyed_correctly);
         CU_add_test(suite, "should_not_fail_to_destroy_when_a_null_pointer_is_passed", should_not_fail_to_destroy_when_a_null_pointer_is_passed);

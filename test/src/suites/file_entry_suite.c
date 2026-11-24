@@ -895,12 +895,47 @@ static void should_sort_directory_entries_by_modification_time_with_ascii_name_t
     result_destroy(&parsed_arguments_result);
 }
 
+static void should_preserve_directory_entry_order_when_U_option_is_active(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", ".", ".."),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-t", "-U", "-r", NULL };
+    t_result *parsed_arguments_result = parse_arguments(3, arguments);
+    t_parsed_arguments *parsed_arguments = result_get_value(parsed_arguments_result);
+    t_sorter_context *context = sorter_context_create(parsed_arguments);
+    const char *entry_names[] = { "m", "z", "a" };
+    const time_t modification_times[] = { 200, 300, 100 };
+
+    for (unsigned int i = 0; i < 3; i++)
+    {
+        t_file_entry *entry = file_entry_create(entry_names[i]);
+        file_entry_set_modification_date(entry, date_from_time(modification_times[i]));
+        file_entry_array_push(array_sut, entry);
+    }
+
+    file_entry_array_sort(context, array_sut);
+
+    CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
+    for (unsigned int i = 0; i < 3; i++)
+        CU_ASSERT_STRING_EQUAL(file_entry_get_name(file_entry_array_get_at(array_sut, i)), entry_names[i]);
+    CU_ASSERT_PTR_NULL(file_entry_array_get_at(array_sut, 3));
+
+    sorter_context_destroy(&context);
+    parsed_arguments_destroy(&parsed_arguments);
+    result_destroy(&parsed_arguments_result);
+}
+
 void register_file_entry_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, test_teardown);
 
     if (suite != NULL)
     {
+        CU_add_test(suite, "should_preserve_directory_entry_order_when_U_option_is_active", should_preserve_directory_entry_order_when_U_option_is_active);
         CU_add_test(suite, "should_create_file_entry_correctly", should_create_file_entry_correctly);
         CU_add_test(suite, "should_create_a_file_entry_from_stats", should_create_a_file_entry_from_stats);
         CU_add_test(suite, "should_copy_acl_type_from_stats_to_file_entry", should_copy_acl_type_from_stats_to_file_entry);

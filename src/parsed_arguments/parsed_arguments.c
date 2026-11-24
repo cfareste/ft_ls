@@ -46,65 +46,6 @@ static int compare_file_operand_entries_by_modification_time(const void *first_i
     return compare_file_operand_entries_by_name(first, second);
 }
 
-static t_comparator_fn get_file_operand_comparator(const t_sorter_context *sorter_context)
-{
-    if (sorter_context_is_modification_time_order_active(sorter_context))
-        return compare_file_operand_entries_by_modification_time;
-
-    return compare_file_operand_entries_by_name;
-}
-
-static t_file_stats **get_file_operand_stats(char **operands, char **file_operands, t_file_stats **file_operands_stats)
-{
-    unsigned int count = 0;
-
-    while (operands[count] != NULL)
-        count++;
-
-    t_file_stats **operands_stats = ft_safe_calloc(count + 1, sizeof(t_file_stats *));
-
-    for (unsigned int i = 0; i < count; i++)
-    {
-        for (unsigned int j = 0; file_operands[j] != NULL; j++)
-        {
-            if (ft_are_string_equals(operands[i], file_operands[j]))
-            {
-                operands_stats[i] = file_operands_stats[j];
-                break;
-            }
-        }
-    }
-    return operands_stats;
-}
-
-static void sort_file_operand_group(const t_sorter_context *sorter_context, char **operands, t_file_stats **operands_stats, const t_comparator_fn comparator)
-{
-    unsigned int count = 0;
-
-    while (operands[count] != NULL)
-        count++;
-
-    t_file_operand_sort_entry *entries = ft_safe_calloc(count, sizeof(t_file_operand_sort_entry));
-    void **entries_to_sort = ft_safe_calloc(count + 1, sizeof(void *));
-    for (unsigned int i = 0; i < count; i++)
-    {
-        entries[i].name = operands[i];
-        entries[i].stats = operands_stats[i];
-        entries_to_sort[i] = &entries[i];
-    }
-
-    sort_pointer_array(sorter_context, entries_to_sort, comparator);
-
-    for (unsigned int i = 0; i < count; i++)
-    {
-        const t_file_operand_sort_entry *entry = entries_to_sort[i];
-        operands[i] = entry->name;
-        operands_stats[i] = entry->stats;
-    }
-    free(entries_to_sort);
-    free(entries);
-}
-
 static int has_failed_to_access_a_file_operand(char **file_operands, t_file_stats **file_operands_stats, const int has_implicit_default_operand)
 {
     if (has_implicit_default_operand)
@@ -164,23 +105,81 @@ static const char *initialize_file_operands(t_parsed_arguments *parsed_arguments
     return NULL;
 }
 
-static void classify_file_operands(t_parsed_arguments *parsed_arguments)
+static t_file_stats **get_operand_group_stats(const t_parsed_arguments *parsed_arguments, char **group_operands)
 {
-    parsed_arguments->non_directory_file_operands = file_operands_get_non_directory(parsed_arguments->file_operands, parsed_arguments->file_operands_stats, parsed_arguments->has_implicit_default_operand);
-    parsed_arguments->directory_file_operands = file_operands_get_directory(parsed_arguments->file_operands, parsed_arguments->file_operands_stats, parsed_arguments->has_implicit_default_operand);
+    const int count = ft_str_matrix_length(group_operands);
+
+    t_file_stats **group_stats = ft_safe_calloc(count + 1, sizeof(t_file_stats *));
+
+    for (int group_index = 0; group_index < count; group_index++)
+    {
+        const char *name = group_operands[group_index];
+        for (int source_index = 0; parsed_arguments->file_operands[source_index] != NULL; source_index++)
+        {
+            if (ft_are_string_equals(name, parsed_arguments->file_operands[source_index]))
+            {
+                group_stats[group_index] = parsed_arguments->file_operands_stats[source_index];
+                break;
+            }
+        }
+    }
+    return group_stats;
 }
 
-static void sort_file_operands(t_parsed_arguments *parsed_arguments)
+static void sort_file_operand_group(char **operands, t_file_stats **operands_stats,
+    const t_sorter_context *sorter_context, const t_comparator_fn comparator)
 {
+    const int count = ft_str_matrix_length(operands);
+    if (count < 2)
+        return;
+
+    t_file_operand_sort_entry *entries = ft_safe_calloc(count, sizeof(t_file_operand_sort_entry));
+    void **entries_to_sort = ft_safe_calloc(count + 1, sizeof(void *));
+    for (int i = 0; i < count; i++)
+    {
+        entries[i].name = operands[i];
+        entries[i].stats = operands_stats[i];
+        entries_to_sort[i] = &entries[i];
+    }
+
+    sort_pointer_array(sorter_context, entries_to_sort, comparator);
+
+    for (int i = 0; i < count; i++)
+    {
+        const t_file_operand_sort_entry *entry = entries_to_sort[i];
+        operands[i] = entry->name;
+        operands_stats[i] = entry->stats;
+    }
+    free(entries_to_sort);
+    free(entries);
+}
+
+static void prepare_operand_groups(t_parsed_arguments *parsed_arguments)
+{
+    char **operands = parsed_arguments->file_operands;
+    t_file_stats **stats = parsed_arguments->file_operands_stats;
+    const int has_default_operand = parsed_arguments->has_implicit_default_operand;
+    char **files = file_operands_get_non_directory(operands, stats, has_default_operand);
+    char **directories = file_operands_get_directory(operands, stats, has_default_operand);
+    t_file_stats **file_stats = get_operand_group_stats(parsed_arguments, files);
+
+    parsed_arguments->non_directory_file_operands = files;
+    parsed_arguments->non_directory_file_operands_stats = file_stats;
+    parsed_arguments->directory_file_operands = directories;
+
+    if (parsed_arguments_is_option_active(parsed_arguments, OPTIONS_NO_SORT))
+        return;
+
     t_sorter_context *sorter_context = sorter_context_create(parsed_arguments);
-    const t_comparator_fn comparator = get_file_operand_comparator(sorter_context);
-    parsed_arguments->non_directory_file_operands_stats = get_file_operand_stats(parsed_arguments->non_directory_file_operands, parsed_arguments->file_operands, parsed_arguments->file_operands_stats);
-    t_file_stats **directory_file_operands_stats = get_file_operand_stats(parsed_arguments->directory_file_operands, parsed_arguments->file_operands, parsed_arguments->file_operands_stats);
+    const t_comparator_fn comparator = sorter_context_is_modification_time_order_active(sorter_context)
+        ? compare_file_operand_entries_by_modification_time
+        : compare_file_operand_entries_by_name;
+    t_file_stats **directory_stats = get_operand_group_stats(parsed_arguments, directories);
 
-    sort_file_operand_group(sorter_context, parsed_arguments->non_directory_file_operands, parsed_arguments->non_directory_file_operands_stats, comparator);
-    sort_file_operand_group(sorter_context, parsed_arguments->directory_file_operands, directory_file_operands_stats, comparator);
+    sort_file_operand_group(files, file_stats, sorter_context, comparator);
+    sort_file_operand_group(directories, directory_stats, sorter_context, comparator);
 
-    free(directory_file_operands_stats);
+    free(directory_stats);
     sorter_context_destroy(&sorter_context);
 }
 
@@ -201,8 +200,7 @@ t_result *parse_arguments(const int num_of_arguments, const char **arguments)
     parsed_arguments->stdout_is_terminal = isatty(STDOUT_FILENO);
     parsed_arguments->options = options_get(arguments);
     const char *failed_advanced_metadata_operand = initialize_file_operands(parsed_arguments, num_of_arguments, arguments);
-    classify_file_operands(parsed_arguments);
-    sort_file_operands(parsed_arguments);
+    prepare_operand_groups(parsed_arguments);
 
     if (failed_advanced_metadata_operand != NULL)
         return result_create_failed(parsed_arguments, failed_advanced_metadata_operand);
