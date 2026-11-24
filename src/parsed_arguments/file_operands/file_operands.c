@@ -8,7 +8,8 @@
 typedef enum e_file_operand_category
 {
     FILE_OPERAND_DIRECTORY,
-    FILE_OPERAND_NON_DIRECTORY
+    FILE_OPERAND_NON_DIRECTORY,
+    FILE_OPERAND_ACCESSIBLE
 } t_file_operand_category;
 
 static int argument_is_an_option(const char *argument)
@@ -66,6 +67,8 @@ static int file_operand_matches_category(const t_file_type file_type, const t_fi
 {
     if (category == FILE_OPERAND_DIRECTORY)
         return file_type == FILE_TYPE_DIRECTORY;
+    if (category == FILE_OPERAND_ACCESSIBLE)
+        return file_type != FILE_TYPE_UNKNOWN;
     return file_type != FILE_TYPE_DIRECTORY && file_type != FILE_TYPE_UNKNOWN;
 }
 
@@ -113,6 +116,14 @@ t_file_stats **file_operands_get_stats(const int num_of_file_operands, char **fi
         return NULL;
 
     return get_stats_from_file_operands(num_of_file_operands, file_operands, follow_symlinks);
+}
+
+char **file_operands_get_accessible(char **file_operands, t_file_stats **file_operands_stats)
+{
+    if (file_operands == NULL || file_operands_stats == NULL)
+        return NULL;
+
+    return get_file_operands_by_category(file_operands, file_operands_stats, 0, FILE_OPERAND_ACCESSIBLE);
 }
 
 char **file_operands_get_non_directory(char **file_operands, t_file_stats **file_operands_stats, const int has_implicit_default_operand)

@@ -64,7 +64,10 @@ static int has_failed_to_access_a_file_operand(char **file_operands, t_file_stat
 
 static t_result *create_parsing_arguments_result(t_parsed_arguments *parsed_arguments)
 {
-    if (has_failed_to_access_a_file_operand(parsed_arguments->file_operands, parsed_arguments->file_operands_stats, parsed_arguments->has_implicit_default_operand))
+    const int skip_implicit_operand = parsed_arguments->has_implicit_default_operand
+        && !parsed_arguments_is_option_active(parsed_arguments, OPTIONS_IMMEDIATE_DIRS);
+
+    if (has_failed_to_access_a_file_operand(parsed_arguments->file_operands, parsed_arguments->file_operands_stats, skip_implicit_operand))
         return result_create_failed(parsed_arguments, NULL);
 
     return result_create_successful(parsed_arguments);
@@ -94,10 +97,13 @@ static const char *retrieve_advanced_file_stats(char **file_operands, t_file_sta
 static const char *initialize_file_operands(t_parsed_arguments *parsed_arguments, const int num_of_arguments, const char **arguments)
 {
     const int num_of_file_operands = num_of_arguments - options_get_amount(arguments);
+    const int immediate_dirs = parsed_arguments_is_option_active(parsed_arguments, OPTIONS_IMMEDIATE_DIRS);
 
     parsed_arguments->has_implicit_default_operand = num_of_file_operands == 0;
     parsed_arguments->file_operands = file_operands_get(num_of_file_operands, arguments);
-    parsed_arguments->file_operands_stats = file_operands_get_stats(num_of_file_operands, parsed_arguments->file_operands, !parsed_arguments_is_long_format_active(parsed_arguments));
+    const int stats_count = immediate_dirs ? ft_str_matrix_length(parsed_arguments->file_operands) : num_of_file_operands;
+    const int follow_symlinks = !immediate_dirs && !parsed_arguments_is_long_format_active(parsed_arguments);
+    parsed_arguments->file_operands_stats = file_operands_get_stats(stats_count, parsed_arguments->file_operands, follow_symlinks);
 
     if (parsed_arguments_is_long_format_active(parsed_arguments))
         return retrieve_advanced_file_stats(parsed_arguments->file_operands, parsed_arguments->file_operands_stats);
@@ -159,8 +165,13 @@ static void prepare_operand_groups(t_parsed_arguments *parsed_arguments)
     char **operands = parsed_arguments->file_operands;
     t_file_stats **stats = parsed_arguments->file_operands_stats;
     const int has_default_operand = parsed_arguments->has_implicit_default_operand;
-    char **files = file_operands_get_non_directory(operands, stats, has_default_operand);
-    char **directories = file_operands_get_directory(operands, stats, has_default_operand);
+    const int immediate_dirs = parsed_arguments_is_option_active(parsed_arguments, OPTIONS_IMMEDIATE_DIRS);
+    char **files = immediate_dirs
+        ? file_operands_get_accessible(operands, stats)
+        : file_operands_get_non_directory(operands, stats, has_default_operand);
+    char **directories = immediate_dirs
+        ? ft_safe_calloc(1, sizeof(char *))
+        : file_operands_get_directory(operands, stats, has_default_operand);
     t_file_stats **file_stats = get_operand_group_stats(parsed_arguments, files);
 
     parsed_arguments->non_directory_file_operands = files;

@@ -4,6 +4,7 @@
 #include "mocks.h"
 #include "parsed_arguments.h"
 #include "file_stats.h"
+#include <errno.h>
 
 #define SUITE_NAME "parsed_arguments"
 
@@ -50,6 +51,93 @@ static void should_be_created_correctly(void)
     CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
     CU_ASSERT_PTR_NULL(result_get_error_context(parsed_arguments_result));
     CU_ASSERT(verify_that_no_error_was_printed());
+}
+
+static void should_sort_all_operands_together_without_following_symlinks_with_d(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("dir", ".", ".."),
+        MOCK_FILE("file"),
+        MOCK_SYMLINK("link", "dir"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *args[] = { "dir", "-dr", "link", "file", NULL };
+    get_parsed_arguments_result(4, args);
+
+    CU_ASSERT_TRUE_FATAL(result_has_succeed(parsed_arguments_result));
+    CU_ASSERT_TRUE(parsed_arguments_is_option_active(sut, OPTIONS_IMMEDIATE_DIRS));
+    CU_ASSERT_FALSE(parsed_arguments_has_directory_file_operands(sut));
+    const char * const *operands = parsed_arguments_get_non_directory_file_operands(sut);
+    t_file_stats * const *stats = parsed_arguments_get_non_directory_file_operands_stats(sut);
+    CU_ASSERT_PTR_NOT_NULL_FATAL(operands[0]);
+    CU_ASSERT_STRING_EQUAL(operands[0], "link");
+    CU_ASSERT_PTR_NOT_NULL_FATAL(operands[1]);
+    CU_ASSERT_STRING_EQUAL(operands[1], "file");
+    CU_ASSERT_PTR_NOT_NULL_FATAL(operands[2]);
+    CU_ASSERT_STRING_EQUAL(operands[2], "dir");
+    CU_ASSERT_PTR_NULL(operands[3]);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(stats[0]), FILE_TYPE_SYMLINK);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(stats[1]), FILE_TYPE_REGULAR);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(stats[2]), FILE_TYPE_DIRECTORY);
+    CU_ASSERT(verify_that_no_error_was_printed());
+}
+
+static void should_include_stats_for_the_implicit_operand_with_d(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", ".", ".."),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *args[] = { "-d", NULL };
+    get_parsed_arguments_result(1, args);
+
+    CU_ASSERT_TRUE_FATAL(result_has_succeed(parsed_arguments_result));
+    CU_ASSERT_FALSE(parsed_arguments_has_directory_file_operands(sut));
+    const char * const *operands = parsed_arguments_get_non_directory_file_operands(sut);
+    t_file_stats * const *stats = parsed_arguments_get_non_directory_file_operands_stats(sut);
+    CU_ASSERT_PTR_NOT_NULL_FATAL(operands[0]);
+    CU_ASSERT_STRING_EQUAL(operands[0], ".");
+    CU_ASSERT_PTR_NULL(operands[1]);
+    CU_ASSERT_EQUAL(file_stats_get_file_type(stats[0]), FILE_TYPE_DIRECTORY);
+    CU_ASSERT(verify_that_no_error_was_printed());
+}
+
+static void should_skip_lstat_for_the_implicit_operand_without_d(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_ENTRY(".", DEFAULT_DIR_MODE, NULL, NULL, ((t_vfs_mock_errors){ .lstat_errno = EACCES })),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *args[] = { "-l", NULL };
+    get_parsed_arguments_result(1, args);
+
+    CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
+    CU_ASSERT_TRUE(parsed_arguments_has_directory_file_operands(sut));
+    CU_ASSERT(verify_that_no_error_was_printed());
+}
+
+static void should_report_lstat_failure_for_the_implicit_operand_with_d(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_ENTRY(".", DEFAULT_DIR_MODE, NULL, NULL, ((t_vfs_mock_errors){ .lstat_errno = EACCES })),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *args[] = { "-d", NULL };
+    get_parsed_arguments_result(1, args);
+
+    CU_ASSERT_TRUE(result_has_failed(parsed_arguments_result));
+    CU_ASSERT_PTR_NOT_NULL_FATAL(sut);
+    CU_ASSERT_FALSE(parsed_arguments_has_directory_file_operands(sut));
+    CU_ASSERT_PTR_NULL(parsed_arguments_get_non_directory_file_operands(sut)[0]);
+    CU_ASSERT_FALSE(verify_that_no_error_was_printed());
 }
 
 static void should_be_destroyed_correctly(void)
@@ -1210,6 +1298,10 @@ void register_parsed_arguments_suite(void)
     {
         CU_add_test(suite, "should_preserve_each_operand_group_order_when_U_option_is_active", should_preserve_each_operand_group_order_when_U_option_is_active);
         CU_add_test(suite, "should_be_created_correctly", should_be_created_correctly);
+        CU_add_test(suite, "should_sort_all_operands_together_without_following_symlinks_with_d", should_sort_all_operands_together_without_following_symlinks_with_d);
+        CU_add_test(suite, "should_include_stats_for_the_implicit_operand_with_d", should_include_stats_for_the_implicit_operand_with_d);
+        CU_add_test(suite, "should_skip_lstat_for_the_implicit_operand_without_d", should_skip_lstat_for_the_implicit_operand_without_d);
+        CU_add_test(suite, "should_report_lstat_failure_for_the_implicit_operand_with_d", should_report_lstat_failure_for_the_implicit_operand_with_d);
         CU_add_test(suite, "should_be_destroyed_correctly", should_be_destroyed_correctly);
         CU_add_test(suite, "should_not_fail_to_destroy_when_a_null_pointer_is_passed", should_not_fail_to_destroy_when_a_null_pointer_is_passed);
         CU_add_test(suite, "should_not_fail_to_destroy_if_its_already_null", should_not_fail_to_destroy_if_its_already_null);
