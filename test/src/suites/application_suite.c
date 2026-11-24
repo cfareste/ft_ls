@@ -1368,6 +1368,74 @@ static void should_render_the_default_directory_without_an_owner_column_with_g(v
     CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
 }
 
+static void should_render_one_file_without_an_owner_column_with_g(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE_WITH_STATS("file", MOCK_AUTHOR("alice"), MOCK_GROUP("staff"), MOCK_SIZE(42)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-g", "file", NULL };
+    get_parsed_arguments_result(2, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "-rw-r--r-- 1 staff 42 Jan  1  1970 file\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
+static void should_render_one_directory_without_an_owner_column_with_g(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("dir", ".", "..", "child"),
+        MOCK_FILE_WITH_STATS("dir/child", MOCK_BLOCKS(2), MOCK_AUTHOR("bob"), MOCK_GROUP("wheel"), MOCK_SIZE(8)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-g", "dir", NULL };
+    get_parsed_arguments_result(2, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "total 1\n"
+        "-rw-r--r-- 1 wheel 8 Jan  1  1970 child\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
+static void should_render_mixed_operands_without_an_owner_column_with_g(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE_WITH_STATS("file", MOCK_AUTHOR("alice"), MOCK_GROUP("staff"), MOCK_SIZE(42)),
+        MOCK_FILE_WITH_STATS("file2", MOCK_AUTHOR("bob"), MOCK_GROUP("wheel"), MOCK_SIZE(8)),
+        MOCK_DIR("dir1", ".", "..", "child"),
+        MOCK_FILE_WITH_STATS("dir1/child", MOCK_BLOCKS(2), MOCK_AUTHOR("charlie"), MOCK_GROUP("developers"), MOCK_SIZE(7)),
+        MOCK_DIR("dir2", ".", ".."),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-g", "dir2", "file2", "dir1", "file", NULL };
+    get_parsed_arguments_result(5, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "-rw-r--r-- 1 staff 42 Jan  1  1970 file\n"
+        "-rw-r--r-- 1 wheel  8 Jan  1  1970 file2\n"
+        "\n"
+        "dir1:\n"
+        "total 1\n"
+        "-rw-r--r-- 1 developers 7 Jan  1  1970 child\n"
+        "\n"
+        "dir2:\n"
+        "total 0\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
 static void should_render_a_symlink_operand_without_an_owner_column_with_gl(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -5401,6 +5469,9 @@ void register_application_suite(void)
         CU_add_test(suite, "should_successfully_print_the_contents_of_the_specified_operands_recursively", should_successfully_print_the_contents_of_the_specified_operands_recursively);
         CU_add_test(suite, "should_render_the_default_directory_in_long_format", should_render_the_default_directory_in_long_format);
         CU_add_test(suite, "should_render_the_default_directory_without_an_owner_column_with_g", should_render_the_default_directory_without_an_owner_column_with_g);
+        CU_add_test(suite, "should_render_one_file_without_an_owner_column_with_g", should_render_one_file_without_an_owner_column_with_g);
+        CU_add_test(suite, "should_render_one_directory_without_an_owner_column_with_g", should_render_one_directory_without_an_owner_column_with_g);
+        CU_add_test(suite, "should_render_mixed_operands_without_an_owner_column_with_g", should_render_mixed_operands_without_an_owner_column_with_g);
         CU_add_test(suite, "should_render_a_symlink_operand_without_an_owner_column_with_gl", should_render_a_symlink_operand_without_an_owner_column_with_gl);
         CU_add_test(suite, "should_render_a_non_directory_operand_in_long_format", should_render_a_non_directory_operand_in_long_format);
         CU_add_test(suite, "should_render_a_symlink_to_a_directory_operand_as_a_link_in_long_format", should_render_a_symlink_to_a_directory_operand_as_a_link_in_long_format);

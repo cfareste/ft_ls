@@ -403,3 +403,9 @@ QA LS-36 Immediate dirs (`ls -d ... | cat`)
    - Archivos
    - Directorios
    - Mixto
+
+
+QA LS-35 Long format without group (ls -g ... | cat)
+1. Sin parámetros
+2. 1 parámetro (nonDir y dir)
+3. X parámetros (mix nonDirs y dirs)
