@@ -353,7 +353,7 @@ QA LS-28 Manage ACL and extended attributes with long format option (`ls -l ... 
    - Directorios vacíos
 
 
-QA LS-29 Print dynamic multi-column output (`ls -C --tabsize=0 -w 80 ... | cat)
+QA LS-29 Print dynamic multi-column output (`ls -C --tabsize=0 -w 80 ...)
 1. C=80 ls -C
 2. C=40 ls -C a b c d e f g h i j k l
 3. C=20 ls -C a b c d e
@@ -364,7 +364,7 @@ QA LS-29 Print dynamic multi-column output (`ls -C --tabsize=0 -w 80 ... | cat)
 8. Cualquier otro test que pruebe las columnas
 
 
-QA LS-41 Colored output (`ls --color | cat`)
+QA LS-41 Colored output (`ls --color`)
 1. Enlace simbólico roto (huérfano / destino inexistente)
 2. Directorio con Sticky bit y escribible por otros
 3. Directorio escribible por otros (sin Sticky bit)
@@ -387,7 +387,7 @@ QA LS-41 Colored output (`ls --color | cat`)
 20. Archivo regular con extensión o sufijo de respaldo / temporal
 
 
-QA LS-37 No sorting (`ls -U ... | cat`)
+QA LS-37 No sorting (`ls -U ...`)
 1. Sin parámetros
 2. 1 parámetro (directorio)
 3. Múltiples parámetros
@@ -396,7 +396,7 @@ QA LS-37 No sorting (`ls -U ... | cat`)
    - Mixto
 
 
-QA LS-36 Immediate dirs (`ls -d ... | cat`)
+QA LS-36 Immediate dirs (`ls -d ...`)
 1. Sin parámetros
 2. 1 parámetro (archivo y directorio)
 3. Múltiples parámetros
@@ -405,7 +405,16 @@ QA LS-36 Immediate dirs (`ls -d ... | cat`)
    - Mixto
 
 
-QA LS-35 Long format without group (ls -g ... | cat)
+QA LS-35 Long format without group (ls -g ...)
 1. Sin parámetros
 2. 1 parámetro (nonDir y dir)
 3. X parámetros (mix nonDirs y dirs)
+
+
+QA LS-34 Support for -f option (ls -f ...)
+1. Sin parámetros
+2. 1 parámetro (directorio)
+3. Múltiples parámetros
+   - Archivos
+   - Directorios
+   - Mixto

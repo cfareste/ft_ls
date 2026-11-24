@@ -163,3 +163,8 @@ src -2                                                                          
 -g file                                                                                                                                           ::       -g file
 -g firstDir                                                                                                                                       ::       -g firstDir
 -g secondDir file firstDir Makefile                                                                                                               ::       -g secondDir file firstDir Makefile
+-f                                                                                                                                                ::       -aU
+-f dir_only_hidden                                                                                                                                ::       -aU dir_only_hidden
+-f file2 .hidden file                                                                                                                             ::       -aU file2 .hidden file
+-f secondDir dir_only_hidden firstDir                                                                                                             ::       -aU secondDir dir_only_hidden firstDir
+-f secondDir file2 firstDir .hidden file                                                                                                          ::       -aU secondDir file2 firstDir .hidden file
