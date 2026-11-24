@@ -5,6 +5,7 @@
 #include "parsed_arguments.h"
 #include "file_stats.h"
 #include <errno.h>
+#include <string.h>
 
 #define SUITE_NAME "parsed_arguments"
 
@@ -137,7 +138,8 @@ static void should_report_lstat_failure_for_the_implicit_operand_with_d(void)
     CU_ASSERT_PTR_NOT_NULL_FATAL(sut);
     CU_ASSERT_FALSE(parsed_arguments_has_directory_file_operands(sut));
     CU_ASSERT_PTR_NULL(parsed_arguments_get_non_directory_file_operands(sut)[0]);
-    CU_ASSERT_FALSE(verify_that_no_error_was_printed());
+    CU_ASSERT(verify_that_the_error_printed_is(
+        "ft_ls: cannot access '.': %s\n", strerror(EACCES)));
 }
 
 static void should_be_destroyed_correctly(void)
