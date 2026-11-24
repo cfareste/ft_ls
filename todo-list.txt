@@ -394,3 +394,12 @@ QA LS-37 No sorting (`ls -U ... | cat`)
    - Archivos
    - Directorios
    - Mixto
+
+
+QA LS-36 Immediate dirs (`ls -d ... | cat`)
+1. Sin parámetros
+2. 1 parámetro (archivo y directorio)
+3. Múltiples parámetros
+   - Archivos
+   - Directorios
+   - Mixto

@@ -153,3 +153,9 @@ src -2                                                                          
 -U mtime_file_same_z mtime_file_old mtime_file_new                                                                                                ::       -U mtime_file_same_z mtime_file_old mtime_file_new
 -U mtime_dir_old mtime_dir_new                                                                                                                    ::       -U mtime_dir_old mtime_dir_new
 -U mtime_dir_old mtime_file_same_z mtime_dir_new mtime_file_old                                                                                   ::       -U mtime_dir_old mtime_file_same_z mtime_dir_new mtime_file_old
+-d                                                                                                                                                ::       -d
+-d file                                                                                                                                           ::       -d file
+-d firstDir                                                                                                                                       ::       -d firstDir
+-d file2 file                                                                                                                                     ::       -d file2 file
+-d secondDir firstDir                                                                                                                             ::       -d secondDir firstDir
+-d secondDir file2 firstDir file                                                                                                                  ::       -d secondDir file2 firstDir file
