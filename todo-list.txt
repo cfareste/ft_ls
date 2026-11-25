@@ -418,3 +418,18 @@ QA LS-34 Support for -f option (ls -f ...)
    - Archivos
    - Directorios
    - Mixto
+
+
+QA LS-33 Enable atime for time operations (ls -u ...)
+1. Solo -u
+   - Directorio actual
+   - Mezcla de múltiples operandos (non dirs y dirs)
+2. Opción -u y -t
+   - Directorio actual
+   - Mezcla de múltiples operandos (non dirs y dirs)
+3. Opción -u y formato largo (-l o -g)
+   - Directorio actual
+   - Mezcla de múltiples operandos (non dirs y dirs)
+4. Opciones -u, -t y formato largo (-l o -g)
+   - Directorio actual
+   - Mezcla de múltiples operandos (non dirs y dirs)

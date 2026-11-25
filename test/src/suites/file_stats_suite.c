@@ -884,12 +884,37 @@ static void should_return_NULL_when_an_error_reading_symbolic_links_occurs(void)
     file_stats_destroy(&stats);
 }
 
+static void should_retain_access_and_modification_dates_with_nanoseconds(void)
+{
+    const time_t accessed = vfs_mock_make_timestamp(10, 5, 2024, 8, 9, 10);
+    const time_t modified = vfs_mock_make_timestamp(21, 11, 2023, 18, 19, 20);
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE_WITH_STATS("file", .stats.st_atim = { accessed, 123 }, .stats.st_mtim = { modified, 456 }),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+    t_file_stats *stats = file_stats_get_without_following_symlinks("file");
+
+    const t_date access_date = file_stats_get_access_date(stats);
+    const t_date modification_date = file_stats_get_modification_date(stats);
+
+    CU_ASSERT_EQUAL(access_date.timestamp, accessed);
+    CU_ASSERT_EQUAL(access_date.year, 2024);
+    CU_ASSERT_EQUAL(access_date.nanoseconds, 123);
+    CU_ASSERT_EQUAL(modification_date.timestamp, modified);
+    CU_ASSERT_EQUAL(modification_date.nanoseconds, 456);
+    CU_ASSERT(verify_that_no_error_was_printed());
+
+    file_stats_destroy(&stats);
+}
+
 void register_file_stats_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, NULL);
 
     if (suite != NULL)
     {
+        CU_add_test(suite, "should_retain_access_and_modification_dates_with_nanoseconds", should_retain_access_and_modification_dates_with_nanoseconds);
         CU_add_test(suite, "should_create_file_stats_correctly", should_create_file_stats_correctly);
         CU_add_test(suite, "should_detect_the_acl_type_for_each_file", should_detect_the_acl_type_for_each_file);
         CU_add_test(suite, "should_detect_default_posix_acl_and_probe_selinux_when_xattrs_are_unsupported", should_detect_default_posix_acl_and_probe_selinux_when_xattrs_are_unsupported);

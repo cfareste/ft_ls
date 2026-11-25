@@ -1273,12 +1273,41 @@ static void should_render_a_symlink_name_with_its_target_in_long_format(void)
     file_entry_array_destroy(&file_entry_array);
 }*/
 
+static void should_render_access_date_in_long_format_with_u(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE_WITH_STATS("file", MOCK_AUTHOR("alice"), MOCK_GROUP("staff"),
+            MOCK_ACCESS_TIME(1, 1, 2002, 0, 0, 0), MOCK_MODIFICATION_TIME(2, 2, 2004, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+    const char *args[] = { "-lu", "file", NULL };
+    get_parsed_arguments_result(2, args);
+
+    t_file_stats *stats = file_stats_get_without_following_symlinks("file");
+    t_file_entry *entry = file_entry_create_from_stats("file", stats);
+    file_entry_set_advanced_metadata_from_stats(entry, stats, 1);
+    t_file_entry_array *entries = file_entry_array_create();
+    file_entry_array_push(entries, entry);
+    t_render_context *context = render_context_create(parsed_arguments);
+
+    render_entries(context, entries);
+
+    CU_ASSERT(verify_that_the_output_printed_is("-rw-r--r-- 1 alice staff 1024 Jan  1  2002 file\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+
+    render_context_destroy(&context);
+    file_entry_array_destroy(&entries);
+    file_stats_destroy(&stats);
+}
+
 void register_renderer_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, test_teardown);
 
     if (suite != NULL)
     {
+        CU_add_test(suite, "should_render_access_date_in_long_format_with_u", should_render_access_date_in_long_format_with_u);
         CU_add_test(suite, "should_print_single_column_entries_when_the_strategy_is_called_directly", should_print_single_column_entries_when_the_strategy_is_called_directly);
         CU_add_test(suite, "should_apply_extension_and_executable_colors", should_apply_extension_and_executable_colors);
         CU_add_test(suite, "should_color_symlinks_and_their_targets_and_mark_broken_links", should_color_symlinks_and_their_targets_and_mark_broken_links);

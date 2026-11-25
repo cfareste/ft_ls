@@ -69,6 +69,15 @@ static void should_preserve_other_options_when_combined_with_f(void)
     CU_ASSERT_EQUAL(options_get_invalid_option(arguments), '\0');
 }
 
+static void should_accept_u_on_its_own(void)
+{
+    const char *arguments[] = { "-u", NULL };
+
+    CU_ASSERT_EQUAL(options_get(arguments), OPTIONS_ENABLE_ATIME);
+    CU_ASSERT_EQUAL(options_get_invalid_option(arguments), '\0');
+    CU_ASSERT_EQUAL(options_get_amount(arguments), 1);
+}
+
 static void should_accept_u_with_t(void)
 {
     const char *arguments[] = { "-ut", NULL };
@@ -121,6 +130,7 @@ void register_options_suite(void)
     CU_add_test(suite, "should_return_zero_option_count_for_a_NULL_argument_list", should_return_zero_option_count_for_a_NULL_argument_list);
     CU_add_test(suite, "should_count_option_arguments_not_individual_flags", should_count_option_arguments_not_individual_flags);
     CU_add_test(suite, "should_accept_u_with_t", should_accept_u_with_t);
+    CU_add_test(suite, "should_accept_u_on_its_own", should_accept_u_on_its_own);
     CU_add_test(suite, "should_return_no_invalid_option_for_a_NULL_argument_list", should_return_no_invalid_option_for_a_NULL_argument_list);
     CU_add_test(suite, "should_return_no_invalid_option_for_supported_and_non_option_arguments", should_return_no_invalid_option_for_supported_and_non_option_arguments);
     CU_add_test(suite, "should_return_the_first_unsupported_option_character", should_return_the_first_unsupported_option_character);
