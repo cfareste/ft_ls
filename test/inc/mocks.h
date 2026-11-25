@@ -61,6 +61,7 @@ typedef struct s_vfs_mock_entry
 #define MOCK_SIZE(value)                                                .stats.st_size = (value)
 #define MOCK_DEVICE(major_value, minor_value)                           .stats.st_rdev = makedev((major_value), (minor_value))
 #define MOCK_MODIFICATION_TIME(day, month, year, hour, minute, second)  .stats.st_mtim.tv_sec = vfs_mock_make_timestamp((day), (month), (year), (hour), (minute), (second))
+#define MOCK_ACCESS_TIME(day, month, year, hour, minute, second)        .stats.st_atim.tv_sec = vfs_mock_make_timestamp((day), (month), (year), (hour), (minute), (second))
 
 #define NO_ERRORS ((t_vfs_mock_errors){ 0 })
 #define MOCK_ENTRY(path_value, mode_value, entries_value, target_value, errors_value) \
