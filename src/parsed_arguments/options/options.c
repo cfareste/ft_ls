@@ -8,6 +8,7 @@
 #define READ_ALL_OPTION_CHAR 'a'
 #define REVERSE_OPTION_CHAR 'r'
 #define TIME_SORTING_OPTION_CHAR 't'
+#define ENABLE_ATIME_OPTION_CHAR 'u'
 #define NO_SORT_OPTION_CHAR 'U'
 #define READ_ALL_NO_SORT_OPTION_CHAR 'f'
 #define IMMEDIATE_DIRS_OPTION_CHAR 'd'
@@ -38,6 +39,8 @@ static t_options get_option_flag(const char option)
         return OPTIONS_REVERSE;
     if (option == TIME_SORTING_OPTION_CHAR)
         return OPTIONS_TIME_SORTING;
+    if (option == ENABLE_ATIME_OPTION_CHAR)
+        return OPTIONS_ENABLE_ATIME;
     if (option == NO_SORT_OPTION_CHAR)
         return OPTIONS_NO_SORT;
     if (option == READ_ALL_NO_SORT_OPTION_CHAR)
