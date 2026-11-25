@@ -88,6 +88,20 @@ prepare_color_fixtures() {
     touch -t 201901020000 color-cases
 }
 
+reset_access_time_fixture_dates() {
+    touch -a -t 200101010000 atime-cases/{a,dir_a,dir_a/child,list/a} &&
+        touch -a -t 200201010000 atime-cases/{b,dir_b,dir_b/child,list/b}
+}
+
+prepare_access_time_fixtures() {
+    mkdir -p atime-cases/{dir_a,dir_b,list} &&
+        printf '%100000s' '' > atime-cases/a &&
+        touch atime-cases/{b,dir_a/child,dir_b/child,list/a,list/b} &&
+        touch -m -t 200401010000 atime-cases/{a,dir_a,dir_a/child,list/a} &&
+        touch -m -t 200301010000 atime-cases/{b,dir_b,dir_b/child,list/b} &&
+        reset_access_time_fixture_dates
+}
+
 prepare_test_environment() {
     # Misc. directories
     mkdir -p firstDir secondDir empty
@@ -172,6 +186,8 @@ prepare_test_environment() {
     touch -t 202501010000 mtime_file_new mtime_dir_old/new mtime_dir_new/new
     touch -t 202001010000 mtime_dir_old
     touch -t 202501010000 mtime_dir_new
+
+    prepare_access_time_fixtures || return 1
 
     # Multi-option sorting fixtures with unique modification times
     mkdir -p multi_flag_dir/subdir
@@ -305,6 +321,17 @@ outputs_match() {
     return 0
 }
 
+run_test_command() {
+    local command="$1"
+
+    if [[ "${command}" == *" atime-cases/"* ]]; then
+        # Reading a directory can update its atime before the second command runs.
+        reset_access_time_fixture_dates || return 1
+    fi
+
+    bash -lc "${command}"
+}
+
 run_single_test() {
     local ft_args="$1"
     local model_args="$2"
@@ -319,13 +346,13 @@ run_single_test() {
         ft_cmd="${ft_cmd} ${ft_args}"
     fi
 
-    bash -lc "${ft_cmd}" >"${ft_output}" 2>&1 || ft_status=$?
+    run_test_command "${ft_cmd}" >"${ft_output}" 2>&1 || ft_status=$?
     if [[ "${model_args}" == --color=* ]]; then
-        LS_COLORS="${COLOR_PALETTE}" bash -lc "${model_cmd}" >"${model_output}" 2>&1 || model_status=$?
+        LS_COLORS="${COLOR_PALETTE}" run_test_command "${model_cmd}" >"${model_output}" 2>&1 || model_status=$?
         # GNU ls emits an initial reset and wraps ordinary names in a no-op color.
         sed -E -i '0,/\x1b\[0m/s///; s/\x1b\[00m([^\x1b]*)\x1b\[0m/\1/g' "${model_output}"
     else
-        bash -lc "${model_cmd}" >"${model_output}" 2>&1 || model_status=$?
+        run_test_command "${model_cmd}" >"${model_output}" 2>&1 || model_status=$?
     fi
 
     if [[ "${ft_status}" -eq "${model_status}" ]] && outputs_match "${model_output}" "${ft_output}"; then

@@ -168,3 +168,11 @@ src -2                                                                          
 -f file2 .hidden file                                                                                                                             ::       -aU file2 .hidden file
 -f secondDir dir_only_hidden firstDir                                                                                                             ::       -aU secondDir dir_only_hidden firstDir
 -f secondDir file2 firstDir .hidden file                                                                                                          ::       -aU secondDir file2 firstDir .hidden file
+-u atime-cases/list                                                                                                                               ::       -u atime-cases/list
+-u atime-cases/dir_a atime-cases/b atime-cases/dir_b atime-cases/a                                                                                ::       -u atime-cases/dir_a atime-cases/b atime-cases/dir_b atime-cases/a
+-ut atime-cases/list                                                                                                                              ::       -ut atime-cases/list
+-ut atime-cases/dir_a atime-cases/b atime-cases/dir_b atime-cases/a                                                                               ::       -ut atime-cases/dir_a atime-cases/b atime-cases/dir_b atime-cases/a
+-lu atime-cases/list                                                                                                                              ::       -lu atime-cases/list
+-gu atime-cases/dir_a atime-cases/b atime-cases/dir_b atime-cases/a                                                                               ::       -gu atime-cases/dir_a atime-cases/b atime-cases/dir_b atime-cases/a
+-gut atime-cases/list                                                                                                                             ::       -gut atime-cases/list
+-lut atime-cases/dir_a atime-cases/b atime-cases/dir_b atime-cases/a                                                                              ::       -lut atime-cases/dir_a atime-cases/b atime-cases/dir_b atime-cases/a
