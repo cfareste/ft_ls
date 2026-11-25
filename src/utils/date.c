@@ -49,6 +49,15 @@ t_date date_from_time(const time_t timestamp)
     return date;
 }
 
+int date_compare_newest_first(const t_date first, const t_date second)
+{
+    if (first.timestamp > second.timestamp)
+        return -1;
+    if (first.timestamp < second.timestamp)
+        return 1;
+    return (first.nanoseconds < second.nanoseconds) - (first.nanoseconds > second.nanoseconds);
+}
+
 time_t date_get_current_time(void)
 {
     return time(NULL);
