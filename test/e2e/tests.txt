@@ -84,23 +84,23 @@ src -l Makefile file                                                            
 -r src .hiddir empty                                                                                                                              ::       -r src .hiddir empty
 -r src Makefile .hiddir empty linkfile .hidden                                                                                                    ::       -r src Makefile .hiddir empty linkfile .hidden
 -t                                                                                                                                                ::       -t
--t mtime_dir_old                                                                                                                                  ::       -t mtime_dir_old
+-t mtime_dir_a                                                                                                                                    ::       -t mtime_dir_a
 -t mtime_file_old mtime_file_same_z mtime_file_same_a mtime_file_new                                                                              ::       -t mtime_file_old mtime_file_same_z mtime_file_same_a mtime_file_new
--t mtime_dir_old mtime_dir_new                                                                                                                    ::       -t mtime_dir_old mtime_dir_new
--t mtime_file_old mtime_dir_old mtime_file_new mtime_dir_new                                                                                      ::       -t mtime_file_old mtime_dir_old mtime_file_new mtime_dir_new
+-t mtime_dir_a mtime_dir_z                                                                                                                        ::       -t mtime_dir_a mtime_dir_z
+-t mtime_file_old mtime_dir_a mtime_file_new mtime_dir_z                                                                                          ::       -t mtime_file_old mtime_dir_a mtime_file_new mtime_dir_z
 -Rl firstDir                                                                                                                                      ::       -Rl firstDir
 -Ra .                                                                                                                                             ::       -Ra .
 -Rr firstDir                                                                                                                                      ::       -Rr firstDir
--Rt mtime_dir_old                                                                                                                                 ::       -Rt mtime_dir_old
+-Rt mtime_dir_a                                                                                                                                   ::       -Rt mtime_dir_a
 -la .                                                                                                                                             ::       -la .
 -lr firstDir                                                                                                                                      ::       -lr firstDir
--lt mtime_dir_old                                                                                                                                 ::       -lt mtime_dir_old
+-lt mtime_dir_a                                                                                                                                   ::       -lt mtime_dir_a
 -ar .                                                                                                                                             ::       -ar .
 -at multi_flag_dir                                                                                                                                ::       -at multi_flag_dir
 -rt mtime_file_old mtime_file_same_z mtime_file_same_a mtime_file_new                                                                             ::       -rt mtime_file_old mtime_file_same_z mtime_file_same_a mtime_file_new
 -laR firstDir                                                                                                                                     ::       -laR firstDir
 -rta multi_flag_dir                                                                                                                               ::       -rta multi_flag_dir
--Rlt mtime_dir_old                                                                                                                                ::       -Rlt mtime_dir_old
+-Rlt mtime_dir_a                                                                                                                                  ::       -Rlt mtime_dir_a
 -lartR multi_flag_dir                                                                                                                             ::       -lartR multi_flag_dir
 -2                                                                                                                                                ::       -2
 -lR2                                                                                                                                              ::       -lR2
@@ -149,10 +149,10 @@ src -2                                                                          
 --color -l color-cases/suffixes/media.ppm color-cases/suffixes/temp~                                                                              ::       --color=always -l color-cases/suffixes/media.ppm color-cases/suffixes/temp~
 --color -l color-cases/valid color-cases/orphan                                                                                                   ::       --color=always -l color-cases/valid color-cases/orphan
 -U                                                                                                                                                ::       -U
--U mtime_dir_old                                                                                                                                  ::       -U mtime_dir_old
+-U mtime_dir_a                                                                                                                                    ::       -U mtime_dir_a
 -U mtime_file_same_z mtime_file_old mtime_file_new                                                                                                ::       -U mtime_file_same_z mtime_file_old mtime_file_new
--U mtime_dir_old mtime_dir_new                                                                                                                    ::       -U mtime_dir_old mtime_dir_new
--U mtime_dir_old mtime_file_same_z mtime_dir_new mtime_file_old                                                                                   ::       -U mtime_dir_old mtime_file_same_z mtime_dir_new mtime_file_old
+-U mtime_dir_a mtime_dir_z                                                                                                                        ::       -U mtime_dir_a mtime_dir_z
+-U mtime_dir_a mtime_file_same_z mtime_dir_z mtime_file_old                                                                                       ::       -U mtime_dir_a mtime_file_same_z mtime_dir_z mtime_file_old
 -d                                                                                                                                                ::       -d
 -d file                                                                                                                                           ::       -d file
 -d firstDir                                                                                                                                       ::       -d firstDir
