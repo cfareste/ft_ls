@@ -76,13 +76,6 @@ static const char *get_month_abbreviation(const int month)
     return months[month - 1];
 }
 
-static int is_recent_modification(const t_date modification_date)
-{
-    const time_t current_time = date_get_current_time();
-
-    return modification_date.timestamp >= current_time - SIX_MONTHS_IN_SECONDS;
-}
-
 static size_t get_unsigned_number_width(unsigned long number)
 {
     size_t width = 1;
@@ -191,24 +184,24 @@ static void print_size(const t_file_entry *entry, const t_column_widths widths)
     ft_printf("%ld ", size);
 }
 
-static void print_modification_date(const t_file_entry *entry)
+static void print_date(const t_date date)
 {
-    const t_date modification_date = file_entry_get_modification_date(entry);
+    const time_t recent_cutoff = date_get_current_time() - SIX_MONTHS_IN_SECONDS;
 
-    if (is_recent_modification(modification_date))
+    if (date.timestamp >= recent_cutoff)
     {
         ft_printf("%s %2d %02d:%02d ",
-                  get_month_abbreviation(modification_date.month),
-                  modification_date.day,
-                  modification_date.hour,
-                  modification_date.minute);
+                  get_month_abbreviation(date.month),
+                  date.day,
+                  date.hour,
+                  date.minute);
         return;
     }
 
     ft_printf("%s %2d  %d ",
-              get_month_abbreviation(modification_date.month),
-              modification_date.day,
-              modification_date.year);
+              get_month_abbreviation(date.month),
+              date.day,
+              date.year);
 }
 
 static void print_failed_entry(const t_file_entry *entry, const t_column_widths widths, const int has_acl)
@@ -239,7 +232,10 @@ static void print_entry(const t_parsed_arguments *parsed_arguments, const t_file
         print_padded_text(file_entry_get_author(entry), widths.author);
     print_padded_text(file_entry_get_group(entry), widths.group);
     print_size(entry, widths);
-    print_modification_date(entry);
+    const t_date date = parsed_arguments_is_option_active(parsed_arguments, OPTIONS_ENABLE_ATIME)
+        ? file_entry_get_access_date(entry)
+        : file_entry_get_modification_date(entry);
+    print_date(date);
     render_colors_print_name_with_target(parsed_arguments, entry);
     ft_printf("\n");
 }

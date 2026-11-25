@@ -12,7 +12,8 @@ typedef enum e_options
     OPTIONS_COLOR = 1 << 6,
     OPTIONS_NO_SORT = 1 << 7,
     OPTIONS_IMMEDIATE_DIRS = 1 << 8,
-    OPTIONS_LONG_FORMAT_NO_OWNER = 1 << 9
+    OPTIONS_LONG_FORMAT_NO_OWNER = 1 << 9,
+    OPTIONS_ENABLE_ATIME = 1 << 10
 } t_options;
 
 t_options options_get(const char **arguments);

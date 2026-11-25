@@ -36,14 +36,18 @@ static int compare_file_operand_entries_by_modification_time(const void *first_i
 {
     const t_file_operand_sort_entry *first = first_item;
     const t_file_operand_sort_entry *second = second_item;
-    const time_t first_timestamp = file_stats_get_modification_date(first->stats).timestamp;
-    const time_t second_timestamp = file_stats_get_modification_date(second->stats).timestamp;
+    const int comparison = date_compare_newest_first(file_stats_get_modification_date(first->stats), file_stats_get_modification_date(second->stats));
 
-    if (first_timestamp > second_timestamp)
-        return -1;
-    if (first_timestamp < second_timestamp)
-        return 1;
-    return compare_file_operand_entries_by_name(first, second);
+    return comparison == 0 ? compare_file_operand_entries_by_name(first, second) : comparison;
+}
+
+static int compare_file_operand_entries_by_access_time(const void *first_item, const void *second_item)
+{
+    const t_file_operand_sort_entry *first = first_item;
+    const t_file_operand_sort_entry *second = second_item;
+    const int comparison = date_compare_newest_first(file_stats_get_access_date(first->stats), file_stats_get_access_date(second->stats));
+
+    return comparison == 0 ? compare_file_operand_entries_by_name(first, second) : comparison;
 }
 
 static int has_failed_to_access_a_file_operand(char **file_operands, t_file_stats **file_operands_stats, const int has_implicit_default_operand)
@@ -186,9 +190,11 @@ static void prepare_operand_groups(t_parsed_arguments *parsed_arguments)
         return;
 
     t_sorter_context *sorter_context = sorter_context_create(parsed_arguments);
-    const t_comparator_fn comparator = sorter_context_is_modification_time_order_active(sorter_context)
-        ? compare_file_operand_entries_by_modification_time
-        : compare_file_operand_entries_by_name;
+    t_comparator_fn comparator = compare_file_operand_entries_by_name;
+    if (sorter_context_is_access_time_order_active(sorter_context))
+        comparator = compare_file_operand_entries_by_access_time;
+    else if (sorter_context_is_modification_time_order_active(sorter_context))
+        comparator = compare_file_operand_entries_by_modification_time;
     t_file_stats **directory_stats = get_operand_group_stats(parsed_arguments, directories);
 
     sort_file_operand_group(files, file_stats, sorter_context, comparator);

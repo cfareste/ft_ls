@@ -54,6 +54,9 @@ static void should_create_a_file_entry_from_stats(void)
             MOCK_GROUP("developers"),
             MOCK_SIZE(12345),
             MOCK_DEVICE(12, 34),
+            MOCK_ACCESS_TIME(3, 5, 2023, 9, 8, 7),
+            .stats.st_atim.tv_nsec = 123,
+            .stats.st_mtim.tv_nsec = 456,
             MOCK_MODIFICATION_TIME(12, 10, 2024, 14, 10, 42)),
         MOCK_NULL_TERMINATOR()
     };
@@ -62,6 +65,7 @@ static void should_create_a_file_entry_from_stats(void)
 
     t_file_entry *entry = file_entry_create_from_stats("entry", stats);
     const t_date modification_date = file_entry_get_modification_date(entry);
+    const t_date access_date = file_entry_get_access_date(entry);
     const t_device device = file_entry_get_device(entry);
 
     CU_ASSERT_PTR_NOT_NULL(entry);
@@ -82,6 +86,9 @@ static void should_create_a_file_entry_from_stats(void)
     CU_ASSERT_EQUAL(modification_date.hour, 14);
     CU_ASSERT_EQUAL(modification_date.minute, 10);
     CU_ASSERT_EQUAL(modification_date.second, 42);
+    CU_ASSERT_EQUAL(modification_date.nanoseconds, 456);
+    CU_ASSERT_EQUAL(access_date.timestamp, vfs_mock_make_timestamp(3, 5, 2023, 9, 8, 7));
+    CU_ASSERT_EQUAL(access_date.nanoseconds, 123);
     CU_ASSERT_PTR_NULL(file_entry_get_link_target(entry));
     CU_ASSERT(verify_that_no_error_was_printed());
 
@@ -929,12 +936,48 @@ static void should_preserve_directory_entry_order_when_U_option_is_active(void)
     result_destroy(&parsed_arguments_result);
 }
 
+static void should_sort_entries_by_access_time_and_break_exact_ties_by_name(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE_WITH_STATS("a", .stats.st_atim = { 100, 1 }, .stats.st_mtim = { 300, 0 }),
+        MOCK_FILE_WITH_STATS("b", .stats.st_atim = { 100, 2 }, .stats.st_mtim = { 200, 0 }),
+        MOCK_FILE_WITH_STATS("c", .stats.st_atim = { 100, 2 }, .stats.st_mtim = { 100, 0 }),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+    const char *names[] = { "c", "a", "b" };
+    for (unsigned int i = 0; i < 3; i++)
+    {
+        t_file_stats *stats = file_stats_get_without_following_symlinks(names[i]);
+        file_entry_array_push(array_sut, file_entry_create_from_stats(names[i], stats));
+        file_stats_destroy(&stats);
+    }
+
+    const char *args[] = { "-u", NULL };
+    t_result *result = parse_arguments(1, args);
+    t_parsed_arguments *parsed_arguments = result_get_value(result);
+    t_sorter_context *context = sorter_context_create(parsed_arguments);
+
+    file_entry_array_sort(context, array_sut);
+
+    CU_ASSERT_TRUE(result_has_succeed(result));
+    CU_ASSERT_STRING_EQUAL(file_entry_get_name(file_entry_array_get_at(array_sut, 0)), "b");
+    CU_ASSERT_STRING_EQUAL(file_entry_get_name(file_entry_array_get_at(array_sut, 1)), "c");
+    CU_ASSERT_STRING_EQUAL(file_entry_get_name(file_entry_array_get_at(array_sut, 2)), "a");
+    CU_ASSERT(verify_that_no_error_was_printed());
+
+    sorter_context_destroy(&context);
+    parsed_arguments_destroy(&parsed_arguments);
+    result_destroy(&result);
+}
+
 void register_file_entry_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, test_teardown);
 
     if (suite != NULL)
     {
+        CU_add_test(suite, "should_sort_entries_by_access_time_and_break_exact_ties_by_name", should_sort_entries_by_access_time_and_break_exact_ties_by_name);
         CU_add_test(suite, "should_preserve_directory_entry_order_when_U_option_is_active", should_preserve_directory_entry_order_when_U_option_is_active);
         CU_add_test(suite, "should_create_file_entry_correctly", should_create_file_entry_correctly);
         CU_add_test(suite, "should_create_a_file_entry_from_stats", should_create_a_file_entry_from_stats);

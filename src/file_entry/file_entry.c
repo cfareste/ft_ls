@@ -19,6 +19,7 @@ struct s_file_entry
     long size;
     t_device device;
     t_date modification_date;
+    t_date access_date;
     char *target;
 };
 
@@ -57,18 +58,22 @@ static int compare_by_entry_name(const void *first_entry, const void *second_ent
     return ft_strcmp(first_entry_name, second_entry_name);
 }
 
-static int compare_by_entry_modification_time(const void *first_entry, const void *second_entry)
+static int compare_by_entry_modification_time(const void *first_item, const void *second_item)
 {
-    const t_file_entry *first = first_entry;
-    const t_file_entry *second = second_entry;
-    const t_date first_modification_date = file_entry_get_modification_date(first);
-    const t_date second_modification_date = file_entry_get_modification_date(second);
+    const t_file_entry *first = first_item;
+    const t_file_entry *second = second_item;
+    const int comparison = date_compare_newest_first(file_entry_get_modification_date(first), file_entry_get_modification_date(second));
 
-    if (first_modification_date.timestamp > second_modification_date.timestamp)
-        return -1;
-    if (first_modification_date.timestamp < second_modification_date.timestamp)
-        return 1;
-    return compare_by_entry_name(first_entry, second_entry);
+    return comparison == 0 ? compare_by_entry_name(first, second) : comparison;
+}
+
+static int compare_by_entry_access_time(const void *first_item, const void *second_item)
+{
+    const t_file_entry *first = first_item;
+    const t_file_entry *second = second_item;
+    const int comparison = date_compare_newest_first(file_entry_get_access_date(first), file_entry_get_access_date(second));
+
+    return comparison == 0 ? compare_by_entry_name(first, second) : comparison;
 }
 
 static int compare_no_sort(const void *first_entry, const void *second_entry)
@@ -119,6 +124,7 @@ t_file_entry *file_entry_create_from_stats(const char *file_name, t_file_stats *
     file_entry_set_size(file_entry, file_stats_get_size(file_stats));
     file_entry_set_device(file_entry, file_stats_get_device(file_stats));
     file_entry_set_modification_date(file_entry, file_stats_get_modification_date(file_stats));
+    file_entry->access_date = file_stats_get_access_date(file_stats);
 
     return file_entry;
 }
@@ -335,6 +341,14 @@ t_date file_entry_get_modification_date(const t_file_entry *entry)
     return entry->modification_date;
 }
 
+t_date file_entry_get_access_date(const t_file_entry *entry)
+{
+    if (entry == NULL)
+        return (t_date){0};
+
+    return entry->access_date;
+}
+
 void file_entry_set_modification_date(t_file_entry *entry, const t_date modification_date)
 {
     if (entry == NULL)
@@ -488,6 +502,8 @@ void file_entry_array_sort(const t_sorter_context *context, const t_file_entry_a
     t_comparator_fn comparator = compare_by_entry_name;
     if (sorter_context_is_no_sort_active(context))
         comparator = compare_no_sort;
+    else if (sorter_context_is_access_time_order_active(context))
+        comparator = compare_by_entry_access_time;
     else if (sorter_context_is_modification_time_order_active(context))
         comparator = compare_by_entry_modification_time;
 

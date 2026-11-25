@@ -141,6 +141,18 @@ static void should_return_the_current_timestamp(void)
     CU_ASSERT(current_time >= time_before && current_time <= time_after);
 }
 
+static void should_compare_dates_by_seconds_then_nanoseconds(void)
+{
+    const t_date older_second = { .timestamp = 100, .nanoseconds = 999999999 };
+    const t_date older_fraction = { .timestamp = 101, .nanoseconds = 100 };
+    const t_date newer_fraction = { .timestamp = 101, .nanoseconds = 200 };
+
+    CU_ASSERT(date_compare_newest_first(older_second, older_fraction) > 0);
+    CU_ASSERT(date_compare_newest_first(newer_fraction, older_fraction) < 0);
+    CU_ASSERT(date_compare_newest_first(older_fraction, newer_fraction) > 0);
+    CU_ASSERT_EQUAL(date_compare_newest_first(newer_fraction, newer_fraction), 0);
+}
+
 void register_date_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, set_up_utc_timezone, restore_timezone, NULL, NULL);
@@ -148,6 +160,7 @@ void register_date_suite(void)
     if (suite == NULL)
         return ;
 
+    CU_add_test(suite, "should_compare_dates_by_seconds_then_nanoseconds", should_compare_dates_by_seconds_then_nanoseconds);
     CU_add_test(suite, "should_convert_unix_epoch", should_convert_unix_epoch);
     CU_add_test(suite, "should_convert_leap_day_with_two_digit_day", should_convert_leap_day_with_two_digit_day);
     CU_add_test(suite, "should_convert_single_digit_day_and_month", should_convert_single_digit_day_and_month);

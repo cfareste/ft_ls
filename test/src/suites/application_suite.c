@@ -2718,6 +2718,240 @@ static void should_preserve_order_for_mixed_operands_with_no_sort(void)
     );
 }
 
+static void should_sort_current_directory_by_access_time_with_u(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", ".", "..", "a", "b"),
+        MOCK_FILE_WITH_STATS("a",
+            MOCK_ACCESS_TIME(1, 1, 2001, 0, 0, 0), MOCK_MODIFICATION_TIME(1, 1, 2004, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("b",
+            MOCK_ACCESS_TIME(1, 1, 2002, 0, 0, 0), MOCK_MODIFICATION_TIME(1, 1, 2003, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-u", NULL };
+    get_parsed_arguments_result(1, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "b\n"
+        "a\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
+static void should_sort_mixed_operands_by_access_time_with_u(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR_WITH_STATS("dir_a", ((const char *[]){ ".", "..", "child", NULL }),
+            MOCK_ACCESS_TIME(1, 1, 2001, 0, 0, 0), MOCK_MODIFICATION_TIME(1, 1, 2004, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("dir_b", ((const char *[]){ ".", "..", "child", NULL }),
+            MOCK_ACCESS_TIME(1, 1, 2002, 0, 0, 0), MOCK_MODIFICATION_TIME(1, 1, 2003, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("dir_a/child",
+            MOCK_ACCESS_TIME(1, 1, 2001, 0, 0, 0), MOCK_MODIFICATION_TIME(1, 1, 2004, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("dir_b/child",
+            MOCK_ACCESS_TIME(1, 1, 2002, 0, 0, 0), MOCK_MODIFICATION_TIME(1, 1, 2003, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("a",
+            MOCK_ACCESS_TIME(1, 1, 2001, 0, 0, 0), MOCK_MODIFICATION_TIME(1, 1, 2004, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("b",
+            MOCK_ACCESS_TIME(1, 1, 2002, 0, 0, 0), MOCK_MODIFICATION_TIME(1, 1, 2003, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-u", "dir_a", "b", "dir_b", "a", NULL };
+    get_parsed_arguments_result(5, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "b\n"
+        "a\n"
+        "\ndir_b:\n"
+        "child\n"
+        "\ndir_a:\n"
+        "child\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
+static void should_sort_current_directory_by_access_time_with_ut(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", ".", "..", "a", "b"),
+        MOCK_FILE_WITH_STATS("a",
+            MOCK_ACCESS_TIME(1, 1, 2001, 0, 0, 0), MOCK_MODIFICATION_TIME(1, 1, 2004, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("b",
+            MOCK_ACCESS_TIME(1, 1, 2002, 0, 0, 0), MOCK_MODIFICATION_TIME(1, 1, 2003, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-ut", NULL };
+    get_parsed_arguments_result(1, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "b\n"
+        "a\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
+static void should_sort_mixed_operands_by_access_time_with_ut(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR_WITH_STATS("dir_a", ((const char *[]){ ".", "..", "child", NULL }),
+            MOCK_ACCESS_TIME(1, 1, 2001, 0, 0, 0), MOCK_MODIFICATION_TIME(1, 1, 2004, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("dir_b", ((const char *[]){ ".", "..", "child", NULL }),
+            MOCK_ACCESS_TIME(1, 1, 2002, 0, 0, 0), MOCK_MODIFICATION_TIME(1, 1, 2003, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("dir_a/child",
+            MOCK_ACCESS_TIME(1, 1, 2001, 0, 0, 0), MOCK_MODIFICATION_TIME(1, 1, 2004, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("dir_b/child",
+            MOCK_ACCESS_TIME(1, 1, 2002, 0, 0, 0), MOCK_MODIFICATION_TIME(1, 1, 2003, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("a",
+            MOCK_ACCESS_TIME(1, 1, 2001, 0, 0, 0), MOCK_MODIFICATION_TIME(1, 1, 2004, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("b",
+            MOCK_ACCESS_TIME(1, 1, 2002, 0, 0, 0), MOCK_MODIFICATION_TIME(1, 1, 2003, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-ut", "dir_a", "b", "dir_b", "a", NULL };
+    get_parsed_arguments_result(5, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "b\n"
+        "a\n"
+        "\ndir_b:\n"
+        "child\n"
+        "\ndir_a:\n"
+        "child\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
+static void should_print_current_directory_access_dates_in_name_order_with_lu(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", ".", "..", "a", "b"),
+        MOCK_FILE_WITH_STATS("a",
+            MOCK_ACCESS_TIME(1, 1, 2001, 0, 0, 0), MOCK_MODIFICATION_TIME(1, 1, 2004, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("b",
+            MOCK_ACCESS_TIME(1, 1, 2002, 0, 0, 0), MOCK_MODIFICATION_TIME(1, 1, 2003, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-lu", NULL };
+    get_parsed_arguments_result(1, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "total 0\n"
+        "-rw-r--r-- 1 root root 1024 Jan  1  2001 a\n"
+        "-rw-r--r-- 1 root root 1024 Jan  1  2002 b\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
+static void should_print_mixed_operand_access_dates_in_name_order_with_gu(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR_WITH_STATS("dir_a", ((const char *[]){ ".", "..", "child", NULL }),
+            MOCK_ACCESS_TIME(1, 1, 2001, 0, 0, 0), MOCK_MODIFICATION_TIME(1, 1, 2004, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("dir_b", ((const char *[]){ ".", "..", "child", NULL }),
+            MOCK_ACCESS_TIME(1, 1, 2002, 0, 0, 0), MOCK_MODIFICATION_TIME(1, 1, 2003, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("dir_a/child",
+            MOCK_ACCESS_TIME(1, 1, 2001, 0, 0, 0), MOCK_MODIFICATION_TIME(1, 1, 2004, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("dir_b/child",
+            MOCK_ACCESS_TIME(1, 1, 2002, 0, 0, 0), MOCK_MODIFICATION_TIME(1, 1, 2003, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("a",
+            MOCK_ACCESS_TIME(1, 1, 2001, 0, 0, 0), MOCK_MODIFICATION_TIME(1, 1, 2004, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("b",
+            MOCK_ACCESS_TIME(1, 1, 2002, 0, 0, 0), MOCK_MODIFICATION_TIME(1, 1, 2003, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-gu", "dir_a", "b", "dir_b", "a", NULL };
+    get_parsed_arguments_result(5, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "-rw-r--r-- 1 root 1024 Jan  1  2001 a\n"
+        "-rw-r--r-- 1 root 1024 Jan  1  2002 b\n"
+        "\ndir_a:\n"
+        "total 0\n"
+        "-rw-r--r-- 1 root 1024 Jan  1  2001 child\n"
+        "\ndir_b:\n"
+        "total 0\n"
+        "-rw-r--r-- 1 root 1024 Jan  1  2002 child\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
+static void should_sort_and_print_current_directory_access_dates_with_gut(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", ".", "..", "a", "b"),
+        MOCK_FILE_WITH_STATS("a",
+            MOCK_ACCESS_TIME(1, 1, 2001, 0, 0, 0), MOCK_MODIFICATION_TIME(1, 1, 2004, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("b",
+            MOCK_ACCESS_TIME(1, 1, 2002, 0, 0, 0), MOCK_MODIFICATION_TIME(1, 1, 2003, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-gut", NULL };
+    get_parsed_arguments_result(1, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "total 0\n"
+        "-rw-r--r-- 1 root 1024 Jan  1  2002 b\n"
+        "-rw-r--r-- 1 root 1024 Jan  1  2001 a\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
+static void should_sort_and_print_mixed_operand_access_dates_with_lut(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR_WITH_STATS("dir_a", ((const char *[]){ ".", "..", "child", NULL }),
+            MOCK_ACCESS_TIME(1, 1, 2001, 0, 0, 0), MOCK_MODIFICATION_TIME(1, 1, 2004, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("dir_b", ((const char *[]){ ".", "..", "child", NULL }),
+            MOCK_ACCESS_TIME(1, 1, 2002, 0, 0, 0), MOCK_MODIFICATION_TIME(1, 1, 2003, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("dir_a/child",
+            MOCK_ACCESS_TIME(1, 1, 2001, 0, 0, 0), MOCK_MODIFICATION_TIME(1, 1, 2004, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("dir_b/child",
+            MOCK_ACCESS_TIME(1, 1, 2002, 0, 0, 0), MOCK_MODIFICATION_TIME(1, 1, 2003, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("a",
+            MOCK_ACCESS_TIME(1, 1, 2001, 0, 0, 0), MOCK_MODIFICATION_TIME(1, 1, 2004, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("b",
+            MOCK_ACCESS_TIME(1, 1, 2002, 0, 0, 0), MOCK_MODIFICATION_TIME(1, 1, 2003, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-lut", "dir_a", "b", "dir_b", "a", NULL };
+    get_parsed_arguments_result(5, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "-rw-r--r-- 1 root root 1024 Jan  1  2002 b\n"
+        "-rw-r--r-- 1 root root 1024 Jan  1  2001 a\n"
+        "\ndir_b:\n"
+        "total 0\n"
+        "-rw-r--r-- 1 root root 1024 Jan  1  2002 child\n"
+        "\ndir_a:\n"
+        "total 0\n"
+        "-rw-r--r-- 1 root root 1024 Jan  1  2001 child\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
 static void should_sort_the_current_directory_by_modification_time_when_no_file_operands_are_specified(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -5639,6 +5873,14 @@ void register_application_suite(void)
         CU_add_test(suite, "should_preserve_order_for_multiple_file_operands_with_no_sort", should_preserve_order_for_multiple_file_operands_with_no_sort);
         CU_add_test(suite, "should_preserve_order_for_multiple_directory_operands_with_no_sort", should_preserve_order_for_multiple_directory_operands_with_no_sort);
         CU_add_test(suite, "should_preserve_order_for_mixed_operands_with_no_sort", should_preserve_order_for_mixed_operands_with_no_sort);
+        CU_add_test(suite, "should_sort_current_directory_by_access_time_with_u", should_sort_current_directory_by_access_time_with_u);
+        CU_add_test(suite, "should_sort_mixed_operands_by_access_time_with_u", should_sort_mixed_operands_by_access_time_with_u);
+        CU_add_test(suite, "should_sort_current_directory_by_access_time_with_ut", should_sort_current_directory_by_access_time_with_ut);
+        CU_add_test(suite, "should_sort_mixed_operands_by_access_time_with_ut", should_sort_mixed_operands_by_access_time_with_ut);
+        CU_add_test(suite, "should_print_current_directory_access_dates_in_name_order_with_lu", should_print_current_directory_access_dates_in_name_order_with_lu);
+        CU_add_test(suite, "should_print_mixed_operand_access_dates_in_name_order_with_gu", should_print_mixed_operand_access_dates_in_name_order_with_gu);
+        CU_add_test(suite, "should_sort_and_print_current_directory_access_dates_with_gut", should_sort_and_print_current_directory_access_dates_with_gut);
+        CU_add_test(suite, "should_sort_and_print_mixed_operand_access_dates_with_lut", should_sort_and_print_mixed_operand_access_dates_with_lut);
         CU_add_test(suite, "should_sort_the_current_directory_by_modification_time_when_no_file_operands_are_specified", should_sort_the_current_directory_by_modification_time_when_no_file_operands_are_specified);
         CU_add_test(suite, "should_sort_a_directory_operand_contents_by_modification_time", should_sort_a_directory_operand_contents_by_modification_time);
         CU_add_test(suite, "should_sort_multiple_file_operands_by_modification_time", should_sort_multiple_file_operands_by_modification_time);

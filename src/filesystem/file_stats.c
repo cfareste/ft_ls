@@ -33,6 +33,7 @@ struct s_file_stats
     off_t size;
     t_device device;
     t_date modification_date;
+    t_date access_date;
     char *target;
     int target_retrieval_attempted;
     int target_retrieval_failed;
@@ -215,6 +216,9 @@ static void initialize_stats(t_file_stats *file_stats, const char *file_path, co
         file_stats->device.minor = minor(stats->st_rdev);
     }
     file_stats->modification_date = date_from_time(stats->st_mtime);
+    file_stats->modification_date.nanoseconds = stats->st_mtim.tv_nsec;
+    file_stats->access_date = date_from_time(stats->st_atime);
+    file_stats->access_date.nanoseconds = stats->st_atim.tv_nsec;
 }
 
 static int retrieve_target_pointed_by_link(t_file_stats *stats)
@@ -399,6 +403,14 @@ t_date file_stats_get_modification_date(const t_file_stats *file_stats)
         return (t_date){0};
 
     return file_stats->modification_date;
+}
+
+t_date file_stats_get_access_date(const t_file_stats *file_stats)
+{
+    if (file_stats == NULL)
+        return (t_date){0};
+
+    return file_stats->access_date;
 }
 
 const char *file_stats_get_target_pointed_by_link(t_file_stats *stats)

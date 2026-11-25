@@ -85,7 +85,20 @@ prepare_color_fixtures() {
         COLOR_BLOCK_DEVICE="$(find /dev -type b -print -quit 2>/dev/null)"
     fi
     export COLOR_CAP_FILE COLOR_BLOCK_DEVICE
-    touch -t 201901020000 color-cases
+}
+
+reset_access_time_fixture_dates() {
+    touch -a -t 200101010000 atime-cases/{a,dir_a,dir_a/child,list/a} &&
+        touch -a -t 200201010000 atime-cases/{b,dir_b,dir_b/child,list/b}
+}
+
+prepare_access_time_fixtures() {
+    mkdir -p atime-cases/{dir_a,dir_b,list} &&
+        printf '%100000s' '' > atime-cases/a &&
+        touch atime-cases/{b,dir_a/child,dir_b/child,list/a,list/b} &&
+        touch -m -t 200401010000 atime-cases/{a,dir_a,dir_a/child,list/a} &&
+        touch -m -t 200301010000 atime-cases/{b,dir_b,dir_b/child,list/b} &&
+        reset_access_time_fixture_dates
 }
 
 prepare_test_environment() {
@@ -161,28 +174,21 @@ prepare_test_environment() {
     touch "nopermdir/file"
     chmod 000 nopermdir
 
-    # Modification-time sorting fixtures
-    mkdir mtime_dir_old mtime_dir_new
+    # Distinct mtimes in the same second, plus an exact tie for sorting by name.
+    mkdir mtime_dir_a mtime_dir_z
     touch mtime_file_old mtime_file_same_z mtime_file_same_a mtime_file_new
-    touch mtime_dir_old/old mtime_dir_old/same_z mtime_dir_old/same_a mtime_dir_old/new
-    touch mtime_dir_new/old mtime_dir_new/same_z mtime_dir_new/same_a mtime_dir_new/new
-    find . -mindepth 1 -maxdepth 1 ! -type s -exec touch -h -t 201901010000 {} +
-    touch -t 202001010000 mtime_file_old mtime_dir_old/old mtime_dir_new/old
-    touch -t 202401010000 mtime_file_same_z mtime_file_same_a mtime_dir_old/same_z mtime_dir_old/same_a mtime_dir_new/same_z mtime_dir_new/same_a
-    touch -t 202501010000 mtime_file_new mtime_dir_old/new mtime_dir_new/new
-    touch -t 202001010000 mtime_dir_old
-    touch -t 202501010000 mtime_dir_new
+    touch mtime_dir_a/old mtime_dir_a/same_z mtime_dir_a/same_a mtime_dir_a/new
+    touch mtime_dir_z/old mtime_dir_z/same_z mtime_dir_z/same_a mtime_dir_z/new
+    touch -m -d 2024-01-01T00:00:00.100000001 mtime_file_old mtime_dir_a/old mtime_dir_z/old mtime_dir_a || return 1
+    touch -m -d 2024-01-01T00:00:00.100000002 mtime_file_same_z mtime_file_same_a +        mtime_dir_a/{same_z,same_a} mtime_dir_z/{same_z,same_a} || return 1
+    touch -m -d 2024-01-01T00:00:00.100000003 mtime_file_new mtime_dir_a/new mtime_dir_z/new mtime_dir_z || return 1
 
-    # Multi-option sorting fixtures with unique modification times
+    prepare_access_time_fixtures || return 1
+
+    # Multi-option sorting fixtures with their filesystem timestamps.
     mkdir -p multi_flag_dir/subdir
     touch multi_flag_dir/old multi_flag_dir/.hidden multi_flag_dir/new
     touch multi_flag_dir/subdir/.nested_hidden multi_flag_dir/subdir/nested
-    touch -t 202001010000 multi_flag_dir/old
-    touch -t 202101010000 multi_flag_dir/.hidden
-    touch -t 202301010000 multi_flag_dir/subdir
-    touch -t 202401010000 multi_flag_dir/new
-    touch -t 202501010000 multi_flag_dir/subdir/.nested_hidden
-    touch -t 202601010000 multi_flag_dir/subdir/nested
 
     # ACL fixtures for long-format output
     if ! command -v setfacl >/dev/null 2>&1; then
@@ -235,10 +241,7 @@ prepare_test_environment() {
     ln -s loop-two acl-cases/symlinks/loop-one
     ln -s loop-one acl-cases/symlinks/loop-two
 
-    prepare_color_fixtures || return 1
-
-    # Keep the parent directory older than multi_flag_dir for the -t ordering tests.
-    touch -t 201901010000 .
+    prepare_color_fixtures
 }
 
 remove_test_environment() {
@@ -305,6 +308,17 @@ outputs_match() {
     return 0
 }
 
+run_test_command() {
+    local command="$1"
+
+    if [[ "${command}" == *" atime-cases/"* ]]; then
+        # Reading a directory can update its atime before the second command runs.
+        reset_access_time_fixture_dates || return 1
+    fi
+
+    bash -lc "${command}"
+}
+
 run_single_test() {
     local ft_args="$1"
     local model_args="$2"
@@ -319,13 +333,13 @@ run_single_test() {
         ft_cmd="${ft_cmd} ${ft_args}"
     fi
 
-    bash -lc "${ft_cmd}" >"${ft_output}" 2>&1 || ft_status=$?
+    run_test_command "${ft_cmd}" >"${ft_output}" 2>&1 || ft_status=$?
     if [[ "${model_args}" == --color=* ]]; then
-        LS_COLORS="${COLOR_PALETTE}" bash -lc "${model_cmd}" >"${model_output}" 2>&1 || model_status=$?
+        LS_COLORS="${COLOR_PALETTE}" run_test_command "${model_cmd}" >"${model_output}" 2>&1 || model_status=$?
         # GNU ls emits an initial reset and wraps ordinary names in a no-op color.
         sed -E -i '0,/\x1b\[0m/s///; s/\x1b\[00m([^\x1b]*)\x1b\[0m/\1/g' "${model_output}"
     else
-        bash -lc "${model_cmd}" >"${model_output}" 2>&1 || model_status=$?
+        run_test_command "${model_cmd}" >"${model_output}" 2>&1 || model_status=$?
     fi
 
     if [[ "${ft_status}" -eq "${model_status}" ]] && outputs_match "${model_output}" "${ft_output}"; then

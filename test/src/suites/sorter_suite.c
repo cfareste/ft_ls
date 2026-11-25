@@ -152,12 +152,47 @@ static void should_sort_an_unsorted_array_in_reverse_order_when_reverse_option_i
     result_destroy(&parsed_arguments_result);
 }
 
+static void should_select_access_time_order_for_u_according_to_format_and_t(void)
+{
+    const struct {
+        const char *option;
+        int access_time_order;
+        int modification_time_order;
+    } cases[] = {
+        { "-t", 0, 1 },
+        { "-u", 1, 0 },
+        { "-ut", 1, 0 },
+        { "-lu", 0, 0 },
+        { "-gu", 0, 0 },
+        { "-lut", 1, 0 },
+        { "-gut", 1, 0 }
+    };
+
+    CU_ASSERT_FALSE(sorter_context_is_access_time_order_active(NULL));
+    for (unsigned int i = 0; i < sizeof(cases) / sizeof(cases[0]); i++)
+    {
+        const char *args[] = { cases[i].option, NULL };
+        t_result *result = parse_arguments(1, args);
+        t_parsed_arguments *parsed_arguments = result_get_value(result);
+        t_sorter_context *context = sorter_context_create(parsed_arguments);
+
+        CU_ASSERT_TRUE(result_has_succeed(result));
+        CU_ASSERT_EQUAL(sorter_context_is_access_time_order_active(context), cases[i].access_time_order);
+        CU_ASSERT_EQUAL(sorter_context_is_modification_time_order_active(context), cases[i].modification_time_order);
+
+        sorter_context_destroy(&context);
+        parsed_arguments_destroy(&parsed_arguments);
+        result_destroy(&result);
+    }
+}
+
 void register_sorter_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, test_teardown);
 
     if (suite != NULL)
     {
+        CU_add_test(suite, "should_select_access_time_order_for_u_according_to_format_and_t", should_select_access_time_order_for_u_according_to_format_and_t);
         CU_add_test(suite, "should_create_sorter_context", should_create_sorter_context);
         CU_add_test(suite, "should_report_modification_time_order_only_when_the_t_option_is_active", should_report_modification_time_order_only_when_the_t_option_is_active);
         CU_add_test(suite, "should_destroy_sorter_context", should_destroy_sorter_context);

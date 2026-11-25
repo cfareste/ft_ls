@@ -1292,12 +1292,42 @@ static void should_preserve_each_operand_group_order_when_U_option_is_active(voi
     CU_ASSERT_EQUAL(file_stats_get_modification_date(stats[2]).year, 2020);
 }
 
+static void should_sort_file_and_directory_operands_by_access_time_with_ut(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE_WITH_STATS("a", .stats.st_atim = { 100, 1 }, .stats.st_mtim = { 300, 0 }),
+        MOCK_FILE_WITH_STATS("b", .stats.st_atim = { 100, 2 }, .stats.st_mtim = { 200, 0 }),
+        MOCK_DIR_WITH_STATS("dir_a", NULL, .stats.st_atim = { 100, 1 }, .stats.st_mtim = { 300, 0 }),
+        MOCK_DIR_WITH_STATS("dir_b", NULL, .stats.st_atim = { 100, 2 }, .stats.st_mtim = { 200, 0 }),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *args[] = { "-ut", "a", "dir_a", "b", "dir_b", NULL };
+    get_parsed_arguments_result(5, args);
+
+    CU_ASSERT_TRUE_FATAL(result_has_succeed(parsed_arguments_result));
+    const char * const *files = parsed_arguments_get_non_directory_file_operands(sut);
+    const char * const *directories = parsed_arguments_get_directory_file_operands(sut);
+    t_file_stats * const *stats = parsed_arguments_get_non_directory_file_operands_stats(sut);
+    CU_ASSERT_STRING_EQUAL(files[0], "b");
+    CU_ASSERT_STRING_EQUAL(files[1], "a");
+    CU_ASSERT_PTR_NULL(files[2]);
+    CU_ASSERT_STRING_EQUAL(directories[0], "dir_b");
+    CU_ASSERT_STRING_EQUAL(directories[1], "dir_a");
+    CU_ASSERT_PTR_NULL(directories[2]);
+    CU_ASSERT_EQUAL(file_stats_get_access_date(stats[0]).nanoseconds, 2);
+    CU_ASSERT_EQUAL(file_stats_get_access_date(stats[1]).nanoseconds, 1);
+    CU_ASSERT(verify_that_no_error_was_printed());
+}
+
 void register_parsed_arguments_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, test_teardown);
 
     if (suite != NULL)
     {
+        CU_add_test(suite, "should_sort_file_and_directory_operands_by_access_time_with_ut", should_sort_file_and_directory_operands_by_access_time_with_ut);
         CU_add_test(suite, "should_preserve_each_operand_group_order_when_U_option_is_active", should_preserve_each_operand_group_order_when_U_option_is_active);
         CU_add_test(suite, "should_be_created_correctly", should_be_created_correctly);
         CU_add_test(suite, "should_sort_all_operands_together_without_following_symlinks_with_d", should_sort_all_operands_together_without_following_symlinks_with_d);
