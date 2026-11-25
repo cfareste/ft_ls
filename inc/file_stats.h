@@ -57,6 +57,7 @@ const char *file_stats_get_group(t_file_stats *stats);
 long file_stats_get_size(const t_file_stats *file_stats);
 t_device file_stats_get_device(const t_file_stats *file_stats);
 t_date file_stats_get_modification_date(const t_file_stats *file_stats);
+t_date file_stats_get_access_date(const t_file_stats *file_stats);
 const char *file_stats_get_target_pointed_by_link(t_file_stats *stats);
 int file_stats_target_retrieval_failed(const t_file_stats *stats);
 void file_stats_destroy(t_file_stats **file_stats);

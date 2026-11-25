@@ -34,6 +34,7 @@ void file_entry_set_size(t_file_entry *entry, long size);
 t_device file_entry_get_device(const t_file_entry *entry);
 void file_entry_set_device(t_file_entry *entry, t_device device);
 t_date file_entry_get_modification_date(const t_file_entry *entry);
+t_date file_entry_get_access_date(const t_file_entry *entry);
 void file_entry_set_modification_date(t_file_entry *entry, t_date modification_date);
 const char *file_entry_get_link_target(const t_file_entry *entry);
 void file_entry_set_link_target(t_file_entry *entry, const char *target);
