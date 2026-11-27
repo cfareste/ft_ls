@@ -1,10 +1,6 @@
 TODO:
 
 
-TODO En algún momento:
-- Investigar si los tests están acoplados a la implementación interna de las cosas
-
-
 TODO Para mejorar siguientes proyectos:
 - Las historias no pensarlas tan prematuramente (o tener más cosas en cuenta)
 - No ser tan rígido con el número de ellas, ya que algunas son muy grandes porque he tenido que hacer muchas cosas en ella porque no tenía
@@ -17,12 +13,6 @@ el terreno allanado, como con los mocks, github actions, etc. Cada una de ellas 
   - Reordenar los requerimientos de cada épica en historias
 - Mirar el casing de C
 - Mirar si en C se suele usar bools o simplemente ints
-
-
-TODO QA:
-- Investigar de nuevo casos completos (para esa historia, no épica)
-- Probar que este hecho, tanto a mano como con tests
-
 
 
 QA LS-8 Execution without parameters (`ls -aU | cat`)
