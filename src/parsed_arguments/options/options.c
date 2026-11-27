@@ -4,6 +4,11 @@
 
 #define COLOR_OPTION "--color"
 
+int options_is_option_argument(const char *argument)
+{
+    return argument != NULL && argument[0] == '-' && argument[1] != '\0';
+}
+
 static int parse_short_option(t_options *options, t_sort_type *sort_option, const char flag)
 {
     switch (flag)
@@ -71,13 +76,10 @@ t_parsed_options options_parse(const char **arguments, const int stdout_is_termi
 
     for (int i = 0; arguments != NULL && arguments[i] != NULL; i++)
     {
-        if (arguments[i][0] != '-')
+        if (!options_is_option_argument(arguments[i]))
             continue;
 
         parsed_options.options_amount++;
-        if (arguments[i][1] == '\0')
-            continue;
-
         if (ft_are_string_equals(arguments[i], COLOR_OPTION))
         {
             parsed_options.options.color_files = 1;

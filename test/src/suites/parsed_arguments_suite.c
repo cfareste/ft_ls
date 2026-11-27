@@ -141,6 +141,43 @@ static void should_report_lstat_failure_for_the_implicit_operand_with_d(void)
         "ft_ls: cannot access '.': %s\n", strerror(EACCES)));
 }
 
+static void should_report_a_missing_lone_dash_operand(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", ".", ".."),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *args[] = { "-", NULL };
+    get_parsed_arguments_result(1, args);
+
+    CU_ASSERT_TRUE(result_has_failed(parsed_arguments_result));
+    CU_ASSERT_TRUE(parsed_arguments_is_file_operand(sut, "-"));
+    CU_ASSERT_FALSE(parsed_arguments_has_directory_file_operands(sut));
+    CU_ASSERT(verify_that_the_error_printed_is(
+        "ft_ls: cannot access '-': %s\n", strerror(ENOENT)));
+}
+
+static void should_keep_an_existing_lone_dash_as_a_file_operand(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_FILE("-"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *args[] = { "-l", "-", NULL };
+    get_parsed_arguments_result(2, args);
+
+    CU_ASSERT_TRUE_FATAL(result_has_succeed(parsed_arguments_result));
+    const char * const *operands = parsed_arguments_get_non_directory_file_operands(sut);
+    CU_ASSERT_PTR_NOT_NULL_FATAL(operands[0]);
+    CU_ASSERT_STRING_EQUAL(operands[0], "-");
+    CU_ASSERT_PTR_NULL(operands[1]);
+    CU_ASSERT(verify_that_no_error_was_printed());
+}
+
 static void should_be_destroyed_correctly(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -1365,6 +1402,8 @@ void register_parsed_arguments_suite(void)
         CU_add_test(suite, "should_sort_file_and_directory_operands_by_access_time_with_ut", should_sort_file_and_directory_operands_by_access_time_with_ut);
         CU_add_test(suite, "should_preserve_each_operand_group_order_when_U_option_is_active", should_preserve_each_operand_group_order_when_U_option_is_active);
         CU_add_test(suite, "should_be_created_correctly", should_be_created_correctly);
+        CU_add_test(suite, "should_report_a_missing_lone_dash_operand", should_report_a_missing_lone_dash_operand);
+        CU_add_test(suite, "should_keep_an_existing_lone_dash_as_a_file_operand", should_keep_an_existing_lone_dash_as_a_file_operand);
         CU_add_test(suite, "should_sort_all_operands_together_without_following_symlinks_with_d", should_sort_all_operands_together_without_following_symlinks_with_d);
         CU_add_test(suite, "should_include_stats_for_the_implicit_operand_with_d", should_include_stats_for_the_implicit_operand_with_d);
         CU_add_test(suite, "should_skip_lstat_for_the_implicit_operand_without_d", should_skip_lstat_for_the_implicit_operand_without_d);

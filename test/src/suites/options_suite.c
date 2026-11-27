@@ -136,6 +136,16 @@ static void should_disable_recursion_and_dereferencing_for_immediate_directories
     CU_ASSERT_FALSE(last_result.options.dereference_symlinks);
 }
 
+static void should_count_only_the_option_when_a_lone_dash_is_also_passed(void)
+{
+    const char *arguments[] = { "-", "-l", NULL };
+    const t_parsed_options result = options_parse(arguments, 0);
+
+    CU_ASSERT_EQUAL(result.invalid_option, '\0');
+    CU_ASSERT_EQUAL(result.options_amount, 1);
+    CU_ASSERT_EQUAL(result.options.format, FORMAT_LONG);
+}
+
 static void should_return_the_first_unsupported_option_character(void)
 {
     const char *arguments[] = { "-laX", "-z", NULL };
@@ -158,5 +168,6 @@ void register_options_suite(void)
     CU_add_test(suite, "should_resolve_explicit_and_implicit_time_sorting", should_resolve_explicit_and_implicit_time_sorting);
     CU_add_test(suite, "should_apply_f_settings_including_when_sort_is_overridden", should_apply_f_settings_including_when_sort_is_overridden);
     CU_add_test(suite, "should_disable_recursion_and_dereferencing_for_immediate_directories", should_disable_recursion_and_dereferencing_for_immediate_directories);
+    CU_add_test(suite, "should_count_only_the_option_when_a_lone_dash_is_also_passed", should_count_only_the_option_when_a_lone_dash_is_also_passed);
     CU_add_test(suite, "should_return_the_first_unsupported_option_character", should_return_the_first_unsupported_option_character);
 }

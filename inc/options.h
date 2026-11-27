@@ -24,3 +24,4 @@ typedef struct s_parsed_options
 } t_parsed_options;
 
 t_parsed_options options_parse(const char **arguments, int stdout_is_terminal);
+int options_is_option_argument(const char *argument);

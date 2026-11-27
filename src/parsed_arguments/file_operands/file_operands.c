@@ -1,6 +1,6 @@
-#include <stddef.h>
 #include "file_operands.h"
 #include "libft.h"
+#include "options.h"
 
 #define DEFAULT_NUM_OF_OPERANDS 1
 #define DEFAULT_FILE_OPERAND "."
@@ -11,11 +11,6 @@ typedef enum e_file_operand_category
     FILE_OPERAND_NON_DIRECTORY,
     FILE_OPERAND_ACCESSIBLE
 } t_file_operand_category;
-
-static int argument_is_an_option(const char *argument)
-{
-    return argument[0] == '-';
-}
 
 static char **get_default_file_operands(void)
 {
@@ -34,7 +29,7 @@ static char **get_file_operands_from_arguments(const int num_of_file_operands, c
     int arguments_i = 0;
     while (arguments[arguments_i] != NULL)
     {
-        if (!argument_is_an_option(arguments[arguments_i]))
+        if (!options_is_option_argument(arguments[arguments_i]))
         {
             file_operands[operands_i] = ft_safe_strdup(arguments[arguments_i]);
             operands_i++;
