@@ -5779,12 +5779,1098 @@ static void should_color_every_supported_file_suffix(void)
         "\033[00;90mtemp~\033[0m\n");
 }
 
+static void should_apply_R_l_a_t_r_color(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("root", ".", "..", "z", "a", ".h"),
+        MOCK_DIR_WITH_STATS("root/.", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2001, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2004, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/..", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2003, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2002, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/z", ((const char *[]){ ".", "..", "leaf", NULL }),
+            MOCK_MODIFICATION_TIME(1, 1, 2004, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2001, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/a",
+            MOCK_MODIFICATION_TIME(1, 1, 2005, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2003, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/.h",
+            MOCK_MODIFICATION_TIME(1, 1, 2002, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2005, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/z/.", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2001, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2004, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/z/..", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2003, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2002, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/z/leaf",
+            MOCK_MODIFICATION_TIME(1, 1, 2004, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2004, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-R", "-l", "-a", "-t", "-r", "--color", "root", NULL };
+    get_parsed_arguments_result(7, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "root:\n"
+        "total 0\n"
+        "drwxr-xr-x 1 root root 1024 Jan  1  2001 \033[01;34m.\033[0m\n"
+        "-rw-r--r-- 1 root root 1024 Jan  1  2002 .h\n"
+        "drwxr-xr-x 1 root root 1024 Jan  1  2003 \033[01;34m..\033[0m\n"
+        "drwxr-xr-x 1 root root 1024 Jan  1  2004 \033[01;34mz\033[0m\n"
+        "-rw-r--r-- 1 root root 1024 Jan  1  2005 a\n"
+        "\nroot/z:\n"
+        "total 0\n"
+        "drwxr-xr-x 1 root root 1024 Jan  1  2001 \033[01;34m.\033[0m\n"
+        "drwxr-xr-x 1 root root 1024 Jan  1  2003 \033[01;34m..\033[0m\n"
+        "-rw-r--r-- 1 root root 1024 Jan  1  2004 leaf\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
+static void should_apply_R_g_a_u_r_color(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("root", ".", "..", "z", "a", ".h"),
+        MOCK_DIR_WITH_STATS("root/.", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2001, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2004, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/..", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2003, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2002, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/z", ((const char *[]){ ".", "..", "leaf", NULL }),
+            MOCK_MODIFICATION_TIME(1, 1, 2004, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2001, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/a",
+            MOCK_MODIFICATION_TIME(1, 1, 2005, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2003, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/.h",
+            MOCK_MODIFICATION_TIME(1, 1, 2002, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2005, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/z/.", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2001, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2004, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/z/..", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2003, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2002, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/z/leaf",
+            MOCK_MODIFICATION_TIME(1, 1, 2004, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2004, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-R", "-g", "-a", "-u", "-r", "--color", "root", NULL };
+    get_parsed_arguments_result(7, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "root:\n"
+        "total 0\n"
+        "drwxr-xr-x 1 root 1024 Jan  1  2001 \033[01;34mz\033[0m\n"
+        "-rw-r--r-- 1 root 1024 Jan  1  2003 a\n"
+        "-rw-r--r-- 1 root 1024 Jan  1  2005 .h\n"
+        "drwxr-xr-x 1 root 1024 Jan  1  2002 \033[01;34m..\033[0m\n"
+        "drwxr-xr-x 1 root 1024 Jan  1  2004 \033[01;34m.\033[0m\n"
+        "\nroot/z:\n"
+        "total 0\n"
+        "-rw-r--r-- 1 root 1024 Jan  1  2004 leaf\n"
+        "drwxr-xr-x 1 root 1024 Jan  1  2002 \033[01;34m..\033[0m\n"
+        "drwxr-xr-x 1 root 1024 Jan  1  2004 \033[01;34m.\033[0m\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
+static void should_apply_g_u_t_r_a_color(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("root", ".", "..", "z", "a", ".h"),
+        MOCK_DIR_WITH_STATS("root/.", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2001, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2004, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/..", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2003, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2002, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/z", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2004, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2001, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/a",
+            MOCK_MODIFICATION_TIME(1, 1, 2005, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2003, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/.h",
+            MOCK_MODIFICATION_TIME(1, 1, 2002, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2005, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-g", "-u", "-t", "-r", "-a", "--color", "root", NULL };
+    get_parsed_arguments_result(7, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "total 0\n"
+        "drwxr-xr-x 1 root 1024 Jan  1  2001 \033[01;34mz\033[0m\n"
+        "drwxr-xr-x 1 root 1024 Jan  1  2002 \033[01;34m..\033[0m\n"
+        "-rw-r--r-- 1 root 1024 Jan  1  2003 a\n"
+        "drwxr-xr-x 1 root 1024 Jan  1  2004 \033[01;34m.\033[0m\n"
+        "-rw-r--r-- 1 root 1024 Jan  1  2005 .h\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
+static void should_apply_l_d_a_u_r_color(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR_WITH_STATS("root/z", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2004, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2001, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/a",
+            MOCK_MODIFICATION_TIME(1, 1, 2005, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2003, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/.h",
+            MOCK_MODIFICATION_TIME(1, 1, 2002, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2005, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-l", "-d", "-a", "-u", "-r", "--color", "root/z", "root/a", "root/.h", NULL };
+    get_parsed_arguments_result(9, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "drwxr-xr-x 1 root root 1024 Jan  1  2001 \033[01;34mroot/z\033[0m\n"
+        "-rw-r--r-- 1 root root 1024 Jan  1  2003 root/a\n"
+        "-rw-r--r-- 1 root root 1024 Jan  1  2005 root/.h\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
+static void should_apply_R_d_t_color(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR_WITH_STATS("root/z", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2004, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2001, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/a",
+            MOCK_MODIFICATION_TIME(1, 1, 2005, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2003, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/.h",
+            MOCK_MODIFICATION_TIME(1, 1, 2002, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2005, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-R", "-d", "-t", "--color", "root/z", "root/a", "root/.h", NULL };
+    get_parsed_arguments_result(7, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "root/a\n"
+        "\033[01;34mroot/z\033[0m\n"
+        "root/.h\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
+static void should_apply_g_d_a_t(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR_WITH_STATS("root/z", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2004, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2001, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/a",
+            MOCK_MODIFICATION_TIME(1, 1, 2005, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2003, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/.h",
+            MOCK_MODIFICATION_TIME(1, 1, 2002, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2005, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-g", "-d", "-a", "-t", "root/z", "root/a", "root/.h", NULL };
+    get_parsed_arguments_result(7, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "-rw-r--r-- 1 root 1024 Jan  1  2005 root/a\n"
+        "drwxr-xr-x 1 root 1024 Jan  1  2004 root/z\n"
+        "-rw-r--r-- 1 root 1024 Jan  1  2002 root/.h\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
+static void should_apply_R_C_a_t_r_color(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("root", ".", "..", "z", "a", ".h"),
+        MOCK_DIR_WITH_STATS("root/.", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2001, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2004, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/..", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2003, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2002, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/z", ((const char *[]){ ".", "..", "leaf", NULL }),
+            MOCK_MODIFICATION_TIME(1, 1, 2004, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2001, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/a",
+            MOCK_MODIFICATION_TIME(1, 1, 2005, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2003, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/.h",
+            MOCK_MODIFICATION_TIME(1, 1, 2002, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2005, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/z/.", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2001, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2004, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/z/..", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2003, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2002, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/z/leaf",
+            MOCK_MODIFICATION_TIME(1, 1, 2004, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2004, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+    ioctl_mock_setup_columns(80);
+
+    const char *arguments[] = { "-R", "-C", "-a", "-t", "-r", "--color", "root", NULL };
+    get_parsed_arguments_result(7, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "root:\n"
+        "\033[01;34m.\033[0m  .h  \033[01;34m..\033[0m  \033[01;34mz\033[0m  a\n"
+        "\nroot/z:\n"
+        "\033[01;34m.\033[0m  \033[01;34m..\033[0m  leaf\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
+static void should_apply_C_u_a_r_color(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("root", ".", "..", "z", "a", ".h"),
+        MOCK_DIR_WITH_STATS("root/.", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2001, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2004, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/..", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2003, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2002, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/z", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2004, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2001, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/a",
+            MOCK_MODIFICATION_TIME(1, 1, 2005, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2003, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/.h",
+            MOCK_MODIFICATION_TIME(1, 1, 2002, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2005, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+    ioctl_mock_setup_columns(80);
+
+    const char *arguments[] = { "-C", "-u", "-a", "-r", "--color", "root", NULL };
+    get_parsed_arguments_result(6, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "\033[01;34mz\033[0m  \033[01;34m..\033[0m  a  \033[01;34m.\033[0m  .h\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
+static void should_apply_C_d_a_t_color(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR_WITH_STATS("root/z", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2004, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2001, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/a",
+            MOCK_MODIFICATION_TIME(1, 1, 2005, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2003, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/.h",
+            MOCK_MODIFICATION_TIME(1, 1, 2002, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2005, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+    ioctl_mock_setup_columns(80);
+
+    const char *arguments[] = { "-C", "-d", "-a", "-t", "--color", "root/z", "root/a", "root/.h", NULL };
+    get_parsed_arguments_result(8, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "root/a  \033[01;34mroot/z\033[0m  root/.h\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
+static void should_apply_R_l_U_a_color(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("root", ".", "..", "z", "a", ".h"),
+        MOCK_DIR_WITH_STATS("root/.", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2001, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2004, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/..", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2003, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2002, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/z", ((const char *[]){ ".", "..", "leaf", NULL }),
+            MOCK_MODIFICATION_TIME(1, 1, 2004, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2001, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/a",
+            MOCK_MODIFICATION_TIME(1, 1, 2005, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2003, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/.h",
+            MOCK_MODIFICATION_TIME(1, 1, 2002, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2005, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/z/.", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2001, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2004, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/z/..", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2003, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2002, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/z/leaf",
+            MOCK_MODIFICATION_TIME(1, 1, 2004, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2004, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-R", "-l", "-U", "-a", "--color", "root", NULL };
+    get_parsed_arguments_result(6, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "root:\n"
+        "total 0\n"
+        "drwxr-xr-x 1 root root 1024 Jan  1  2001 \033[01;34m.\033[0m\n"
+        "drwxr-xr-x 1 root root 1024 Jan  1  2003 \033[01;34m..\033[0m\n"
+        "drwxr-xr-x 1 root root 1024 Jan  1  2004 \033[01;34mz\033[0m\n"
+        "-rw-r--r-- 1 root root 1024 Jan  1  2005 a\n"
+        "-rw-r--r-- 1 root root 1024 Jan  1  2002 .h\n"
+        "\nroot/z:\n"
+        "total 0\n"
+        "drwxr-xr-x 1 root root 1024 Jan  1  2001 \033[01;34m.\033[0m\n"
+        "drwxr-xr-x 1 root root 1024 Jan  1  2003 \033[01;34m..\033[0m\n"
+        "-rw-r--r-- 1 root root 1024 Jan  1  2004 leaf\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
+static void should_apply_U_r_a_C(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("root", ".", "..", "z", "a", ".h"),
+        MOCK_DIR_WITH_STATS("root/.", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2001, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2004, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/..", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2003, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2002, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/z", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2004, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2001, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/a",
+            MOCK_MODIFICATION_TIME(1, 1, 2005, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2003, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/.h",
+            MOCK_MODIFICATION_TIME(1, 1, 2002, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2005, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+    ioctl_mock_setup_columns(80);
+
+    const char *arguments[] = { "-U", "-r", "-a", "-C", "root", NULL };
+    get_parsed_arguments_result(5, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        ".  ..  z  a  .h\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
+static void should_apply_l_u_U_a(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("root", ".", "..", "z", "a", ".h"),
+        MOCK_DIR_WITH_STATS("root/.", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2001, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2004, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/..", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2003, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2002, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/z", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2004, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2001, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/a",
+            MOCK_MODIFICATION_TIME(1, 1, 2005, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2003, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/.h",
+            MOCK_MODIFICATION_TIME(1, 1, 2002, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2005, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-l", "-u", "-U", "-a", "root", NULL };
+    get_parsed_arguments_result(5, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "total 0\n"
+        "drwxr-xr-x 1 root root 1024 Jan  1  2004 .\n"
+        "drwxr-xr-x 1 root root 1024 Jan  1  2002 ..\n"
+        "drwxr-xr-x 1 root root 1024 Jan  1  2001 z\n"
+        "-rw-r--r-- 1 root root 1024 Jan  1  2003 a\n"
+        "-rw-r--r-- 1 root root 1024 Jan  1  2005 .h\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
+static void should_apply_d_U_a_l(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR_WITH_STATS("root/z", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2004, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2001, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/a",
+            MOCK_MODIFICATION_TIME(1, 1, 2005, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2003, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/.h",
+            MOCK_MODIFICATION_TIME(1, 1, 2002, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2005, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-d", "-U", "-a", "-l", "root/z", "root/a", "root/.h", NULL };
+    get_parsed_arguments_result(7, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "drwxr-xr-x 1 root root 1024 Jan  1  2004 root/z\n"
+        "-rw-r--r-- 1 root root 1024 Jan  1  2005 root/a\n"
+        "-rw-r--r-- 1 root root 1024 Jan  1  2002 root/.h\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
+static void should_apply_g_U_a_color(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("root", ".", "..", "z", "a", ".h"),
+        MOCK_DIR_WITH_STATS("root/.", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2001, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2004, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/..", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2003, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2002, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/z", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2004, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2001, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/a",
+            MOCK_MODIFICATION_TIME(1, 1, 2005, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2003, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/.h",
+            MOCK_MODIFICATION_TIME(1, 1, 2002, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2005, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-g", "-U", "-a", "--color", "root", NULL };
+    get_parsed_arguments_result(5, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "total 0\n"
+        "drwxr-xr-x 1 root 1024 Jan  1  2001 \033[01;34m.\033[0m\n"
+        "drwxr-xr-x 1 root 1024 Jan  1  2003 \033[01;34m..\033[0m\n"
+        "drwxr-xr-x 1 root 1024 Jan  1  2004 \033[01;34mz\033[0m\n"
+        "-rw-r--r-- 1 root 1024 Jan  1  2005 a\n"
+        "-rw-r--r-- 1 root 1024 Jan  1  2002 .h\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
+static void should_apply_R_f_C(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("root", ".", "..", "z", "a", ".h"),
+        MOCK_DIR_WITH_STATS("root/.", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2001, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2004, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/..", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2003, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2002, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/z", ((const char *[]){ ".", "..", "leaf", NULL }),
+            MOCK_MODIFICATION_TIME(1, 1, 2004, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2001, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/a",
+            MOCK_MODIFICATION_TIME(1, 1, 2005, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2003, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/.h",
+            MOCK_MODIFICATION_TIME(1, 1, 2002, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2005, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/z/.", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2001, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2004, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/z/..", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2003, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2002, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/z/leaf",
+            MOCK_MODIFICATION_TIME(1, 1, 2004, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2004, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+    ioctl_mock_setup_columns(80);
+
+    const char *arguments[] = { "-R", "-f", "-C", "root", NULL };
+    get_parsed_arguments_result(4, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "root:\n"
+        ".  ..  z  a  .h\n"
+        "\nroot/z:\n"
+        ".  ..  leaf\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
+static void should_apply_f_r_g_color(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("root", ".", "..", "z", "a", ".h"),
+        MOCK_DIR_WITH_STATS("root/.", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2001, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2004, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/..", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2003, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2002, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/z", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2004, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2001, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/a",
+            MOCK_MODIFICATION_TIME(1, 1, 2005, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2003, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/.h",
+            MOCK_MODIFICATION_TIME(1, 1, 2002, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2005, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-f", "-r", "-g", "--color", "root", NULL };
+    get_parsed_arguments_result(5, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "total 0\n"
+        "drwxr-xr-x 1 root 1024 Jan  1  2001 \033[01;34m.\033[0m\n"
+        "drwxr-xr-x 1 root 1024 Jan  1  2003 \033[01;34m..\033[0m\n"
+        "drwxr-xr-x 1 root 1024 Jan  1  2004 \033[01;34mz\033[0m\n"
+        "-rw-r--r-- 1 root 1024 Jan  1  2005 a\n"
+        "-rw-r--r-- 1 root 1024 Jan  1  2002 .h\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
+static void should_apply_d_f_u(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR_WITH_STATS("root/z", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2004, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2001, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/a",
+            MOCK_MODIFICATION_TIME(1, 1, 2005, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2003, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/.h",
+            MOCK_MODIFICATION_TIME(1, 1, 2002, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2005, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-d", "-f", "-u", "root/z", "root/a", "root/.h", NULL };
+    get_parsed_arguments_result(6, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "root/z\n"
+        "root/a\n"
+        "root/.h\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
+static void should_apply_l_f_a_U(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("root", ".", "..", "z", "a", ".h"),
+        MOCK_DIR_WITH_STATS("root/.", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2001, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2004, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/..", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2003, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2002, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/z", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2004, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2001, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/a",
+            MOCK_MODIFICATION_TIME(1, 1, 2005, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2003, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/.h",
+            MOCK_MODIFICATION_TIME(1, 1, 2002, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2005, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-l", "-f", "-a", "-U", "root", NULL };
+    get_parsed_arguments_result(5, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "total 0\n"
+        "drwxr-xr-x 1 root root 1024 Jan  1  2001 .\n"
+        "drwxr-xr-x 1 root root 1024 Jan  1  2003 ..\n"
+        "drwxr-xr-x 1 root root 1024 Jan  1  2004 z\n"
+        "-rw-r--r-- 1 root root 1024 Jan  1  2005 a\n"
+        "-rw-r--r-- 1 root root 1024 Jan  1  2002 .h\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
+static void should_apply_l_C_a_t(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("root", ".", "..", "z", "a", ".h"),
+        MOCK_DIR_WITH_STATS("root/.", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2001, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2004, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/..", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2003, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2002, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/z", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2004, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2001, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/a",
+            MOCK_MODIFICATION_TIME(1, 1, 2005, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2003, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/.h",
+            MOCK_MODIFICATION_TIME(1, 1, 2002, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2005, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+    ioctl_mock_setup_columns(80);
+
+    const char *arguments[] = { "-l", "-C", "-a", "-t", "root", NULL };
+    get_parsed_arguments_result(5, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "a  z  ..  .h  .\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
+static void should_apply_C_l_a_t(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("root", ".", "..", "z", "a", ".h"),
+        MOCK_DIR_WITH_STATS("root/.", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2001, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2004, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/..", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2003, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2002, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/z", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2004, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2001, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/a",
+            MOCK_MODIFICATION_TIME(1, 1, 2005, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2003, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/.h",
+            MOCK_MODIFICATION_TIME(1, 1, 2002, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2005, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-C", "-l", "-a", "-t", "root", NULL };
+    get_parsed_arguments_result(5, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "total 0\n"
+        "-rw-r--r-- 1 root root 1024 Jan  1  2005 a\n"
+        "drwxr-xr-x 1 root root 1024 Jan  1  2004 z\n"
+        "drwxr-xr-x 1 root root 1024 Jan  1  2003 ..\n"
+        "-rw-r--r-- 1 root root 1024 Jan  1  2002 .h\n"
+        "drwxr-xr-x 1 root root 1024 Jan  1  2001 .\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
+static void should_apply_g_C_a_r(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("root", ".", "..", "z", "a", ".h"),
+        MOCK_DIR_WITH_STATS("root/.", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2001, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2004, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/..", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2003, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2002, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/z", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2004, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2001, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/a",
+            MOCK_MODIFICATION_TIME(1, 1, 2005, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2003, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/.h",
+            MOCK_MODIFICATION_TIME(1, 1, 2002, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2005, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+    ioctl_mock_setup_columns(80);
+
+    const char *arguments[] = { "-g", "-C", "-a", "-r", "root", NULL };
+    get_parsed_arguments_result(5, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "z  a  .h  ..  .\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
+static void should_apply_C_g_a_r(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("root", ".", "..", "z", "a", ".h"),
+        MOCK_DIR_WITH_STATS("root/.", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2001, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2004, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/..", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2003, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2002, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/z", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2004, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2001, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/a",
+            MOCK_MODIFICATION_TIME(1, 1, 2005, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2003, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/.h",
+            MOCK_MODIFICATION_TIME(1, 1, 2002, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2005, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-C", "-g", "-a", "-r", "root", NULL };
+    get_parsed_arguments_result(5, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "total 0\n"
+        "drwxr-xr-x 1 root 1024 Jan  1  2004 z\n"
+        "-rw-r--r-- 1 root 1024 Jan  1  2005 a\n"
+        "-rw-r--r-- 1 root 1024 Jan  1  2002 .h\n"
+        "drwxr-xr-x 1 root 1024 Jan  1  2003 ..\n"
+        "drwxr-xr-x 1 root 1024 Jan  1  2001 .\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
+static void should_apply_l_g_a_t(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("root", ".", "..", "z", "a", ".h"),
+        MOCK_DIR_WITH_STATS("root/.", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2001, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2004, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/..", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2003, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2002, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/z", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2004, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2001, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/a",
+            MOCK_MODIFICATION_TIME(1, 1, 2005, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2003, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/.h",
+            MOCK_MODIFICATION_TIME(1, 1, 2002, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2005, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-l", "-g", "-a", "-t", "root", NULL };
+    get_parsed_arguments_result(5, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "total 0\n"
+        "-rw-r--r-- 1 root 1024 Jan  1  2005 a\n"
+        "drwxr-xr-x 1 root 1024 Jan  1  2004 z\n"
+        "drwxr-xr-x 1 root 1024 Jan  1  2003 ..\n"
+        "-rw-r--r-- 1 root 1024 Jan  1  2002 .h\n"
+        "drwxr-xr-x 1 root 1024 Jan  1  2001 .\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
+static void should_apply_g_l_a_t(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("root", ".", "..", "z", "a", ".h"),
+        MOCK_DIR_WITH_STATS("root/.", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2001, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2004, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/..", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2003, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2002, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/z", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2004, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2001, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/a",
+            MOCK_MODIFICATION_TIME(1, 1, 2005, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2003, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/.h",
+            MOCK_MODIFICATION_TIME(1, 1, 2002, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2005, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-g", "-l", "-a", "-t", "root", NULL };
+    get_parsed_arguments_result(5, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "total 0\n"
+        "-rw-r--r-- 1 root 1024 Jan  1  2005 a\n"
+        "drwxr-xr-x 1 root 1024 Jan  1  2004 z\n"
+        "drwxr-xr-x 1 root 1024 Jan  1  2003 ..\n"
+        "-rw-r--r-- 1 root 1024 Jan  1  2002 .h\n"
+        "drwxr-xr-x 1 root 1024 Jan  1  2001 .\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
+static void should_apply_t_U_a_l(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("root", ".", "..", "z", "a", ".h"),
+        MOCK_DIR_WITH_STATS("root/.", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2001, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2004, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/..", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2003, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2002, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/z", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2004, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2001, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/a",
+            MOCK_MODIFICATION_TIME(1, 1, 2005, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2003, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/.h",
+            MOCK_MODIFICATION_TIME(1, 1, 2002, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2005, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-t", "-U", "-a", "-l", "root", NULL };
+    get_parsed_arguments_result(5, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "total 0\n"
+        "drwxr-xr-x 1 root root 1024 Jan  1  2001 .\n"
+        "drwxr-xr-x 1 root root 1024 Jan  1  2003 ..\n"
+        "drwxr-xr-x 1 root root 1024 Jan  1  2004 z\n"
+        "-rw-r--r-- 1 root root 1024 Jan  1  2005 a\n"
+        "-rw-r--r-- 1 root root 1024 Jan  1  2002 .h\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
+static void should_apply_U_t_a_l(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("root", ".", "..", "z", "a", ".h"),
+        MOCK_DIR_WITH_STATS("root/.", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2001, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2004, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/..", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2003, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2002, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/z", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2004, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2001, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/a",
+            MOCK_MODIFICATION_TIME(1, 1, 2005, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2003, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/.h",
+            MOCK_MODIFICATION_TIME(1, 1, 2002, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2005, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-U", "-t", "-a", "-l", "root", NULL };
+    get_parsed_arguments_result(5, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "total 0\n"
+        "-rw-r--r-- 1 root root 1024 Jan  1  2005 a\n"
+        "drwxr-xr-x 1 root root 1024 Jan  1  2004 z\n"
+        "drwxr-xr-x 1 root root 1024 Jan  1  2003 ..\n"
+        "-rw-r--r-- 1 root root 1024 Jan  1  2002 .h\n"
+        "drwxr-xr-x 1 root root 1024 Jan  1  2001 .\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
+static void should_apply_t_f_a(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("root", ".", "..", "z", "a", ".h"),
+        MOCK_DIR_WITH_STATS("root/.", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2001, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2004, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/..", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2003, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2002, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/z", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2004, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2001, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/a",
+            MOCK_MODIFICATION_TIME(1, 1, 2005, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2003, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/.h",
+            MOCK_MODIFICATION_TIME(1, 1, 2002, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2005, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-t", "-f", "-a", "root", NULL };
+    get_parsed_arguments_result(4, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        ".\n"
+        "..\n"
+        "z\n"
+        "a\n"
+        ".h\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
+static void should_apply_f_t_a(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("root", ".", "..", "z", "a", ".h"),
+        MOCK_DIR_WITH_STATS("root/.", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2001, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2004, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/..", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2003, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2002, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/z", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2004, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2001, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/a",
+            MOCK_MODIFICATION_TIME(1, 1, 2005, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2003, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/.h",
+            MOCK_MODIFICATION_TIME(1, 1, 2002, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2005, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-f", "-t", "-a", "root", NULL };
+    get_parsed_arguments_result(4, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "a\n"
+        "z\n"
+        "..\n"
+        ".h\n"
+        ".\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
+static void should_apply_lur(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("root", ".", "..", "z", "a", ".h"),
+        MOCK_DIR_WITH_STATS("root/z", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2004, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2001, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/a",
+            MOCK_MODIFICATION_TIME(1, 1, 2005, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2003, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-lur", "root", NULL };
+    get_parsed_arguments_result(2, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "total 0\n"
+        "drwxr-xr-x 1 root root 1024 Jan  1  2001 z\n"
+        "-rw-r--r-- 1 root root 1024 Jan  1  2003 a\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
+static void should_apply_frt(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("root", ".", "..", "z", "a", ".h"),
+        MOCK_DIR_WITH_STATS("root/.", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2001, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2004, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/..", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2003, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2002, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/z", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2004, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2001, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/a",
+            MOCK_MODIFICATION_TIME(1, 1, 2005, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2003, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/.h",
+            MOCK_MODIFICATION_TIME(1, 1, 2002, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2005, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-frt", "root", NULL };
+    get_parsed_arguments_result(2, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        ".\n"
+        ".h\n"
+        "..\n"
+        "z\n"
+        "a\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
+static void should_apply_gCl(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("root", ".", "..", "z", "a", ".h"),
+        MOCK_DIR_WITH_STATS("root/z", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2004, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2001, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/a",
+            MOCK_MODIFICATION_TIME(1, 1, 2005, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2003, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-gCl", "root", NULL };
+    get_parsed_arguments_result(2, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "total 0\n"
+        "-rw-r--r-- 1 root 1024 Jan  1  2005 a\n"
+        "drwxr-xr-x 1 root 1024 Jan  1  2004 z\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
+static void should_apply_f_C_g_l_R_a_u_t_r_color(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("root", ".", "..", "z", "a", ".h"),
+        MOCK_DIR_WITH_STATS("root/.", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2001, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2004, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/..", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2003, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2002, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/z", ((const char *[]){ ".", "..", "leaf", NULL }),
+            MOCK_MODIFICATION_TIME(1, 1, 2004, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2001, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/a",
+            MOCK_MODIFICATION_TIME(1, 1, 2005, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2003, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/.h",
+            MOCK_MODIFICATION_TIME(1, 1, 2002, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2005, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/z/.", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2001, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2004, 0, 0, 0)),
+        MOCK_DIR_WITH_STATS("root/z/..", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2003, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2002, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/z/leaf",
+            MOCK_MODIFICATION_TIME(1, 1, 2004, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2004, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-f", "-C", "-g", "-l", "-R", "-a", "-u", "-t", "-r", "--color", "root", NULL };
+    get_parsed_arguments_result(11, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "root:\n"
+        "total 0\n"
+        "drwxr-xr-x 1 root 1024 Jan  1  2001 \033[01;34mz\033[0m\n"
+        "drwxr-xr-x 1 root 1024 Jan  1  2002 \033[01;34m..\033[0m\n"
+        "-rw-r--r-- 1 root 1024 Jan  1  2003 a\n"
+        "drwxr-xr-x 1 root 1024 Jan  1  2004 \033[01;34m.\033[0m\n"
+        "-rw-r--r-- 1 root 1024 Jan  1  2005 .h\n"
+        "\nroot/z:\n"
+        "total 0\n"
+        "drwxr-xr-x 1 root 1024 Jan  1  2002 \033[01;34m..\033[0m\n"
+        "-rw-r--r-- 1 root 1024 Jan  1  2004 leaf\n"
+        "drwxr-xr-x 1 root 1024 Jan  1  2004 \033[01;34m.\033[0m\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
+static void should_apply_R_l_C_g_r_u_U_a_d_color(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR_WITH_STATS("root/z", NULL,
+            MOCK_MODIFICATION_TIME(1, 1, 2004, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2001, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/a",
+            MOCK_MODIFICATION_TIME(1, 1, 2005, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2003, 0, 0, 0)),
+        MOCK_FILE_WITH_STATS("root/.h",
+            MOCK_MODIFICATION_TIME(1, 1, 2002, 0, 0, 0), MOCK_ACCESS_TIME(1, 1, 2005, 0, 0, 0)),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-R", "-l", "-C", "-g", "-r", "-u", "-U", "-a", "-d", "--color", "root/z", "root/a", "root/.h", NULL };
+    get_parsed_arguments_result(13, arguments);
+    const int result = application_run(parsed_arguments_result);
+
+    CU_ASSERT(verify_that_the_output_printed_is(
+        "drwxr-xr-x 1 root 1024 Jan  1  2001 \033[01;34mroot/z\033[0m\n"
+        "-rw-r--r-- 1 root 1024 Jan  1  2003 root/a\n"
+        "-rw-r--r-- 1 root 1024 Jan  1  2005 root/.h\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_EQUAL(result, FT_LS_APPLICATION_SUCCESS);
+}
+
 void register_application_suite(void)
 {
     const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, test_teardown);
 
     if (suite != NULL)
     {
+        CU_add_test(suite, "should_apply_R_l_a_t_r_color", should_apply_R_l_a_t_r_color);
+        CU_add_test(suite, "should_apply_R_g_a_u_r_color", should_apply_R_g_a_u_r_color);
+        CU_add_test(suite, "should_apply_g_u_t_r_a_color", should_apply_g_u_t_r_a_color);
+        CU_add_test(suite, "should_apply_l_d_a_u_r_color", should_apply_l_d_a_u_r_color);
+        CU_add_test(suite, "should_apply_R_d_t_color", should_apply_R_d_t_color);
+        CU_add_test(suite, "should_apply_g_d_a_t", should_apply_g_d_a_t);
+        CU_add_test(suite, "should_apply_R_C_a_t_r_color", should_apply_R_C_a_t_r_color);
+        CU_add_test(suite, "should_apply_C_u_a_r_color", should_apply_C_u_a_r_color);
+        CU_add_test(suite, "should_apply_C_d_a_t_color", should_apply_C_d_a_t_color);
+        CU_add_test(suite, "should_apply_R_l_U_a_color", should_apply_R_l_U_a_color);
+        CU_add_test(suite, "should_apply_U_r_a_C", should_apply_U_r_a_C);
+        CU_add_test(suite, "should_apply_l_u_U_a", should_apply_l_u_U_a);
+        CU_add_test(suite, "should_apply_d_U_a_l", should_apply_d_U_a_l);
+        CU_add_test(suite, "should_apply_g_U_a_color", should_apply_g_U_a_color);
+        CU_add_test(suite, "should_apply_R_f_C", should_apply_R_f_C);
+        CU_add_test(suite, "should_apply_f_r_g_color", should_apply_f_r_g_color);
+        CU_add_test(suite, "should_apply_d_f_u", should_apply_d_f_u);
+        CU_add_test(suite, "should_apply_l_f_a_U", should_apply_l_f_a_U);
+        CU_add_test(suite, "should_apply_l_C_a_t", should_apply_l_C_a_t);
+        CU_add_test(suite, "should_apply_C_l_a_t", should_apply_C_l_a_t);
+        CU_add_test(suite, "should_apply_g_C_a_r", should_apply_g_C_a_r);
+        CU_add_test(suite, "should_apply_C_g_a_r", should_apply_C_g_a_r);
+        CU_add_test(suite, "should_apply_l_g_a_t", should_apply_l_g_a_t);
+        CU_add_test(suite, "should_apply_g_l_a_t", should_apply_g_l_a_t);
+        CU_add_test(suite, "should_apply_t_U_a_l", should_apply_t_U_a_l);
+        CU_add_test(suite, "should_apply_U_t_a_l", should_apply_U_t_a_l);
+        CU_add_test(suite, "should_apply_t_f_a", should_apply_t_f_a);
+        CU_add_test(suite, "should_apply_f_t_a", should_apply_f_t_a);
+        CU_add_test(suite, "should_apply_lur", should_apply_lur);
+        CU_add_test(suite, "should_apply_frt", should_apply_frt);
+        CU_add_test(suite, "should_apply_gCl", should_apply_gCl);
+        CU_add_test(suite, "should_apply_f_C_g_l_R_a_u_t_r_color", should_apply_f_C_g_l_R_a_u_t_r_color);
+        CU_add_test(suite, "should_apply_R_l_C_g_r_u_U_a_d_color", should_apply_R_l_C_g_r_u_U_a_d_color);
         CU_add_test(suite, "should_color_a_single_orphan_operand", should_color_a_single_orphan_operand);
         CU_add_test(suite, "should_color_links_and_their_targets_in_long_format", should_color_links_and_their_targets_in_long_format);
         CU_add_test(suite, "should_color_directories_by_sticky_bit_and_other_write_permission", should_color_directories_by_sticky_bit_and_other_write_permission);
