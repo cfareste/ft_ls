@@ -1,6 +1,5 @@
-#include <sys/ioctl.h>
-#include <unistd.h>
 #include <stdlib.h>
+#include "terminal.h"
 #include "libft.h"
 #include "render_strategies.h"
 #include "render_colors.h"
@@ -18,11 +17,9 @@ typedef struct s_column_info
 
 static size_t get_terminal_width(void)
 {
-    struct winsize terminal_size = { 0 };
+    const size_t width = terminal_get_stdout_width();
 
-    if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &terminal_size) != 0 || terminal_size.ws_col == 0)
-        return DEFAULT_TERMINAL_WIDTH;
-    return terminal_size.ws_col;
+    return width == 0 ? DEFAULT_TERMINAL_WIDTH : width;
 }
 
 static size_t get_maximum_column_count(const unsigned int file_count, const size_t terminal_width)

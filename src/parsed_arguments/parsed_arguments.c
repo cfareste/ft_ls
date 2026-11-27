@@ -1,8 +1,8 @@
 #include <stdlib.h>
-#include <unistd.h>
 #include "parsed_arguments.h"
 #include "options.h"
 #include "file_operands.h"
+#include "terminal.h"
 #include "sorter.h"
 #include "error_reporter.h"
 #include "libft.h"
@@ -202,7 +202,7 @@ t_result *parse_arguments(const int num_of_arguments, const char **arguments)
     if (num_of_arguments < 0 || arguments == NULL)
         return NULL;
 
-    const int stdout_is_terminal = isatty(STDOUT_FILENO);
+    const int stdout_is_terminal = terminal_stdout_is_terminal();
     const t_parsed_options option_result = options_parse(arguments, stdout_is_terminal);
     if (option_result.invalid_option != '\0')
     {

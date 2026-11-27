@@ -1,4 +1,7 @@
 TODO:
+1. No computar syscalls si no es necesario
+2. Caché de getpwuid y getgrgid
+
 
 
 TODO Para mejorar siguientes proyectos:

@@ -88,6 +88,7 @@ ROOT_SRCS = application.c \
 			parsed_arguments.c \
 			options.c \
 			file_operands.c \
+			terminal.c \
 			directory.c \
 			date.c \
 			file_stats.c \
