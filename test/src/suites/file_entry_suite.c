@@ -5,7 +5,6 @@
 #include "file_stats.h"
 #include "mocks.h"
 #include "parsed_arguments.h"
-#include "sorter.h"
 
 #define SUITE_NAME "file_entry"
 #define DEFAULT_NAME "default"
@@ -14,7 +13,6 @@
 
 static t_file_entry *entry_sut;
 static t_file_entry_array *array_sut;
-static t_sorter_context *sorter_context;
 
 static void test_setup(void)
 {
@@ -22,14 +20,12 @@ static void test_setup(void)
     vfs_mock_reset();
     entry_sut = file_entry_create(DEFAULT_NAME);
     array_sut = file_entry_array_create();
-    sorter_context = sorter_context_create(NULL);
 }
 
 static void test_teardown(void)
 {
     file_entry_destroy(&entry_sut);
     file_entry_array_destroy(&array_sut);
-    sorter_context_destroy(&sorter_context);
 }
 
 static void assert_file_entry_array_is_null(const t_file_entry_array *file_entry_array)
@@ -830,7 +826,7 @@ static void should_push_correctly_an_specified_entry(void)
 
 static void should_not_fail_when_sorting_a_NULL_file_entry_array(void)
 {
-    file_entry_array_sort(sorter_context, NULL);
+    file_entry_array_sort(NULL, NULL);
 }
 
 static void should_sort_the_file_operands_by_entry_name(void)
@@ -845,7 +841,7 @@ static void should_sort_the_file_operands_by_entry_name(void)
     file_entry_array_push(array_sut, file_entry_create(entry_names[6]));
     file_entry_array_push(array_sut, file_entry_create(entry_names[7]));
 
-    file_entry_array_sort(sorter_context, array_sut);
+    file_entry_array_sort(NULL, array_sut);
     const t_file_entry *first_entry = file_entry_array_get_at(array_sut, 0);
     const t_file_entry *second_entry = file_entry_array_get_at(array_sut, 1);
     const t_file_entry *third_entry = file_entry_array_get_at(array_sut, 2);
@@ -877,7 +873,6 @@ static void should_sort_directory_entries_by_modification_time_with_ascii_name_t
     const char *arguments[] = { "-t", NULL };
     t_result *parsed_arguments_result = parse_arguments(1, arguments);
     t_parsed_arguments *parsed_arguments = result_get_value(parsed_arguments_result);
-    t_sorter_context *time_context = sorter_context_create(parsed_arguments);
     const char *entry_names[] = { "old", "same_z", "same_a", "new" };
     const time_t modification_times[] = { 100, 200, 200, 300 };
 
@@ -888,7 +883,7 @@ static void should_sort_directory_entries_by_modification_time_with_ascii_name_t
         file_entry_array_push(array_sut, entry);
     }
 
-    file_entry_array_sort(time_context, array_sut);
+    file_entry_array_sort(parsed_arguments, array_sut);
 
     CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
     CU_ASSERT_STRING_EQUAL(file_entry_get_name(file_entry_array_get_at(array_sut, 0)), "new");
@@ -897,7 +892,6 @@ static void should_sort_directory_entries_by_modification_time_with_ascii_name_t
     CU_ASSERT_STRING_EQUAL(file_entry_get_name(file_entry_array_get_at(array_sut, 3)), "old");
     CU_ASSERT(verify_that_no_error_was_printed());
 
-    sorter_context_destroy(&time_context);
     parsed_arguments_destroy(&parsed_arguments);
     result_destroy(&parsed_arguments_result);
 }
@@ -913,7 +907,6 @@ static void should_preserve_directory_entry_order_when_U_option_is_active(void)
     const char *arguments[] = { "-t", "-U", "-r", NULL };
     t_result *parsed_arguments_result = parse_arguments(3, arguments);
     t_parsed_arguments *parsed_arguments = result_get_value(parsed_arguments_result);
-    t_sorter_context *context = sorter_context_create(parsed_arguments);
     const char *entry_names[] = { "m", "z", "a" };
     const time_t modification_times[] = { 200, 300, 100 };
 
@@ -924,14 +917,13 @@ static void should_preserve_directory_entry_order_when_U_option_is_active(void)
         file_entry_array_push(array_sut, entry);
     }
 
-    file_entry_array_sort(context, array_sut);
+    file_entry_array_sort(parsed_arguments, array_sut);
 
     CU_ASSERT_TRUE(result_has_succeed(parsed_arguments_result));
     for (unsigned int i = 0; i < 3; i++)
         CU_ASSERT_STRING_EQUAL(file_entry_get_name(file_entry_array_get_at(array_sut, i)), entry_names[i]);
     CU_ASSERT_PTR_NULL(file_entry_array_get_at(array_sut, 3));
 
-    sorter_context_destroy(&context);
     parsed_arguments_destroy(&parsed_arguments);
     result_destroy(&parsed_arguments_result);
 }
@@ -956,9 +948,8 @@ static void should_sort_entries_by_access_time_and_break_exact_ties_by_name(void
     const char *args[] = { "-u", NULL };
     t_result *result = parse_arguments(1, args);
     t_parsed_arguments *parsed_arguments = result_get_value(result);
-    t_sorter_context *context = sorter_context_create(parsed_arguments);
 
-    file_entry_array_sort(context, array_sut);
+    file_entry_array_sort(parsed_arguments, array_sut);
 
     CU_ASSERT_TRUE(result_has_succeed(result));
     CU_ASSERT_STRING_EQUAL(file_entry_get_name(file_entry_array_get_at(array_sut, 0)), "b");
@@ -966,7 +957,6 @@ static void should_sort_entries_by_access_time_and_break_exact_ties_by_name(void
     CU_ASSERT_STRING_EQUAL(file_entry_get_name(file_entry_array_get_at(array_sut, 2)), "a");
     CU_ASSERT(verify_that_no_error_was_printed());
 
-    sorter_context_destroy(&context);
     parsed_arguments_destroy(&parsed_arguments);
     result_destroy(&result);
 }

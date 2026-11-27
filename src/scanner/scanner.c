@@ -9,7 +9,7 @@ struct s_scanner_context
 {
     int retrieve_long_format_metadata;
     int retrieve_author;
-    int include_hidden_entries;
+    int filter_hidden_files;
 };
 
 typedef struct s_scan_state
@@ -25,9 +25,9 @@ t_scanner_context *scanner_context_create(const t_parsed_arguments *parsed_argum
 {
     t_scanner_context *context = ft_safe_calloc(1, sizeof(t_scanner_context));
 
-    context->retrieve_long_format_metadata = parsed_arguments_is_long_format_active(parsed_arguments);
-    context->retrieve_author = !parsed_arguments_is_option_active(parsed_arguments, OPTIONS_LONG_FORMAT_NO_OWNER);
-    context->include_hidden_entries = parsed_arguments_is_option_active(parsed_arguments, OPTIONS_READ_ALL);
+    context->retrieve_long_format_metadata = parsed_arguments_get_format(parsed_arguments) == FORMAT_LONG;
+    context->retrieve_author = parsed_arguments_should_print_owner(parsed_arguments);
+    context->filter_hidden_files = parsed_arguments_should_filter_hidden_files(parsed_arguments);
 
     return context;
 }
@@ -49,7 +49,7 @@ static void record_failed_entry(t_scan_state *state, const char *entry_path)
 
 static int should_skip_entry(const t_scan_state *state, const t_dir_entry *entry)
 {
-    return !state->scanner->include_hidden_entries && directory_is_entry_hidden_file(entry);
+    return state->scanner->filter_hidden_files && directory_is_entry_hidden_file(entry);
 }
 
 static void retrieve_entry_metadata(t_scan_state *state, t_file_entry *entry, t_file_stats *stats, const char *entry_path)

@@ -2,115 +2,146 @@
 #include "CUnit/CUnit.h"
 #include "CUnit/Basic.h"
 #include "options.h"
-#include "../../../inc/options.h"
 
 #define SUITE_NAME "options"
 
-static void should_return_no_options_for_a_NULL_argument_list(void)
+static void should_resolve_defaults_without_options(void)
 {
-    CU_ASSERT_EQUAL(options_get(NULL), OPTIONS_NONE);
+    const char *arguments[] = { "file", NULL };
+    const t_parsed_options result = options_parse(arguments, 0);
+
+    CU_ASSERT_EQUAL(result.invalid_option, '\0');
+    CU_ASSERT_EQUAL(result.options_amount, 0);
+    CU_ASSERT_EQUAL(result.options.format, FORMAT_SINGLE_COLUMN);
+    CU_ASSERT_EQUAL(result.options.sort_type, SORT_NAME);
+    CU_ASSERT_EQUAL(result.options.time_type, TIME_MTIME);
+    CU_ASSERT_TRUE(result.options.print_owner);
+    CU_ASSERT_TRUE(result.options.filter_hidden_files);
+    CU_ASSERT_TRUE(result.options.dereference_symlinks);
+    CU_ASSERT_FALSE(result.options.sort_reverse);
+    CU_ASSERT_FALSE(result.options.immediate_dirs);
+    CU_ASSERT_FALSE(result.options.recursion);
+    CU_ASSERT_FALSE(result.options.color_files);
 }
 
-static void should_return_no_options_for_an_empty_argument_list(void)
+static void should_default_to_columns_on_a_terminal(void)
 {
-    const char *arguments[] = { NULL };
+    const t_parsed_options result = options_parse(NULL, 1);
 
-    CU_ASSERT_EQUAL(options_get(arguments), OPTIONS_NONE);
+    CU_ASSERT_EQUAL(result.invalid_option, '\0');
+    CU_ASSERT_EQUAL(result.options_amount, 0);
+    CU_ASSERT_EQUAL(result.options.format, FORMAT_COLUMNS);
+    CU_ASSERT_EQUAL(result.options.sort_type, SORT_NAME);
 }
 
-static void should_combine_all_supported_options_including_combined_flags(void)
+static void should_accumulate_independent_settings_and_count_option_arguments(void)
 {
-    const char *arguments[] = { "-Rldg", "-Car", "-tUu", "--color", "file", NULL };
-    const t_options expected = OPTIONS_RECURSIVE | OPTIONS_LONG_FORMAT
-        | OPTIONS_MULTI_COLUMN_FORMAT | OPTIONS_READ_ALL | OPTIONS_REVERSE
-        | OPTIONS_TIME_SORTING | OPTIONS_COLOR | OPTIONS_NO_SORT | OPTIONS_IMMEDIATE_DIRS
-        | OPTIONS_LONG_FORMAT_NO_OWNER | OPTIONS_ENABLE_ATIME;
+    const char *arguments[] = { "-Raltr", "file", "--color", NULL };
+    const t_parsed_options result = options_parse(arguments, 1);
 
-    CU_ASSERT_EQUAL(options_get(arguments), expected);
+    CU_ASSERT_EQUAL(result.invalid_option, '\0');
+    CU_ASSERT_EQUAL(result.options_amount, 2);
+    CU_ASSERT_EQUAL(result.options.format, FORMAT_LONG);
+    CU_ASSERT_EQUAL(result.options.sort_type, SORT_TIME);
+    CU_ASSERT_EQUAL(result.options.time_type, TIME_MTIME);
+    CU_ASSERT_TRUE(result.options.print_owner);
+    CU_ASSERT_FALSE(result.options.filter_hidden_files);
+    CU_ASSERT_FALSE(result.options.dereference_symlinks);
+    CU_ASSERT_TRUE(result.options.sort_reverse);
+    CU_ASSERT_TRUE(result.options.recursion);
+    CU_ASSERT_TRUE(result.options.color_files);
 }
 
-static void should_accept_d_as_a_standalone_option(void)
+static void should_use_the_last_explicit_format_and_preserve_owner_preference(void)
 {
-    const char *arguments[] = { "-d", NULL };
+    const char *columns[] = { "-lg", "-C", NULL };
+    const char *long_without_owner[] = { "-Cgl", NULL };
+    const t_parsed_options column_result = options_parse(columns, 0);
+    const t_parsed_options long_result = options_parse(long_without_owner, 0);
 
-    CU_ASSERT_EQUAL(options_get(arguments), OPTIONS_IMMEDIATE_DIRS);
-    CU_ASSERT_EQUAL(options_get_invalid_option(arguments), '\0');
-    CU_ASSERT_EQUAL(options_get_amount(arguments), 1);
+    CU_ASSERT_EQUAL(column_result.invalid_option, '\0');
+    CU_ASSERT_EQUAL(column_result.options.format, FORMAT_COLUMNS);
+    CU_ASSERT_FALSE(column_result.options.print_owner);
+    CU_ASSERT_TRUE(column_result.options.dereference_symlinks);
+    CU_ASSERT_EQUAL(long_result.invalid_option, '\0');
+    CU_ASSERT_EQUAL(long_result.options.format, FORMAT_LONG);
+    CU_ASSERT_FALSE(long_result.options.print_owner);
+    CU_ASSERT_FALSE(long_result.options.dereference_symlinks);
 }
 
-static void should_return_zero_option_count_for_a_NULL_argument_list(void)
+static void should_resolve_explicit_and_implicit_time_sorting(void)
 {
-    CU_ASSERT_EQUAL(options_get_amount(NULL), 0);
+    const struct {
+        const char *flags;
+        t_sort_type sort_type;
+        t_time_type time_type;
+    } cases[] = {
+        { "-u", SORT_TIME, TIME_ATIME },
+        { "-ut", SORT_TIME, TIME_ATIME },
+        { "-lu", SORT_NAME, TIME_ATIME },
+        { "-gu", SORT_NAME, TIME_ATIME },
+        { "-lut", SORT_TIME, TIME_ATIME },
+        { "-gut", SORT_TIME, TIME_ATIME },
+        { "-uUlC", SORT_NONE, TIME_ATIME },
+        { "-luC", SORT_TIME, TIME_ATIME },
+        { "-tU", SORT_NONE, TIME_MTIME },
+        { "-Ut", SORT_TIME, TIME_MTIME },
+        { "-tfu", SORT_NONE, TIME_ATIME },
+        { "-fut", SORT_TIME, TIME_ATIME }
+    };
+
+    for (unsigned int i = 0; i < sizeof(cases) / sizeof(cases[0]); i++)
+    {
+        const char *arguments[] = { cases[i].flags, NULL };
+        const t_parsed_options result = options_parse(arguments, 0);
+
+        CU_ASSERT_EQUAL(result.invalid_option, '\0');
+        CU_ASSERT_EQUAL(result.options.sort_type, cases[i].sort_type);
+        CU_ASSERT_EQUAL(result.options.time_type, cases[i].time_type);
+    }
 }
 
-static void should_accept_g_as_a_standalone_option(void)
+static void should_apply_f_settings_including_when_sort_is_overridden(void)
 {
-    const char *arguments[] = { "-g", NULL };
+    const char *arguments[] = { "-lf", "--color", "-t", NULL };
+    const char *f_arguments[] = { "-f", NULL };
+    const t_parsed_options result = options_parse(arguments, 0);
+    const t_parsed_options f_result = options_parse(f_arguments, 0);
 
-    CU_ASSERT_EQUAL(options_get(arguments), OPTIONS_LONG_FORMAT_NO_OWNER);
-    CU_ASSERT_EQUAL(options_get_invalid_option(arguments), '\0');
-    CU_ASSERT_EQUAL(options_get_amount(arguments), 1);
+    CU_ASSERT_EQUAL(result.invalid_option, '\0');
+    CU_ASSERT_EQUAL(result.options.format, FORMAT_LONG);
+    CU_ASSERT_EQUAL(result.options.sort_type, SORT_TIME);
+    CU_ASSERT_TRUE(result.options.color_files);
+    CU_ASSERT_FALSE(result.options.filter_hidden_files);
+    CU_ASSERT_EQUAL(f_result.invalid_option, '\0');
+    CU_ASSERT_EQUAL(f_result.options.format, FORMAT_SINGLE_COLUMN);
+    CU_ASSERT_EQUAL(f_result.options.sort_type, SORT_NONE);
+    CU_ASSERT_FALSE(f_result.options.filter_hidden_files);
 }
 
-static void should_expand_f_to_read_all_and_no_sort(void)
+static void should_disable_recursion_and_dereferencing_for_immediate_directories(void)
 {
-    const char *arguments[] = { "-f", NULL };
+    const char *first[] = { "-d", "-RC", NULL };
+    const char *last[] = { "-Rd", NULL };
+    const t_parsed_options first_result = options_parse(first, 0);
+    const t_parsed_options last_result = options_parse(last, 0);
 
-    CU_ASSERT_EQUAL(options_get(arguments), OPTIONS_READ_ALL | OPTIONS_NO_SORT);
-    CU_ASSERT_EQUAL(options_get_invalid_option(arguments), '\0');
-    CU_ASSERT_EQUAL(options_get_amount(arguments), 1);
-}
-
-static void should_preserve_other_options_when_combined_with_f(void)
-{
-    const char *arguments[] = { "-lf", "--color", NULL };
-
-    CU_ASSERT_EQUAL(options_get(arguments), OPTIONS_READ_ALL | OPTIONS_NO_SORT | OPTIONS_LONG_FORMAT | OPTIONS_COLOR);
-    CU_ASSERT_EQUAL(options_get_invalid_option(arguments), '\0');
-}
-
-static void should_accept_u_on_its_own(void)
-{
-    const char *arguments[] = { "-u", NULL };
-
-    CU_ASSERT_EQUAL(options_get(arguments), OPTIONS_ENABLE_ATIME);
-    CU_ASSERT_EQUAL(options_get_invalid_option(arguments), '\0');
-    CU_ASSERT_EQUAL(options_get_amount(arguments), 1);
-}
-
-static void should_accept_u_with_t(void)
-{
-    const char *arguments[] = { "-ut", NULL };
-
-    CU_ASSERT_EQUAL(options_get(arguments), OPTIONS_ENABLE_ATIME | OPTIONS_TIME_SORTING);
-    CU_ASSERT_EQUAL(options_get_invalid_option(arguments), '\0');
-    CU_ASSERT_EQUAL(options_get_amount(arguments), 1);
-}
-
-static void should_count_option_arguments_not_individual_flags(void)
-{
-    const char *arguments[] = { "-Rl", "file", "-art", NULL };
-
-    CU_ASSERT_EQUAL(options_get_amount(arguments), 2);
-}
-
-static void should_return_no_invalid_option_for_a_NULL_argument_list(void)
-{
-    CU_ASSERT_EQUAL(options_get_invalid_option(NULL), '\0');
-}
-
-static void should_return_no_invalid_option_for_supported_and_non_option_arguments(void)
-{
-    const char *arguments[] = { "-RlaCd", "-Uug", "--color", "file", NULL };
-
-    CU_ASSERT_EQUAL(options_get_invalid_option(arguments), '\0');
+    CU_ASSERT_EQUAL(first_result.invalid_option, '\0');
+    CU_ASSERT_TRUE(first_result.options.immediate_dirs);
+    CU_ASSERT_FALSE(first_result.options.recursion);
+    CU_ASSERT_FALSE(first_result.options.dereference_symlinks);
+    CU_ASSERT_EQUAL(last_result.invalid_option, '\0');
+    CU_ASSERT_TRUE(last_result.options.immediate_dirs);
+    CU_ASSERT_FALSE(last_result.options.recursion);
+    CU_ASSERT_FALSE(last_result.options.dereference_symlinks);
 }
 
 static void should_return_the_first_unsupported_option_character(void)
 {
     const char *arguments[] = { "-laX", "-z", NULL };
+    const t_parsed_options result = options_parse(arguments, 0);
 
-    CU_ASSERT_EQUAL(options_get_invalid_option(arguments), 'X');
+    CU_ASSERT_EQUAL(result.invalid_option, 'X');
 }
 
 void register_options_suite(void)
@@ -120,18 +151,12 @@ void register_options_suite(void)
     if (suite == NULL)
         return ;
 
-    CU_add_test(suite, "should_return_no_options_for_a_NULL_argument_list", should_return_no_options_for_a_NULL_argument_list);
-    CU_add_test(suite, "should_return_no_options_for_an_empty_argument_list", should_return_no_options_for_an_empty_argument_list);
-    CU_add_test(suite, "should_combine_all_supported_options_including_combined_flags", should_combine_all_supported_options_including_combined_flags);
-    CU_add_test(suite, "should_accept_d_as_a_standalone_option", should_accept_d_as_a_standalone_option);
-    CU_add_test(suite, "should_accept_g_as_a_standalone_option", should_accept_g_as_a_standalone_option);
-    CU_add_test(suite, "should_expand_f_to_read_all_and_no_sort", should_expand_f_to_read_all_and_no_sort);
-    CU_add_test(suite, "should_preserve_other_options_when_combined_with_f", should_preserve_other_options_when_combined_with_f);
-    CU_add_test(suite, "should_return_zero_option_count_for_a_NULL_argument_list", should_return_zero_option_count_for_a_NULL_argument_list);
-    CU_add_test(suite, "should_count_option_arguments_not_individual_flags", should_count_option_arguments_not_individual_flags);
-    CU_add_test(suite, "should_accept_u_with_t", should_accept_u_with_t);
-    CU_add_test(suite, "should_accept_u_on_its_own", should_accept_u_on_its_own);
-    CU_add_test(suite, "should_return_no_invalid_option_for_a_NULL_argument_list", should_return_no_invalid_option_for_a_NULL_argument_list);
-    CU_add_test(suite, "should_return_no_invalid_option_for_supported_and_non_option_arguments", should_return_no_invalid_option_for_supported_and_non_option_arguments);
+    CU_add_test(suite, "should_resolve_defaults_without_options", should_resolve_defaults_without_options);
+    CU_add_test(suite, "should_default_to_columns_on_a_terminal", should_default_to_columns_on_a_terminal);
+    CU_add_test(suite, "should_accumulate_independent_settings_and_count_option_arguments", should_accumulate_independent_settings_and_count_option_arguments);
+    CU_add_test(suite, "should_use_the_last_explicit_format_and_preserve_owner_preference", should_use_the_last_explicit_format_and_preserve_owner_preference);
+    CU_add_test(suite, "should_resolve_explicit_and_implicit_time_sorting", should_resolve_explicit_and_implicit_time_sorting);
+    CU_add_test(suite, "should_apply_f_settings_including_when_sort_is_overridden", should_apply_f_settings_including_when_sort_is_overridden);
+    CU_add_test(suite, "should_disable_recursion_and_dereferencing_for_immediate_directories", should_disable_recursion_and_dereferencing_for_immediate_directories);
     CU_add_test(suite, "should_return_the_first_unsupported_option_character", should_return_the_first_unsupported_option_character);
 }

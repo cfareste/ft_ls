@@ -3088,11 +3088,11 @@ static void should_apply_recursive_and_long_options_together(void)
     const char *arguments[] = { "-Rl", "qa", NULL };
     get_parsed_arguments_result(2, arguments);
 
-    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_RECURSIVE));
-    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_LONG_FORMAT));
-    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_READ_ALL));
-    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_REVERSE));
-    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_TIME_SORTING));
+    CU_ASSERT_TRUE(parsed_arguments_should_recurse(parsed_arguments));
+    CU_ASSERT_EQUAL(parsed_arguments_get_format(parsed_arguments), FORMAT_LONG);
+    CU_ASSERT_TRUE(parsed_arguments_should_filter_hidden_files(parsed_arguments));
+    CU_ASSERT_FALSE(parsed_arguments_should_reverse_sort(parsed_arguments));
+    CU_ASSERT_NOT_EQUAL(parsed_arguments_get_sort_type(parsed_arguments), SORT_TIME);
     const int result = application_run(parsed_arguments_result);
 
     CU_ASSERT(verify_that_no_error_was_printed());
@@ -3116,11 +3116,11 @@ static void should_apply_recursive_and_read_all_options_together(void)
     const char *arguments[] = { "-Ra", "qa", NULL };
     get_parsed_arguments_result(2, arguments);
 
-    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_RECURSIVE));
-    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_LONG_FORMAT));
-    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_READ_ALL));
-    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_REVERSE));
-    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_TIME_SORTING));
+    CU_ASSERT_TRUE(parsed_arguments_should_recurse(parsed_arguments));
+    CU_ASSERT_NOT_EQUAL(parsed_arguments_get_format(parsed_arguments), FORMAT_LONG);
+    CU_ASSERT_FALSE(parsed_arguments_should_filter_hidden_files(parsed_arguments));
+    CU_ASSERT_FALSE(parsed_arguments_should_reverse_sort(parsed_arguments));
+    CU_ASSERT_NOT_EQUAL(parsed_arguments_get_sort_type(parsed_arguments), SORT_TIME);
     const int result = application_run(parsed_arguments_result);
 
     CU_ASSERT(verify_that_no_error_was_printed());
@@ -3146,11 +3146,11 @@ static void should_apply_recursive_and_reverse_options_together(void)
     const char *arguments[] = { "-Rr", "qa", NULL };
     get_parsed_arguments_result(2, arguments);
 
-    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_RECURSIVE));
-    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_LONG_FORMAT));
-    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_READ_ALL));
-    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_REVERSE));
-    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_TIME_SORTING));
+    CU_ASSERT_TRUE(parsed_arguments_should_recurse(parsed_arguments));
+    CU_ASSERT_NOT_EQUAL(parsed_arguments_get_format(parsed_arguments), FORMAT_LONG);
+    CU_ASSERT_TRUE(parsed_arguments_should_filter_hidden_files(parsed_arguments));
+    CU_ASSERT_TRUE(parsed_arguments_should_reverse_sort(parsed_arguments));
+    CU_ASSERT_NOT_EQUAL(parsed_arguments_get_sort_type(parsed_arguments), SORT_TIME);
     const int result = application_run(parsed_arguments_result);
 
     assert_application_succeeded_with_output(result, "qa:\nzulu\nsubdir\nalpha\n\nqa/subdir:\nzulu\nalpha\n");
@@ -3175,11 +3175,11 @@ static void should_apply_recursive_and_time_sorting_options_together(void)
     const char *arguments[] = { "-Rt", "qa", NULL };
     get_parsed_arguments_result(2, arguments);
 
-    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_RECURSIVE));
-    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_LONG_FORMAT));
-    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_READ_ALL));
-    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_REVERSE));
-    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_TIME_SORTING));
+    CU_ASSERT_TRUE(parsed_arguments_should_recurse(parsed_arguments));
+    CU_ASSERT_NOT_EQUAL(parsed_arguments_get_format(parsed_arguments), FORMAT_LONG);
+    CU_ASSERT_TRUE(parsed_arguments_should_filter_hidden_files(parsed_arguments));
+    CU_ASSERT_FALSE(parsed_arguments_should_reverse_sort(parsed_arguments));
+    CU_ASSERT_EQUAL(parsed_arguments_get_sort_type(parsed_arguments), SORT_TIME);
     const int result = application_run(parsed_arguments_result);
 
     assert_application_succeeded_with_output(result, "qa:\nzulu\nsubdir\nalpha\n\nqa/subdir:\nnested\n");
@@ -3199,11 +3199,11 @@ static void should_apply_long_format_and_read_all_options_together(void)
     const char *arguments[] = { "-la", "qa", NULL };
     get_parsed_arguments_result(2, arguments);
 
-    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_RECURSIVE));
-    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_LONG_FORMAT));
-    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_READ_ALL));
-    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_REVERSE));
-    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_TIME_SORTING));
+    CU_ASSERT_FALSE(parsed_arguments_should_recurse(parsed_arguments));
+    CU_ASSERT_EQUAL(parsed_arguments_get_format(parsed_arguments), FORMAT_LONG);
+    CU_ASSERT_FALSE(parsed_arguments_should_filter_hidden_files(parsed_arguments));
+    CU_ASSERT_FALSE(parsed_arguments_should_reverse_sort(parsed_arguments));
+    CU_ASSERT_NOT_EQUAL(parsed_arguments_get_sort_type(parsed_arguments), SORT_TIME);
     const int result = application_run(parsed_arguments_result);
 
     CU_ASSERT(verify_that_no_error_was_printed());
@@ -3224,11 +3224,11 @@ static void should_apply_long_format_and_reverse_options_together(void)
     const char *arguments[] = { "-lr", "qa", NULL };
     get_parsed_arguments_result(2, arguments);
 
-    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_RECURSIVE));
-    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_LONG_FORMAT));
-    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_READ_ALL));
-    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_REVERSE));
-    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_TIME_SORTING));
+    CU_ASSERT_FALSE(parsed_arguments_should_recurse(parsed_arguments));
+    CU_ASSERT_EQUAL(parsed_arguments_get_format(parsed_arguments), FORMAT_LONG);
+    CU_ASSERT_TRUE(parsed_arguments_should_filter_hidden_files(parsed_arguments));
+    CU_ASSERT_TRUE(parsed_arguments_should_reverse_sort(parsed_arguments));
+    CU_ASSERT_NOT_EQUAL(parsed_arguments_get_sort_type(parsed_arguments), SORT_TIME);
     const int result = application_run(parsed_arguments_result);
 
     CU_ASSERT(verify_that_no_error_was_printed());
@@ -3249,11 +3249,11 @@ static void should_apply_long_format_and_time_sorting_options_together(void)
     const char *arguments[] = { "-lt", "qa", NULL };
     get_parsed_arguments_result(2, arguments);
 
-    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_RECURSIVE));
-    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_LONG_FORMAT));
-    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_READ_ALL));
-    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_REVERSE));
-    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_TIME_SORTING));
+    CU_ASSERT_FALSE(parsed_arguments_should_recurse(parsed_arguments));
+    CU_ASSERT_EQUAL(parsed_arguments_get_format(parsed_arguments), FORMAT_LONG);
+    CU_ASSERT_TRUE(parsed_arguments_should_filter_hidden_files(parsed_arguments));
+    CU_ASSERT_FALSE(parsed_arguments_should_reverse_sort(parsed_arguments));
+    CU_ASSERT_EQUAL(parsed_arguments_get_sort_type(parsed_arguments), SORT_TIME);
     const int result = application_run(parsed_arguments_result);
 
     CU_ASSERT(verify_that_no_error_was_printed());
@@ -3275,11 +3275,11 @@ static void should_apply_read_all_and_reverse_options_together(void)
     const char *arguments[] = { "-ar", "qa", NULL };
     get_parsed_arguments_result(2, arguments);
 
-    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_RECURSIVE));
-    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_LONG_FORMAT));
-    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_READ_ALL));
-    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_REVERSE));
-    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_TIME_SORTING));
+    CU_ASSERT_FALSE(parsed_arguments_should_recurse(parsed_arguments));
+    CU_ASSERT_NOT_EQUAL(parsed_arguments_get_format(parsed_arguments), FORMAT_LONG);
+    CU_ASSERT_FALSE(parsed_arguments_should_filter_hidden_files(parsed_arguments));
+    CU_ASSERT_TRUE(parsed_arguments_should_reverse_sort(parsed_arguments));
+    CU_ASSERT_NOT_EQUAL(parsed_arguments_get_sort_type(parsed_arguments), SORT_TIME);
     const int result = application_run(parsed_arguments_result);
 
     assert_application_succeeded_with_output(result, "zulu\nalpha\n.hidden\n..\n.\n");
@@ -3303,11 +3303,11 @@ static void should_apply_read_all_and_time_sorting_options_together(void)
     const char *arguments[] = { "-at", "qa", NULL };
     get_parsed_arguments_result(2, arguments);
 
-    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_RECURSIVE));
-    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_LONG_FORMAT));
-    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_READ_ALL));
-    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_REVERSE));
-    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_TIME_SORTING));
+    CU_ASSERT_FALSE(parsed_arguments_should_recurse(parsed_arguments));
+    CU_ASSERT_NOT_EQUAL(parsed_arguments_get_format(parsed_arguments), FORMAT_LONG);
+    CU_ASSERT_FALSE(parsed_arguments_should_filter_hidden_files(parsed_arguments));
+    CU_ASSERT_FALSE(parsed_arguments_should_reverse_sort(parsed_arguments));
+    CU_ASSERT_EQUAL(parsed_arguments_get_sort_type(parsed_arguments), SORT_TIME);
     const int result = application_run(parsed_arguments_result);
 
     assert_application_succeeded_with_output(result, "zulu\nalpha\n.hidden\n..\n.\n");
@@ -3328,11 +3328,11 @@ static void should_apply_reverse_and_time_sorting_options_together(void)
     const char *arguments[] = { "-rt", "qa", NULL };
     get_parsed_arguments_result(2, arguments);
 
-    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_RECURSIVE));
-    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_LONG_FORMAT));
-    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_READ_ALL));
-    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_REVERSE));
-    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_TIME_SORTING));
+    CU_ASSERT_FALSE(parsed_arguments_should_recurse(parsed_arguments));
+    CU_ASSERT_NOT_EQUAL(parsed_arguments_get_format(parsed_arguments), FORMAT_LONG);
+    CU_ASSERT_TRUE(parsed_arguments_should_filter_hidden_files(parsed_arguments));
+    CU_ASSERT_TRUE(parsed_arguments_should_reverse_sort(parsed_arguments));
+    CU_ASSERT_EQUAL(parsed_arguments_get_sort_type(parsed_arguments), SORT_TIME);
     const int result = application_run(parsed_arguments_result);
 
     assert_application_succeeded_with_output(result, "old\nmiddle\nnew\n");
@@ -3355,11 +3355,11 @@ static void should_apply_long_format_read_all_and_recursive_options_together(voi
     const char *arguments[] = { "-laR", "qa", NULL };
     get_parsed_arguments_result(2, arguments);
 
-    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_RECURSIVE));
-    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_LONG_FORMAT));
-    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_READ_ALL));
-    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_REVERSE));
-    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_TIME_SORTING));
+    CU_ASSERT_TRUE(parsed_arguments_should_recurse(parsed_arguments));
+    CU_ASSERT_EQUAL(parsed_arguments_get_format(parsed_arguments), FORMAT_LONG);
+    CU_ASSERT_FALSE(parsed_arguments_should_filter_hidden_files(parsed_arguments));
+    CU_ASSERT_FALSE(parsed_arguments_should_reverse_sort(parsed_arguments));
+    CU_ASSERT_NOT_EQUAL(parsed_arguments_get_sort_type(parsed_arguments), SORT_TIME);
     const int result = application_run(parsed_arguments_result);
 
     CU_ASSERT(verify_that_no_error_was_printed());
@@ -3384,11 +3384,11 @@ static void should_apply_read_all_reverse_and_time_sorting_options_together(void
     const char *arguments[] = { "-rta", "qa", NULL };
     get_parsed_arguments_result(2, arguments);
 
-    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_RECURSIVE));
-    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_LONG_FORMAT));
-    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_READ_ALL));
-    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_REVERSE));
-    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_TIME_SORTING));
+    CU_ASSERT_FALSE(parsed_arguments_should_recurse(parsed_arguments));
+    CU_ASSERT_NOT_EQUAL(parsed_arguments_get_format(parsed_arguments), FORMAT_LONG);
+    CU_ASSERT_FALSE(parsed_arguments_should_filter_hidden_files(parsed_arguments));
+    CU_ASSERT_TRUE(parsed_arguments_should_reverse_sort(parsed_arguments));
+    CU_ASSERT_EQUAL(parsed_arguments_get_sort_type(parsed_arguments), SORT_TIME);
     const int result = application_run(parsed_arguments_result);
 
     assert_application_succeeded_with_output(result, ".\n..\n.hidden\nalpha\nzulu\n");
@@ -3416,11 +3416,11 @@ static void should_apply_recursive_long_format_and_time_sorting_options_together
     const char *arguments[] = { "-Rlt", "qa", NULL };
     get_parsed_arguments_result(2, arguments);
 
-    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_RECURSIVE));
-    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_LONG_FORMAT));
-    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_READ_ALL));
-    CU_ASSERT_FALSE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_REVERSE));
-    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_TIME_SORTING));
+    CU_ASSERT_TRUE(parsed_arguments_should_recurse(parsed_arguments));
+    CU_ASSERT_EQUAL(parsed_arguments_get_format(parsed_arguments), FORMAT_LONG);
+    CU_ASSERT_TRUE(parsed_arguments_should_filter_hidden_files(parsed_arguments));
+    CU_ASSERT_FALSE(parsed_arguments_should_reverse_sort(parsed_arguments));
+    CU_ASSERT_EQUAL(parsed_arguments_get_sort_type(parsed_arguments), SORT_TIME);
     const int result = application_run(parsed_arguments_result);
 
     CU_ASSERT(verify_that_no_error_was_printed());
@@ -3451,11 +3451,11 @@ static void should_apply_all_options_together(void)
     const char *arguments[] = { "-lartR", "qa", NULL };
     get_parsed_arguments_result(2, arguments);
 
-    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_RECURSIVE));
-    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_LONG_FORMAT));
-    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_READ_ALL));
-    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_REVERSE));
-    CU_ASSERT_TRUE(parsed_arguments_is_option_active(parsed_arguments, OPTIONS_TIME_SORTING));
+    CU_ASSERT_TRUE(parsed_arguments_should_recurse(parsed_arguments));
+    CU_ASSERT_EQUAL(parsed_arguments_get_format(parsed_arguments), FORMAT_LONG);
+    CU_ASSERT_FALSE(parsed_arguments_should_filter_hidden_files(parsed_arguments));
+    CU_ASSERT_TRUE(parsed_arguments_should_reverse_sort(parsed_arguments));
+    CU_ASSERT_EQUAL(parsed_arguments_get_sort_type(parsed_arguments), SORT_TIME);
     const int result = application_run(parsed_arguments_result);
 
     CU_ASSERT(verify_that_no_error_was_printed());

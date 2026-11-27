@@ -2,116 +2,98 @@
 #include "options.h"
 #include "libft.h"
 
-#define RECURSIVE_OPTION_CHAR 'R'
-#define LONG_FORMAT_OPTION_CHAR 'l'
-#define LONG_FORMAT_NO_OWNER_OPTION_CHAR 'g'
-#define READ_ALL_OPTION_CHAR 'a'
-#define REVERSE_OPTION_CHAR 'r'
-#define TIME_SORTING_OPTION_CHAR 't'
-#define ENABLE_ATIME_OPTION_CHAR 'u'
-#define NO_SORT_OPTION_CHAR 'U'
-#define READ_ALL_NO_SORT_OPTION_CHAR 'f'
-#define IMMEDIATE_DIRS_OPTION_CHAR 'd'
-#define MULTI_COLUMN_FORMAT_OPTION_CHAR 'C'
 #define COLOR_OPTION "--color"
 
-static int argument_is_an_option(const char *argument)
+static int parse_short_option(t_options *options, t_sort_type *sort_option, const char flag)
 {
-    return argument[0] == '-';
-}
-
-static int argument_is_color_option(const char *argument)
-{
-    return ft_are_string_equals(argument, COLOR_OPTION);
-}
-
-static t_options get_option_flag(const char option)
-{
-    if (option == RECURSIVE_OPTION_CHAR)
-        return OPTIONS_RECURSIVE;
-    if (option == LONG_FORMAT_OPTION_CHAR)
-        return OPTIONS_LONG_FORMAT;
-    if (option == LONG_FORMAT_NO_OWNER_OPTION_CHAR)
-        return OPTIONS_LONG_FORMAT_NO_OWNER;
-    if (option == READ_ALL_OPTION_CHAR)
-        return OPTIONS_READ_ALL;
-    if (option == REVERSE_OPTION_CHAR)
-        return OPTIONS_REVERSE;
-    if (option == TIME_SORTING_OPTION_CHAR)
-        return OPTIONS_TIME_SORTING;
-    if (option == ENABLE_ATIME_OPTION_CHAR)
-        return OPTIONS_ENABLE_ATIME;
-    if (option == NO_SORT_OPTION_CHAR)
-        return OPTIONS_NO_SORT;
-    if (option == READ_ALL_NO_SORT_OPTION_CHAR)
-        return OPTIONS_READ_ALL | OPTIONS_NO_SORT;
-    if (option == IMMEDIATE_DIRS_OPTION_CHAR)
-        return OPTIONS_IMMEDIATE_DIRS;
-    if (option == MULTI_COLUMN_FORMAT_OPTION_CHAR)
-        return OPTIONS_MULTI_COLUMN_FORMAT;
-    return OPTIONS_NONE;
-}
-
-char options_get_invalid_option(const char **arguments)
-{
-    if (arguments == NULL)
-        return '\0';
-
-    for (int i = 0; arguments[i] != NULL; i++)
+    switch (flag)
     {
-        if (!argument_is_an_option(arguments[i]))
-            continue ;
-        if (argument_is_color_option(arguments[i]))
-            continue ;
+        case 'C': options->format = FORMAT_COLUMNS; break;
+        case 'l': options->format = FORMAT_LONG; break;
+        case 'g':
+            options->format = FORMAT_LONG;
+            options->print_owner = 0;
+            break;
+        case 't': *sort_option = SORT_TIME; break;
+        case 'U': *sort_option = SORT_NONE; break;
+        case 'f':
+            *sort_option = SORT_NONE;
+            options->filter_hidden_files = 0;
+            break;
+        case 'u': options->time_type = TIME_ATIME; break;
+        case 'r': options->sort_reverse = 1; break;
+        case 'a': options->filter_hidden_files = 0; break;
+        case 'd': options->immediate_dirs = 1; break;
+        case 'R': options->recursion = 1; break;
+        default: return 0;
+    }
+    return 1;
+}
+
+static void resolve_options(t_options *options, const t_sort_type sort_option)
+{
+    if (sort_option != SORT_NOT_SET)
+        options->sort_type = sort_option;
+    else if (options->format != FORMAT_LONG && options->time_type == TIME_ATIME)
+        options->sort_type = SORT_TIME;
+
+    if (options->immediate_dirs)
+        options->recursion = 0;
+
+    options->dereference_symlinks = !options->immediate_dirs && options->format != FORMAT_LONG;
+}
+
+static t_parsed_options get_default_options(const int stdout_is_terminal)
+{
+    t_parsed_options parsed_options = {
+        .options = {
+            .format = FORMAT_SINGLE_COLUMN,
+            .sort_type = SORT_NAME,
+            .time_type = TIME_MTIME,
+            .print_owner = 1,
+            .filter_hidden_files = 1,
+            .dereference_symlinks = 1
+        },
+        .options_amount = 0,
+        .invalid_option = '\0'
+    };
+
+    if (stdout_is_terminal)
+        parsed_options.options.format = FORMAT_COLUMNS;
+
+    return parsed_options;
+}
+
+t_parsed_options options_parse(const char **arguments, const int stdout_is_terminal)
+{
+    t_parsed_options parsed_options = get_default_options(stdout_is_terminal);
+    t_sort_type sort_option = SORT_NOT_SET;
+
+    for (int i = 0; arguments != NULL && arguments[i] != NULL; i++)
+    {
+        if (arguments[i][0] != '-')
+            continue;
+
+        parsed_options.options_amount++;
+        if (arguments[i][1] == '\0')
+            continue;
+
+        if (ft_are_string_equals(arguments[i], COLOR_OPTION))
+        {
+            parsed_options.options.color_files = 1;
+            continue;
+        }
 
         for (int j = 1; arguments[i][j] != '\0'; j++)
         {
-            if (get_option_flag(arguments[i][j]) == OPTIONS_NONE)
-                return arguments[i][j];
+            if (!parse_short_option(&parsed_options.options, &sort_option, arguments[i][j]))
+            {
+                parsed_options.invalid_option = arguments[i][j];
+                return parsed_options;
+            }
         }
     }
+    resolve_options(&parsed_options.options, sort_option);
 
-    return '\0';
-}
-
-t_options options_get(const char **arguments)
-{
-    if (arguments == NULL)
-        return OPTIONS_NONE;
-
-    int options = OPTIONS_NONE;
-
-    for (int i = 0; arguments[i] != NULL; i++)
-    {
-        if (!argument_is_an_option(arguments[i]))
-            continue ;
-        if (argument_is_color_option(arguments[i]))
-        {
-            options |= OPTIONS_COLOR;
-            continue ;
-        }
-
-        for (int j = 1; arguments[i][j] != '\0'; j++)
-        {
-            options |= get_option_flag(arguments[i][j]);
-        }
-    }
-
-    return options;
-}
-
-int options_get_amount(const char **arguments)
-{
-    if (arguments == NULL)
-        return 0;
-
-    int num_of_options = 0;
-
-    for (int i = 0; arguments[i] != 0; i++)
-    {
-        if (argument_is_an_option(arguments[i]))
-            num_of_options++;
-    }
-
-    return num_of_options;
+    return parsed_options;
 }
