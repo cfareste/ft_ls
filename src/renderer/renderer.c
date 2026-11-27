@@ -40,17 +40,18 @@ static int should_print_directory_header(const t_parsed_arguments *parsed_argume
 {
     const int has_multiple_file_operands = parsed_arguments_has_multiple_file_operands(parsed_arguments);
     const int has_directory_file_operands = parsed_arguments_has_directory_file_operands(parsed_arguments);
-    const int is_recursive = parsed_arguments_is_option_active(parsed_arguments, OPTIONS_RECURSIVE);
+    const int is_recursive = parsed_arguments_should_recurse(parsed_arguments);
 
     return (has_multiple_file_operands && has_directory_file_operands) || is_recursive;
 }
 
 static const t_render_strategy *select_render_strategy(const t_parsed_arguments *parsed_arguments)
 {
-    if (parsed_arguments_is_long_format_active(parsed_arguments))
+    const t_format format = parsed_arguments_get_format(parsed_arguments);
+
+    if (format == FORMAT_LONG)
         return &LONG_FORMAT_RENDER_STRATEGY;
-    if (parsed_arguments_is_option_active(parsed_arguments, OPTIONS_MULTI_COLUMN_FORMAT)
-        || parsed_arguments_is_stdout_a_tty(parsed_arguments))
+    if (format == FORMAT_COLUMNS)
         return &MULTI_COLUMN_RENDER_STRATEGY;
 
     return &SINGLE_COLUMN_RENDER_STRATEGY;

@@ -89,15 +89,27 @@ prepare_color_fixtures() {
 
 reset_access_time_fixture_dates() {
     touch -a -t 200101010000 atime-cases/{a,dir_a,dir_a/child,list/a} &&
-        touch -a -t 200201010000 atime-cases/{b,dir_b,dir_b/child,list/b}
+        touch -a -t 200201010000 atime-cases/{b,dir_b,dir_b/child,list/b} &&
+        touch -a -t 200101010000 atime-cases/combinations/tree/z &&
+        touch -a -t 200201010000 atime-cases/combinations &&
+        touch -a -t 200301010000 atime-cases/combinations/tree/a &&
+        touch -a -t 200401010000 atime-cases/combinations/tree{,/z/leaf} &&
+        touch -a -t 200501010000 atime-cases/combinations/tree/.h
 }
 
 prepare_access_time_fixtures() {
     mkdir -p atime-cases/{dir_a,dir_b,list} &&
+        mkdir -p atime-cases/combinations/tree/z &&
         printf '%100000s' '' > atime-cases/a &&
         touch atime-cases/{b,dir_a/child,dir_b/child,list/a,list/b} &&
         touch -m -t 200401010000 atime-cases/{a,dir_a,dir_a/child,list/a} &&
         touch -m -t 200301010000 atime-cases/{b,dir_b,dir_b/child,list/b} &&
+        touch atime-cases/combinations/tree/{a,.h,z/leaf} &&
+        touch -m -t 200101010000 atime-cases/combinations/tree &&
+        touch -m -t 200201010000 atime-cases/combinations/tree/.h &&
+        touch -m -t 200301010000 atime-cases/combinations &&
+        touch -m -t 200401010000 atime-cases/combinations/tree/z{,/leaf} &&
+        touch -m -t 200501010000 atime-cases/combinations/tree/a &&
         reset_access_time_fixture_dates
 }
 
@@ -314,6 +326,8 @@ run_test_command() {
     if [[ "${command}" == *" atime-cases/"* ]]; then
         # Reading a directory can update its atime before the second command runs.
         reset_access_time_fixture_dates || return 1
+        bash -c "${command}"
+        return $?
     fi
 
     bash -lc "${command}"

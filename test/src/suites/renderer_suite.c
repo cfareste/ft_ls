@@ -691,6 +691,31 @@ static void should_render_one_entry_with_long_format(void)
     render_context_destroy(&context);
 }
 
+static void should_render_columns_when_columns_overrides_long_format(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", ".", ".."),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+    ioctl_mock_setup_columns(80);
+    const char *args[] = { "-lC", NULL };
+    get_parsed_arguments_result(1, args);
+
+    t_file_entry_array *entries = file_entry_array_create();
+    file_entry_array_push(entries, file_entry_create("a"));
+    file_entry_array_push(entries, file_entry_create("b"));
+    t_render_context *context = render_context_create(parsed_arguments);
+
+    render_entries(context, entries);
+
+    CU_ASSERT(verify_that_the_output_printed_is("a  b\n"));
+    CU_ASSERT(verify_that_no_error_was_printed());
+
+    render_context_destroy(&context);
+    file_entry_array_destroy(&entries);
+}
+
 static void should_render_entries_in_long_format_aligned(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -1337,6 +1362,7 @@ void register_renderer_suite(void)
         CU_add_test(suite, "should_render_the_types_separator_if_has_at_least_one_non_dir_and_one_dir", should_render_the_types_separator_if_has_at_least_one_non_dir_and_one_dir);
         CU_add_test(suite, "should_not_render_the_types_separator_if_doesnt_have_at_least_one_non_dir_and_one_dir", should_not_render_the_types_separator_if_doesnt_have_at_least_one_non_dir_and_one_dir);
         CU_add_test(suite, "should_render_one_entry_with_long_format", should_render_one_entry_with_long_format);
+        CU_add_test(suite, "should_render_columns_when_columns_overrides_long_format", should_render_columns_when_columns_overrides_long_format);
         CU_add_test(suite, "should_render_entries_in_long_format_aligned", should_render_entries_in_long_format_aligned);
         CU_add_test(suite, "should_render_missing_author_and_group_as_question_marks", should_render_missing_author_and_group_as_question_marks);
         CU_add_test(suite, "should_render_one_failed_entry_in_long_format", should_render_one_failed_entry_in_long_format);
@@ -1350,6 +1376,5 @@ void register_renderer_suite(void)
         CU_add_test(suite, "should_render_char_and_block_devices_in_long_format", should_render_char_and_block_devices_in_long_format);
         CU_add_test(suite, "should_render_an_old_modification_file_in_long_format", should_render_an_old_modification_file_in_long_format);
         CU_add_test(suite, "should_render_a_symlink_name_with_its_target_in_long_format", should_render_a_symlink_name_with_its_target_in_long_format);
-        // CU_add_test(suite, "should_render_the_name_of_every_entry_with_a_file_entry_array_of_various_elements_separated_by_two_spaces", should_render_the_name_of_every_entry_with_a_file_entry_array_of_various_elements_separated_by_two_spaces);
     }
 }

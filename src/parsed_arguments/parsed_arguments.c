@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include "parsed_arguments.h"
+#include "options.h"
 #include "file_operands.h"
 #include "sorter.h"
 #include "error_reporter.h"
@@ -68,8 +69,7 @@ static int has_failed_to_access_a_file_operand(char **file_operands, t_file_stat
 
 static t_result *create_parsing_arguments_result(t_parsed_arguments *parsed_arguments)
 {
-    const int skip_implicit_operand = parsed_arguments->has_implicit_default_operand
-        && !parsed_arguments_is_option_active(parsed_arguments, OPTIONS_IMMEDIATE_DIRS);
+    const int skip_implicit_operand = parsed_arguments->has_implicit_default_operand && !parsed_arguments->options.immediate_dirs;
 
     if (has_failed_to_access_a_file_operand(parsed_arguments->file_operands, parsed_arguments->file_operands_stats, skip_implicit_operand))
         return result_create_failed(parsed_arguments, NULL);
@@ -99,22 +99,17 @@ static const char *retrieve_advanced_file_stats(char **file_operands, t_file_sta
     return failed_operand;
 }
 
-static const char *initialize_file_operands(t_parsed_arguments *parsed_arguments, const int num_of_arguments, const char **arguments)
+static const char *initialize_file_operands(t_parsed_arguments *parsed_arguments, const int num_of_file_operands, const char **arguments)
 {
-    const int num_of_file_operands = num_of_arguments - options_get_amount(arguments);
-    const int immediate_dirs = parsed_arguments_is_option_active(parsed_arguments, OPTIONS_IMMEDIATE_DIRS);
+    const int immediate_dirs = parsed_arguments->options.immediate_dirs;
 
     parsed_arguments->has_implicit_default_operand = num_of_file_operands == 0;
     parsed_arguments->file_operands = file_operands_get(num_of_file_operands, arguments);
     const int stats_count = immediate_dirs ? ft_str_matrix_length(parsed_arguments->file_operands) : num_of_file_operands;
-    const int follow_symlinks = !immediate_dirs && !parsed_arguments_is_long_format_active(parsed_arguments);
-    parsed_arguments->file_operands_stats = file_operands_get_stats(stats_count, parsed_arguments->file_operands, follow_symlinks);
+    parsed_arguments->file_operands_stats = file_operands_get_stats(stats_count, parsed_arguments->file_operands, parsed_arguments->options.dereference_symlinks);
 
-    if (parsed_arguments_is_long_format_active(parsed_arguments))
-    {
-        const int retrieve_author = !parsed_arguments_is_option_active(parsed_arguments, OPTIONS_LONG_FORMAT_NO_OWNER);
-        return retrieve_advanced_file_stats(parsed_arguments->file_operands, parsed_arguments->file_operands_stats, retrieve_author);
-    }
+    if (parsed_arguments->options.format == FORMAT_LONG)
+        return retrieve_advanced_file_stats(parsed_arguments->file_operands, parsed_arguments->file_operands_stats, parsed_arguments->options.print_owner);
 
     return NULL;
 }
@@ -141,7 +136,7 @@ static t_file_stats **get_operand_group_stats(const t_parsed_arguments *parsed_a
 }
 
 static void sort_file_operand_group(char **operands, t_file_stats **operands_stats,
-    const t_sorter_context *sorter_context, const t_comparator_fn comparator)
+    const t_parsed_arguments *parsed_arguments, const t_comparator_fn comparator)
 {
     const int count = ft_str_matrix_length(operands);
     if (count < 2)
@@ -156,7 +151,7 @@ static void sort_file_operand_group(char **operands, t_file_stats **operands_sta
         entries_to_sort[i] = &entries[i];
     }
 
-    sort_pointer_array(sorter_context, entries_to_sort, comparator);
+    sort_pointer_array(parsed_arguments, entries_to_sort, comparator);
 
     for (int i = 0; i < count; i++)
     {
@@ -173,7 +168,7 @@ static void prepare_operand_groups(t_parsed_arguments *parsed_arguments)
     char **operands = parsed_arguments->file_operands;
     t_file_stats **stats = parsed_arguments->file_operands_stats;
     const int has_default_operand = parsed_arguments->has_implicit_default_operand;
-    const int immediate_dirs = parsed_arguments_is_option_active(parsed_arguments, OPTIONS_IMMEDIATE_DIRS);
+    const int immediate_dirs = parsed_arguments->options.immediate_dirs;
     char **files = immediate_dirs
         ? file_operands_get_accessible(operands, stats)
         : file_operands_get_non_directory(operands, stats, has_default_operand);
@@ -186,22 +181,20 @@ static void prepare_operand_groups(t_parsed_arguments *parsed_arguments)
     parsed_arguments->non_directory_file_operands_stats = file_stats;
     parsed_arguments->directory_file_operands = directories;
 
-    if (parsed_arguments_is_option_active(parsed_arguments, OPTIONS_NO_SORT))
+    if (parsed_arguments->options.sort_type == SORT_NONE)
         return;
 
-    t_sorter_context *sorter_context = sorter_context_create(parsed_arguments);
     t_comparator_fn comparator = compare_file_operand_entries_by_name;
-    if (sorter_context_is_access_time_order_active(sorter_context))
-        comparator = compare_file_operand_entries_by_access_time;
-    else if (sorter_context_is_modification_time_order_active(sorter_context))
-        comparator = compare_file_operand_entries_by_modification_time;
+    if (parsed_arguments->options.sort_type == SORT_TIME)
+        comparator = parsed_arguments->options.time_type == TIME_ATIME
+            ? compare_file_operand_entries_by_access_time
+            : compare_file_operand_entries_by_modification_time;
     t_file_stats **directory_stats = get_operand_group_stats(parsed_arguments, directories);
 
-    sort_file_operand_group(files, file_stats, sorter_context, comparator);
-    sort_file_operand_group(directories, directory_stats, sorter_context, comparator);
+    sort_file_operand_group(files, file_stats, parsed_arguments, comparator);
+    sort_file_operand_group(directories, directory_stats, parsed_arguments, comparator);
 
     free(directory_stats);
-    sorter_context_destroy(&sorter_context);
 }
 
 t_result *parse_arguments(const int num_of_arguments, const char **arguments)
@@ -209,18 +202,20 @@ t_result *parse_arguments(const int num_of_arguments, const char **arguments)
     if (num_of_arguments < 0 || arguments == NULL)
         return NULL;
 
-    const char invalid_option = options_get_invalid_option(arguments);
-    if (invalid_option != '\0')
+    const int stdout_is_terminal = isatty(STDOUT_FILENO);
+    const t_parsed_options option_result = options_parse(arguments, stdout_is_terminal);
+    if (option_result.invalid_option != '\0')
     {
-        report_invalid_option(invalid_option);
+        report_invalid_option(option_result.invalid_option);
         return result_create_failed(NULL, NULL);
     }
 
     t_parsed_arguments *parsed_arguments = ft_safe_calloc(1, sizeof(t_parsed_arguments));
 
-    parsed_arguments->stdout_is_terminal = isatty(STDOUT_FILENO);
-    parsed_arguments->options = options_get(arguments);
-    const char *failed_advanced_metadata_operand = initialize_file_operands(parsed_arguments, num_of_arguments, arguments);
+    parsed_arguments->stdout_is_terminal = stdout_is_terminal;
+    parsed_arguments->options = option_result.options;
+    const int num_of_file_operands = num_of_arguments - option_result.options_amount;
+    const char *failed_advanced_metadata_operand = initialize_file_operands(parsed_arguments, num_of_file_operands, arguments);
     prepare_operand_groups(parsed_arguments);
 
     if (failed_advanced_metadata_operand != NULL)
@@ -252,25 +247,68 @@ const char * const *parsed_arguments_get_directory_file_operands(const t_parsed_
     return (const char * const *) parsed_arguments->directory_file_operands;
 }
 
-int parsed_arguments_has_any_option_active(const t_parsed_arguments *parsed_arguments)
+t_format parsed_arguments_get_format(const t_parsed_arguments *parsed_arguments)
+{
+    if (parsed_arguments == NULL)
+        return FORMAT_SINGLE_COLUMN;
+
+    return parsed_arguments->options.format;
+}
+
+t_sort_type parsed_arguments_get_sort_type(const t_parsed_arguments *parsed_arguments)
+{
+    if (parsed_arguments == NULL)
+        return SORT_NAME;
+
+    return parsed_arguments->options.sort_type;
+}
+
+t_time_type parsed_arguments_get_time_type(const t_parsed_arguments *parsed_arguments)
+{
+    if (parsed_arguments == NULL)
+        return TIME_MTIME;
+
+    return parsed_arguments->options.time_type;
+}
+
+int parsed_arguments_should_print_owner(const t_parsed_arguments *parsed_arguments)
+{
+    if (parsed_arguments == NULL)
+        return 1;
+
+    return parsed_arguments->options.print_owner;
+}
+
+int parsed_arguments_should_reverse_sort(const t_parsed_arguments *parsed_arguments)
 {
     if (parsed_arguments == NULL)
         return 0;
 
-    return parsed_arguments->options != OPTIONS_NONE;
+    return parsed_arguments->options.sort_reverse;
 }
 
-int parsed_arguments_is_option_active(const t_parsed_arguments *parsed_arguments, const t_options option)
+int parsed_arguments_should_filter_hidden_files(const t_parsed_arguments *parsed_arguments)
+{
+    if (parsed_arguments == NULL)
+        return 1;
+
+    return parsed_arguments->options.filter_hidden_files;
+}
+
+int parsed_arguments_should_recurse(const t_parsed_arguments *parsed_arguments)
 {
     if (parsed_arguments == NULL)
         return 0;
 
-    return (parsed_arguments->options & option) != OPTIONS_NONE;
+    return parsed_arguments->options.recursion;
 }
 
-int parsed_arguments_is_long_format_active(const t_parsed_arguments *parsed_arguments)
+int parsed_arguments_should_color_files(const t_parsed_arguments *parsed_arguments)
 {
-    return parsed_arguments_is_option_active(parsed_arguments, OPTIONS_LONG_FORMAT | OPTIONS_LONG_FORMAT_NO_OWNER);
+    if (parsed_arguments == NULL)
+        return 0;
+
+    return parsed_arguments->options.color_files;
 }
 
 int parsed_arguments_is_stdout_a_tty(const t_parsed_arguments *parsed_arguments)

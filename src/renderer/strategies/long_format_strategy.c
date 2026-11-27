@@ -61,7 +61,10 @@ static char get_permission_character(const t_permissions permissions, const t_pe
         return column.special_without_execute;
     }
 
-    return permissions & column.permission ? column.character : '-';
+    if (permissions & column.permission)
+        return column.character;
+
+    return '-';
 }
 
 static const char *get_month_abbreviation(const int month)
@@ -102,17 +105,21 @@ static void print_alignment_padding(const size_t column_width, const size_t valu
 
 static t_column_widths get_column_widths(const t_file_entry_array *entries, const int show_author)
 {
-    const size_t size_width = file_entry_array_get_biggest_size(entries);
+    size_t size_width = file_entry_array_get_biggest_size(entries);
     const size_t device_digits = file_entry_array_get_biggest_device_width(entries);
-    const size_t device_width = device_digits == 0 ? 0 : device_digits + 2;
-    const size_t column_size_width = size_width > device_width ? size_width : device_width;
+    if (device_digits != 0 && device_digits + 2 > size_width)
+        size_width = device_digits + 2;
+
+    size_t author_width = 0;
+    if (show_author)
+        author_width = file_entry_array_get_biggest_author_width(entries);
 
     return (t_column_widths){
         .link_count = file_entry_array_get_biggest_link_count(entries),
-        .author = show_author ? file_entry_array_get_biggest_author_width(entries) : 0,
+        .author = author_width,
         .show_author = show_author,
         .group = file_entry_array_get_biggest_group_width(entries),
-        .size = column_size_width,
+        .size = size_width,
         .date = file_entry_array_get_biggest_date_width(entries)
     };
 }
@@ -218,7 +225,8 @@ static void print_failed_entry(const t_file_entry *entry, const t_column_widths 
     ft_printf(" %s\n", file_entry_get_name(entry));
 }
 
-static void print_entry(const t_parsed_arguments *parsed_arguments, const t_file_entry *entry, const t_column_widths widths, const int has_acl)
+static void print_entry(const t_parsed_arguments *parsed_arguments, const t_file_entry *entry,
+    const t_column_widths widths, const int has_acl, const t_time_type time_type)
 {
     if (file_entry_get_file_type(entry) == FILE_TYPE_UNKNOWN)
     {
@@ -232,7 +240,7 @@ static void print_entry(const t_parsed_arguments *parsed_arguments, const t_file
         print_padded_text(file_entry_get_author(entry), widths.author);
     print_padded_text(file_entry_get_group(entry), widths.group);
     print_size(entry, widths);
-    const t_date date = parsed_arguments_is_option_active(parsed_arguments, OPTIONS_ENABLE_ATIME)
+    const t_date date = time_type == TIME_ATIME
         ? file_entry_get_access_date(entry)
         : file_entry_get_modification_date(entry);
     print_date(date);
@@ -251,10 +259,11 @@ void directory_entries_prefix_long_format_strategy(const t_parsed_arguments *par
 void long_format_strategy(const t_parsed_arguments *parsed_arguments, const t_file_entry_array *file_entry_array)
 {
     const unsigned int count = file_entry_array_get_length(file_entry_array);
-    const int show_author = !parsed_arguments_is_option_active(parsed_arguments, OPTIONS_LONG_FORMAT_NO_OWNER);
+    const int show_author = parsed_arguments_should_print_owner(parsed_arguments);
+    const t_time_type time_type = parsed_arguments_get_time_type(parsed_arguments);
     const t_column_widths widths = get_column_widths(file_entry_array, show_author);
     const int has_acl = file_entry_array_has_acl(file_entry_array);
 
     for (unsigned int i = 0; i < count; i++)
-        print_entry(parsed_arguments, file_entry_array_get_at(file_entry_array, i), widths, has_acl);
+        print_entry(parsed_arguments, file_entry_array_get_at(file_entry_array, i), widths, has_acl, time_type);
 }

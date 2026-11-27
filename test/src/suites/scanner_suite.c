@@ -430,6 +430,35 @@ static void should_retrieve_advanced_metadata_only_when_long_format_is_active(vo
     result_destroy(&parsed_arguments_result);
 }
 
+static void should_include_hidden_entries_and_skip_long_metadata_when_columns_override_long_format(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR(".", ".hidden"),
+        MOCK_FILE_WITH_STATS(".hidden", MOCK_AUTHOR("alice"), MOCK_GROUP("staff")),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    const char *arguments[] = { "-lfC", NULL };
+    t_result *parse_result = parse_arguments(1, arguments);
+    t_parsed_arguments *parsed_arguments = result_get_value(parse_result);
+    scanner_context_destroy(&scanner_context);
+    scanner_context = scanner_context_create(parsed_arguments);
+    parsed_arguments_destroy(&parsed_arguments);
+    result_destroy(&parse_result);
+
+    scan_directory(".");
+
+    CU_ASSERT_TRUE(result_has_succeed(result));
+    CU_ASSERT_EQUAL(file_entry_array_get_length(sut), 1);
+    const t_file_entry *entry = file_entry_array_get_at(sut, 0);
+    CU_ASSERT_PTR_NOT_NULL_FATAL(entry);
+    CU_ASSERT_STRING_EQUAL(file_entry_get_name(entry), ".hidden");
+    CU_ASSERT_PTR_NULL(file_entry_get_author(entry));
+    CU_ASSERT_PTR_NULL(file_entry_get_group(entry));
+    CU_ASSERT(verify_that_no_error_was_printed());
+}
+
 static void should_not_retrieve_advanced_metadata_without_long_format(void)
 {
     const t_vfs_mock_entry vfs[] = {
@@ -518,6 +547,7 @@ void register_scanner_suite(void)
         CU_add_test(suite, "should_return_a_valid_array_even_if_it_fails_to_access_an_entry", should_return_a_valid_array_even_if_it_fails_to_access_an_entry);
         CU_add_test(suite, "should_retrieve_advanced_metadata_only_when_long_format_is_active", should_retrieve_advanced_metadata_only_when_long_format_is_active);
         CU_add_test(suite, "should_not_retrieve_advanced_metadata_without_long_format", should_not_retrieve_advanced_metadata_without_long_format);
+        CU_add_test(suite, "should_include_hidden_entries_and_skip_long_metadata_when_columns_override_long_format", should_include_hidden_entries_and_skip_long_metadata_when_columns_override_long_format);
         CU_add_test(suite, "should_return_all_entries_if_read_all_is_active_for_a_directory_with_hidden_files", should_return_all_entries_if_read_all_is_active_for_a_directory_with_hidden_files);
         CU_add_test(suite, "should_return_all_entries_if_read_all_is_active_for_a_directory_with_only_hidden_files", should_return_all_entries_if_read_all_is_active_for_a_directory_with_only_hidden_files);
     }

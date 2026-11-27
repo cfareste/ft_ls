@@ -3,7 +3,6 @@
 #include "path_builder.h"
 #include "renderer.h"
 #include "scanner.h"
-#include "sorter.h"
 #include "libft.h"
 
 typedef struct s_application_context
@@ -11,7 +10,6 @@ typedef struct s_application_context
     const t_parsed_arguments *parsed_arguments;
     t_render_context *render_context;
     t_scanner_context *scanner_context;
-    t_sorter_context *sorter_context;
     t_ft_ls_error_code error_code;
 } t_application_context;
 
@@ -21,11 +19,8 @@ static t_file_entry *create_file_operand_entry(const t_parsed_arguments *parsed_
 {
     t_file_entry *entry = file_entry_create_from_stats(file_operand, file_stats);
 
-    if (parsed_arguments_is_long_format_active(parsed_arguments))
-    {
-        const int retrieve_author = !parsed_arguments_is_option_active(parsed_arguments, OPTIONS_LONG_FORMAT_NO_OWNER);
-        file_entry_set_advanced_metadata_from_stats(entry, file_stats, retrieve_author);
-    }
+    if (parsed_arguments_get_format(parsed_arguments) == FORMAT_LONG)
+        file_entry_set_advanced_metadata_from_stats(entry, file_stats, parsed_arguments_should_print_owner(parsed_arguments));
     return entry;
 }
 
@@ -109,10 +104,10 @@ static void process_directory(t_application_context *context, const char *direct
 {
     t_file_entry_array *entries = scan_directory(context, directory_path);
 
-    file_entry_array_sort(context->sorter_context, entries);
+    file_entry_array_sort(context->parsed_arguments, entries);
     render_directory(context->render_context, directory_path, entries);
 
-    if (parsed_arguments_is_option_active(context->parsed_arguments, OPTIONS_RECURSIVE))
+    if (parsed_arguments_should_recurse(context->parsed_arguments))
         process_subdirectories(context, directory_path, entries);
 
     file_entry_array_destroy(&entries);
@@ -140,7 +135,6 @@ static void initialize_context(t_application_context *context, const t_parsed_ar
     context->parsed_arguments = parsed_arguments;
     context->render_context = render_context_create(parsed_arguments);
     context->scanner_context = scanner_context_create(parsed_arguments);
-    context->sorter_context = sorter_context_create(parsed_arguments);
     context->error_code = result_has_failed(parsing_arguments_result) ? FT_LS_APPLICATION_MAJOR_ERROR : FT_LS_APPLICATION_SUCCESS;
 }
 
@@ -148,7 +142,6 @@ static void destroy_context(t_application_context *context)
 {
     render_context_destroy(&context->render_context);
     scanner_context_destroy(&context->scanner_context);
-    sorter_context_destroy(&context->sorter_context);
 }
 
 t_ft_ls_error_code application_run(const t_result *parsing_arguments_result)

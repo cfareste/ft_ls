@@ -196,7 +196,10 @@ static t_file_acl_type get_file_acl_type(t_file_stats *file_stats)
         return FILE_ACL_NONE;
     has_unknown_acl |= selinux_status == ACL_XATTR_UNKNOWN;
 
-    return has_unknown_acl ? FILE_ACL_UNKNOWN : FILE_ACL_NONE;
+    if (has_unknown_acl)
+        return FILE_ACL_UNKNOWN;
+
+    return FILE_ACL_NONE;
 }
 
 static void initialize_stats(t_file_stats *file_stats, const char *file_path, const struct stat *stats)
@@ -360,8 +363,10 @@ const char *file_stats_get_author(t_file_stats *stats)
         return stats->author;
 
     const struct passwd *author = getpwuid(stats->author_id);
-
-    stats->author = get_name_or_id(author == NULL ? NULL : author->pw_name, (int)stats->author_id);
+    const char *name = NULL;
+    if (author != NULL)
+        name = author->pw_name;
+    stats->author = get_name_or_id(name, (int)stats->author_id);
 
     return stats->author;
 }
@@ -375,8 +380,10 @@ const char *file_stats_get_group(t_file_stats *stats)
         return stats->group;
 
     const struct group *group = getgrgid(stats->group_id);
-
-    stats->group = get_name_or_id(group == NULL ? NULL : group->gr_name, (int)stats->group_id);
+    const char *name = NULL;
+    if (group != NULL)
+        name = group->gr_name;
+    stats->group = get_name_or_id(name, (int)stats->group_id);
 
     return stats->group;
 }

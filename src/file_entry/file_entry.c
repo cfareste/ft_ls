@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include "file_entry.h"
 #include "sorter.h"
+#include "parsed_arguments.h"
 #include "libft.h"
 
 #define DEFAULT_CAPACITY 8
@@ -74,13 +75,6 @@ static int compare_by_entry_access_time(const void *first_item, const void *seco
     const int comparison = date_compare_newest_first(file_entry_get_access_date(first), file_entry_get_access_date(second));
 
     return comparison == 0 ? compare_by_entry_name(first, second) : comparison;
-}
-
-static int compare_no_sort(const void *first_entry, const void *second_entry)
-{
-    (void) first_entry;
-    (void) second_entry;
-    return 0;
 }
 
 static void increase_entries_capacity(t_file_entry_array *array)
@@ -494,20 +488,18 @@ size_t file_entry_array_get_biggest_date_width(const t_file_entry_array *file_en
     return file_entry_array->biggest_date_width;
 }
 
-void file_entry_array_sort(const t_sorter_context *context, const t_file_entry_array *file_entry_array)
+void file_entry_array_sort(const t_parsed_arguments *parsed_arguments, const t_file_entry_array *file_entry_array)
 {
     if (file_entry_array == NULL)
         return ;
 
     t_comparator_fn comparator = compare_by_entry_name;
-    if (sorter_context_is_no_sort_active(context))
-        comparator = compare_no_sort;
-    else if (sorter_context_is_access_time_order_active(context))
-        comparator = compare_by_entry_access_time;
-    else if (sorter_context_is_modification_time_order_active(context))
-        comparator = compare_by_entry_modification_time;
+    if (parsed_arguments_get_sort_type(parsed_arguments) == SORT_TIME)
+        comparator = parsed_arguments_get_time_type(parsed_arguments) == TIME_ATIME
+            ? compare_by_entry_access_time
+            : compare_by_entry_modification_time;
 
-    sort_pointer_array(context, (void **) file_entry_array->entries, comparator);
+    sort_pointer_array(parsed_arguments, (void **) file_entry_array->entries, comparator);
 }
 
 void file_entry_destroy(t_file_entry **file_entry)

@@ -433,3 +433,39 @@ QA LS-33 Enable atime for time operations (ls -u ...)
 4. Opciones -u, -t y formato largo (-l o -g)
    - Directorio actual
    - Mezcla de múltiples operandos (non dirs y dirs)
+
+
+QA LS-40 Support for multi-option execution (ls -gduUf --color ...)
+1. -R -l -a -t -r --color
+2. -R -g -a -u -r --color
+3. -g -u -t -r -a --color
+4. -l -d -a -u -r --color
+5. -R -d -t --color
+6. -g -d -a -t
+7. -R -C -a -t -r --color
+8. -C -u -a -r --color
+9. -C -d -a -t --color
+10. -R -l -U -a --color
+11. -U -r -a -C
+12. -l -u -U -a
+13. -d -U -a -l
+14. -g -U -a --color
+15. -R -f -C
+16. -f -r -g --color
+17. -d -f -u
+18. -l -f -a -U
+19. -l -C -a -t
+20. -C -l -a -t
+21. -g -C -a -r
+22. -C -g -a -r
+23. -l -g -a -t
+24. -g -l -a -t
+25. -t -U -a -l
+26. -U -t -a -l
+27. -t -f -a
+28. -f -t -a
+29. -lur
+30. -frt
+31. -gCl
+32. -f -C -g -l -R -a -u -t -r --color
+33. -R -l -C -g -r -u -U -a -d --color

@@ -7,90 +7,35 @@
 
 #define SUITE_NAME "sorter"
 
-static t_sorter_context *sorter_context;
-
-static void test_setup(void)
-{
-    sorter_context = sorter_context_create(NULL);
-}
-
-static void test_teardown(void)
-{
-    sorter_context_destroy(&sorter_context);
-}
-
 static int compare_by_ascii(const void *first_string, const void *second_string)
 {
     return ft_strcmp(first_string, second_string);
 }
 
-static void should_create_sorter_context(void)
-{
-    t_sorter_context *context = sorter_context_create(NULL);
-
-    CU_ASSERT_PTR_NOT_NULL(context);
-
-    sorter_context_destroy(&context);
-}
-
-static void should_report_modification_time_order_only_when_the_t_option_is_active(void)
-{
-    const char *time_arguments[] = { "-t", NULL };
-    const char *other_arguments[] = { "-r", NULL };
-    t_result *time_result = parse_arguments(1, time_arguments);
-    t_result *other_result = parse_arguments(1, other_arguments);
-    t_parsed_arguments *time_arguments_parsed = result_get_value(time_result);
-    t_parsed_arguments *other_arguments_parsed = result_get_value(other_result);
-    t_sorter_context *time_context = sorter_context_create(time_arguments_parsed);
-    t_sorter_context *other_context = sorter_context_create(other_arguments_parsed);
-
-    CU_ASSERT_EQUAL(sorter_context_is_modification_time_order_active(NULL), 0);
-    CU_ASSERT_EQUAL(sorter_context_is_modification_time_order_active(sorter_context), 0);
-    CU_ASSERT_EQUAL(sorter_context_is_modification_time_order_active(time_context), 1);
-    CU_ASSERT_EQUAL(sorter_context_is_modification_time_order_active(other_context), 0);
-
-    sorter_context_destroy(&time_context);
-    sorter_context_destroy(&other_context);
-    parsed_arguments_destroy(&time_arguments_parsed);
-    parsed_arguments_destroy(&other_arguments_parsed);
-    result_destroy(&time_result);
-    result_destroy(&other_result);
-}
-
-static void should_destroy_sorter_context(void)
-{
-    t_sorter_context *context = sorter_context_create(NULL);
-
-    sorter_context_destroy(&context);
-    sorter_context_destroy(NULL);
-
-    CU_ASSERT_PTR_NULL(context);
-}
-
 static void should_not_fail_when_passing_a_NULL_pointer(void)
 {
-    sort_pointer_array(sorter_context, NULL, compare_by_ascii);
+    sort_pointer_array(NULL, NULL, compare_by_ascii);
 }
 
 static void should_not_fail_when_passing_a_NULL_file_entry_array(void)
 {
     void *invalid_array = NULL;
 
-    sort_pointer_array(sorter_context, &invalid_array, compare_by_ascii);
+    sort_pointer_array(NULL, &invalid_array, compare_by_ascii);
 }
 
 static void should_not_fail_when_passing_a_NULL_comparator_function(void)
 {
     void *array[] = { "valid", NULL };
 
-    sort_pointer_array(sorter_context, array, NULL);
+    sort_pointer_array(NULL, array, NULL);
 }
 
 static void should_do_nothing_when_a_file_entry_array_with_one_entry_is_passed(void)
 {
     void *array[] = { "file", NULL };
 
-    sort_pointer_array(sorter_context, array, compare_by_ascii);
+    sort_pointer_array(NULL, array, compare_by_ascii);
 
     CU_ASSERT_STRING_EQUAL(array[0], "file");
     CU_ASSERT_PTR_NULL(array[1]);
@@ -100,7 +45,7 @@ static void should_do_nothing_when_an_already_sorted_file_entry_array_is_passed(
 {
     void *array[] = { ".hidden", "2file", "FILE", "_file", "a", "f", "file", NULL };
 
-    sort_pointer_array(sorter_context, array, compare_by_ascii);
+    sort_pointer_array(NULL, array, compare_by_ascii);
 
     CU_ASSERT_STRING_EQUAL(array[0], ".hidden");
     CU_ASSERT_STRING_EQUAL(array[1], "2file");
@@ -116,7 +61,7 @@ static void should_sort_an_unsorted_array(void)
 {
     void *array[] = { "a", "2file", ".hidden", "_file", "f", "file", "FILE", NULL };
 
-    sort_pointer_array(sorter_context, array, compare_by_ascii);
+    sort_pointer_array(NULL, array, compare_by_ascii);
 
     CU_ASSERT_STRING_EQUAL(array[0], ".hidden");
     CU_ASSERT_STRING_EQUAL(array[1], "2file");
@@ -133,10 +78,9 @@ static void should_sort_an_unsorted_array_in_reverse_order_when_reverse_option_i
     const char *arguments[] = { "-r", NULL };
     t_result *parsed_arguments_result = parse_arguments(1, arguments);
     t_parsed_arguments *parsed_arguments = result_get_value(parsed_arguments_result);
-    t_sorter_context *reverse_context = sorter_context_create(parsed_arguments);
     void *array[] = { "a", "2file", ".hidden", "_file", "f", "file", "FILE", NULL };
 
-    sort_pointer_array(reverse_context, array, compare_by_ascii);
+    sort_pointer_array(parsed_arguments, array, compare_by_ascii);
 
     CU_ASSERT_STRING_EQUAL(array[0], "file");
     CU_ASSERT_STRING_EQUAL(array[1], "f");
@@ -147,55 +91,34 @@ static void should_sort_an_unsorted_array_in_reverse_order_when_reverse_option_i
     CU_ASSERT_STRING_EQUAL(array[6], ".hidden");
     CU_ASSERT_PTR_NULL(array[7]);
 
-    sorter_context_destroy(&reverse_context);
     parsed_arguments_destroy(&parsed_arguments);
     result_destroy(&parsed_arguments_result);
 }
 
-static void should_select_access_time_order_for_u_according_to_format_and_t(void)
+static void should_preserve_array_order_when_no_sort_overrides_time_and_reverse_is_requested(void)
 {
-    const struct {
-        const char *option;
-        int access_time_order;
-        int modification_time_order;
-    } cases[] = {
-        { "-t", 0, 1 },
-        { "-u", 1, 0 },
-        { "-ut", 1, 0 },
-        { "-lu", 0, 0 },
-        { "-gu", 0, 0 },
-        { "-lut", 1, 0 },
-        { "-gut", 1, 0 }
-    };
+    const char *arguments[] = { "-trU", NULL };
+    t_result *result = parse_arguments(1, arguments);
+    t_parsed_arguments *parsed_arguments = result_get_value(result);
+    void *array[] = { "b", "a", "c", NULL };
 
-    CU_ASSERT_FALSE(sorter_context_is_access_time_order_active(NULL));
-    for (unsigned int i = 0; i < sizeof(cases) / sizeof(cases[0]); i++)
-    {
-        const char *args[] = { cases[i].option, NULL };
-        t_result *result = parse_arguments(1, args);
-        t_parsed_arguments *parsed_arguments = result_get_value(result);
-        t_sorter_context *context = sorter_context_create(parsed_arguments);
+    sort_pointer_array(parsed_arguments, array, compare_by_ascii);
 
-        CU_ASSERT_TRUE(result_has_succeed(result));
-        CU_ASSERT_EQUAL(sorter_context_is_access_time_order_active(context), cases[i].access_time_order);
-        CU_ASSERT_EQUAL(sorter_context_is_modification_time_order_active(context), cases[i].modification_time_order);
+    CU_ASSERT_TRUE(result_has_succeed(result));
+    CU_ASSERT_STRING_EQUAL(array[0], "b");
+    CU_ASSERT_STRING_EQUAL(array[1], "a");
+    CU_ASSERT_STRING_EQUAL(array[2], "c");
 
-        sorter_context_destroy(&context);
-        parsed_arguments_destroy(&parsed_arguments);
-        result_destroy(&result);
-    }
+    parsed_arguments_destroy(&parsed_arguments);
+    result_destroy(&result);
 }
 
 void register_sorter_suite(void)
 {
-    const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, test_setup, test_teardown);
+    const CU_pSuite suite = CU_add_suite_with_setup_and_teardown(SUITE_NAME, NULL, NULL, NULL, NULL);
 
     if (suite != NULL)
     {
-        CU_add_test(suite, "should_select_access_time_order_for_u_according_to_format_and_t", should_select_access_time_order_for_u_according_to_format_and_t);
-        CU_add_test(suite, "should_create_sorter_context", should_create_sorter_context);
-        CU_add_test(suite, "should_report_modification_time_order_only_when_the_t_option_is_active", should_report_modification_time_order_only_when_the_t_option_is_active);
-        CU_add_test(suite, "should_destroy_sorter_context", should_destroy_sorter_context);
         CU_add_test(suite, "should_not_fail_when_passing_a_NULL_pointer", should_not_fail_when_passing_a_NULL_pointer);
         CU_add_test(suite, "should_not_fail_when_passing_a_NULL_file_entry_array", should_not_fail_when_passing_a_NULL_file_entry_array);
         CU_add_test(suite, "should_not_fail_when_passing_a_NULL_comparator_function", should_not_fail_when_passing_a_NULL_comparator_function);
@@ -203,5 +126,6 @@ void register_sorter_suite(void)
         CU_add_test(suite, "should_do_nothing_when_an_already_sorted_file_entry_array_is_passed", should_do_nothing_when_an_already_sorted_file_entry_array_is_passed);
         CU_add_test(suite, "should_sort_an_unsorted_array", should_sort_an_unsorted_array);
         CU_add_test(suite, "should_sort_an_unsorted_array_in_reverse_order_when_reverse_option_is_active", should_sort_an_unsorted_array_in_reverse_order_when_reverse_option_is_active);
+        CU_add_test(suite, "should_preserve_array_order_when_no_sort_overrides_time_and_reverse_is_requested", should_preserve_array_order_when_no_sort_overrides_time_and_reverse_is_requested);
     }
 }

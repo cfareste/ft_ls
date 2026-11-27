@@ -126,11 +126,6 @@ static void print_colored_text(const char *text, const char *color)
     ft_printf("%s%s%s", color, text, COLOR_RESET);
 }
 
-static int color_is_enabled(const t_parsed_arguments *parsed_arguments)
-{
-    return parsed_arguments_is_option_active(parsed_arguments, OPTIONS_COLOR);
-}
-
 static t_file_stats *get_link_target_stats(const t_file_entry *entry)
 {
     return file_stats_get_following_symlinks(file_entry_get_path(entry));
@@ -154,7 +149,7 @@ void render_colors_print_name(const t_parsed_arguments *parsed_arguments, const 
 {
     if (entry == NULL)
         return;
-    if (!color_is_enabled(parsed_arguments))
+    if (!parsed_arguments_should_color_files(parsed_arguments))
     {
         ft_printf("%s", file_entry_get_name(entry));
         return;
@@ -173,7 +168,7 @@ void render_colors_print_name_with_target(const t_parsed_arguments *parsed_argum
 
     const char *name = file_entry_get_name(entry);
     const char *target = file_entry_get_link_target(entry);
-    if (!color_is_enabled(parsed_arguments))
+    if (!parsed_arguments_should_color_files(parsed_arguments))
     {
         ft_printf("%s", name);
         if (target != NULL)
