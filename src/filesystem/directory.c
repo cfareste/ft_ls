@@ -81,6 +81,24 @@ int directory_is_entry_empty(const t_dir_entry *dir_entry)
     return dir_entry->entry == NULL;
 }
 
+t_file_type directory_get_entry_type(const t_dir_entry *dir_entry)
+{
+    if (directory_is_entry_empty(dir_entry))
+        return FILE_TYPE_UNKNOWN;
+
+    switch (dir_entry->entry->d_type)
+    {
+        case DT_REG: return FILE_TYPE_REGULAR;
+        case DT_DIR: return FILE_TYPE_DIRECTORY;
+        case DT_CHR: return FILE_TYPE_CHARDEVICE;
+        case DT_BLK: return FILE_TYPE_BLOCKDEVICE;
+        case DT_FIFO: return FILE_TYPE_FIFO;
+        case DT_LNK: return FILE_TYPE_SYMLINK;
+        case DT_SOCK: return FILE_TYPE_SOCKET;
+        default: return FILE_TYPE_UNKNOWN;
+    }
+}
+
 int directory_is_entry_hidden_file(const t_dir_entry *dir_entry)
 {
     if (dir_entry == NULL)

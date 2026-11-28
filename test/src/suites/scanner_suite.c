@@ -34,10 +34,9 @@ static void scan_directory(const char *path)
     sut = result_get_value(result);
 }
 
-static void enable_read_all_option(void)
+static void configure_scanner(const char **arguments, const int count)
 {
-    const char *arguments[] = { "-a", NULL };
-    t_result *parsed_arguments_result = parse_arguments(1, arguments);
+    t_result *parsed_arguments_result = parse_arguments(count, arguments);
     t_parsed_arguments *parsed_arguments = result_get_value(parsed_arguments_result);
 
     scanner_context_destroy(&scanner_context);
@@ -45,6 +44,12 @@ static void enable_read_all_option(void)
 
     parsed_arguments_destroy(&parsed_arguments);
     result_destroy(&parsed_arguments_result);
+}
+
+static void enable_read_all_option(void)
+{
+    const char *arguments[] = { "-a", NULL };
+    configure_scanner(arguments, 1);
 }
 
 static void assert_file_entry_array_is_null(void)
@@ -387,6 +392,8 @@ static void should_return_a_valid_array_even_if_it_fails_to_access_an_entry(void
     const char *expected_file_names[] = { "valid", "dir", "nonValid", "entries", NULL };
     const t_file_type expected_file_types[] = { FILE_TYPE_REGULAR, FILE_TYPE_REGULAR, FILE_TYPE_UNKNOWN, FILE_TYPE_REGULAR, FILE_TYPE_NONE };
 
+    const char *arguments[] = { "-t", NULL };
+    configure_scanner(arguments, 1);
     scan_directory("valid_dir");
 
     CU_ASSERT(verify_that_the_error_printed_is(
@@ -398,6 +405,23 @@ static void should_return_a_valid_array_even_if_it_fails_to_access_an_entry(void
     assert_file_entry_array_length_is(4);
     assert_file_entry_array_names_are(expected_file_names);
     assert_file_entry_array_types_are(expected_file_types);
+}
+
+static void should_skip_stats_for_a_plain_listing_with_unknown_entry_type(void)
+{
+    const t_vfs_mock_entry vfs[] = {
+        MOCK_DIR("dir", "unknown"),
+        MOCK_FILE_ACCESS_ERROR(EACCES, "dir/unknown"),
+        MOCK_NULL_TERMINATOR()
+    };
+    vfs_mock_setup(vfs);
+
+    scan_directory("dir");
+
+    CU_ASSERT(verify_that_no_error_was_printed());
+    CU_ASSERT_FALSE(result_has_failed(result));
+    assert_file_entry_array_length_is(1);
+    assert_file_entry_file_type_is(file_entry_array_get_at(sut, 0), FILE_TYPE_UNKNOWN);
 }
 
 static void should_retrieve_advanced_metadata_only_when_long_format_is_active(void)
@@ -545,6 +569,7 @@ void register_scanner_suite(void)
         CU_add_test(suite, "should_return_an_array_with_the_elements_that_didnt_fail_if_fails_to_read_a_middle_entry_of_a_directory", should_return_an_array_with_the_elements_that_didnt_fail_if_fails_to_read_a_middle_entry_of_a_directory);
         CU_add_test(suite, "should_return_a_valid_array_even_if_it_fails_to_close_a_directory", should_return_a_valid_array_even_if_it_fails_to_close_a_directory);
         CU_add_test(suite, "should_return_a_valid_array_even_if_it_fails_to_access_an_entry", should_return_a_valid_array_even_if_it_fails_to_access_an_entry);
+        CU_add_test(suite, "should_skip_stats_for_a_plain_listing_with_unknown_entry_type", should_skip_stats_for_a_plain_listing_with_unknown_entry_type);
         CU_add_test(suite, "should_retrieve_advanced_metadata_only_when_long_format_is_active", should_retrieve_advanced_metadata_only_when_long_format_is_active);
         CU_add_test(suite, "should_not_retrieve_advanced_metadata_without_long_format", should_not_retrieve_advanced_metadata_without_long_format);
         CU_add_test(suite, "should_include_hidden_entries_and_skip_long_metadata_when_columns_override_long_format", should_include_hidden_entries_and_skip_long_metadata_when_columns_override_long_format);

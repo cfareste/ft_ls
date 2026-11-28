@@ -1,5 +1,12 @@
 TODO:
 1. No computar syscalls si no es necesario
+   - syscalls:
+        - opendir / readdir / closedir
+        - readlink
+        - getgrgid / getpwuid
+        - isatty / ioctl
+        - lgetxattr
+        - ctime / time
 2. Caché de getpwuid y getgrgid
 
 

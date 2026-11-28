@@ -8,6 +8,9 @@
 struct s_scanner_context
 {
     int retrieve_long_format_metadata;
+    int sort_by_time;
+    int recurse;
+    int color_files;
     int retrieve_author;
     int filter_hidden_files;
 };
@@ -26,6 +29,9 @@ t_scanner_context *scanner_context_create(const t_parsed_arguments *parsed_argum
     t_scanner_context *context = ft_safe_calloc(1, sizeof(t_scanner_context));
 
     context->retrieve_long_format_metadata = parsed_arguments_get_format(parsed_arguments) == FORMAT_LONG;
+    context->sort_by_time = parsed_arguments_get_sort_type(parsed_arguments) == SORT_TIME;
+    context->recurse = parsed_arguments_should_recurse(parsed_arguments);
+    context->color_files = parsed_arguments_should_color_files(parsed_arguments);
     context->retrieve_author = parsed_arguments_should_print_owner(parsed_arguments);
     context->filter_hidden_files = parsed_arguments_should_filter_hidden_files(parsed_arguments);
 
@@ -62,19 +68,33 @@ static void retrieve_entry_metadata(t_scan_state *state, t_file_entry *entry, t_
         record_failed_entry(state, entry_path);
 }
 
+static int should_retrieve_entry_stats(const t_scanner_context *context, const t_file_type type)
+{
+    return context->retrieve_long_format_metadata || context->sort_by_time
+        || (type == FILE_TYPE_UNKNOWN && (context->recurse || context->color_files))
+        || (context->color_files && (type == FILE_TYPE_REGULAR || type == FILE_TYPE_DIRECTORY));
+}
+
 static void append_entry(t_scan_state *state, const t_dir_entry *directory_entry, t_file_entry_array *entries)
 {
     if (should_skip_entry(state, directory_entry))
         return;
 
     const char *entry_name = directory_get_entry_name(directory_entry);
+    const t_file_type type = directory_get_entry_type(directory_entry);
     char *entry_path = build_path(state->directory_path, entry_name);
-    t_file_stats *stats = file_stats_get_without_following_symlinks(entry_path);
-
-    if (stats == NULL)
-        record_failed_entry(state, entry_path);
+    t_file_stats *stats = NULL;
+    const int retrieve_stats = should_retrieve_entry_stats(state->scanner, type);
+    if (retrieve_stats)
+    {
+        stats = file_stats_get_without_following_symlinks(entry_path);
+        if (stats == NULL)
+            record_failed_entry(state, entry_path);
+    }
 
     t_file_entry *entry = file_entry_create_from_stats(entry_name, stats);
+    if (!retrieve_stats)
+        file_entry_set_file_type(entry, type);
     file_entry_set_path(entry, entry_path);
     retrieve_entry_metadata(state, entry, stats, entry_path);
 

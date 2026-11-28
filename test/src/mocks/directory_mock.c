@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "libft.h"
 #include "mocks.h"
+#include "path_builder.h"
 
 typedef struct s_mock_dir
 {
@@ -11,6 +12,20 @@ typedef struct s_mock_dir
     unsigned int next_index;
     int error_on_close;
 } t_mock_dir;
+
+static unsigned char get_entry_dtype(const char *directory_path, const char *name)
+{
+    if (ft_are_string_equals(name, ".") || ft_are_string_equals(name, ".."))
+        return DT_DIR;
+
+    char *path = build_path(directory_path, name);
+    const t_vfs_mock_entry *entry = find_vfs_entry(path);
+    free(path);
+
+    if (entry == NULL || entry->errors.lstat_errno != 0)
+        return DT_UNKNOWN;
+    return IFTODT(entry->stats.st_mode);
+}
 
 DIR *mock_opendir(const char *path)
 {
@@ -64,6 +79,7 @@ struct dirent *mock_readdir(DIR *dirp)
 
     ft_bzero(&stream->entry, sizeof(struct dirent));
     ft_strlcpy(stream->entry.d_name, next_entry_name, sizeof(stream->entry.d_name));
+    stream->entry.d_type = get_entry_dtype(stream->dir_entry->path, next_entry_name);
     stream->next_index++;
 
     return &stream->entry;
